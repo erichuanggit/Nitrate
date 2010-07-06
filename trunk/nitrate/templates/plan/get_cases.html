@@ -1,0 +1,274 @@
+{% load ifin %}
+<div class="popup" id="id_import_case_zone" {% if xml_form.xml_file.errors %}{% else %}style="display:none;"{% endif %}>
+	<div class="submit-row">
+		<input type="button" value="x" onclick="parentNode.parentNode.hide(); $('import-error').innerHTML='';">
+	</div>
+	<form action="{% url tcms.testplans.views.cases test_plan.plan_id %}" method="POST" enctype="multipart/form-data">
+		<div  class="right-bar" >
+			<label class="errors" id="import-error">{{ xml_form.xml_file.errors }}</label>	
+			{{ xml_form.a }}
+			<label><b>Import XML file:</b></label>
+			{{ xml_form.xml_file }}
+			<input type="submit" value="Import" />
+			<br/>
+			<label class="grey">{{ xml_form.xml_file.help_text }}</label>
+		</div>
+	</form>
+</div>
+<form id="id_form_cases" action="{% url tcms.testcases.views.all %}" method="get">
+	<input id="case_sort_by" type="hidden" name="case_sort_by" value="{{ REQUEST_CONTENTS.case_sort_by }}"/>
+	<div class="tab_navigation">
+		<div class="actions whitelink">
+			{% if perms.testcases.add_testcase %}
+			<label>New Case :</label>
+			<input class="add_new" type="button" value="Write new case" onclick="window.location.href='{% url tcms.testcases.views.new %}?from_plan={{ test_plan.plan_id }}';"/>
+			|
+			<input type="button" class="import" value="Import cases from XML" onclick="$('id_import_case_zone').show();" />
+			|
+			<input type="button" class="search" value="Add cases from other plans" onclick="window.location.href='{% url tcms.testplans.views.cases test_plan.plan_id %}?a=link_cases'" />
+			{% else %}
+			<label>New Case :</label>
+			<input class="add_new" type="button" disabled="true" value="Write new case"/>
+			|
+			<input type="button" class="import"  disabled="true" value="Import cases form XML"  />
+			|
+			<input type="button" class="search"  disabled="true" value="Add cases from other plans"  />
+			{% endif %}
+            <span class="reorder_case">
+                <a id="id_filtercase" class="filtercase" title="Click to show filter options">Show filter options</a>
+				{% if perms.testcases.change_testcase %}
+                <a id="id_sort" class="sortlink" title="Click me,then Drag and drop the rows to adjust the order,and click 'Done Sorting' link to submit your changes">Re-order cases</a>
+				{% endif %}
+			</span>
+		</div>
+	</div>
+	<div class="mixbar">
+		<div class="actions">
+        	| New: 
+            {% if perms.testreviews.add_testreview %}
+			<input type="button"  title="Make new review from selected cases" class="new_review" value="Review" onclick="window.location.href='{% url tcms.testreviews.views.new test_plan.plan_id %}?' + $('id_form_cases').serialize();" />
+			
+			{% else %}
+			<input type="button" disabled="true" title="Make new review form selected cases" class="new_review" value="Review" onclick="window.location.href='{% url tcms.testreviews.views.new test_plan.plan_id %}?' + $('id_form_cases').serialize();" />
+			
+			{% endif %}
+			{% if perms.testruns.add_testrun %}
+			<input type="button" class="new_run"  title="Make new test run form selected cases" value="Run" onclick="window.location.href='{% url tcms.testruns.views.new %}' + '?' + this.up(2).serialize();"/>
+			
+			{% else %}
+			<input type="button" class="new_run"  disabled="true" title="Make new test run form selected cases" value="Run" />
+			
+			{% endif %}
+            
+            
+            |
+			Case(s):
+			<input type="button" class="export" title="Export selected cases into XML file" value="Export" onclick="window.location.href='{% url tcms.testplans.views.export test_plan.plan_id %}?' + $('id_form_cases').serialize();" />
+			<input type="button" class="print_view" value="Print"  title="print view of selected cases" onclick="window.location.href='{% url tcms.testplans.views.printable test_plan.plan_id %}?' + $('id_form_cases').serialize();" />
+			{% if perms.testcases.add_testcase %}
+			
+			<input type="button" class="clone" value="Clone" title="Clone selected cases to another test plan" onclick="window.location.href='{% url tcms.testcases.views.clone %}?' + $('id_form_cases').serialize();" />
+			
+			{% else %}
+			
+			<input type="button" class="clone" value="Clone" title="Clone selected cases to another test plan" disabled="true"/>
+			
+			{% endif %}
+			{% if perms.testcases.delete_testcaseplan %}
+			<input type="button" class="delete" value="Remove" title="Remove selected cases from this plan" onclick="delPlanCase('testcases', '{{ test_plan.plan_id }}');" />
+			
+			{% else %}
+			<input type="button" class="delete" value="Remove" title="Remove selected cases from this plan" disabled="true"/>
+			
+			{% endif %}
+            |
+            
+            Tag:
+            
+            {% if perms.testcases.add_testcasetag %}
+             <input type="button" value="Add" id="id_add_case_tags" class="add" />
+            {% endif %}
+            {% if perms.testcases.delete_testcasetag %}
+            <input type="button" value="Remove" id="id_remove_case_tags" class="delete" /> |
+            {% endif %}
+             
+            <input type="button" value="Automated" title="change automated" class="automated sprites" id="batch_automated" />
+            
+           {% if perms.testcases.change_testcase %}
+            <input type="button" value="Default tester" title="change default tester" class="assignee sprites" onclick="changePlanCaseDefaultTester(this.up(2), this.up(3), {{ test_plan.plan_id }})" />  
+            {% else%}
+            <input type="button" value="Default tester" title="change default tester" class="assigneedisable sprites" onclick="changePlanCaseDefaultTester(this.up(2), this.up(3), {{ test_plan.plan_id }})"  disabled="disabled"/>
+            
+            {% endif %}
+			{% if perms.testcases.change_testcase %}
+            <select name="new_case_status_id" id="new_case_set_status">
+            	<option title="please choose a status" value="">Set status</option>
+                {% for case_stat in case_status %}
+				<option value="{{ case_stat.id }}" title="Set selected test cases {{ case_stat.name }}">{{ case_stat.name }}</option>
+				{% endfor %}
+            </select>
+            <select name="new_priority_id" id="new_case_priority">
+            	<option title="please choose a priority" value="">Set priority</option>
+				{% for priority in priorities %}
+				<option value="{{ priority.id }}">{{ priority.value }}</option>
+				{% endfor %}
+            </select>
+			{% else %}
+			<select name="new_priority_id" id="new_case_priority" disabled="disabled">
+            	<option title="please choose a priority" value="">Set priority</option>
+            </select>
+			{% endif %}
+            
+                     
+		</div>
+        <div class="mixbar_tag">
+            <div class="tagname">Tags:</div>
+            <div id="id_case_own_tags_list" class="taglist">
+                {% for tag in case_own_tags %}
+                <a href="#testcases">{{ tag }}</a>
+                {% empty %}
+                <div class="grey">No tags in cases</div>
+                {% endfor %}
+            </div>
+        </div>
+	</div>
+	<div class="list_filter" id="list_filter_m" {% ifnotequal REQUEST_CONTENTS.a 'search' %} style="display:none;" {% endifnotequal %}>
+		{% include 'case/form/filter.html' %}
+		<div class="submit-row bottom">
+			<input type="submit" value="Filter cases" />
+		</div>
+	</div>
+	<table id="id_table_cases" class="list" cellpadding="1" cellspacing="0" border="0">
+		<thead>
+			<tr>
+				<th class="nosort" align="left" width="18px">
+					<a id="id_blind_all_link" href="javascript:blinddownAllCases()">
+						<img id="id_blind_all_img" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
+					</a>
+				</th>
+				<th class="nosort" align="left" width="20px">
+					<input id="id_check_all_button" type="checkbox" checked  />
+				</th>
+				<th align="left" width="50px">
+					<a title="Sort by case ID" href="#testcases" onclick="sortCase('testcases', '{{ test_plan.plan_id }}', 'case_id')">
+						#
+					</a>
+				</th>
+				
+				<th align="left">
+					<a title="Sort by Summary" href="#testcases" onclick="sortCase('testcases', '{{ test_plan.plan_id }}', 'summary')">
+						Test Case Summary
+					</a>
+				</th>
+                
+				<th align="left" width="90px" id="col_author_head">
+					<a title="Sort by Author" href="#testcases" onclick="sortCase('testcases', '{{ test_plan.plan_id }}', 'author')">
+						Author
+					</a>
+				</th>
+                <th align="left" width="110px" id="col_author_head">
+					<a title="Sort by Default Tester" href="#testcases" onclick="sortCase('testcases', '{{ test_plan.plan_id }}', 'default_tester')">
+						Default Tester
+					</a>
+				</th>
+				<th align="left" width="140px" id="col_author_head">
+					<a title="Sort by automated" href="#testcases" onclick="sortCase('testcases', '{{ test_plan.plan_id }}', 'is_automated')">
+						Automated
+					</a>
+				</th>
+				<th align="left" width="120px">
+					<a title="Sort by status" href="#testcases" onclick="sortCase('testcases', '{{ test_plan.plan_id }}', 'case_status')">
+						Status
+					</a>
+				</th>
+				<th align="left" width="100px">
+					<a title="Sort by categoty" href="#testcases" onclick="sortCase('testcases', '{{ test_plan.plan_id }}', 'category__name')">
+						Category
+					</a>
+				</th>
+				<th align="left" width="60px" id="col_priority_head">
+					<a title="Sort by prority" href="#testcases" onclick="sortCase('testcases', '{{ test_plan.plan_id }}', 'priority')">
+						Priority
+					</a>
+				</th>
+				<th align="left" width="80px" id="col_text_version_head" style="display:none">Text version</th>
+				<th align="left" width="40px" id="col_sortkey_head">
+					<a title="Sort by sortkey" href="#testcases" onclick="sortCase('testcases', '{{ test_plan.plan_id }}', 'sortkey')">
+						Sort
+					</a>
+				</th>
+				<th align="left" width="55px">Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for testcase in test_cases %}
+			<tr id="id_tr_case_{{ forloop.counter }}" class="{% cycle 'odd' 'even' %}" >
+				<td onclick="toggleTestCaseContents('{{ forloop.counter }}')">
+					<img class="up" id="blind_icon_{{ forloop.counter }}" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
+				</td>
+				<td>
+					<input id="id_checkbox_case_{{ forloop.counter }}" type="checkbox" name="case" value="{{ testcase.case_id }}" class="checkbox" {% ifin testcase.case_id selected_case_ids %}checked{% endifin %} />
+				</td>
+				<td>
+					<a href="{% url tcms.testcases.views.get testcase.case_id %}?from_plan={{ test_plan.plan_id }}">{{ testcase.case_id }}</a>
+				</td>
+				
+				<td class="subject" onclick="toggleTestCaseContents('{{ forloop.counter }}')">
+					<a id="link_{{ forloop.counter }}" class="blind_down_link">{{ testcase.summary }}</a>
+				</td>
+				<td class="col_author_content"><a title="Send email to {{ testcase.author.email }}" href="mailto:{{ testcase.author.email }}">{{ testcase.author }}</a></td>
+                <td class="col_author_content"><a title="Send email to {{ testcase.defaulte_tester.email }}" href="mailto:{{ testcase.author.email }}">{{ testcase.default_tester }}</a></td>
+				<td class="col_tester_content">{{ testcase.get_is_automated_status }}</td>
+				<!-- <td >{{ testcase.create_date }}</td>-->
+				<td >
+					{% if perms.testcases.change_testcase %}
+					<a id="case_status_{{ forloop.counter }}" class="show_change_status_link" onclick="javascript:showStatusSelect('{{ forloop.counter }}')" style="display: none;">{{ testcase.case_status }}</a>
+					<select id="case_status_select_{{ forloop.counter }}" class="change_status_selector" onchange="changeTestCaseStatus('{{ forloop.counter }}', '{{ testcase.case_id }}')">
+						{% for case_stat in case_status %}
+						<option {% ifequal case_stat.id testcase.case_status_id %} selected="1" {% endifequal %} value="{{ case_stat.id }}">{{ case_stat.name }}</option>
+						{% endfor %}
+					</select>
+					{% else %}
+					<span id="case_status_{{ forloop.counter }}">
+						{{ testcase.case_status }}
+					</span>
+					{% endif %}
+				</td>
+				<td class="col_priority_category" onclick="toggleTestCaseContents('{{ forloop.counter }}')">{{ testcase.category }}</td>
+				<td class="col_priority_content" onclick="toggleTestCaseContents('{{ forloop.counter }}')" align="center">{{ testcase.priority }}</td>
+				<td valign="top" width="8%" class="col_category_content" style="display:none">{{ testcase.category }}</td>
+				{% comment %}
+				<td valign="top" class="col_component_content">
+					{% for component in testcase.component.all %}
+					{{ component }}
+					{% endfor %}
+				</td>
+				{% endcomment %}
+				<td class="col_sortkey_content" onclick="toggleTestCaseContents('{{ forloop.counter }}')" align="center">
+					<div class="mark">
+						<a href="#" onclick="changeCaseOrder('{{ testcase.pk }}', '{{ testcase.sortkey }}', '{{ test_plan.pk }}')">{{ testcase.sortkey }}</a>
+					</div>
+				</td>
+				<td align="center" >
+					{% if perms.testcases.change_testcase %}
+					<a class="editlink" href="{% url tcms.testcases.views.edit testcase.case_id %}?from_plan={{ test_plan.plan_id }}">Edit</a>
+					{% else %}
+					<span class="editlink grey">Edit</span>
+					{% endif %}
+				</td>
+			</tr>
+			<tr class="hide" id="hidenRow_{{ forloop.counter }}" style="display: none;">
+				<td id="id_case_text_{{ forloop.counter }}" colspan="12">
+					<div class="ajax_loading"></div>
+				</td>
+			</tr>
+			{% empty %}
+			<tr>
+				<td colspan="12">
+					<center class="prompt-message prompt">No test case was found in this plan.</center></span>
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</form>

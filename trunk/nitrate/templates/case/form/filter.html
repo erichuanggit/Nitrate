@@ -1,0 +1,48 @@
+<input type="hidden" name="a" value="search" />
+<input type="hidden" name="from_plan" value="{{ test_plan.pk }}" />
+
+<div class="leftlistinfo">
+	<div class="listinfo">
+		<span class="title">Case</span>
+	 	{{ search_form.summary }}
+	</div>
+	<div class="listinfo">
+		<span class="title">Author</span>
+	 	{{ search_form.author }}
+	</div>
+	<div class="listinfo">
+		<span class="title">Tester</span>
+	 	{{ search_form.default_tester }}
+	</div>
+	<div class="listinfo_liinline">
+		<span class="title">Priority</span>
+		{{ search_form.priority }}
+	</div>
+    <div class="listinfo_liinline">
+		<span class="title">Automated</span>
+		{{ search_form.is_automated }}
+        <div class="automatedlist">
+		{{ search_form.is_automated_proposed }}
+		<label>{{ search_form.is_automated_proposed.label }}</label>
+        </div>
+	</div>
+</div>
+<div class="rightlistinfo">
+	<div class="listinfo">
+		<span class="title">Category</span>
+		 {{ search_form.category }}
+	</div>
+	<div class="listinfo_liinline">
+		<span class="title">Status</span>
+	 {{ search_form.case_status }}
+	</div>
+	<div class="listinfo">
+		<span class="title">Component</span>
+		{{ search_form.component }}
+	</div>
+	<div class="listinfo">
+		<span class="title">Tag</span>
+		{{ search_form.tag__name__in }}
+	</div>
+</div>
+<div class="setinput">{{ search_form.errors }}</div>

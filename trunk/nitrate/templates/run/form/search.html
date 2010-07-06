@@ -1,0 +1,63 @@
+<div class="leftlistinfo">
+	<div class="listinfo">
+        <span class="title"><label for="id_summary">Run Summary</label></span>
+        <span class="listinfo_input">{{ search_form.summary }}</span>
+	</div>
+	<div class="listinfo">
+		<span class="title"><label for="id_product_id">Product</label></span> 
+		<span class="listinfo_input">{{ search_form.product }}</span>
+	</div>
+	<div class="listinfo">
+		<span class="title"><label for="id_env_group_id">Environment Group</label></span>
+		<span class="listinfo_input">{{ search_form.env_group }}</span>
+	</div>
+	<div class="listinfo">
+		<span class="title"><label for="id_people_type">Owner</label></span>
+		<span style="float:left;">{{ search_form.people_type }}</span>
+		{% if REQUEST_CONTENTS.people %}
+		<div class="name_short"><input id="id_search_people" type="text" name="people" value="{{ REQUEST_CONTENTS.people }}" /></div>
+		{% else %}
+		{% if REQUEST_CONTENTS.manager %}
+		<div class="name_short"><input id="id_search_people" type="text" name="people" value="{{ REQUEST_CONTENTS.manager }}" /></div>
+		{% else %}
+		<div class="name_short"><input id="id_search_people" type="text" name="people" value="{{ REQUEST_CONTENTS.default_tester }}" /></div>
+		{% endif %}
+		{% endif %}
+	</div>
+	<div class="listinfo">
+		<span class="title"><label for="id_caserun_assignee">Case Run Assignee</label></span>
+		<span class="listinfo_input">{{ search_form.case_run__assignee__email__startswith }}</span>
+	</div>
+</div>
+
+<div class="rightlistinfo">
+	<div class="listinfo">
+		<span class="title"><label for="id_plan">Plan</label></span>
+		<span class="listinfo_input">{{ search_form.plan }}</span>
+	</div>
+	<div class="listinfo">
+		<span class="title"><label for="id_version_id">Product Version</label></span>
+		<span class="listinfo_input">{{ search_form.product_version }}</span>
+	</div>
+	<div class="listinfo">
+		<span class="title"><label for="id_build_id">Build</label></span>
+		<span class="listinfo_input">{{ search_form.build }}</span>
+	</div>
+	<div class="listinfo">
+		<span class="title"><label for="id_status">Status</label></span>
+		<span class="listinfo_input">{{ search_form.status }}</span>
+	</div>
+	<div class="listinfo">
+		<span class="title"><label for="id_tag">Tag</label></span>
+		<span class="listinfo_input">{{ search_form.tag__name__in }}</span>
+	</div>
+</div>
+
+
+
+
+
+
+
+
+

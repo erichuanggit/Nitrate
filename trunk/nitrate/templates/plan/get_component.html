@@ -1,0 +1,15 @@
+<ul>
+	{% for component in test_plan.component.all %}
+	<li>{{ component }}</li>
+	{% endfor %}
+</ul>
+<div>
+	<form action="{% url tcms.testplans.views.component %}">
+		<input type="hidden" name="plan" value="{{ test_plan.pk }}">
+		<label>Component ID:</label>
+		<input type="text" name="component" />
+		<input type="submit" name="a" value="add" />
+		<input type="submit" name="a" value="remove" />
+		<input type="submit" name="a" value="update" />
+	</form>
+</div>

@@ -1,0 +1,113 @@
+{% extends "tcms_base.html" %}
+
+{% block subtitle %}{{ test_review.summary }}{% endblock %}
+
+{% block custom_stylesheet %}
+{% endblock %}
+{% block custom_javascript %}
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/progressbar/progressbar.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/fastinit.js"></script>
+<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/tablednd.js'></script>
+<script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
+<script type="text/javascript" src='{{ MEDIA_URL }}/js/testreview_actions.js'></script>
+<script type="text/javascript">
+Nitrate.Utils.after_page_load(Nitrate.TestReviews.Details.on_load);
+</script>
+{% endblock %}
+
+{% block contents %}
+{% load comments %}
+<div id="content">
+	<!-- Store some values for easier javascript acccess -->
+	<div class="crumble">
+		<a href="{% url tcms.core.views.index %}">Home</a>
+		>> <a href="{% url tcms.testplans.views.all %}">Plans</a>
+		>> <a href="{% url tcms.testplans.views.get test_review.plan.plan_id %}#testreviews">{{ test_review.plan.plan_id }}:{{ test_review.plan }}</a>
+		>> Test review :{{ test_review.summary }}
+	</div>
+	<div class="control">
+	</div>
+
+	<h2 id="display_title">{{ test_review.summary }}</h2>
+	<div class="Detailform">
+		<div class="">
+			<div class="cell">
+				<div class="sd">Test Plan</div>
+				<div><a href="{% url tcms.testplans.views.get test_review.plan_id %}">{{ test_review.plan.name }}</a></div>
+			</div>
+			<div class="cell">
+				<div class="sd">Product</div>
+				<div id="display_product">{{ test_review.plan.product }}</div>
+			</div>
+			<div class="cell">
+				<div class="sd">Product Version</div>
+				<div class="name">{{ test_review.plan.default_product_version }}</div>
+			</div>
+			<div class="cell">
+				<div class="sd">Author</div>
+				<div class="name"><a href="mailto:{{ test_review.author.email }}">{{ test_review.author.email }}</a></div>
+			</div>
+			<div class="cell">
+				<div class="sd">Default Reviewer</div>
+				{% for default_reviewer in test_review.default_reviewer.all %}
+				<div class="name"><a href="mailto:{{ default_reviewer.email }}">{{ default_reviewer.email }}</a></div>
+				{% endfor %}
+			</div>
+			<div class="cell">
+				<div class="sd">Started at</div>
+				<div class="name">{{ test_review.start_date }}</div>
+			</div>
+			<div class="cell">
+				<div class="sd">Stoped at</div>
+				<div class="name">{{ test_review.stop_date }}</div>
+			</div>
+			<div class="cell">
+				<div class="sd">Environment</div>
+				<div id="display_env" >
+					<dl class="ul-no-format">
+						{% for value in test_review.env_value.all %}
+						<dd>
+							<span class="sd" >{{ value.value.property }}: </span>{{ value.value }}test
+						</dd>
+						{% endfor %}
+						<dd>Not set environment for this review</dd>
+					</dl>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% if test_review_cases %}
+	<div class="Detailform">
+		<div class="mixbar border-1"> 
+			<span class="tit">Cases: {{ test_review_cases|length }}</span>
+		</div>
+		<div class="list case_review listheader" id="id_table_cases" cellspacing="0" cellspan="0">
+			<span class="lab-20">#</span>
+			<span class="lab-80">
+				<a id="id_blind_all_link" href="javascript:blinddownAllCases()">
+					<img id="id_blind_all_img" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
+				</a>
+			</span>
+			<span class="lab-80">ID</span>
+			<span class="lab-300">Summary</span>
+			<span class="lab-100">Priority</span>
+			<span class="lab-150">Status</span>
+            <span class="lab-150">Last Modify</span>
+            <span class="lab-150">Reviewer</span>
+            <span class="lab-100_right">Action</span>
+			{% comment %}
+			<span width="4%">Sort</span>
+			{% endcomment %}
+		</div>	
+		{% for test_review_case in test_review_cases %}
+		<div id="id_review_case_container_{{ forloop.counter }}" class="case_review {% cycle 'odd' 'even' %}">
+			{% include "review/get_case.html" %}
+		</div>
+		{% endfor %}
+	</div>
+	{% else %}
+	<div class="list">
+		<span class="prompt-message"><center>No test cases </center></span>
+	</div>
+	{% endif %}		
+{% endblock %}

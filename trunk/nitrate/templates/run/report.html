@@ -1,0 +1,167 @@
+{% load comments %}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>{{ testrun.summary }}</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta http-equiv="Content-Language" content="utf-8" />
+	<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/print.css" media="all" />
+    
+    <style>
+    body{background:#235D9F; height:100%}
+    </style>
+</head>
+<body>
+	<div class="report_title">Test Log Report</div>
+	<div class="report_content">
+	<div id="content">
+        <div class="listcontent">
+        	<div class="leftlistinfo">
+            	<div class="listinfo">
+                	<span class="title">Test Plan:</span>{{ test_run.plan.plan_id }}:{{ test_run.plan.name }}
+                </div>
+                <div class="listinfo">
+                	<span class="title">Product Version:</span>{{ test_run.product_version }}
+                </div>
+                <div class="listinfo">
+                	<span class="title">Manager:</span>{{ test_run.manager.email }}
+                </div>
+                <div class="listinfo">
+                	<span class="title">Estimated Time:</span>{{ test_run.estimated_time }}
+                </div>
+                
+                <div class="listinfo">
+                	<span class="title">Environment:</span>
+                    <div class="linotype">
+                    		<ul>
+							{% for run_env_value in test_run.env_value.select_related.all %}
+							<li>
+								<span class="lab" >{{ run_env_value.property }}: </span>{{ run_env_value.value }}
+							</li>
+							{% endfor %}
+						</ul>
+                    </div>
+                </div>
+                <div class="listinfo">
+                	<span class="title">Note:</span>{{ test_run.notes|linebreaksbr }}
+                </div>
+            
+            </div>
+            <div class="rightlistinfo">
+            	<div class="listinfo">
+                	<span class="title">Product:</span>{{ test_run.build.product }}
+                </div>
+                <div class="listinfo">
+                	<span class="title">Build:</span>{{ test_run.build }}
+                </div>
+                <div class="listinfo">
+                	<span class="title">Default Tester:</span>
+                    {% if test_run.default_tester %}
+				{{ test_run.default_tester.email }}
+				{% else %}
+				{{ test_run.default_tester }}
+				{% endif %}
+                </div>
+                <div class="listinfo">
+                	<span class="title">Started at:</span>{{ test_run.start_date }}
+                </div>
+                <div class="listinfo">
+                	<span class="title">Finished at:</span>{{ test_run.notes|safe }}
+                </div>
+            </div>
+            <div class="clear"></div>
+        </div>
+		{% if test_case_runs.count %}
+        
+		<h2>Run test cases:</h2>
+		<table  class="list border-1" cellpadding="0" cellspacing="0">
+			<tr>
+				<th height="25px">Closed at</th>
+				<th>ID</th>
+				<th>Summary</th>
+				<th>Case ID</th>
+				<th>Tested by</th>
+				<th>Category</th>
+				<th>Status</th>
+			</tr>
+			{% for test_case_run in test_case_runs %}
+			<tr>
+				<td>{{ test_case_run.close_date }}</td>
+				<td>{{ test_case_run.case_run_id }}</td>
+				<td>{{ test_case_run.case.summary }}</td>
+				<td>{{ test_case_run.case_id }}</td>
+				<td>{{ test_case_run.tested_by.email }}</td>
+				<td>{{ test_case_run.case.category }}</td>
+				<td><span class="highlight">{{ test_case_run.case_run_status.name|upper }}</span></td>
+			</tr>
+            {% comment %}
+			<!--{% if test_case_run.log %}
+			<tr>
+				<td class="sep" align="right" valign="top"><span class="notes">Logs:</span></td>
+				<td class="sep" align="left" valign="top" colspan="7">
+					<span class="notes">
+						{% for log in test_case_run.log %}
+						<li>[{{ log.date }}] - [{{ log.who }}] - {{ log.action }}
+						{% endfor %}
+						 
+				</span></td>
+			</tr>
+			{% endif %}-->
+            {% endcomment %}
+		
+			{% get_comment_list for test_case_run as comments %}
+			{% if comments %}
+			<tr>
+				<td class="sep" align="right" valign="top"><span class="notes">Comments:</span></td>
+				<td class="sep" align="left" valign="top" colspan="6">
+					<span class="notes" >
+						<ul style="margin-left:10px;">
+							{% for comment in comments %}
+							<li>[{{ comment.submit_date }}] - [{{ comment.user }}] <br />{{ comment.comment|linebreaksbr }}</li>
+							{% endfor %}
+						</ul>
+					</span> 
+				</td>
+			</tr>
+			{% endif %}
+			{% endfor %}
+		</table>
+		{% endif %}
+		<h3>Total: {{ test_case_runs.count_by_status.total }}</h3>
+		<h2>Pending test cases: {{ test_case_runs.count_by_status.IDLE }}</h2>
+		<h3>Test run completed: {{ test_case_runs.count_by_status.complete_percent|floatformat:2 }} %</h3>
+        
+       
+        {% if test_case_run_bugs %}
+        <hr style="margin:40px auto 20px;"/>
+        <h2><a name="buglist" style="cursor:default; text-decoration:none">Bug List:</a></h2>
+        
+        <table  class="list border-1" cellpadding="0" cellspacing="0">
+			<tr>
+				<th height="25px" width="190">Bug Tracker</th>
+				<th>Bug Url</th>
+			</tr>
+            {% for bug in test_case_run_bugs %}
+			<tr>
+            	<td>{{ bug.bug_system.name }}</td>
+            	<td><a href="{{ bug.get_absolute_url }}" >{{ bug.get_absolute_url }}</a></td>
+            </tr>
+            {% endfor %}
+            <tr>
+            	<td>View all bugs</td>
+            	<td><a href="{{ SETTINGS.BUGZILLA_URL }}buglist.cgi?bugidtype=include&bug_id={% for bug in test_case_run_bugs %}{{ bug.bug_id }}{% if not forloop.last %},{% endif %}{% endfor %}">
+            	             {{ SETTINGS.BUGZILLA_URL }}buglist.cgi?bugidtype=include&bug_id={% for bug in test_case_run_bugs %}{{ bug.bug_id }}{% if not forloop.last %},{% endif %}{% endfor %}</a></td>
+            </tr>
+		</table>
+        
+        {% endif %}
+        
+        
+		
+
+	</div>
+</body>
+</html>

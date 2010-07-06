@@ -1,0 +1,98 @@
+{% load comments %}
+
+<td id="id_case_text_{{ forloop.counter }}" colspan="12">
+	<table class="case_detail">
+		<tr>
+			<td valign="top">
+				<h4>Setup:</h4>
+				<div class="content">{{ case_text.setup|safe }}</div>
+			</td>
+			<td class="" valign="top">
+				<h4>Breakdown:</h4>
+				<div class="content">{{ case_text.breakdown|safe }}</div>
+			</td>
+			<td valign="top" rowspan="2" width="200">
+				<h4><span class="title strong">Attachment:</span></h4>
+				<ul class="ul-no-format">
+					{% for attachment_file in test_case.attachment.all %}
+					<li>
+						<a href="{% url tcms.core.files.check_file attachment_file.attachment_id %}">
+							{{ attachment_file.file_name }}
+						</a>
+					</li>
+					{% empty %}
+					<li class="grey">No attachment found</li>
+					{% endfor %}
+				</ul>
+				<h4><span class="title strong">Component:</span></h4>
+				<ul class="ul-no-format">
+					{% for component in test_case.component.all %}
+					<li id="display_component" >{{ component.name }}</li>
+					{% empty %}
+					<li class="grey">No component found</li>
+					{% endfor %}
+				</ul>
+				<h4><span class="title strong">Tag:</span></h4>
+				<ul class="ul-no-format">
+					{% for tag in test_case.tag.all %}
+					<li>{{ tag }}</li>
+					{% empty %}
+					<li class="grey">No tag found</li>
+					{% endfor %}
+				</ul>
+				<h4><span class="title strong">bug:</span></h4>
+				<ul class="ul-no-format">
+					{% for bug in bugs %}
+					<li>
+						<a href="{{ bug.get_absolute_url }}">{{ bug }}</a>
+						{% if bug.case_run_id %}
+						<span class="grey"> - From Run</span>
+						<a href="{% url tcms.testruns.views.get bug.case_run.run_id %}">{{ bug.case_run.run_id }}</a>
+						{% endif %}
+					</li>
+					{% empty %}
+					<li class="grey">No bug found</li>
+					{% endfor %}
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td class="" valign="top">
+				<h4>Actions:</h4>
+				<div class="content">{{ case_text.action|safe }}</div>
+			</td>
+			<td class="" valign="top">
+				<h4>Expected Results:</h4>
+				<div class="content">{{ case_text.effect|safe }}</div>
+			</td>
+		</tr>
+		{% if test_case_run %}
+        <tr>
+        <td colspan="3" style="border:none; background:none">
+        	<h4>Test Case Run Detail Information:</h4>
+            <div><span class="detail_title">Running Date:</span>{{ test_case_run.running_date }}</div>
+            <div><span class="detail_title">Close Date:</span>{{ test_case_run.close_date }}</div>
+			<div><span class="detail_title">Build:</span>{{ test_case_run.build }}</div>
+            <div><span class="detail_title">Text Version:</span>{{ test_case_run.case_text_version }}</div>
+            <div><span class="detail_title">Notes:</span>{{ test_case_run.notes }}</div>
+        </td>
+        </tr>
+		<tr>
+			<td colspan="3" style="border:none; background:none">
+				{% get_comment_list for test_case_run as case_run_comments %}
+				<h4> Comments:</h4>
+				<ul class="comment ul-no-format">
+					{% for comment in case_run_comments %}
+					<li>
+						<span class="strong">{{ comment.user.email }}</span>
+						<span class="grey">{{ comment.submit_date }}</span><br/>
+					{{ comment.comment|linebreaksbr }} 
+					</li>
+					{% endfor %}
+				</ul>
+                
+			</td>
+		</tr>
+		{% endif %}
+	</table>
+</td>

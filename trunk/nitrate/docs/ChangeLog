@@ -1,0 +1,232 @@
+[200-03-04: REVISION 1426]
+[CHANGED] Cut 35 strings in build and environments when update product
+[CHANGED] Product versions are all dropdown box now
+[NEW] Send a mail to default tester when new run created, add a new function called mailto, with mail template support.
+[CHANGED] Fixed create new plan and new run problem after modify to relationshiop db.
+[NEW] Add a core/debug.py for Debug output code finished
+[CHANGED] Move render from utils to skins py file.
+[CHANGED] Fill some template with ACL code
+[CHANGED] Fixed report bug of test run, and create case in run
+[NEW] add prompt when create new run
+[CHANGED] Fixed status of case in plan details page and some ACL problem
+[NEW] Blind down all case in run now works
+
+[2009-03-03: REVISION 1414]
+[NEW] Search case when assign case to plan now works
+[NEW] Brand new front page. But still something unknown how to implement it.
+[CHANGED] Limit 15 items in front page
+
+
+[2009-03-02: REVISION 1396]
+
+[NEW] Integrate pylint test framework
+
+
+[2009-02-25: REVISION 1367]
+
+[NEW] Show complete environments of a product. Hope the designer can redesign the interface as a tree. 
+
+[2009-02-24: REVISION 1366]
+
+[CHANGED] Rewrite template for url tag for url resolve.
+[NEW] Management interface
+[NEW] Test Runs can be sort now.
+[CHANGED] Workaround was to add this to settings.py: […] to use a tmp-file …
+[CHANGED] use QuerySet?.extra to optimize /plans. It now uses only one SQL query
+[CHANGED] Fixed a lot of db bug by David Malcolm.
+
+[2009-02-20: REVISION 1334]
+
+[CHANGED] Remove recent focus link
+[CHANGED] Improve create new plan page
+[NEW] Return to the top of page when close plan details now works.
+[CHANGED] Changed from Goto function to search with summary or ID now works
+[CHANGED] Test Runs's report with status of test case now works
+
+
+[2009-02-19: REVISION 1325]
+
+[CHANGED] Changed the search from post method from POST to GET for get the search result in URL.
+[CHANGED] Remove foot-at-the-end js when creating new test plan
+[CHANGED] Clean up the default skins files.
+[CHANGED] Remove create new run button from test run list page.
+
+
+[2009-02-18: REVISION 1314]
+
+[NEW] Report for test run now works
+[CHANGED] Update Makefile
+[CHANGED] Update product version relate with product
+[CHANGED] Enlarge the fonts of the interface
+
+
+[2009-02-16: REVISION 1302]
+
+[NEW] Check cookie for browser now works
+[NEW] Fully remove new features function
+[CHANGED] Reformat CHANGELOG file.
+[CHANGED] Fixed firebug dependence bug when upload a plan document.
+
+
+[2009-02-11: REVISION 1288]
+
+[NEW] Restore the upload plan document function
+[CHANGED] Change case status(CONFIRMED/PROPOSED) appearance
+[NEW] Expand plan document in plan details page
+[NEW] In Test Plan, select all and expand all case function now works
+[NEW] Edit test case link in plan now works
+[NEW] Add comment during execute run now works
+[NEW] Upload plan document when create new run now works but only support plan text and HTML, will support ODT in next version
+
+
+[2009-01-21: REVISION 1272]
+
+[NEW] Create run with cases now works
+[NEW] Test Plan report made is works
+[NEW] Test Plan port to fully ORM code
+[NEW] Attachment in test plan is works now
+[NEW] Sort column in test plan now works
+
+
+[2009-01-16: REVISION 1249]
+
+[CHANGED] All of Ajax code now are all support unicode string
+[CHANGED] Built-in Django-TinyMCE code for drop the dependence
+[CHANGED] Make TinyMCE text editor display better
+[CHANGED] Complete prompts when there is no test case or run in test plan details
+
+
+[2009-01-15: REVISION 1247]
+
+[CHANGED] Modify Changelog js code from Builder to Element to support comment line breaking
+[CHANGED] Modify Changelog js code for support Chinese
+[CHANGED] Removed SQLAlchemy code from TCMS
+
+
+[2009-01-14: REVISION 1240]
+
+[CHANGED] Modify estimated time to 3 columns select box
+[NEW] Edit test case now full works
+[CHANGED] Fixed test plan and other single quotes conversation problem
+[NEW] Link all of people to his/her email.
+
+
+[2009-01-13: REVISION 1230]
+
+[NEW] Estimated time of create test case now works
+[NEW] Change test case status now works
+[CHANGED] Modify js architecture to add a global tcms_actions.js file
+[CHANGED] Correct test case in run display and fixed display product in test run details
+[NEW] Test run in test plan now can be displayed
+[CHANGED] Fixed execute test run display problem
+[NEW] Complete navigate bar
+
+
+[2009-01-9: VERSION 0.10 Development]
+
+[CHANGED] Rewrite the controller with UserList for listing test plan, case and run
+[NEW] Add ajax style login
+[NEW] Estimated time now works
+[CHANGED] Combine all of test case effects in to one js
+[NEW] Change test case status now works
+
+
+[2009-01-7: VERSION 0.9]
+
+[CHANGED] Fixed go to function problem
+[NEW] Create new test run now works
+
+
+[2009-01-5: VERSION 0.9 Developemnt]
+
+[NEW] Search function now works
+[NEW] Test cases is sort by sortkey field now(with UserList class)
+[NEW] Test cases is sort by case_id field in test plan
+
+
+[2008-12-31: VERSION 0.8]
+
+[CHANGED] A lot of changes for Launch and Learn
+
+
+[2008-12-30: VERSION 0.8 Development]
+
+[NEW] Shortable list of test cases initial complete.
+
+
+[2008-12-29: VERSION 0.8 Development]
+
+[CHANGED] Clean up javascript codes and fixed a lot of bugs with relationship database modeling
+
+
+[2008-12-25: VERSION 0.8 Development]
+
+[CHANGED] Clean up the html code
+[NEW] Add navigator in test plan relative
+[NEW] Move the db codes to relationship with ForeignKey, faster performance ;-)
+
+
+[2008-12-24: VERSION 0.7 Development]
+
+[NEW] Add create test case function and assign to new plan.
+[CHANGED] Improve create test plan interface and function
+[NEW] Add TinyMCE as default rich text editor.
+[CHANGED] Huge interface changes.
+
+
+[2008-12-16: VERSION 0.6 Development]
+
+[NEW] Add 500 and 404 error page(404 write by dli and 500 write by me)
+[CHANGED] improve UI by dli
+
+
+[2008-12-10: VERSION 0.5]
+
+[NEW] Add execute testcase preview interface by dli
+
+
+[2008-12-9: VERSION 0.5 Development]
+
+[NEW] Add execute test case function to TCMS
+
+
+[2008-12-8: VERSION 0.5 Development]
+
+[NEW] Add cache system into TCMS
+[NEW] Add RAW SQL syntax by lizhang for performance
+
+
+[2008-12-5: VERSION 0.5 Development]
+
+[CHANGED] Resolve the profiles table conflict problem with lizhang's help
+[NEW] Add ssl to the site
+
+
+[2008-12-3: VERSION 0.4]
+
+[NEW] rewrite the database abstract layer for mapper multiple table query results into dictionary data structure
+
+
+[2008-11-28: VERSION 0.4 Development]
+
+[NEW] finish research the mapper multiple table query result into dictionary data structure
+[NEW] finish test plan fully display as real in database
+
+
+[2008-11-26: VERSION 0.3]
+
+[NEW] finish Queary test case and test runs from database
+
+
+[2008-11-23: VERSION 0.3 Development]
+
+[CHANGED] Improve session in the global web site
+[NEW] Rewrite new features with ajax style
+
+
+[2008-11-20: VERSION 0.3 Development]
+
+[NEW] Add session code for TCMS
+[NEW] Add session support for changelog
+[NEW] Add login requirement for create new test plan
+[CHANGED] Modify plan details, change the textarea to span, to show the test plan details.

@@ -1,0 +1,46 @@
+{% if response %}
+<div id="response">{{ response }}</div>
+{% endif %}
+
+<table class="list" cellpadding="0" cellspacing="0" width="100%">
+	<tr>
+		<th width="12%">Case Run ID</th>
+		<th>Run ID</th>
+		<th>Bug URL</th>
+        <th>Action</th>
+       
+	</tr>
+	{% for bug in test_case.get_bugs %}
+	<tr class="{% cycle 'even' 'odd' %}">
+		<td>{{ bug.case_run_id }}</td>
+		<td>{% if bug.case_run_id %}<a href="{% url tcms.testruns.views.get bug.case_run.run_id %}">{{ bug.case_run.run_id }}</a>{% else %}None{% endif %}</td>
+		<td><a href="{{ bug.get_absolute_url }}">{{ bug.get_absolute_url }}</a></td>
+        <td><a class="remove" onclick="removeCaseBug('{{ bug.id }}')">Remove</a></td>
+        
+	</tr>
+	{% empty %}
+	<tr>
+		<td colspan="4" align="center" class="grey">No bug related to this case.</td>
+	</tr>
+	{% endfor %}
+	{% if perms.testcases.add_testcasebug %}
+	<tr>
+		<td colspan="4" style="padding:0;">
+			<form id="id_case_bug_form" action="{% url tcms.testcases.views.bug test_case.case_id %}" method="get">
+				<div class="addtag">
+					<span class="tit">Add Bug</span>
+					<input type="hidden" name="handle" value="add" />
+					<input type="hidden" name="case" value="{{ test_case.case_id }}" />
+					<input type="hidden" name="case_run" value="" />
+					<input type="hidden" name="bug_system" value="1" />
+					<input type="text" size="20" name="bug_id" />
+					<a href="#bug" class="addlink" onclick="addCaseBug(this.up(1))">Add</a>
+				</div>
+			</form>
+		</td>
+	</tr>
+	{% endif %}
+</table>
+{% if message %}
+	<div id="message" class="hidden">{{ message }}</div>
+{% endif %}

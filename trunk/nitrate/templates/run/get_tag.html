@@ -1,0 +1,10 @@
+{% for tag in object.tag.all %}
+<span>
+	{{ tag }}
+	{% if perms.testruns.delete_testruntag %}
+	<a href="javascript:void(0)" onclick="removeRuntag('id_tag_container', '{{ object.run_id }}', '{{ tag }}')"><img src="{{ MEDIA_URL }}/images/icon_cross.png" width="12" height="12" title="remove this tag" /></a>
+	{% endif %}
+</span>
+{% empty %}
+<span class="grey">No tag.</span>
+{% endfor %}

@@ -1,0 +1,119 @@
+{% extends "tcms_base.html" %}
+
+{% load extra_filters %}
+
+{% block subtitle %}Test cases{% endblock %}
+
+{% block custom_stylesheet %}
+{% endblock %}
+{% block custom_javascript %}
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/fastinit.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/tablesort.js"></script>
+<script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
+<script type="text/javascript">
+Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
+</script>
+{% endblock %}
+{% block contents %}
+<div id="content">
+	<div class="crumble">
+		<a href="{% url tcms.core.views.index %}">Home</a> >>
+		{% if query_result %}
+		<a href="{% url tcms.testcases.views.all %}">Search Cases</a> >> Search result
+		{% else %}
+		Search Cases
+		{% endif %}
+	</div>
+	<form action="{% url tcms.testcases.views.all %}" method="get">
+		<input type="hidden" name="a" value="search" />
+		<div id="itemSearch" class="itemSearch">
+			<h2>Search Case</h2>
+			{% include "case/form/search.html" %}
+			
+			<div class="bottom" >
+				<input type="submit" size="7" value="Search" name="" title="Search test case" />
+				<input type="reset" size="7" value="Reset" name="" title="Reset the search keyword" />
+			</div>
+		</div>
+	</form>
+	<!--case list-->
+	{% if test_cases %}
+    <form id="cases_form" action="{% url tcms.testcases.views.clone %}" method="post">
+    <div id="contentTab" class="mixbar">
+		<span class="tit">{{ test_cases|length }} Cases</span>
+        {% if perms.testcases.add_testcase %}
+		<span><input type="submit" value="Clone" title="clone selected test plans" /></span> 
+		{% endif %}
+	</div>
+	<table class="list border-bottom" id="testcases_table" cellpadding="0" cellspacing="0" border="0">
+		<thead>
+			<tr>
+            	<th width="20" class="nosort" ><input type="checkbox" id="id_check_all_cases" onclick="taggleAllCasesCheckbox('testcases_table');" title="Select all/Select none"></th>
+				<th align="left" width="50" class="sortcol sortdesc">ID</th>
+				<th align="left" class="sortcol">Summary</th>
+				<th align="left" width="100" class="sortcol">Author</th>
+				{% comment %}
+				<th align="left" width="130" class="sortcol">Default Tester</th>
+				{% endcomment %}
+				<th align="left" width="120" class="sortcol">Category</th>
+				<th align="left" width="60" class="sortcol">Priority</th>
+				<th align="left" width="90" class="sortcol">Status</th>
+				<th align="left" width="140" class="sortcol">Created</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for test_case in test_cases %}
+			<tr class="{% cycle 'odd' 'even' %}">
+                <td valign="top"><input type="checkbox" name="case" value="{{ test_case.case_id }}" title="Select/Unselect"></td>
+				{% comment %}
+				<td>
+					<a id="blind_link_{{ forloop.counter }}" href="javascript:toggleTestCaseContents('{{ forloop.counter }}')">
+						<img id="blind_icon_{{ forloop.counter }}" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
+					</a>
+				</td>
+				{% endcomment %}
+				<td valign="top"><a href="{% url tcms.testcases.views.get test_case.case_id %}">{{ test_case.case_id }}</a></td>
+				<td valign="top" class="subject"><a id="link_{{ test_case.case_id }}" href="{% url tcms.testcases.views.get test_case.case_id %}">{{ test_case.summary }}</a></td>
+				{% comment %}
+				<td valign="top" ><a id="link_{{ test_case.case_id }}" href="javascript:toggleTestCaseContents('{{ test_case.case_id }}')">{{ test_case.summary }}</a></td>
+				{% endcomment %}
+				<td valign="top" ><a href="mailto:{{ test_case.author.email }}">{{ test_case.author }}</a></td>
+				{% comment %}
+				<td valign="top" ><a href="mailto:{{ test_case.default_tester.email }}">{{ test_case.default_tester.email }}</a></td>
+				{% endcomment %}
+				<td valign="top" >{{ test_case.category }}</td>
+				<td valign="top" align="center" >{{ test_case.priority }}</td>
+				<td valign="top" >{{ test_case.case_status }}</td>
+				<td valign="top" >{{ test_case.create_date }}</td>
+			</tr>
+			{% comment %}
+			<tr>
+				<td id="hidenRow_{{ test_case.case_id }}" style="display: none;"  colspan="7">
+					<td colspan="5" >
+						<div>
+							<h4>SETUP</h4>
+							<p> {{ test_case.latest_text.setup|safe }}</p>
+							<h4>ACTIONS</h4>
+							<p>{{ test_case.latest_text.action|safe }}</p>
+						</div>
+					</td>
+					<td colspan="4">
+						<h4>BREAKDOWN</h4>
+						<p>{{ test_case.latest_text.breakdown|safe }}</p>
+						<h4>EFFECT</h4>
+						<p>{{ test_case.latest_text.effect|safe }}</p>
+					</td>
+				</td>
+			</tr>
+			{% endcomment %}
+			{% endfor %}
+		</tbody>
+	</table>
+    </form>
+	{% else %}
+	{% ifequal REQUEST_CONTENTS.a 'search' %}
+	<span class="prompt-message"><center>No test case found</center></span>
+	{% endifequal %}
+	{% endif %}
+</div>
+{% endblock %}

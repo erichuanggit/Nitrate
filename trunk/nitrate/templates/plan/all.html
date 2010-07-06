@@ -1,0 +1,116 @@
+{% extends "tcms_base.html" %}
+
+{% load extra_filters %}
+
+{% block subtitle %}Test plans{% endblock %}
+
+{% block custom_stylesheet %}
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/print.css" media="print" />
+{% endblock %}
+
+{% block custom_javascript %}
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/fastinit.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/tablesort.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/testplan_actions.js"></script>
+<script type="text/javascript">
+Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
+</script>
+{% endblock %}
+
+{% block contents %}
+
+<div id="content">
+	<div class="crumble">
+		<a href="{% url tcms.core.views.index %}">Home</a>
+		{% if query_result %}
+		>> <a href="{% url tcms.testplans.views.all %}">Planning</a> 
+		>> Search result
+		{% else %}
+		>> Planning
+		{% endif %}
+	</div>
+	<div id="itemSearch" class="itemSearch">
+		<form id="id_search_plan_form" action="{% url tcms.testplans.views.all %}" method="get">
+			<input type="hidden" name="action" value="search" />
+			<h2>Search Plan</h2>
+			{% include 'plan/form/search.html' %}
+			<div class="bottom" >
+				<input type="submit" size="7" value="Search" />
+				<input type="reset" size="7" value="Reset" title="Reset the form"/>
+				<span class="right-action">
+					<a title="list all the plans" href="?name=&author=&product_id=&env_group_id=&is_active=on" class="viewall">View All Plans</a>&nbsp;
+					
+				</span>
+			</div>
+		</div>
+	</form>
+	
+	{% if REQUEST_CONTENTS.items %}
+    <div id="contentTab" class="mixbar">
+		<span class="tit">{{ test_plans|length }} Plans</span>
+		{% if perms.testplans.add_testplan %}
+		<span>
+			<input type="button" name="" title="Create new test plan" onclick="window.location='{% url tcms.testplans.views.new %}'"value="New Test Plan" />
+		</span> 
+		{% endif %}
+		{% if perms.testplans.add_testplan %}
+		<span><input type="button" name="" onclick="window.location='{% url tcms.testplans.views.clone %}?' + $('plans_form').serialize()" value="Clone" title="clone selected test plans"/></span> 
+		{% endif %}
+		{% if testplans and perms.testplans.add_testplan %}
+		<span class="right-action">
+			Add Column
+			<select id="column_add">
+				<option></option>
+				{% comment %}
+				<option id="col_product_option" value="col_product">Product</option>
+				{% endcomment %}
+				<option id="col_product_veresion_option" value="col_product_version">Product Version</option>
+			</select>
+		</span>
+		{% endif %}
+	</div>
+	<form id="plans_form">
+		<table id="testplans_table" class="list border-bottom" cellpadding="0" cellspacing="0" border="0" style="table-layout:fixed;">
+			<thead>
+				<tr>
+					<th  width="20" class="nosort"><input type="checkbox" id="id_check_all_plans" onclick="taggleAllCasesCheckbox(container = 'testplans_table');" title="Select all/Select none"></th>
+					<th  width="50" class="sortcol sortasc" title="Sort by plan ID">#</th>
+					<th class="sortcol" title="Sort by plan name">Name</th>
+					<th  width="100" class="sortcol" title="Sort by author">Author</th>
+					<th  width="180" class="sortcol" title="Sort by product name" id="col_product_head">Product</th>
+					<th  width="120" class="sortcol" title="Sort by product version" style="display:none" id="col_product_version_head">Product Version</th>
+					<th  width="140" class="sortcol" title="Sort by plan type">Type</th>
+					<th  width="50" class="sortcol" title="Sort by number of test cases">Cases</th>
+					<th  width="40" class="sortcol" title="Sort by number of test runs">Runs</th>
+					<th class="nosort" align="left" width="80">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for test_plan in test_plans %}
+				<tr class="{% if not test_plan.is_active %}line-through inactive{% endif %}">
+					<td><input type="checkbox" name="plan_id" value="{{ test_plan.plan_id }}" title="Select/Unselect"></td>
+					<td class="{% if not test_plan.is_active %}underline{% endif %}"><a href="{% url tcms.testplans.views.get test_plan.plan_id %}">{{ test_plan.plan_id }}</a></td>
+					<td  class="{% if not test_plan.is_active %}underline{% endif %}"><a href="{% url tcms.testplans.views.get test_plan.plan_id %}" title="Go to {{ test_plan.name }}">{{ test_plan }} </a></td>
+					<td><a title="Send email to {{ test_plan.author.email}}" href="mailto:{{ test_plan.author.email }}">{{ test_plan.author }}</a></td>
+					<td  class="col_product_content">{{ test_plan.product }}</td>
+					<td  style="display:none" class="col_product_version_content">{{ test_plan.default_product_version }}</td>
+					<td>{{ test_plan.type }}</td>
+					<td align="center"><a href="{% url tcms.testplans.views.get test_plan.plan_id %}" title="{{ test_plan.num_cases }} test cases">{{ test_plan.num_cases }}</a></td>
+					<td align="center"><a href="{% url tcms.testplans.views.get test_plan.plan_id %}#testruns" title="{{ test_plan.num_runs }} test runs">{{ test_plan.num_runs }}</a></td>
+					<td  ALIGN="center">
+						{% if perms.testplans.change_testplan %}
+						<a class="editlink" href="{% url tcms.testplans.views.edit test_plan.plan_id %}">Edit</a>
+						{% endif %}
+					</td>
+				</tr>
+				{% empty %}
+				<tr>
+					<td colspan="9">No test plans found.</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</form>
+	{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,149 @@
+{% extends "tcms_base.html" %}
+
+{% block subtitle %}Builds Report - {{ product }}{% endblock %}
+
+{% block custom_stylesheet %}
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/print.css" media="print" />
+{% endblock %}
+
+{% block custom_javascript %}
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/fastinit.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/tablesort.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/report.js"></script>
+<script type="text/javascript">
+Nitrate.Utils.after_page_load(Nitrate.Report.Builds.on_load);
+</script>
+{% endblock %}
+
+{% block contents %}
+<div id="content">
+	<div class="crumble">
+		<a href="{% url tcms.core.views.index %}">Home</a>
+		>><a href="/report">Reporting</a>
+		>>{{ product }}
+	</div>
+	{% include 'report/nav.html' %}
+	<div class="Detailform border-1" style="border-top:none;background:#f1f1f1 ;">
+		{% comment %}
+		<div class="crumb">
+			<span class="right-action"> <label class="select">report</label> | <label class="">dashboard </label></span>
+		</div>
+		{% endcomment %}
+		{% if build %}
+		<div class="report">
+			<h2>Build: {{ build }}</h2>
+			{% comment %}
+			<div class="page_control">
+				<span><a href="#">pre RHEL5.4-Server-Supplementary-20090813.0</a></span>
+				|
+				<span><a href="#">next RHEL5.4-Server-Supplementary-20090813.0</a> </span>
+			</div>
+			{% endcomment %}
+			<!--filter of data report -->
+			{% comment %}
+			<fieldset class="filter">
+				<legend>Filter</legend>
+				<div class="option_row">
+					<label>Test Run</label>
+					<select>
+						<option>All</option>
+						<option>Running</option>
+						<option>Finished</option>
+					</select>
+				</div>
+				<div class="apply_row">
+					<a class="applylink"><a>Apply</a></a>
+				</div>
+			</fieldset>
+			{% endcomment %}
+			<!--end of filter of data report -->
+			<!--data of status of caserun -->
+			<table class="report_data report" border="0" cellspacing="1" cellpadding="0" width="75%">
+				<tr class="variety_pass">
+					<td>PASSED</td>
+					<td>{{ case_run_count.PASSED }}</td>
+					<td>{{ case_run_count.PASSED_percent|default:'0'|floatformat }}%</td>
+				</tr>
+				<tr class="variety_fail">
+					<td>FAILED</td>
+					<td>{{ case_run_count.FAILED }}</td>
+					<td>{{ case_run_count.FAILED_percent|default:'0'|floatformat }}%</td>
+				</tr>
+				<tr class="variety_idel">
+					<td>IDLE</td>
+					<td>{{ case_run_count.IDLE }}</td>
+					<td>{{ case_run_count.IDLE_percent|default:'0'|floatformat }}%</td>
+				</tr>
+				<tr class="variety_error">
+					<td>ERROR</td>
+					<td>{{ case_run_count.ERROR }}</td>
+					<td>{{ case_run_count.ERROR_percent|default:'0'|floatformat }}%</td>
+				</tr>
+				<tr class="variety_tested">
+					<td>PAUSED</td>
+					<td>{{ case_run_count.PAUSED }}</td>
+					<td>{{ case_run_count.PAUSED_percent|default:'0'|floatformat }}%</td>
+				</tr>
+				<tr  class="variety_block">
+					<td>BLOCKED</td>
+					<td>{{ case_run_count.BLOCKED }}</td>
+					<td>{{ case_run_count.BLOCKED_percent|default:'0'|floatformat }}%</td>
+				</tr>
+				<tr class="variety_running">
+					<td>RUNNING</td>
+					<td>{{ case_run_count.RUNNING }}</td>
+					<td>{{ case_run_count.RUNNING_percent|default:'0'|floatformat }}%</td>
+				</tr>
+			</table>
+			<!--end data of status of caserun -->
+		</divs>
+		{% endif %}
+		{% comment %}
+		<div class="page_control">
+			<span><a href="#">pre RHEL5.4-Server-Supplementary-20090813.0</a></span>
+			|
+			<span><a href="#">next RHEL5.4-Server-Supplementary-20090813.0</a> </span>
+		</div>
+		{% endcomment %}
+		<table class="list report" id="report_build" border="0" cellspacing="0" cellpadding="0" width="100%">
+			<thead>
+				<tr>
+					<th class="sortcol sortasc" width="5%">ID</th>
+					<th class="sortcol">BUILD</th>
+					<th class="sortcol">RUNS (Finished/ Total)</th>
+					<th class="sortcol">Testing Cases</th>
+					<th class="sortcol">Failed Cases</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for build in builds %}
+				<tr >
+					<td>
+						{{ build.build_id }}
+					</td>
+					<td class="variety_0">
+						<a href="?build_id={{ build.build_id }}">{{ build }}</a>
+					</td>
+					<td class="variety_1">
+						<p>{{ build.finished_runs }}/{{ build.total_runs }}</p>
+					</td>
+					<td class="variety_4">
+						<div class="progress-bar">
+							<div class="progress-inner" style="width:{{ build.finished_case_run_percent|default:'0' }}px">
+								<div class="percent">{{ build.finished_case_run_percent|default:'0' }}%</div>
+							</div>
+						</div>
+					</td>
+					<td>
+						{% if build.failed_case_run_count %}
+						<div class="strong emphasize">{{ build.failed_case_run_count|default:'0' }} Failed</div>
+						{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+<!--content over -->
+{% endblock %}

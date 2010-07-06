@@ -1,0 +1,39 @@
+{% extends "tcms_base.html" %}
+
+{% load extra_filters %}
+
+{% block subtitle %}{{ type|upper }} - {{ info }}{% endblock %}
+
+{% block custom_stylesheet %}
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/print.css" media="print" />
+{% endblock %}
+
+{% block custom_javascript %}
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/fastinit.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/tablesort.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/testplan_actions.js"></script>
+<script type="text/javascript">
+Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
+</script>
+{% endblock %}
+
+{% block contents %}
+
+<!--creat plan(button)-->
+<div id="content">
+	<div class="Detailform" >
+	<div class="system_info prompt-message  {{ type }} border-1 " style="width:auto;">
+		
+		<p>{{ info|safe }}</p>
+
+	{% if next %}
+	<a href="{{ next }}">Continue</a>
+	{% else %}
+	<a href="{% url tcms.core.views.index }">Return to homepage</a>
+	{% endif %}
+	</div>
+	</div>
+</div>
+
+{% endblock %}
+
