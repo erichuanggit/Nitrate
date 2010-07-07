@@ -24,6 +24,10 @@
 == Create a development environment. == #create_dev_env
 Nitrate is standard Django app. The deployment method is the same as others.
 
+Before you starting to installation, please read the
+[https://fedorahosted.org/nitrate/browser/trunk/nitrate/docs/README README]
+file at first.
+
 === Download the sources. === #download_source
 The Nitrate source code is available at:
 https://fedorahosted.org/nitrate/browser/trunk/nitrate/
@@ -191,8 +195,8 @@ Then use the django-admin syncdb to initial the data.
 $ export DJANGO_SETTINGS_MODULE=tcms.dev_settings
 }}}
 If you are install from git source you need to define the env as following:
-$ export PYTHONPATH=[nitrate_download_path]/nitrate/trunk/nitrate/
 {{{
+$ export PYTHONPATH=[nitrate_download_path]/nitrate/trunk/nitrate/
 $ django-admin syncdb
 }}}
 Because of Nitrate supports multiple bug tracker system, you may need to initial
