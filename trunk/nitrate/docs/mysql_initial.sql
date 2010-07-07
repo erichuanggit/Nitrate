@@ -2,16 +2,14 @@
 --
 -- Upgrade to 2.0
 --
-/*
 -- Empty the permission table
-TRUNCATE auth_permission;
-TRUNCATE auth_group_permissions;
+-- TRUNCATE auth_permission;
+-- TRUNCATE auth_group_permissions;
 
 -- Add columns new app need
 ALTER TABLE test_plans ADD extra_link varchar(1024);
 ALTER TABLE test_runs ADD estimated_time time DEFAULT '00:00:00';
 ALTER TABLE test_attachments ADD stored_name mediumtext;
-*/
 
 --
 -- Upgrade to 3.0
@@ -34,7 +32,6 @@ CREATE INDEX case_bugs_case_bug_system_id_idx ON test_case_bugs (bug_system_id);
 -- After syncdb process
 -- INSERT INTO test_case_bug_systems (name, url_reg_exp) values ('Red Hat Bugzilla', 'https://bugzilla.redhat.com/show_bug.cgi?id=%s');
 -- UPDATE test_case_bugs SET bug_system_id = 1;
--- DROP TABLE IF EXISTS `tcms_bookmark_category`;
 ALTER TABLE test_tags CHANGE tag_name tag_name VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs;
 
 -- Upgrade to 3.0.2
