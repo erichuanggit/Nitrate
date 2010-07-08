@@ -1,25 +1,17 @@
 = Nitrate installation =
 
 == Contents: ==
-{{{
-#!html
-<ul>
-<li><a href="#create_dev_env">Create a development environment.</a></li>
-  <ul>
-    <li><a href="#download_source">Download the sources.</a></li>
-    <li><a href="#generate_config_file">Generate the configuration file.</a></li>
-    <li><a href="#initial_db">Initial database schema.</a></li>
-    <li><a href="#start_app">Start the Django app.</a></li>
-  </ul>
-<li><a href="#extra_apache">Extra installation deployed with Apache.</a></li>
-  <ul>
-    <li><a href="#extra_apache_mod_auth_kerb">Deployed with mod_auth_kerb.</a></li>
-  </ul>
-<li><a href="#extra_nginx">Extra installation deployed with Nginx.</a></li>
-<li><a href="#migrate_testopia">Migration from testopia.</a></li>
-<li><a href="#more_info">More information.</a></li>
-</ul>
-}}}
+
+ * [#create_dev_env Create a development environment.]
+   * [#download_source Download the source.]
+   * [#generate_config_file Generate the configuration file.]
+   * [#initial_db Create the initial database schema.]
+   * [#start_app Start the Django app.]
+ * [#extra_apache Deploy with Apache.]
+   * [#extra_apache_mod_auth_kerb Deploy with mod_auth_kerb.]
+ * [#extra_nginx Deploy with Nginx.]
+ * [#migrate_testopia Migrate from Testopia.]
+ * [#more_info More information.]
 
 == Create a development environment. == #create_dev_env
 Nitrate is standard Django app. The deployment method is the same as others.
@@ -138,7 +130,7 @@ $ django-admin runserver
 Then try to use web browser to open http://localhost:8000/ to see the web service
 working status.
 
-== Extra installation steps deployed with Apache. == #extra_apache
+== Deploy with Apache. == #extra_apache
 We recommend to use the WSGI method, it saves resources and very fast. The sample
 is located at:
 https://fedorahosted.org/nitrate/browser/trunk/nitrate/contrib/conf/nitrate-httpd.conf
@@ -149,7 +141,7 @@ comment the settings starts with 'Auth' and 'Krb' at first.
 Then place the file to /etc/httpd/conf.d/ and modify the files path from default
 to you specific should be OK.
 
-=== Deployed with mod_auth_kerb. === #extra_apache_mod_auth_kerb
+=== Deploy with mod_auth_kerb. === #extra_apache_mod_auth_kerb
 First you need to request the keytab file and a /etc/krb5.conf from your KDC
 administrators at first, place the keytab file to /etc/httpd/conf/httpd.keytab
 and place the krb5.conf file into /etc.
@@ -170,7 +162,7 @@ AUTHENTICATION_BACKENDS = (
 
 Then restart the web server should be done.
 
-== Extra installation steps deployed with Nginx. == #extra_nginx
+== Deploy with Nginx. == #extra_nginx
 With benchmark, we found Nginx + FCGI is faster than Apache + Mod_python, To use
 the Nginix to deploy the Nitrate will be a good idea for production environment.
 
@@ -179,7 +171,7 @@ https://fedorahosted.org/nitrate/browser/trunk/nitrate/contrib/conf/nitrate-ngin
 
 The file is very initial, and patches are welcome.
 
-== Migration from old testopia. == #migrate_testopia
+== Migrate from Testopia. == #migrate_testopia
 Because of Nitrate schema is compatible with testopia, it makes migrate the data
 from testopia is possible.
 
@@ -211,5 +203,5 @@ The bugzilla(testopia) can keep running, just modify the 'url_reg_exp' column
 for bugzilla as the bugzilla(testopia) URL.
 
 == More information. == #more_info
-* http://docs.djangoproject.com [[BR]]
-* http://docs.djangoproject.com/en/dev/howto/deployment/ [[BR]]
+ * http://docs.djangoproject.com
+ * http://docs.djangoproject.com/en/dev/howto/deployment/
