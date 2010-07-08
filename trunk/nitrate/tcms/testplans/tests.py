@@ -22,6 +22,7 @@ class PlanTests(unittest.TestCase):
         except AssertionError, e:
             self.assertEquals(response.status_code, 302)
 
+#    (r'^plans/clone/$', 'tcms.testplans.views.clone'),
     def test_plan_clone(self):
         response = self.c.get('/plans/clone/', {'plan_id':self.plan_id})
         try:
