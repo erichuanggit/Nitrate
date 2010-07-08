@@ -10,6 +10,7 @@
     <categoryname>{{ test_case.category }}</categoryname>
     {# <component product="{{ test_plan.product }}"></component> #}
     <defaulttester>{{ test_case.default_tester.email }}</defaulttester>
+    <notes>{{ test_case.notes }}</notes>
     
     <testplan_reference type="Xml_description">{{ test_plan.name }}</testplan_reference>
     
