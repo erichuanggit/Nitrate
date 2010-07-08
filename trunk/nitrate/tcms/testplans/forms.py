@@ -184,6 +184,7 @@ class CasePlanXMLField(forms.FileField):
             'is_automated': is_automated,
             'case_status_id': case_status_id,
             'category_name': category_name,
+            'notes': case.get('notes', {}).get('value', ''),
             'action': case.get('action', {}).get('value', ''),
             'effect': case.get('expectedresults', {}).get('value', ''),
             'setup': case.get('setup', {}).get('value', ''),

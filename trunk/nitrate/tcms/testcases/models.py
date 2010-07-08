@@ -107,6 +107,7 @@ class TestCase(TCMSActionModel):
     requirement = models.CharField(max_length=255, blank=True)
     alias = models.CharField(max_length=255, blank=True)
     estimated_time = TimedeltaField(null=True, blank=True)
+    notes = models.TextField(blank=True)
     
     case_status = models.ForeignKey(TestCaseStatus)
     category = models.ForeignKey(
@@ -171,6 +172,7 @@ class TestCase(TCMSActionModel):
             category = values['category'],
             priority = values['priority'],
             default_tester = values['default_tester'],
+            notes = values['notes'],
         )
 
     @classmethod

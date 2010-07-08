@@ -435,6 +435,12 @@ def edit(request, case_id, template_name = 'case/edit.html'):
                 ))
                 tc.priority = form.cleaned_data['priority']
             
+            if tc.notes != form.cleaned_data['notes']:
+                tc.log_action(request.user, 'Case notes changed from %s to %s in edit page.' % (
+                    tc.notes, form.cleaned_data['notes']
+                ))
+                tc.notes = form.cleaned_data['notes']
+            
             if not tc.default_tester_id or tc.default_tester != form.cleaned_data['default_tester']:
                 tc.log_action(request.user, 'Case default tester changed from %s to %s in edit page.' % (
                     tc.default_tester_id and tc.default_tester, form.cleaned_data['default_tester']
@@ -512,6 +518,7 @@ def edit(request, case_id, template_name = 'case/edit.html'):
             'priority': tc.priority_id,
             'product': tc.category.product_id,
             'category': tc.category_id,
+            'notes': tc.notes,
             'component': [c.pk for c in tc.component.all()],
             'estimated_time': tc.estimated_time,
             'setup': tctxt.setup,
@@ -592,6 +599,7 @@ def clone(request, template_name='case/clone.html'):
                         case_status = tc_src.case_status,
                         category = tc_src.category,
                         priority = tc_src.priority,
+                        notes = tc_src.notes,
                         author = clone_form.cleaned_data['maintain_case_orignal_author'] and tc_src.author or request.user,
                         default_tester = clone_form.cleaned_data['maintain_case_orignal_default_tester'] and tc_src.author or request.user,
                     )

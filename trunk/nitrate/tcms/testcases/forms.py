@@ -163,6 +163,11 @@ class BaseCaseForm(forms.Form):
         queryset = Component.objects.none(),
         required = False,
     )
+    notes = forms.CharField(
+        label='Notes', 
+        widget=forms.Textarea, 
+        required=False
+    )
     estimated_time = TimedeltaFormField()
     setup = forms.CharField(label="Setup", widget = TinyMCEWidget, required = False)
     action = forms.CharField(label="Actions", widget = TinyMCEWidget, required = False)

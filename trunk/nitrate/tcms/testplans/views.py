@@ -794,6 +794,7 @@ def cases(request, plan_id):
                             priority_id = case['priority_id'],
                             author_id = case['author_id'],
                             default_tester_id = case['default_tester_id'],
+                            notes = case['notes'],
                         )
                         
                         tc.add_text(

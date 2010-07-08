@@ -620,7 +620,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     });
                     $('dialog').update(html);
                     
-                    html +='</div><input class="dia_btn_close sprites" onclick="this.up(0).hide()" type="button" value="OK,I see" style=" margin:10px 20px;"/>';
+                    html +='</div><input class="dia_btn_close sprites" onclick="this.up(0).hide()" type="button" value="Close" style=" margin:10px 20px;"/>';
                     
                     $('dialog').update(html);
                     p = $('id_form_cases').serialize(true);
@@ -658,7 +658,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     });
                     $('dialog').update(html);
                     
-                    html +='</div><input class="dia_btn_close sprites" onclick="this.up(0).hide()" type="button" value="OK,I see" style=" margin:10px 20px;"/>';
+                    html +='</div><input class="dia_btn_close sprites" onclick="this.up(0).hide()" type="button" value="Close" style=" margin:10px 20px;"/>';
                     
                     $('dialog').update(html);
                     p = $('id_form_cases').serialize(true);
