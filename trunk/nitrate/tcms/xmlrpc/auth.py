@@ -42,7 +42,6 @@ def login(request, parameters):
     |        Key          |          Valid Values                       |
     | username            | A nitrate login (email address)             |
     | password            | String                                      |
-    | use_mod_auth_kerb   | Boolean: The server is using mod_auth_kerb  |
     +-------------------------------------------------------------------+
     
     Returns:     String: Session ID.
@@ -51,21 +50,19 @@ def login(request, parameters):
     >>> Auth.login({'username': 'foo', 'password': 'bar', 'use_mod_auth_kerb': 1})
     """
     from tcms.core.contrib.auth import get_backend
+    user = None
     
     for backend_str in settings.AUTHENTICATION_BACKENDS:
         backend = get_backend(backend_str)
         user = backend.authenticate(*check_user_name(parameters))
         
         if user:
-            break
-    
+            user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
+            django.contrib.auth.login(request, user)
+            return request.session.session_key
+            
     if user is None:
         raise PermissionDenied('Wrong username or password')
-    
-    user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
-    django.contrib.auth.login(request, user)
-    
-    return request.session.session_key
 
 def login_krbv(request):
     """
