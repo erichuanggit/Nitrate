@@ -535,6 +535,9 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         
         // Observe the batch case automated status button
         $('batch_automated').observe('click', function(e) {
+            if($('id_table_cases').adjacent('input.checkbox:checked').length == 0){
+            	alert('No cases selected! Please select at least one case.');
+            	return false;
             $('dialog').update('<div class="ajax_loading"></div>');
             $('dialog').show();
             
