@@ -47,7 +47,7 @@ def login(request, parameters):
     Returns:     String: Session ID.
     
     Example:
-    >>> Auth.login({'username': 'foo', 'password': 'bar', 'use_mod_auth_kerb': 1})
+    >>> Auth.login({'username': 'foo', 'password': 'bar'})
     """
     from tcms.core.contrib.auth import get_backend
     user = None
