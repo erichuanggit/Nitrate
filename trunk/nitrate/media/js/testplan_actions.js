@@ -469,10 +469,10 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             var element = $('list_filter_m');
             if(element.getStyle('display') == 'none'){
                 element.show();
-                this.update("Hide filter options");
+                this.update(default_messages.link.hide_filter);
             } else {
                 element.hide();
-                this.update("Show filter options");
+                this.update(default_messages.link.show_filter);
             }
         })
         
@@ -489,7 +489,12 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             if(!this.value)
                 return false;
             
-            var c = confirm('Are you sure to change the status?');
+            if(!$('id_form_cases').serialize(true)['case']){
+                alert(default_messages.alert.no_case_selected);
+                return false;
+            }
+            
+            var c = confirm(default_messages.confirm.change_case_status);
             if(!c)
                 return false;
             
@@ -511,9 +516,14 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         
         $('new_case_priority').observe('change', function(t) {
             if(!this.value)
-                return false
+                return false;
             
-            var c=confirm('Are you sure to change the priority?')
+            if(!$('id_form_cases').serialize(true)['case']){
+                alert(default_messages.alert.no_case_selected);
+                return false;
+            }
+            
+            var c=confirm(default_messages.confirm.change_case_priority)
             if(!c)
                 return false;
             
@@ -535,10 +545,11 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         
         // Observe the batch case automated status button
         $('batch_automated').observe('click', function(e) {
-            if($('id_table_cases').adjacent('input.checkbox:checked').length == 0){
-            	alert('No cases selected! Please select at least one case.');
-            	return false;
+            if(!$('id_form_cases').serialize(true)['case']){
+                alert(default_messages.alert.no_case_selected);
+                return false;
             }
+            
             $('dialog').update('<div class="ajax_loading"></div>');
             $('dialog').show();
             
@@ -600,6 +611,11 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         
         // Observe the batch add case button
         $('id_add_case_tags').observe('click',function(e) {
+            if(!$('id_form_cases').serialize(true)['case']){
+                alert(default_messages.alert.no_case_selected);
+                return false;
+            }
+            
             constructBatchTagProcessDialog();
             
             // Observe the batch tag form submit
@@ -638,6 +654,11 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
 
         // Observe the batch remove tag function
         $('id_remove_case_tags').observe('click',function(e) {
+            if(!$('id_form_cases').serialize(true)['case']){
+                alert(default_messages.alert.no_case_selected);
+                return false;
+            }
+            
             constructBatchTagProcessDialog();
             
             // Observe the batch tag form submit

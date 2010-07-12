@@ -38,6 +38,20 @@ Event.observe(window, 'load', function(e) {
     var newnewMenu = new dropDownMenu(".nav_li");  
 });
 
+var default_messages = {
+    'alert': {
+        'no_case_selected': 'No cases selected! Please select at least one case.',
+    },
+    'confirm': {
+        'change_case_status': 'Are you sure to change the status?',
+        'change_case_priority': 'Are you sure to change the priority?',
+    },
+    'link': {
+        'hide_filter': 'Hide filter options',
+        'show_filter': 'Show filter options',
+    }
+}
+
 function getURLParam()
 {
     args = $A(arguments);
