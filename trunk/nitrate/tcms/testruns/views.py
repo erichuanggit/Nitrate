@@ -877,7 +877,7 @@ def env_value(request):
             self.trs = trs
         
         def has_no_perm(self, perm):
-            if self.request.user.has_perm(perm + 'tcmsenvrunvaluemap'):
+            if self.request.user.has_perm(perm + '_tcmsenvrunvaluemap'):
                 return False
             
             return {'rc': 1, 'response': 'Permission deined - %s' % perm}
