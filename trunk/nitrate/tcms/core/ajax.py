@@ -22,6 +22,7 @@ Shared functions for plan/case/run.
 Most of these functions are use for Ajax.
 """
 from django.db import models
+from django.db.models import Q
 from django.http import HttpResponse
 from django.utils import simplejson
 from django.views.generic.simple import direct_to_template
@@ -30,6 +31,8 @@ from django.contrib.auth.decorators import user_passes_test
 from tcms.testplans.models import TestPlan
 from tcms.testcases.models import TestCase
 from tcms.testruns.models import TestRun, TestCaseRun
+
+import time
 
 def check_permission(request, perm, response = {}):
     """Shared function for check permission"""
@@ -48,6 +51,15 @@ def strip_parameters(request, skip_parameters):
                 parameters[str(k)] = v
     
     return parameters
+
+#FIXME: Performance needs to be improved.
+#def all_case_combinations(s):
+#    if len(s) == 0:
+#        yield ""
+#    else:
+#        for x in all_case_combinations(s[1:]):
+#            yield s[0].lower() + x
+#            yield s[0].upper() + x
 
 def info(request):
     """Ajax responsor for misc information"""
@@ -107,6 +119,15 @@ def info(request):
         def tags(self):
             from tcms.management.models import TestTag
             query = strip_parameters(request, self.internal_parameters)
+            #FIXME: Performance needs to be improved. 
+            #When type too long will cause a response latency.
+            #tagname = query.get('name__startswith','')
+            #if tagname != None and len(tagname) <=10 :
+            #    seq = list(all_case_combinations(tagname))
+            #    s = "|".join(["Q(name__startswith = '%s')" %item for item in seq])
+            #    return TestTag.objects.filter(eval(s))
+            #else:
+            #return TestTag.objects.filter(**query)
             return TestTag.objects.filter(**query)
         
         def users(self):
