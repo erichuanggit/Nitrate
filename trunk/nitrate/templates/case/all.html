@@ -52,12 +52,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 				<th align="left" width="50" class="sortcol sortdesc">ID</th>
 				<th align="left" class="sortcol">Summary</th>
 				<th align="left" width="100" class="sortcol">Author</th>
-				{% comment %}
 				<th align="left" width="130" class="sortcol">Default Tester</th>
-				{% endcomment %}
+                <th align="left" width="140" class="sortcol">Automated</th>
+                <th align="left" width="90" class="sortcol">Status</th>
 				<th align="left" width="120" class="sortcol">Category</th>
 				<th align="left" width="60" class="sortcol">Priority</th>
-				<th align="left" width="90" class="sortcol">Status</th>
+				
 				<th align="left" width="140" class="sortcol">Created</th>
 			</tr>
 		</thead>
@@ -78,12 +78,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 				<td valign="top" ><a id="link_{{ test_case.case_id }}" href="javascript:toggleTestCaseContents('{{ test_case.case_id }}')">{{ test_case.summary }}</a></td>
 				{% endcomment %}
 				<td valign="top" ><a href="mailto:{{ test_case.author.email }}">{{ test_case.author }}</a></td>
-				{% comment %}
-				<td valign="top" ><a href="mailto:{{ test_case.default_tester.email }}">{{ test_case.default_tester.email }}</a></td>
-				{% endcomment %}
+				<td valign="top" ><a href="mailto:{{ test_case.default_tester.email }}">{{ test_case.default_tester }}</a></td>
+                <td valign="top">{{ test_case.get_is_automated_status }}</td>
+                <td valign="top" >{{ test_case.case_status }}</td>
 				<td valign="top" >{{ test_case.category }}</td>
 				<td valign="top" align="center" >{{ test_case.priority }}</td>
-				<td valign="top" >{{ test_case.case_status }}</td>
+				
 				<td valign="top" >{{ test_case.create_date }}</td>
 			</tr>
 			{% comment %}

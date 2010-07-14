@@ -18,7 +18,6 @@
 					<img id="id_blind_all_img" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
 				</a>
                 {% endif %}
-                
 			</th>
             <th width="90">Case Run ID</th>
 			<th width="60">Case ID</th>
@@ -28,13 +27,13 @@
 			<th width="100">Category</th>
 			<th width="60">Priority</th>
 			<th width="40">Bugs</th>
-			<th width="90" align="center">Status</th>
+			<th width="90" align="center">Status----</th>
 			<th width="40">Sort</th>
 		</tr>
 	</thead>
 	<tbody>
 		{% for test_case_run in test_case_runs %}
-		<tr id="id_tr_case_{{ forloop.counter }}" class="{% cycle 'odd' 'even' %}" >
+		<tr id="id_tr_case_{{ forloop.counter }}" class="{% cycle 'odd' 'even' %} {% ifequal test_case_run.assignee user %}highlight{% endifequal %}">
 			<td>
 				<input type="checkbox" name="case_run" id="id_checkbox_case_{{ forloop.counter }}" value="{{ test_case_run.case_run_id }}" title="Select/Unselect" />
 				<input type="hidden" name="case" value="{{ test_case_run.case_id }}" />
