@@ -658,14 +658,23 @@ def clone(request, template_name='case/clone.html'):
                                 pass
             
             # Detect the number of items and redirect to correct one
-            if len(clone_form.cleaned_data['case']) == 1:
+            cases_count = len(clone_form.cleaned_data['case'])
+            plans_count = len(clone_form.cleaned_data['plan'])
+            
+            if cases_count == 1 and plans_count == 1:
+                return HttpResponseRedirect('%s?from_plan=%s' % (
+                    reverse('tcms.testcases.views.get', args=[tc_dest.pk, ]),
+                    tp.pk
+                ))
+            
+            if cases_count == 1:
                 return HttpResponseRedirect(
-                    reverse('tcms.testcases.views.get', args=[tc_dest.case_id, ])
+                    reverse('tcms.testcases.views.get', args=[tc_dest.pk, ])
                 )
             
-            if len(clone_form.cleaned_data['plan']) == 1:
+            if plans_count == 1:
                 return HttpResponseRedirect(
-                    reverse('tcms.testplans.views.get', args=[request.REQUEST.get('plan'), ])
+                    reverse('tcms.testplans.views.get', args=[tp.pk, ])
                 )
             
             # Otherwise it will prompt to user the clone action is successful.
