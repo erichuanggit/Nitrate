@@ -35,6 +35,13 @@ AUTOMATED_CHOICES = (
     (1, 'Auto'),
 )
 
+AUTOMATED_SERCH_CHOICES = (
+    ('', '----------'),
+    (0, 'Manual'),
+    (1, 'Auto'),
+    (2, 'Both'),
+)
+
 # =========== New Case ModelForm ==============
 # The form works fine for web but broken for XML-RPC.
 # So it's not in using yet.
@@ -323,9 +330,8 @@ class BaseCaseSearchForm(forms.Form):
         required=False
     )
     bug_id = forms.CharField(label="Bug ID", required=False)
-    is_automated = forms.MultipleChoiceField(
-        choices = AUTOMATED_CHOICES,
-        widget = forms.CheckboxSelectMultiple(),
+    is_automated = forms.ChoiceField(
+        choices = AUTOMATED_SERCH_CHOICES,
         required = False,
     )
     is_automated_proposed = forms.BooleanField(
@@ -341,16 +347,6 @@ class BaseCaseSearchForm(forms.Form):
                 int(d)
             except ValueError, error:
                 raise forms.ValidationError(error)
-        
-        return data
- 
-    def clean_is_automated(self):
-        data = self.cleaned_data['is_automated']
-        if len(data) == 2:
-            return 2
-        
-        if len(data):
-            return data[0]
         
         return data
     
