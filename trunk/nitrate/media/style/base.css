@@ -567,6 +567,7 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .form{ margin-left:10px;}
 .choose{ border:1px solid #999;}
 .submit-row{ text-align:center; padding-top:5px; padding-bottom:5px; border-top:1px solid #ccc; float:left; width:100%;}
+.submit-row .tit{ float:left; margin-left:10px;}
 .editor-side{ width:49.5%; float:left; margin-right:0.5%; background:none}
 /*****************************blindup case detail *****************/
 .case_detail{ float:left; width:100%; table-layout:fixed;}
