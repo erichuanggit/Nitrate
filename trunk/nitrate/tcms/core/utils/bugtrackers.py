@@ -41,11 +41,15 @@ class Bugzilla(BugTracker):
         args = {}
         args['cf_build_id'] = run.build.name
         
-        if caserun.get_text_with_version(case_text_version=case_text_version):
-            setup = html2text(caserun.get_text_with_version(case_text_version=case_text_version).setup)
-            action = html2text(caserun.get_text_with_version(case_text_version=case_text_version).action)
-            effect = html2text(caserun.get_text_with_version(case_text_version=case_text_version).effect)
-            breakdown = html2text(caserun.get_text_with_version(case_text_version=case_text_version).breakdown)
+        txt = caserun.get_text_with_version(case_text_version=case_text_version)
+        
+        if txt:
+            plain_txt = txt.get_plain_text()
+            
+            setup = plain_txt.setup
+            action = plain_txt.action
+            effect = plain_txt.effect
+            breakdown = plain_txt.breakdown
         else:
             setup = 'None'
             action = 'None'

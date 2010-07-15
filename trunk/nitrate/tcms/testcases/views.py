@@ -386,7 +386,8 @@ def get_details(request, case_id, template_name = 'case/get_details.html'):
 
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
 def edit(request, case_id, template_name = 'case/edit.html'):
-    from forms import EditCaseForm
+    from forms import EditCaseForm, CaseNotifyForm
+    from signals import EditCaseNotifyThread
     
     try:
         tc = TestCase.objects.select_related().get(case_id = case_id)
@@ -411,37 +412,20 @@ def edit(request, case_id, template_name = 'case/edit.html'):
         
         # Check the form and modify the case
         if form.is_valid():
-            if tc.summary != form.cleaned_data['summary']:
-                tc.log_action(request.user, 'Case summary changed from %s to %s in edit page.' % (
-                    tc.summary, form.cleaned_data['summary']
-                ))
-                tc.summary = form.cleaned_data['summary']
+            # Modify the contents
+            fields = ['summary', 'case_status', 'category', 'priority',
+                'notes', 'is_automated', 'is_automated_proposed', 'script',
+                'arguments', 'requirement', 'alias'
+            ]
             
-            if tc.case_status != form.cleaned_data['case_status']:
-                tc.log_action(request.user, 'Case status changed from %s to %s in edit page.' % (
-                    tc.case_status, form.cleaned_data['case_status']
-                ))
-                tc.case_status = form.cleaned_data['case_status']
+            for field in fields:
+                if getattr(tc, field) != form.cleaned_data[field]:
+                    tc.log_action(request.user, 'Case %s changed from %s to %s in edit page.' % (
+                        field, getattr(tc, field), form.cleaned_data[field]
+                    ))
+                    setattr(tc, field, form.cleaned_data[field])
             
-            if tc.category != form.cleaned_data['category']:
-                tc.log_action(request.user, 'Case category changed from %s to %s in edit page.' % (
-                    tc.category, form.cleaned_data['category']
-                ))
-                tc.category = form.cleaned_data['category']
-            
-            if tc.priority != form.cleaned_data['priority']:
-                tc.log_action(request.user, 'Case priority changed from %s to %s in edit page.' % (
-                    tc.priority, form.cleaned_data['priority']
-                ))
-                tc.priority = form.cleaned_data['priority']
-            
-            if tc.notes != form.cleaned_data['notes']:
-                tc.log_action(request.user, 'Case notes changed from %s to %s in edit page.' % (
-                    tc.notes, form.cleaned_data['notes']
-                ))
-                tc.notes = form.cleaned_data['notes']
-            
-            if not tc.default_tester_id or tc.default_tester != form.cleaned_data['default_tester']:
+            if tc.default_tester != form.cleaned_data['default_tester']:
                 tc.log_action(request.user, 'Case default tester changed from %s to %s in edit page.' % (
                     tc.default_tester_id and tc.default_tester, form.cleaned_data['default_tester']
                 ))
@@ -453,31 +437,59 @@ def edit(request, case_id, template_name = 'case/edit.html'):
             #        tc.estimated_time, form.cleaned_data['estimated_time']
             #    ))
             tc.estimated_time = form.cleaned_data['estimated_time']
-            
-            tc.is_automated = form.cleaned_data['is_automated']
-            tc.is_automated_proposed = form.cleaned_data['is_automated_proposed']
-            tc.script = form.cleaned_data['script']
-            tc.arguments = form.cleaned_data['arguments']
-            tc.reqirement = form.cleaned_data['requirement']
-            tc.alias = form.cleaned_data['alias']
             tc.save()
             
             tc.add_text(
                 author = request.user,
-                create_date = datetime.now(),
-                action = form.cleaned_data.get('action'),
-                effect = form.cleaned_data.get('effect'),
-                setup = form.cleaned_data.get('setup'),
-                breakdown = form.cleaned_data.get('breakdown')
+                action = form.cleaned_data['action'],
+                effect = form.cleaned_data['effect'],
+                setup = form.cleaned_data['setup'],
+                breakdown = form.cleaned_data['breakdown']
             )
             
-            # Remove old case component
+            # Clear and Add components into the case
             tc.clear_components()
-            
-            # Add components into the case
             for component in form.cleaned_data['component']:
                 tc.add_component(component = component)
             
+            # Notification
+            n_form = CaseNotifyForm(request.REQUEST)    # Notification form
+            if n_form.is_valid():
+                n_to = [tc.author.email]                # Initial Notification to
+                
+                if n_form.cleaned_data['default_tester_of_case'] and tc.default_tester_id:
+                    n_to.append(tc.default_tester.email)
+                
+                if n_form.cleaned_data['authors_of_plans']:
+                    n_to.extend(
+                        tc.plan.values_list('author__email', flat=True)
+                    )
+                
+                if n_form.cleaned_data['managers_of_runs']:
+                    n_to.extend(
+                        tc.case_run.values_list('run__manager__email', flat=True)
+                    )
+                
+                if n_form.cleaned_data['default_testers_of_runs']:
+                    n_to.extend(
+                        tc.case_run.values_list('run__default_tester__email', flat=True)
+                    )
+                
+                if n_form.cleaned_data['assignees_of_case_runs']:
+                    n_to.extend(
+                        tc.case_run.values_list('assignee__email', flat=True)
+                    )
+                
+                n_to = list(set(n_to))
+                # Sending the mail with threading
+                EditCaseNotifyThread(
+                    instance = tc,
+                    cleaned_data = form.cleaned_data,
+                    request = request,
+                    to = n_to
+                ).start()
+            
+            # Returns
             if request.REQUEST.get('_continue'):
                 return HttpResponseRedirect('%s?from_plan=%s' % (
                     reverse('tcms.testcases.views.edit', args=[case_id, ]),
@@ -505,6 +517,7 @@ def edit(request, case_id, template_name = 'case/edit.html'):
             ))
     else:
         tctxt = tc.latest_text()
+        n_form = CaseNotifyForm(request.REQUEST)    # Notification form
         form = EditCaseForm(initial={
             'summary': tc.summary,
             'default_tester': tc.default_tester_id and tc.default_tester.email or None,
@@ -533,6 +546,7 @@ def edit(request, case_id, template_name = 'case/edit.html'):
         'test_case': tc,
         'test_plan': tp,
         'form': form,
+        'notify_form': n_form,
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
     })
 

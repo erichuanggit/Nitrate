@@ -323,7 +323,7 @@ class TestRun(TCMSActionModel):
         except:
             raise
     
-    def mail(self, template, subject, context, request = None):
+    def mail(self, template, subject, context, to = [], request = None):
         from tcms.core.utils.mailto import mailto
         
         to = [self.manager.email]

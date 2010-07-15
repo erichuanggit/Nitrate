@@ -17,6 +17,7 @@
 #   Xuqing Kuang <xkuang@redhat.com>
 
 from datetime import datetime
+from django.core.urlresolvers import reverse
 from django.db import models, connection, transaction
 from tcms.core.models import TCMSActionModel, TimedeltaField
 
@@ -271,15 +272,6 @@ class TestCase(TCMSActionModel):
         
         return cls.list(query)
     
-    def add_to_plan(self, plan):
-        try:
-            return TestCasePlan.objects.get_or_create(
-                case = self,
-                plan = plan,
-            )
-        except:
-            pass
-    
     def add_bug(self, bug_id, bug_system, summary = None, description = None, case_run = None):
         try:
             self.case_bug.create(
@@ -309,36 +301,6 @@ class TestCase(TCMSActionModel):
             )
         except:
             raise
-    
-    def remove_bug(self, id):
-        try:
-            bug = self.case_bug.get(id = id)
-            bug.delete()
-        except:
-            raise
-    
-    def remove_component(self, component):
-        cursor = connection.cursor()
-        cursor.execute("DELETE from test_case_components \
-            WHERE case_id = %s AND component_id = %s",
-            (self.case_id, component.id)
-        )
-    
-    def remove_plan(self, plan):
-        cursor = connection.cursor()
-        cursor.execute("DELETE from test_case_plans \
-            WHERE plan_id = %s \
-            AND case_id = %s", 
-            (plan.plan_id, self.case_id)
-        )
-    
-    def remove_tag(self, tag):
-        cursor = connection.cursor()
-        cursor.execute("DELETE from test_case_tags \
-            WHERE case_id = %s \
-            AND tag_id = %s", 
-            (self.pk, tag.pk)
-        )
     
     def add_text(
         self,
@@ -374,6 +336,15 @@ class TestCase(TCMSActionModel):
         
         return latest_text
     
+    def add_to_plan(self, plan):
+        try:
+            return TestCasePlan.objects.get_or_create(
+                case = self,
+                plan = plan,
+            )
+        except:
+            pass
+    
     def clear_components(self):
         try:
             tcc = TestCaseComponent.objects.filter(
@@ -382,18 +353,6 @@ class TestCase(TCMSActionModel):
             tcc.delete()
         except:
             raise
-    
-    def get_is_automated(self): 
-        return self.get_choiced(self.is_automated, AUTOMATED_CHOICES)     
-    
-    def get_is_automated_form_value(self):
-        if self.is_automated == 2:
-            return [0, 1]
-
-        return (self.is_automated, )
-    
-    def get_is_automated_status(self):
-        return self.get_is_automated() + (self.is_automated_proposed and '(Autoproposed)' or '')
     
     def get_bugs(self):
         return TestCaseBug.objects.select_related(
@@ -405,11 +364,34 @@ class TestCase(TCMSActionModel):
     
     def get_component_names(self):
         return self.component.values_list('name', flat=True)
-
+    
     def get_choiced(self, obj_value, choices): 
         for x in choices: 
             if x[0] == obj_value:
                 return x[1]
+    
+    def get_is_automated(self): 
+        return self.get_choiced(self.is_automated, AUTOMATED_CHOICES)     
+    
+    def get_is_automated_form_value(self):
+        if self.is_automated == 2:
+            return [0, 1]
+        
+        return (self.is_automated, )
+    
+    def get_is_automated_status(self):
+        return self.get_is_automated() + (self.is_automated_proposed and '(Autoproposed)' or '')
+    
+    def get_previous_and_next(self, pk_list):
+        pk_list = list(pk_list)
+        current_idx = pk_list.index(self.pk)
+        prev = TestCase.objects.get(pk = pk_list[current_idx - 1])
+        try:
+            next = TestCase.objects.get(pk = pk_list[current_idx + 1])
+        except IndexError:
+            next = TestCase.objects.get(pk = pk_list[0])
+        
+        return (prev, next)
     
     def get_text_with_version(self, case_text_version = None):
         if case_text_version:
@@ -423,25 +405,52 @@ class TestCase(TCMSActionModel):
         
         return self.latest_text()
     
-    def get_previous_and_next(self, pk_list):
-        pk_list = list(pk_list)
-        current_idx = pk_list.index(self.pk)
-        prev = TestCase.objects.get(pk = pk_list[current_idx - 1])
-        try:
-            next = TestCase.objects.get(pk = pk_list[current_idx + 1])
-        except IndexError:
-            next = TestCase.objects.get(pk = pk_list[0])
-        
-        return (prev, next)
-    
     def latest_text(self):
         try:
             return self.text.order_by('-case_text_version')[0]
         except IndexError:
             return NoneText
     
-    def is_confirmed(self):
-        return self.case_status_id == 2 and True or False
+    def mail(self, template, subject, context = {}, to = [], request = None):
+        from tcms.core.utils.mailto import mailto
+        if not to:
+            to = self.author.email
+            
+        to = list(set(to))
+        mailto(template, subject, to, context, request)
+    
+    def remove_bug(self, id):
+        try:
+            bug = self.case_bug.get(id = id)
+            bug.delete()
+        except:
+            raise
+    
+    def remove_component(self, component):
+        cursor = connection.cursor()
+        cursor.execute("DELETE from test_case_components \
+            WHERE case_id = %s AND component_id = %s",
+            (self.case_id, component.id)
+        )
+    
+    def remove_plan(self, plan):
+        cursor = connection.cursor()
+        cursor.execute("DELETE from test_case_plans \
+            WHERE plan_id = %s \
+            AND case_id = %s", 
+            (plan.plan_id, self.case_id)
+        )
+    
+    def remove_tag(self, tag):
+        cursor = connection.cursor()
+        cursor.execute("DELETE from test_case_tags \
+            WHERE case_id = %s \
+            AND tag_id = %s", 
+            (self.pk, tag.pk)
+        )
+    
+    def get_url_path(self, request = None):
+        return reverse('tcms.testcases.views.get', args=[self.pk, ])
 
 class TestCaseText(TCMSActionModel):
     case = models.ForeignKey(TestCase, related_name='text')
@@ -460,6 +469,16 @@ class TestCaseText(TCMSActionModel):
         db_table = u'test_case_texts'
         ordering = ['case', '-case_text_version']
         unique_together = ('case', 'case_text_version')
+    
+    def get_plain_text(self):
+        from tcms.core.utils.html import html2text
+        
+        self.action = html2text(self.action)
+        self.effect = html2text(self.effect)
+        self.setup = html2text(self.setup)
+        self.breakdown = html2text(self.breakdown)
+        
+        return self
 
 class TestCasePlan(models.Model):
     # plan_id = models.IntegerField(max_length=11, primary_key=True)

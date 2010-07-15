@@ -1,0 +1,12 @@
+New case contents:
+
+ID: {{ test_case.get_url }}
+
+ID: {{ test_case.pk }}
+Summary: {{ cleaned_data.summary }}
+
+Actions:
+{{ test_case_plain_text.action }}
+
+Expected results:
+{{ test_case_plain_text.effect }}

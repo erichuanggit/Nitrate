@@ -234,6 +234,13 @@ class NewCaseForm(BaseCaseForm):
 class EditCaseForm(BaseCaseForm):
     pass
 
+class CaseNotifyForm(forms.Form):
+    default_tester_of_case = forms.BooleanField(required = False)
+    authors_of_plans = forms.BooleanField(required = False)
+    managers_of_runs = forms.BooleanField(required = False)
+    default_testers_of_runs = forms.BooleanField(required = False)
+    assignees_of_case_runs = forms.BooleanField(required = False)
+
 # =========== Forms for  XML-RPC functions ==============
 
 class XMLRPCBaseCaseForm(BaseCaseForm):

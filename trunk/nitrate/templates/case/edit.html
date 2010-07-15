@@ -161,8 +161,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
                     <div class="" id="form_effect">{{ form.effect }}</div>
                 </div>
             </fieldset>
-			<div id="control_box" class="submit-row">
-				<div class="errors">{{ form.errors }}</div>
+            <fieldset class="no-border background-light-grey">
+                <h4 class="strong">Notifications:</h4>
+                {{ notify_form.as_p }}
+            </fieldset>
+            <div id="control_box" class="submit-row">
+                <div class="errors">{{ form.errors }}</div>
                 <input type="submit" value="Save" />
                 <input type="submit" name="_continue" value="Save and continue editing"/>
                 {% if test_plan %}
