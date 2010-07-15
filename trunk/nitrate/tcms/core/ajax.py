@@ -32,8 +32,6 @@ from tcms.testplans.models import TestPlan
 from tcms.testcases.models import TestCase
 from tcms.testruns.models import TestRun, TestCaseRun
 
-import time
-
 def check_permission(request, perm, response = {}):
     """Shared function for check permission"""
     if request.user.has_perm(perm):
@@ -60,6 +58,14 @@ def strip_parameters(request, skip_parameters):
 #        for x in all_case_combinations(s[1:]):
 #            yield s[0].lower() + x
 #            yield s[0].upper() + x
+
+def get_case_combinations(s):
+    """
+    @param s: string 
+    @return: a list containing s and the lowercase, uppercase
+            & first letter uppercase form of s.  
+    """
+    return [s, s.lower(), s.upper(), s.capitalize()]
 
 def info(request):
     """Ajax responsor for misc information"""
@@ -127,9 +133,17 @@ def info(request):
             #    s = "|".join(["Q(name__startswith = '%s')" %item for item in seq])
             #    return TestTag.objects.filter(eval(s))
             #else:
-            #return TestTag.objects.filter(**query)
-            return TestTag.objects.filter(**query)
-        
+            #    return TestTag.objects.filter(**query)
+
+            #Another way of handling this:
+            tagname = query.get('name__startswith','')
+            if tagname != None:
+                seq = get_case_combinations(tagname)
+                s = "|".join(["Q(name__startswith = '%s')" %item for item in seq])
+                return TestTag.objects.filter(eval(s))
+            else:
+                return TestTag.objects.filter(**query)
+
         def users(self):
             from django.contrib.auth.models import User
             query = strip_parameters(self.request, self.internal_parameters)
