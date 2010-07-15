@@ -235,18 +235,15 @@ def all(request, template_name="case/all.html"):
     # Intial the plan in plan details page
     if request.REQUEST.get('from_plan'):
         tp = TestPlan.objects.get(pk = request.REQUEST['from_plan'])
+        template_name = 'plan/get_cases.html'
+        SearchForm = CaseFilterForm
     else:
         tp = TestPlan.objects.none()
+        SearchForm = SearchCaseForm
     
     # Initial the form and template
     d_status = TestCaseStatus.objects.exclude(name = 'DISABLED')
     d_status_ids = d_status.values_list('pk', flat=True)
-    
-    if request.REQUEST.get('from_plan'):
-        template_name = 'plan/get_cases.html'
-        SearchForm = CaseFilterForm
-    else:
-        SearchForm = SearchCaseForm
     
     if request.REQUEST.get('a') in ('search', 'sort'):
         search_form = SearchForm(request.REQUEST)

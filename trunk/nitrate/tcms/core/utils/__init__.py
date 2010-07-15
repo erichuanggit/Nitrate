@@ -35,3 +35,22 @@ def form_errors_to_list(form):
     Use for Ajax.Request response
     """
     return [(k, unicode(v[0])) for k, v in form.errors.items()]
+
+
+#FIXME: Performance needs to be improved.
+#def all_case_combinations(s):
+#    if len(s) == 0:
+#        yield ""
+#    else:
+#        for x in all_case_combinations(s[1:]):
+#            yield s[0].lower() + x
+#            yield s[0].upper() + x
+
+def get_string_combinations(s):
+    """
+    @param s: string 
+    @return: a list containing s and the lowercase, uppercase
+            & first letter uppercase form of s.  
+    """
+    return s, s.lower(), s.upper(), s.capitalize()
+

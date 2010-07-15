@@ -32,6 +32,8 @@ from tcms.testplans.models import TestPlan
 from tcms.testcases.models import TestCase
 from tcms.testruns.models import TestRun, TestCaseRun
 
+from tcms.core.utils import get_string_combinations
+
 def check_permission(request, perm, response = {}):
     """Shared function for check permission"""
     if request.user.has_perm(perm):
@@ -49,23 +51,6 @@ def strip_parameters(request, skip_parameters):
                 parameters[str(k)] = v
     
     return parameters
-
-#FIXME: Performance needs to be improved.
-#def all_case_combinations(s):
-#    if len(s) == 0:
-#        yield ""
-#    else:
-#        for x in all_case_combinations(s[1:]):
-#            yield s[0].lower() + x
-#            yield s[0].upper() + x
-
-def get_case_combinations(s):
-    """
-    @param s: string 
-    @return: a list containing s and the lowercase, uppercase
-            & first letter uppercase form of s.  
-    """
-    return [s, s.lower(), s.upper(), s.capitalize()]
 
 def info(request):
     """Ajax responsor for misc information"""
@@ -138,8 +123,8 @@ def info(request):
             #Another way of handling this:
             tagname = query.get('name__startswith','')
             if tagname != None:
-                seq = get_case_combinations(tagname)
-                s = "|".join(["Q(name__startswith = '%s')" %item for item in seq])
+                seq = get_string_combinations(tagname)
+                s = "|".join(["Q(name__startswith = '%s')" % item for item in seq])
                 return TestTag.objects.filter(eval(s))
             else:
                 return TestTag.objects.filter(**query)
