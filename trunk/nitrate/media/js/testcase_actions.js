@@ -515,17 +515,17 @@ function removePlantocase(plan_id, case_id, container)
 function bindRefreshComponentCategoryByProduct(btn_refresh) {
     btn_refresh.observe('click', function(e) {
         var from = 'id_component_from';
-        var to = 'id_component_to'
-        var component_from_field = $(from);
-        var component_to_field = $(to);
+        var to = 'id_component_to';
+        var from_field = $(from);
+        var to_field = $(to);
         
-        component_to_field.update('');
+        to_field.update('');
         
-        getComponentsByProductId(false, $('id_product'), component_from_field, function() {
+        getComponentsByProductId(false, $('id_product'), from_field, function() {
             SelectBox.cache[from] = new Array();
             SelectBox.cache[to] = new Array();
             
-            for (var i = 0; (node = component_from_field.options[i]); i++) {
+            for (var i = 0; (node = from_field.options[i]); i++) {
                 SelectBox.cache[from].push({value: node.value, text: node.text, displayed: 1});
             }
         });

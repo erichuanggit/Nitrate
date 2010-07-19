@@ -89,11 +89,10 @@ Nitrate.TestPlans.Details.on_load = function()
     
     constructPlanDetailsCasesZone('testcases', plan_id);
     constructTagZone('tag', { plan: plan_id });
+    constructPlanComponentsZone('components');
     
     SortableTable.init('testruns_table');
     SortableTable.init('testreview_table');
-    
-    
     
     $$('li.tab a').invoke('observe', 'click', function(i) {
         $$('div.tab_list').each(function(t) {
@@ -707,20 +706,96 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         )
     }
     
-    var failure = function(t) {
-        returnobj = t.responseText.evalJSON(true);
-        alert(returnobj);
-        return false;
-    }
-    
     var url = getURLParam().url_search_case;
     new Ajax.Updater(container, url, {
         method: 'post',
         parameters: parameters,
         onComplete: complete,
-        onFailure: failure
+        onFailure: json_failure
     })
     
+}
+
+function constructPlanComponentsZone(container, parameters, callback)
+{
+    if(!parameters)
+        var parameters = {
+            plan: Nitrate.TestPlans.Instance.pk,
+        }
+    
+    var url = getURLParam().url_plan_components;
+    
+    var complete = function(t) {
+        if(callback) {
+            callback();
+        }
+        
+        $('id_form_plan_components').observe('submit', function(e) {
+            e.stop();
+            var p = this.serialize(true);
+            constructPlanComponentsZone(container, p, callback);
+        });
+        
+        $$('.link_remove_plan_component').invoke('observe', 'click', function(e) {
+            var links = $$('.link_remove_plan_component');
+            var index = links.indexOf(this);
+            var component = $$('input[type="checkbox"][name="component"]')[index];
+            
+            var p = $('id_form_plan_components').serialize(true);
+            p['component'] = component.value;
+            p['a'] = 'remove';
+            
+            constructPlanComponentsZone(container, p, callback)
+        })
+    }
+    
+    new Ajax.Updater(container, url, {
+        method: 'get',
+        parameters: parameters,
+        onComplete: complete,
+        onFailure: html_failure,
+    })
+}
+
+function constructPlanComponentModificationDialog(container)
+{
+    if(!container)
+        var container = getDialog();
+    container.show();
+    
+    var f = new Element('form', {'action': getURLParam().url_plan_components});
+    var s = new Element('input', {'type': 'submit', 'name': 'a', 'value': 'Update'}); // Submit button
+    var c = new Element('input', {'type': 'button', 'value': 'Cancel'}); // Cancel button
+    
+    var parameters = {
+        a: 'get_form',
+        plan: Nitrate.TestPlans.Instance.pk,
+    };
+    
+    f.observe('submit', function(e) {
+        e.stop();
+        constructPlanComponentsZone('components', this.serialize());
+        clearDialog();
+    })
+    
+    c.observe('click', function(e) {
+        clearDialog();
+    })
+    
+    var callback = function(t) {
+        container.update(f);
+        f.appendChild(s);
+        f.appendChild(c);
+        
+        // FIXME: Split the select to two columns, javascript buggy here.
+        /*
+        SelectFilter.init("id_component", "component", 0, "/admin_media/");
+        refreshSelectFilter('component');
+        */
+    }
+    
+    // Get the form and insert into the dialog.
+    constructPlanComponentsZone(f, parameters, callback);
 }
 
 function constructBatchTagProcessDialog(){

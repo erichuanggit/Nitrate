@@ -874,7 +874,7 @@ def component(request, template_name = 'plan/get_component.html'):
     
     class ComponentActions(object):
         def __init__(self, request, tps, cs):
-            self.__all__ = ['add', 'clear', 'remove', 'update', 'render']
+            self.__all__ = ['add', 'clear', 'get_form', 'remove', 'update', 'render']
             self.__msgs__ = {
                 'permission_denied': { 'rc': 1, 'response': 'Permisson denied' },
             }
@@ -897,6 +897,30 @@ def component(request, template_name = 'plan/get_component.html'):
                     except:
                         raise
             return self.render()
+       
+        def clear(self):
+            if not self.request.user.has_perm('testplans.delete_testplancomponent'):
+                pass
+            
+            # Remove the exist components
+            TestPlanComponent.objects.filter(
+                plan__in = self.tps,
+            ).delete()
+        
+        def get_form(self):
+            from forms import PlanComponentForm
+            tpcs = TestPlanComponent.objects.filter(plan = self.tps)
+            
+            form = PlanComponentForm(tps = self.tps, initial={
+                'component': tpcs.values_list('component_id', flat = True),
+            })
+            
+            q_format = request.REQUEST.get('format')
+            if not q_format:
+                q_format = 'p'
+            html = getattr(form, 'as_' + q_format)
+            
+            return HttpResponse(html())
         
         def remove(self):
             if not self.request.user.has_perm('testplans.delete_testplancomponent'):
@@ -914,15 +938,6 @@ def component(request, template_name = 'plan/get_component.html'):
             
             return self.render()
         
-        def clear(self):
-            if not self.request.user.has_perm('testplans.delete_testplancomponent'):
-                pass
-            
-            # Remove the exist components
-            TestPlanComponent.objects.filter(
-                plan__in = self.tps,
-            ).delete()
-        
         def update(self):
             self.clear()
             self.add()
@@ -932,6 +947,18 @@ def component(request, template_name = 'plan/get_component.html'):
             if request.REQUEST.get('multiple'):
                 return HttpResponse(simplejson.dumps(ajax_response))
             
+            if request.REQUEST.get('type'):
+                from django.core import serializers
+                
+                obj = TestPlanComponent.objects.filter(
+                    plan__in = self.tps,
+                )
+                
+                return HttpResponse(
+                    serializers.serialize(request.REQUEST['type'], obj)
+                )
+                
+            
             return direct_to_template(request, template_name, {
                 'test_plan': self.tps[0],
             })
@@ -940,9 +967,13 @@ def component(request, template_name = 'plan/get_component.html'):
         raise Http404
     
     tps = TestPlan.objects.filter(pk__in = request.REQUEST.getlist('plan'))
-    cs = Component.objects.filter(pk__in = request.REQUEST.getlist('component'))
+    
+    if request.REQUEST.get('component'):
+        cs = Component.objects.filter(pk__in = request.REQUEST.getlist('component'))
+    else:
+        cs = Component.objects.none()
     
     cas = ComponentActions(request = request, tps = tps, cs = cs)
     
-    action = getattr(cas, request.REQUEST.get('a', 'render'))
+    action = getattr(cas, request.REQUEST.get('a', 'render').lower())
     return action()

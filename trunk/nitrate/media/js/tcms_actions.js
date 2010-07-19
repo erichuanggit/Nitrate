@@ -41,6 +41,7 @@ Event.observe(window, 'load', function(e) {
 var default_messages = {
     'alert': {
         'no_case_selected': 'No cases selected! Please select at least one case.',
+        'ajax_failure': 'Commnucation with server got some unknown errors.'
     },
     'confirm': {
         'change_case_status': 'Are you sure to change the status?',
@@ -70,6 +71,7 @@ function getURLParam()
     param.url_change_user_group = '/management/account/' + id + '/changegroup/';
     param.url_change_user_status = '/management/account/' + id + '/changestatus/';
 
+    param.url_plan_components  = '/plans/component/';
     param.url_modify_plan  = '/plan/' + id + '/modify/';
     param.url_plan_assign_case = '/plan/' + id + '/assigncase/apply/';
     
@@ -82,14 +84,32 @@ function getURLParam()
     param.url_modify_case = '/case/' + id + '/modify/';
     param.url_case_change_status = '/cases/changestatus/';
     param.url_change_case_order = '/case/' + id + '/changecaseorder/';
-	
-	param.url_runs_env_value = '/runs/env_value/'
+    
+    param.url_runs_env_value = '/runs/env_value/'
 
     param.url_manage_env_categories = '/management/environments/categories/';
     param.url_manage_env_properties = '/management/environments/properties/';
     param.url_manage_env_property_values = '/management/environments/propertyvalues/';
 
     return param;
+}
+
+
+// Exceptions for Ajax
+var json_failure = function()
+{
+    returnobj = t.responseText.evalJSON(true);
+    if(returnobj.response)
+        alert(returnobj.response);
+    else
+        alert(returnobj);
+    return false;
+}
+
+var html_failure = function()
+{
+    alert(default_messages.alert.ajax_failure);
+    return false;
 }
 
 function setCookie(name, value, expires, path, domain, secure) { 
@@ -367,12 +387,20 @@ function getPropertiesByProductId(allow_blank, container)
     })
 }
 
-function getComponentsByProductId(allow_blank, product_field, component_field, callback)
+function getComponentsByProductId(allow_blank, product_field, component_field, callback, parameters)
 {
-    if(!product_field)
-        var product_field = new String('id_product')
+    if(!parameters)
+        var parameters = {};
     
-    product_id = $F(product_field);
+    parameters.info_type = 'components';
+    
+    // Initial the product get from
+    if (!parameters || !parameters.product_id) {
+        if(!product_field)
+            var product_field = new String('id_product')
+        product_id = $F(product_field);
+        parameters.product_id = product_id
+    }
     
     if(!component_field) {
         if($('id_component')) {
@@ -383,7 +411,7 @@ function getComponentsByProductId(allow_blank, product_field, component_field, c
         }
     }
     
-    if(product_id == "")
+    if(parameters.product_id == "")
     {
         $(component_field).innerHTML = '<option value="">---------</option>';
         return true;
@@ -406,16 +434,16 @@ function getComponentsByProductId(allow_blank, product_field, component_field, c
     var failure = function(t) {
         alert("Update components failed");
     }
-
     
     var url = getURLParam().url_get_product_info;
-    new Ajax.Request(url,
-                     {method:'get',
-                      parameters:{info_type:'components',
-                                  product_id:product_id},
-                      requestHeaders: {Accept: 'application/json'},
-                      onSuccess:success, 
-                      onFailure:failure});
+    
+    new Ajax.Request(url,{
+        method:'get',
+        parameters: parameters,
+        requestHeaders: {Accept: 'application/json'},
+        onSuccess:success, 
+        onFailure:failure
+    });
 }
 
 function getCategorisByProductId(allow_blank, product_field, category_field)
@@ -982,3 +1010,58 @@ function addItemsToTextBoxAsList(item, textbox, splitter)
         $(textbox).value += splitter + item;
 }
 
+function getDialog(element)
+{
+    if(!element)
+        var element = $('dialog');
+        
+    return element
+}
+
+
+var clearDialog = function(element)
+{
+    var dialog = getDialog(element);
+    
+    dialog.update(getAjaxLoading());
+    dialog.hide();
+}
+
+function getAjaxLoading()
+{
+    return Element('div', {className: 'ajax_loading'})
+}
+
+
+// FIXME: Buggy here - Fuck you.
+// Using in bindRefreshComponentCategoryByProduct() in testcase_actions
+// Using in constructPlanComponentModificationDialog() in testplan_actions
+function refreshSelectFilter(element, clean)
+{
+    var from = 'id_' + element + '_from';
+    var to = 'id_' + element + '_to';
+    
+    var from_field = $(from);
+    var to_field = $(to);
+    
+    SelectBox.cache[from] = new Array();
+    SelectBox.cache[to] = new Array();
+    
+    if (clean) {
+        to_field.update('');
+        
+        for (var i = 0; (node = from_field.options[i]); i++) {
+            SelectBox.cache[from].push({value: node.value, text: node.text, displayed: 1});
+        }
+    } else {
+        for (var i = 0; (node = from_field.options[i]); i++) {
+            if (!node.selected)
+                SelectBox.cache[from].push({value: node.value, text: node.text, displayed: 1});
+        }
+        
+        for (var i = 0; (node = from_field.options[i]); i++) {
+            if (node.selected)
+                SelectBox.cache[to].push({value: node.value, text: node.text, displayed: 1});
+        }
+    }
+}

@@ -11,9 +11,19 @@
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/tablednd.js'></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}/js/testplan_actions.js"></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
+<script type="text/javascript" src="/admin/jsi18n/"></script>
+<script type="text/javascript" src="{{ ADMIN_MEDIA_PREFIX }}js/core.js"></script>
+<script type="text/javascript" src="{{ ADMIN_MEDIA_PREFIX }}js/SelectFilter2.js"></script>
+<script type="text/javascript" src="{{ ADMIN_MEDIA_PREFIX }}js/SelectBox.js"></script>
 
 <script type="text/javascript">
 Nitrate.Utils.after_page_load(Nitrate.TestPlans.Details.on_load);
+
+Nitrate.TestPlans.Instance = {
+	pk: {{ test_plan.pk }},
+	product_id: {{ test_plan.product_id }},
+	author_id: {{ test_plan.author_id }},
+}
 </script>
 {% endblock %}
 {% block contents %}
@@ -102,22 +112,25 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Details.on_load);
 	<div class="Detailform border-1">
 		<ul id="contentTab" class="content_tab">
 			<li id="tab_document" class="tab">
-				<a href="#document" title="document">Document </a>
+				<a href="#document" title="document">Document</a>
 			</li>
 			<li id="tab_testcases" class="tab tab_focus">
-				<a href="#testcases" title="testcases">{{ test_plan.case.count }} Cases </a>
+				<a href="#testcases" title="testcases">Cases ({{ test_plan.case.count }})</a>
 			</li>
 			<li id="tab_testruns"  class="tab">
-				<a href="#testruns" title="testruns">{{ test_plan.run.count }} Runs </a>
+				<a href="#testruns" title="testruns">Runs ({{ test_plan.run.count }} )</a>
 			</li>
 			<li id="tab_testreviews"  class="tab">
-				<a href="#testreviews" title="testreviews">{{ test_plan.review.count }} Reviews </a>
+				<a href="#testreviews" title="testreviews">Reviews ({{ test_plan.review.count }})</a>
+			</li>
+			<li id="tab_components"  class="tab">
+				<a href="#components" title="components">Default Components ({{ test_plan.component.count }})</a>
 			</li>
 			<li id="tab_attachment" class="tab">
-				<a href="#attachment" title="attachment">{{ test_plan.attachment.count }} Attachments</a>
+				<a href="#attachment" title="attachment">Attachments ({{ test_plan.attachment.count }})</a>
 			</li>
 			<li id="tab_tag" class="tab">
-				<a href="#tag" title="tag">{{ test_plan.tag.count }} Tags</a>
+				<a href="#tag" title="tag">Tags ({{ test_plan.tag.count }})</a>
 			</li>
 			<li id="tab_tag" class="tab">
 				<a href="#log" title="log">Log</a>
@@ -134,6 +147,9 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Details.on_load);
 		</div>
 		<div class="tab_list" id="testreviews"  style="display:none;">
 			{% include "plan/get_reviews.html" %}
+		</div>
+		<div class="tab_list" id="components"  style="display:none;">
+			<div class="ajax_loading"></div>
 		</div>
 		<div class="tab_list" id="log"  style="display:none;">
 			{% include "plan/get_log.html" %}

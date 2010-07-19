@@ -25,7 +25,7 @@ from tcms.core.lib.xml2dict.xml2dict import XML2Dict
 from tcms.core.forms.fields import TimedeltaFormField
 from tcms.core.forms.widgets import TinyMCEWidget
 
-from tcms.management.models import Product, Version, TCMSEnvGroup, Priority, TestTag
+from tcms.management.models import Component, Product, Version, TCMSEnvGroup, Priority, TestTag
 from tcms.testcases.models import TestCaseStatus, TestCaseCategory, TestCaseTag
 
 from models import TestPlan, TestPlanType
@@ -461,3 +461,26 @@ class ImportCasesViaXMLForm(forms.Form):
         help_text='XML file is export with TCMS or Testopia.'
     )
 
+class PlanComponentForm(forms.Form):
+    plan = forms.ModelMultipleChoiceField(
+        queryset = TestPlan.objects.none(),
+        widget = forms.Select(attrs={'style': 'display:none;'}),
+    )
+    component = forms.ModelMultipleChoiceField(
+        queryset = Component.objects.none(),
+        required = False,
+    )
+    
+    def __init__(self, tps, **kwargs):
+        tp_ids = tps.values_list('pk', flat = True)
+        product_ids = list(set(tps.values_list('product_id', flat = True)))
+        
+        if kwargs.get('initial'):
+            kwargs['initial']['plan'] = tp_ids
+        
+        super(PlanComponentForm, self).__init__(**kwargs)
+        
+        self.fields['plan'].queryset = tps
+        self.fields['component'].queryset = Component.objects.filter(
+            product__pk__in = product_ids
+        )
