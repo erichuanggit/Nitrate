@@ -1,0 +1,39 @@
+<table class="list" cellspacing="0" cellspan="0" width="100%">
+	<thead>
+		<tr>
+			<th align="left" width="5%"><input type="checkbox" disabled /></th>
+			<th align="left" width="50%">Name</th>
+			<th align="left" width="30%">Product</th>
+			{# <th align="left" width="20%">Actions</th> #}
+		</tr>
+	</thead>
+	<tbody>
+		{% for component in test_case.component.all %}
+		<tr class="{% cycle 'odd' 'even' %}">
+			<td><input type="checkbox" name="component" value={{ component.pk }} disabled /></td>
+			<td>{{ component.name }}</td>
+			<td>{{ component.product }}</td>
+			{# <td>None</td> #}
+		</tr>
+		 {% empty %}
+		<tr>
+			<td colspan="3" align="center grey">No component</td>
+		</tr>
+		{% endfor %}
+		
+		{% if perms.management.add_testattachment %}
+		<tr>
+			<td colspan="3">
+				<div class="addtag">
+					{% comment %}
+					<span class="tit">Add attachment</span>
+					<a href="{% url tcms.testcases.views.attachment test_case.case_id %}?from_plan={{ test_plan.plan_id }}" class="addlink">add</a> 
+					{% endcomment %}
+					Use <a href="{% url tcms.testcases.views.edit test_case.pk %}">Edit</a> function to modify.
+				</div>
+			</td>
+		</tr>
+		{% endif %}
+		
+	</tbody>
+</table>

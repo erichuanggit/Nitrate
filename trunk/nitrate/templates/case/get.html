@@ -51,6 +51,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Details.on_load);
 		<h2 id="display_title">{{ test_case.summary }}</h2>
 		<fieldset class="no-border">
 			<div class="editor-side">
+				{% comment %}
 				<div class="cell">
 					<div class="sd">Component:</div>
 					<dl class="ul-no-format" style="float:left">
@@ -61,6 +62,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Details.on_load);
 						{% endfor %}
 					</dl>
 				</div>
+				{% endcomment %}
 				<div class="cell">
 					<div class="sd">Default Tester:</div>
 					<div >
@@ -150,10 +152,13 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Details.on_load);
 				<a href="#document"  title="document">Document</a>
 			</li>
 			<li id="tab_attachment" class="tab">
-				<a href="#attachment" title="attachment">{{ test_case.attachment|length }} Attachment(s)</a>
+				<a href="#attachment" title="attachment">Attachments ({{ test_case.attachment.count }})</a>
 			</li>
 			<li id="tab_case_plan" class="tab">
-				<a href="#plan" title="plan">Used in {{ test_case|length }} plan(s)</a>
+				<a href="#plan" title="plan">Test plans ({{ test_case.plan.count }})</a>
+			</li>
+			<li id="tab_component" class="tab">
+				<a href="#component" title="component">Components ({{ test_case.component.count }})</a>
 			</li>
 			{% comment %}
 			<li id="tab_case_depend" class="tab" style="display:none">
@@ -161,16 +166,16 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Details.on_load);
 			</li>
 			{% endcomment %}
 			<li id="tab_case_tag" class="tab">
-				<a href="#tag" title="tag">{{ test_case.tag.count }} Tag(s)</a>
+				<a href="#tag" title="tag">Tags ({{ test_case.tag.count }})</a>
 			</li>
 			<li id="tab_case_bug" class="tab">
-				<a href="#bug" title="bug">{{ test_case.case_bug.count }} Related Bug(s)</a>
+				<a href="#bug" title="bug">Bugs ({{ test_case.case_bug.count }})</a>
 			</li>
             <li id="tab_case_run" class="tab">
-				<a href="#case_run" title="case_run">{{ test_case_runs.count }} Case Run</a>
+				<a href="#case_run" title="case_run">Case Runs ({{ test_case_runs.count }})</a>
 			</li>
 			<li id="tab_case_log" class="tab">
-				<a href="#log" title="log">Change Log</a>
+				<a href="#log" title="log">Change Logs</a>
 			</li>
 		</ul>
 		<div  id="document"  class="Detailform-variety_2 tab_list" style="clear:left;">
@@ -181,6 +186,9 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Details.on_load);
 		</div>
         <div id="plan" style="display:none" class="tab_list">
 			{% include "case/get_plan.html" %}
+		</div>
+		<div id="component" style="display:none" class="tab_list">
+			{% include "case/get_component.html" %}
 		</div>
         {% comment %}
 		<div id="depend" class="tab_list" style="display:none">
