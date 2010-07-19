@@ -140,10 +140,6 @@ Nitrate.TestPlans.SearchCase.on_load = function()
             // bind_version_selector_to_product(true);
         }
     }
-    
-    $('id_check_all_button').observe('click', function(e) {
-        toggleAllCheckBoxes(this, 'id_table_cases', 'case');
-    });
 }
 
 Nitrate.TestPlans.Clone.on_load = function()
@@ -382,17 +378,6 @@ function taggleSort() {
     }
 }
 
-function taggleAllPlansCheckbox(container)
-{
-    if($('id_check_all_plans').checked) {
-        $$('#' + container + ' input[type="checkbox"][name="plan_id"]').each( function(t) { t.checked = true; });
-        $$('#' + container + ' tr').each(function(e) { e.addClassName('selection_row')});
-    } else {
-        $$('#' + container + ' input[type="checkbox"][name="plan_id"]').each( function(t) { t.checked = false; });
-        $$('#' + container + ' tr').each(function(e) { e.removeClassName('selection_row')});
-    }
-}
-
 function delPlanCase(container, plan_id) 
 {
     var parameters = $('id_form_cases').serialize(true);
@@ -457,12 +442,6 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             $('filter_priority').toggle();
         });
         */
-        
-        if($('id_check_all_button')) {
-            $('id_check_all_button').observe('click', function(m) {
-                toggleAllCheckBoxes(this, 'id_table_cases', 'case')
-            })
-        }
         
         $('id_filtercase').observe('click', function(t) {
             var element = $('list_filter_m');

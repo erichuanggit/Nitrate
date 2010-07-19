@@ -2,7 +2,7 @@
 	<table class="list">
 		<thead>
 			<tr>
-				<th><input type="checkbox" >
+				<th><input type="checkbox" onclick="clickedSelectAll(this, this.up(4), 'component')"></th>
 				<th>Component</th>
 				<th>Product</th>
 				<th>Action</th>
@@ -11,10 +11,16 @@
 		<tbody>
 			{% for component in test_plan.component.all %}
 			<tr class="{% cycle 'odd' 'even' %}">
-				<td><input type="checkbox" name="component" value="{{ component.pk }}" /></td>
+				<td><input type="checkbox" name="component" value="{{ component.pk }}" {% if perms.testplans.change_testplancomponent %}{% else %}disabled{% endif %}/></td>
 				<td>{{ component }}</a></td>
 				<td>{{ component.product }}</td>
-				<td><a class="link_remove_plan_component" href="javascript:void(0)">Remove</a></td>
+				<td>
+					{% if perms.testplans.delete_testplancomponent %}
+					<a class="link_remove_plan_component" href="javascript:void(0)">Remove</a>
+					{% else %}
+					<label class="grey">None</label>
+					{% endif %}
+				</td>
 			</tr>
 			{% empty %}
 			<tr><td colspan="5" align="center"><span class="grey">No component defined.</span></td></tr>

@@ -48,7 +48,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 	<table class="list border-bottom" id="testcases_table" cellpadding="0" cellspacing="0" border="0">
 		<thead>
 			<tr>
-            	<th width="20" class="nosort" ><input type="checkbox" id="id_check_all_cases" onclick="taggleAllCasesCheckbox('testcases_table');" title="Select all/Select none"></th>
+            	<th width="20" class="nosort" ><input type="checkbox" id="id_check_all_cases" onclick="clickedSelectAll(this, this.up(4), 'case')" title="Select all/Select none"></th>
 				<th align="left" width="50" class="sortcol sortdesc">ID</th>
 				<th align="left" class="sortcol">Summary</th>
 				<th align="left" width="100" class="sortcol">Author</th>
@@ -64,7 +64,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 		<tbody>
 			{% for test_case in test_cases %}
 			<tr class="{% cycle 'odd' 'even' %}">
-                <td valign="top"><input type="checkbox" name="case" value="{{ test_case.case_id }}" title="Select/Unselect"></td>
+                <td valign="top"><input type="checkbox" name="case" value="{{ test_case.case_id }}"></td>
 				{% comment %}
 				<td>
 					<a id="blind_link_{{ forloop.counter }}" href="javascript:toggleTestCaseContents('{{ forloop.counter }}')">
