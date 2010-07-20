@@ -3,10 +3,17 @@
 == Contents: ==
 
  * [#create_dev_env Create a development environment.]
+   * [#requirements Requirements]
    * [#download_source Download the source.]
    * [#generate_config_file Generate the configuration file.]
    * [#initial_db Create the initial database schema.]
+   * [#initial_data Create the initial data.]
+     * [#initial_super_user Add the super user]
+     * [#initial_site Add the site definition]
    * [#start_app Start the Django app.]
+   * [#basic_admin Basic admin works]
+     * [#initial_bug_tracker Bug tracker initialization]
+     * [#initial_group User groups initialization]
  * [#extra_apache Deploy with Apache.]
    * [#extra_apache_mod_auth_kerb Deploy with mod_auth_kerb.]
  * [#extra_nginx Deploy with Nginx.]
@@ -14,11 +21,22 @@
  * [#more_info More information.]
 
 == Create a development environment. == #create_dev_env
-Nitrate is standard Django app. The deployment method is the same as others.
+Nitrate is standard Django app. The deployment method is the same as
+[http://docs.djangoproject.com/en/dev/howto/deployment/ others].
 
 Before you starting to installation, please read the
 [https://fedorahosted.org/nitrate/browser/trunk/nitrate/docs/README README]
 file at first.
+
+=== Requirements === #requirements
+ * [http://www.python.org Python] >= 2.4
+ * [http://www.djangoproject.com/ Django] = 1.1 (1.2 is not supported yet)
+ * [http://sourceforge.net/projects/mysql-python/ python-MySQL]
+ * [https://fedorahosted.org/kobo/ Kobo]
+ * [http://koji.fedoraproject.org/koji/packageinfo?packageID=5539 python-kerberos]
+
+Recommendations for development:
+ * [http://github.com/robhudson/django-debug-toolbar Django debug toolbar]
 
 === Download the sources. === #download_source
 The Nitrate source code is available at:
@@ -114,6 +132,43 @@ $ export PYTHONPATH=[nitrate_download_path]/nitrate/trunk/nitrate/
 {{{
 $ django-admin syncdb
 }}}
+
+If you got some errrors report, just try to type upon commands and run again.
+
+=== The data initialization === #initial_data
+The initial data including the first super user, site definition, they will be
+needed by the server running.
+
+==== Add the super user ==== #initial_super_user
+Simple type following commands in shell should be OK
+
+{{{
+$ django-admin.py createsuperuser
+Username: [You login user name]
+E-mail address: [Your email]
+Password: [Your password]
+Password (again): [Your password again]
+Superuser created successfully.
+}}}
+
+For more information access the
+[http://docs.djangoproject.com/en/dev/topics/auth/#creating-superusers User authentication in Django].
+
+==== Add the site definition ==== #initial_site
+Here you need some python skills, just type like following:
+
+{{{
+$ python
+>>> from django.contrib.sites.models import Site
+>>> Site.objects.create(name="example.com")
+}}}
+
+Replace the "example.com" to your web server domain name, the definition will
+be used in mailing system.
+
+For more information access the
+[http://docs.djangoproject.com/en/dev/ref/contrib/sites/ Django site framework].
+
 === Start the Django app. === #start_app
 After upon steps completed, now you can try to start the web server built-in
 Django to testing the app running.
@@ -129,6 +184,35 @@ $ django-admin runserver
 }}}
 Then try to use web browser to open http://localhost:8000/ to see the web service
 working status.
+
+=== Basic admin works === #basic_admin
+After your typed your super user user name and password in the browser, you
+will see the "Home page" of Nitrate, there are some configuration needed by you
+enter in the admin system.
+
+==== Bug tracker initialization ==== #initial_bug_tracker
+Access http://localhost:8000/admin/testcases/testcasebugsystem/ on your server,
+and add a new bug tracker URL to Nitrate, it's required by execute run feature.
+
+Click the 'Add test case bug system' link in the top of the table, type the name
+and description as your wish, then type the 'Url reg exp' like
+'https://bugzilla.redhat.com/show_bug.cgi?id=%s', The '%s' will be replaced by
+bug ID.
+
+Nitrate supported multiple bug tracker system backend, the only requirement is
+the bug tracker supports access the bug with bug ID.
+
+==== User groups initialization ==== #initial_group
+Access http://localhost:8000/admin/auth/group/ on your server, you need to create
+the group need by tester at least, apply all of add/change permissions(The
+permissions starts with 'auth_' also be excluded) to the group.
+
+Then when a new memember join the system, just apply the tester group he will
+get the minimal permissions to create/update test plan/case/run and execute the run.
+
+You also can create a group named 'Administrator', apply the people management
+permission(The permissions name starts with 'auth_') to it, allocate some trusted
+people to the group for the user management work.
 
 == Deploy with Apache. == #extra_apache
 We recommend to use the WSGI method, it saves resources and very fast. The sample
