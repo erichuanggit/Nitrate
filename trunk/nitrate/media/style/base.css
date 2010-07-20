@@ -434,6 +434,7 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .run_evenRow{ background:#f1f1f1; width:100%; clear:both; padding:3px 0px; float:left;}
 .run_oddRow{ background:#fff; width:100%; padding:3px 0px; clear:both;}
 .run_current{ background:#f3f8fc;}
+.highlight{ background:#deedd9;}
 .caes_run label{ margin-right:10px; width:120px;}
 .case_run .row{ float:left; clear:both; width:98%; margin-left:1%; padding-top:5px;}
 .case_run .exist_comments ,.case_run .new_comment{ float:left; width:100%; margin:5px 0; }
@@ -534,7 +535,7 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .query_cases_content { float:left; width:100%; padding-left:10px;}
 .query_cases_content label{ width:60%; margin-left:10px; float:left; border-bottom:1px dotted #235C82;}
 /********************************Content Wrap ********************/
-.Detailform{ width:98%;margin-left:auto; margin-right:auto; margin-bottom:5px; padding:1px; clear:both; margin-top:5px;}
+.Detailform{ width:98%;margin-left:auto; margin-right:auto; margin-bottom:5px; padding:0px; clear:both; margin-top:5px;}
 .Detailform .name input[type="text"]{ width:250px;}
 .Detailform table{ table-layout:fixed;}
 .Detailform h3{ margin-bottom:2px; margin-top:2px;}

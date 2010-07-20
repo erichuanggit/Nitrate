@@ -1,5 +1,5 @@
 {% load comments %}
-<div id="id_tr_case_{{ forloop.counter }}" class="execute_case_run run_evenRow {% if test_case_run.is_current %} run_current {% endif %}" onclick="toggleTestCaseContents('{{ forloop.counter }}', '{{ test_case_run.case_text_version}}', '{{ test_case_run.case_run_id}}')">
+<div id="id_tr_case_{{ forloop.counter }}" class="execute_case_run run_evenRow {% if test_case_run.is_current %} run_current {% endif %} {% ifequal test_case_run.assignee user%} mine {%endifequal%}" onclick="toggleTestCaseContents('{{ forloop.counter }}', '{{ test_case_run.case_text_version}}', '{{ test_case_run.case_run_id}}')">
 	{% if response %}
 	<div id='response'>{{ response }}</div>
 	{% endif %}
@@ -15,9 +15,6 @@
 		</a>
 		{% endif %}
 	</div>
-	
-	
-	
 	<span class="lab-50">{{ test_case_run.case.priority.value }}</span>
     <span class="lab-100" title="Case_Run ID">{{ test_case_run.case_run_id }}</span>
     <span class="lab-50"><a href="{% url tcms.testcases.views.get test_case_run.case_id %}?from_plan={{ testrun.plan_id }}" title="Case ID">{{ test_case_run.case_id }}</a></span>
@@ -39,11 +36,11 @@
 <div class="hiddenRow {% if not test_case_run.is_current %}border-top{% endif %}" id="hidenRow_{{ forloop.counter }}" {% if not test_case_run.is_current %}style="display: none"{% endif %}>
 	<div class="grey right-action">
 		<label class="tit" >Author:</label>
-		<a href="mailto:{{ test_case_run.case.author.email }}">{{ test_case_run.case.author.email }}</a>
+		<a href="mailto:{{ test_case_run.case.author.email }}">{{ test_case_run.case.author}}</a>
 		<label class="tit">Tester:</label>
-		<a id="id_link_assignee_{{ test_case_run.case_run_id }}" href="mailto:{{ test_case_run.tested_by.email }}">{{ test_case_run.tested_by.email }}</a>
+		<a id="id_link_assignee_{{ test_case_run.case_run_id }}" href="mailto:{{ test_case_run.tested_by.email }}">{{ test_case_run.tested_by }}</a>
         <label class="tit">Assignee:</label>
-		<a id="id_link_assignee_{{ test_case_run.case_run_id }}" href="mailto:{{ test_case_run.assignee.email }}">{{ test_case_run.assignee.email }}</a>
+		<a id="id_link_assignee_{{ test_case_run.case_run_id }}" href="mailto:{{ test_case_run.assignee.email }}">{{ test_case_run.assignee}}</a>
 		<label class="tit">Category:</label>
 		{{ test_case_run.case.category }}
 		<label  class="tit">Status:</label>

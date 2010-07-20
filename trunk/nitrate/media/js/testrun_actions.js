@@ -101,6 +101,13 @@ Nitrate.TestRuns.Execute.on_load = function()
             blindupAllCases();
         }
     })
+	if($('id_check_box_highlight').checked){
+		$$('.mine').invoke('addClassName','highlight');
+		}
+	$('id_check_box_highlight').observe('click',function(){
+		e=$$('.mine');
+		this.checked && e.invoke('addClassName','highlight') || e.invoke('removeClassName','highlight')
+		})
 }
 
 Nitrate.TestRuns.Clone.on_load = function()
