@@ -31,6 +31,7 @@ $(SRPM): $(TARBALL) $(SPECFILE)
 # This means that we know exactly which version of each file we have in any RPM.
 $(TARBALL): Makefile
 	@rm -rf $(WORK_DIR)
+	@rm -f $(TARBALL)
 	@mkdir $(WORK_DIR)
 	@echo "Getting latest codes from git"
 	@cd $(WORK_DIR); git clone git://git.fedorahosted.org/nitrate.git
