@@ -13,7 +13,7 @@ PWD=$(shell pwd)
 RPMBUILD_OPTIONS=--nodeps --define "_sourcedir $(PWD)" --define "_srcrpmdir $(PWD)"
 
 WORK_DIR=/tmp/nitrate-$(VERSION)-$(RELEASE)
-SOURCE_DIR = $(WORK_DIR)/trunk/
+SOURCE_DIR = $(WORK_DIR)/nitrate/trunk/
 
 # Target: build a local RPM
 local-rpm: $(SRPM)
