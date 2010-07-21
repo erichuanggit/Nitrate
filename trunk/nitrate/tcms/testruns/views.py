@@ -63,7 +63,7 @@ def new(request, template_name = 'run/new.html'):
     num_unconfirmed_cases = 0
     for tc in tcs:
         # Hardcode here, the case_status_id is CONFIRMED
-        if not tc.is_confirmed():
+        if not tc.case_status.is_confirmed():
             num_unconfirmed_cases += 1
     
     if request.method == 'POST': # If the form has been submitted...

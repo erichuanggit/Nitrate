@@ -75,6 +75,9 @@ class TestCaseStatus(TCMSActionModel):
             return cls.objects.get(id = id).name
         except cls.DoesNotExist:
             return None
+    
+    def is_confirmed(self):
+        return self.name == 'CONFIRMED'
 
 class TestCaseCategory(TCMSActionModel):
     id = models.AutoField(db_column='category_id', primary_key=True)
