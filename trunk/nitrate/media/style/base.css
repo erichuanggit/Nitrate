@@ -717,3 +717,8 @@ a:link.edit,a:visited.edit{ color:#333;}
 #id_automated_form ul li input{ margin-right:7px;}
 #id_automated_form p{ margin-left:10px; margin-top:5px;}
 #id_automated_form p input{ float:left}
+
+
+/*table coulumu width*/
+.table_width_checkbox{ width:20px;}
+.table_width_action{ width:120px;}

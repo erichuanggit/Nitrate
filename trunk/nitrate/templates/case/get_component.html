@@ -1,10 +1,10 @@
 <table class="list" cellspacing="0" cellspan="0" width="100%">
 	<thead>
 		<tr>
-			<th align="left" width="5%"><input type="checkbox" disabled /></th>
-			<th align="left" width="50%">Name</th>
-			<th align="left" width="30%">Product</th>
-			{# <th align="left" width="20%">Actions</th> #}
+			<th  class="table_width_checkbox" align="left"><input type="checkbox" disabled /></th>
+			<th align="left">Name</th>
+			<th align="left">Product</th>
+			{# <th align="left">Actions</th> #}
 		</tr>
 	</thead>
 	<tbody>
@@ -17,7 +17,7 @@
 		</tr>
 		 {% empty %}
 		<tr>
-			<td colspan="3" align="center grey">No component</td>
+			<td colspan="3" align="center" class="grey">No component</td>
 		</tr>
 		{% endfor %}
 		
