@@ -20,7 +20,7 @@ BuildRequires:  pylint
 BuildRequires:  Django
 %endif
 
-Requires:       Django = 1.1
+Requires:       Django = 1.1.1
 # Requires:     mod_python
 Requires:       mod_ssl
 Requires:       python-memcached
