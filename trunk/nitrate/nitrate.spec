@@ -1,16 +1,15 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
-%define svn_rev 2859
 %define use_pylint 0
 
 Name:           nitrate
-Version:        3.0.3
-Release:        2.svn%{svn_rev}
+Version:        3.0.4
+Release:        1
 Summary:        Test Case Management System
 
 Group:          Development/Languages
 License:        Internal RH for now
 URL:            https://engineering.redhat.com/trac/testify20/browser/trunk/nitrate
-Source0:        nitrate-%{version}.svn%{svn_rev}.tar.bz2
+Source0:        nitrate-%{version}-%{release}.tar.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:      noarch
@@ -21,8 +20,8 @@ BuildRequires:  pylint
 BuildRequires:  Django
 %endif
 
-Requires:   Django >= 1.1
-# Requires:       mod_python
+Requires:       Django = 1.1
+# Requires:     mod_python
 Requires:       mod_ssl
 Requires:       python-memcached
 Requires:       python-kerberos

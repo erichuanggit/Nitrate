@@ -1,5 +1,4 @@
 SPECFILE=nitrate.spec
-SVN_REV=2859
 PREFIX=/usr
 # FIXME: eventually figure this out, using something like this:
 #$(shell (svn info | awk "/Revision:/ { print $$2 }"))
@@ -9,11 +8,12 @@ VERSION=$(shell rpm -q --qf "%{VERSION}\n" --specfile $(SPECFILE)|head -n1)
 RELEASE=$(shell rpm -q --qf "%{RELEASE}\n" --specfile $(SPECFILE)|head -n1)
 
 SRPM=$(NAME)-$(VERSION)-$(RELEASE).src.rpm
-TARBALL=nitrate-$(VERSION).svn$(SVN_REV).tar.bz2
+TARBALL=nitrate-$(VERSION)-$(RELEASE).tar.bz2
 PWD=$(shell pwd)
 RPMBUILD_OPTIONS=--nodeps --define "_sourcedir $(PWD)" --define "_srcrpmdir $(PWD)"
 
-WORK_DIR=/tmp/nitrate-$(SVN_REV)
+WORK_DIR=/tmp/nitrate-$(VERSION)-$(RELEASE)
+SOURCE_DIR = $(WORK_DIR)/trunk/
 
 # Target: build a local RPM
 local-rpm: $(SRPM)
@@ -32,14 +32,14 @@ $(SRPM): $(TARBALL) $(SPECFILE)
 $(TARBALL): Makefile
 	@rm -rf $(WORK_DIR)
 	@mkdir $(WORK_DIR)
-	@echo "Getting SVN revision $(SVN_REV)"
-	@cd $(WORK_DIR); svn co --revision $(SVN_REV) https://svn.devel.redhat.com/repos/testify20/trunk/nitrate
+	@echo "Getting latest codes from git"
+	@cd $(WORK_DIR); git clone git://git.fedorahosted.org/nitrate.git
 	# Fixup the version field in the page footer so that it shows the precise
 	# RPM version-release:
-	@cd $(WORK_DIR); sed --in-place -r 's|NITRATE_VERSION|$(VERSION)-$(RELEASE)|' $(WORK_DIR)/nitrate/templates/tcms_base.html
-	@cd $(WORK_DIR); mv nitrate nitrate-${VERSION}
-	@cd $(WORK_DIR); tar --bzip2 --exclude .svn -cSpf $(TARBALL) nitrate-${VERSION}
-	@cp $(WORK_DIR)/$(TARBALL) .
+	@cd $(SOURCE_DIR); sed --in-place -r 's|NITRATE_VERSION|$(VERSION)-$(RELEASE)|' $(SOURCE_DIR)/nitrate/templates/tcms_base.html
+	@cd $(SOURCE_DIR); mv nitrate nitrate-${VERSION}-${RELEASE}
+	@cd $(SOURCE_DIR); tar --bzip2 --exclude .git -cSpf $(TARBALL) nitrate-${VERSION}-${RELEASE}
+	@cp $(SOURCE_DIR)/$(TARBALL) .
 
 src-rpm: $(SRPM)
 
