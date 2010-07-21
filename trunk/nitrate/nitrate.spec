@@ -111,7 +111,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
-* Wed July 21 2010 Xuqing Kuang <xkuang@redhat.com - 3.0.4-1
+* Wed July 21 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.4-1
 - First open sourced version.
 - Added all of docs lacked for installation/upgrading/usage.
 - Fixed #604206 - TestCase.link_plan() does not report errors
