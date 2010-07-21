@@ -105,12 +105,32 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc docs/AUTHORS docs/ChangeLog docs/README docs/RELEASENOTES docs/UPGRADING docs/mysql_initial.sql
+%doc docs/INSTALL docs/AUTHORS docs/ChangeLog docs/README docs/RELEASENOTES docs/UPGRADING docs/XMLRPC docs/testopia-dump-blank.sql docs/mysql_initial.sql
 %{python_sitelib}/*
 %{_datadir}/%{name}/*
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
+* Wed July 21 2010 Xuqing Kuang <xkuang@redhat.com - 3.0.4-1
+- First open sourced version.
+- Added all of docs lacked for installation/upgrading/usage.
+- Fixed #604206 - TestCase.link_plan() does not report errors
+- Completed feature #609842 - [FEAT] provide buglist link in addition to ...
+- Fixed #611354 - [Text] Updates to automation options.
+- Fixed UI Bug #609760 - Add Tag text "Ok, I see" needs updating.
+- Fixed UI Bug #606730 - favicon.ico should use transparency
+- Fixed #612797 - Test run env value permission check issue
+- Fixed #612022 - Change Automation status window appears when no test …
+- Fixed #609776 - Tag autocomplete is case sensitive.
+- Fixed #612881 - The filter for 'Automated' 'Manual' 'Autoproposed' is …
+- Fixed #613480 - No way is provided to go back to the plan after cloning a …
+- Fixed UI Bug #610127 - show/highlight test-case-runs assigned to me when executing …
+- Fixed UI Bug #612880 - Need total number for filter out result
+- Completed feature #607844 - (RFE) Flag tests which require the IEEE Test …
+- Completed Feature #587143 - [FEAT] Have a default component when creating …
+- Move the compoent of the case to be a tab
+- Use the updateObject() function to reimplemented multiple operations.
+
 * Mon Jun 28 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.3-2.svn2859
 - Fixed bug #604860. Modify ComponentAdmin?'s search_fields from (('name',)) …
 - Update the plan list & case list & run list
