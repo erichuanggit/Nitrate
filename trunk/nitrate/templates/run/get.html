@@ -58,7 +58,8 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 		<input type="button" value="Delete" title="Delete the run" onclick="window.location.href='{% url tcms.testruns.views.delete test_run.run_id %}'">
 		{% endifequal %}
 		{% endifequal %}
-		{% endif %}
+		<input type="button" value="Export" title="Export cases in this run" onclick="window.location.href='{% url tcms.testruns.views.export test_run.run_id %}?' + $('id_form_case_runs').serialize();" >
+        {% endif %}
 	</div>
 	<h2 id="display_title">{{ test_run.summary }}</h2>
     <div>

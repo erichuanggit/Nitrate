@@ -862,6 +862,24 @@ def update(request, run_id):
         next = reverse('tcms.testruns.views.get', args=[run_id,]),
     ))
 
+def export(request, run_id, template_name = 'run/export.csv'): 
+    import time
+    timestamp_str = time.strftime('%Y-%m-%d') 
+    case_runs = request.REQUEST.getlist('case_run')
+    #Export selected case runs
+    if case_runs:
+        tcrs = TestCaseRun.objects.filter(case_run_id__in = case_runs)
+    #Export all case runs
+    else:
+        tcrs = TestCaseRun.objects.filter(run = run_id)
+    response = direct_to_template(request, template_name, {
+        'tcrs': tcrs,
+    })
+
+    response['Content-Disposition'] = 'attachment; filename=tcms-testcase-runs-%s.csv' % timestamp_str
+
+    return response
+
 def env_value(request):
     """Run environment property edit function"""
     from django.utils import simplejson
