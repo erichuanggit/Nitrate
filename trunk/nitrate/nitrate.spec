@@ -111,7 +111,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
-* Wed July 21 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.4-1
+* Wed Jul 21 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.4-1
 - First open sourced version.
 - Added all of docs lacked for installation/upgrading/usage.
 - Fixed #604206 - TestCase.link_plan() does not report errors
@@ -365,7 +365,6 @@ rm -rf $RPM_BUILD_ROOT
 - Optimize delete case/run ACL policy.
 - Initial completed Reporting feature.
 - Initial XML-RPC interface
-
 
 * Wed Nov 25 2009 Xuqing Kuang <xkuang@redhat.com> - 1.2-3.svn2167
 - Made a mistake in checkout the source, so rebuild it.
