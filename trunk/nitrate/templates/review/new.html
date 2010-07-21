@@ -144,7 +144,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestReviews.New.on_load);
 					<td>
 						<a href="/case/{{ testcase.case_id }}/">{{ testcase.case_id }}</a>
 					</td>
-					{% if not testcase.is_confirmed %}
+					{% if not testcase.case_status.is_confirmed %}
 					<td>
 						<a id="link_{{ forloop.counter }}" class="blind_title_link">
 							{{ testcase.summary }}

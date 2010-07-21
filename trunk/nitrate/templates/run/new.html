@@ -162,12 +162,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 						</td>
 						<td >
 							<a href="/case/{{ test_case.case_id }}/">{{ test_case.case_id }}</a>
-							{% if test_case.is_confirmed %}
+							{% if test_case.case_status.is_confirmed %}
 							<input type="hidden" name="case" value="{{ test_case.case_id }}">
 							{% endif %}
 						</td>
-						<td{% if not test_case.is_confirmed %} style='text-decoration: line-through'{% endif %}>
-							{% if not test_case.is_confirmed %} <img src="{{ MEDIA_URL }}/images/warning.png"/>{% endif %}
+						<td{% if not test_case.case_status.is_confirmed %} style='text-decoration: line-through'{% endif %}>
+							{% if not test_case.case_status.is_confirmed %} <img src="{{ MEDIA_URL }}/images/warning.png"/>{% endif %}
 							<a id="link_{{ forloop.counter }}" class="blind_title_link" href="javascript:toggleTestCaseContents('{{ forloop.counter }}')">
 								{{ test_case.summary }}
 							</a>

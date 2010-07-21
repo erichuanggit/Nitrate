@@ -1,12 +1,37 @@
 New case contents:
 
-ID: {{ test_case.get_url }}
-
 ID: {{ test_case.pk }}
-Summary: {{ cleaned_data.summary }}
+Summary: {{ test_case.summary }}
+Default tester: {{ test_case.default_tester }}
+Product: {{ test_case.category.product }}
+Category: {{ test_case.category }}
+Esitmated time: {{ test_case.estimated_time }}
+Priority: {{ test_case.priority }}
+Status: {{ test_case.case_status }}
+
+Components:
+{% for component in test_case.component.all %}* {{ component }} - ({{ component.product }})
+{% endfor %}
+
+Automated: {{ test_case.get_is_automated_status }}
+Alias: {{ test_case.script }}
+Script: {{ test_case.script }}
+Argument: {{ test_case.argument }}
+
+Notes:
+{{ test_case.notes|safe }}
+
+Setup:
+{{ test_case_plain_text.setup }}
 
 Actions:
 {{ test_case_plain_text.action }}
 
 Expected results:
 {{ test_case_plain_text.effect }}
+
+Breakdown:
+{{ test_case_plain_text.breakdown }}
+
+For more information of changes, access following URL:
+{{ test_case.get_url }}?#log
