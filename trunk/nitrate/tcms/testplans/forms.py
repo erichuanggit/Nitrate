@@ -463,6 +463,7 @@ class ImportCasesViaXMLForm(forms.Form):
 
 class PlanComponentForm(forms.Form):
     plan = forms.ModelMultipleChoiceField(
+        label = '',
         queryset = TestPlan.objects.none(),
         widget = forms.Select(attrs={'style': 'display:none;'}),
     )
