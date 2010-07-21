@@ -37,8 +37,8 @@ $(TARBALL): Makefile
 	# Fixup the version field in the page footer so that it shows the precise
 	# RPM version-release:
 	@cd $(SOURCE_DIR); sed --in-place -r 's|NITRATE_VERSION|$(VERSION)-$(RELEASE)|' $(SOURCE_DIR)/nitrate/templates/tcms_base.html
-	@cd $(SOURCE_DIR); mv nitrate nitrate-${VERSION}-${RELEASE}
-	@cd $(SOURCE_DIR); tar --bzip2 --exclude .git -cSpf $(TARBALL) nitrate-${VERSION}-${RELEASE}
+	@cd $(SOURCE_DIR); mv nitrate nitrate-${VERSION}
+	@cd $(SOURCE_DIR); tar --bzip2 --exclude .git -cSpf $(TARBALL) nitrate-${VERSION}
 	@cp $(SOURCE_DIR)/$(TARBALL) .
 
 src-rpm: $(SRPM)
