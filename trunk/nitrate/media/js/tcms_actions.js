@@ -1069,8 +1069,9 @@ function refreshSelectFilter(element, clean)
 function clickedSelectAll(checkbox, form, name)
 {
     if(checkbox.checked) {
-        $(form).adjacent('input[name='+ name + ']').invoke('setAttribute', 'checked');
+        $(form).adjacent('input[name='+ name + ']').invoke('setAttribute', 'checked', true);
     } else {
+        $(form).adjacent('input[name='+ name + ']').invoke('setAttribute', 'checked', false);
         $(form).adjacent('input[name='+ name + ']').invoke('removeAttribute', 'checked');
     }
 }
