@@ -23,9 +23,9 @@ import tcms
 from setuptools import setup, find_packages
 
 PACKAGE_NAME = 'Nitrate'
-PACKAGE_VER = '3.0.3'
+PACKAGE_VER = '3.0.4'
 PACKAGE_DESC = 'Test Case Management System'
-PACKAGE_URL = 'https://engineering.redhat.com/trac/testify20/browser/trunk/nitrate'
+PACKAGE_URL = 'https://fedorahosted.org/nitrate/browser/trunk/nitrate'
 
 def get_files_below(path):
     # we need to generate a list of paths to static files

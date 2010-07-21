@@ -452,7 +452,7 @@ def edit(request, case_id, template_name = 'case/edit.html'):
             # Notification
             n_form = CaseNotifyForm(request.REQUEST)    # Notification form
             if n_form.is_valid():
-                n_to = [tc.author.email]                # Initial Notification to
+                n_to = [request.user.email, tc.author.email]                # Initial Notification to
                 
                 if n_form.cleaned_data['default_tester_of_case'] and tc.default_tester_id:
                     n_to.append(tc.default_tester.email)
