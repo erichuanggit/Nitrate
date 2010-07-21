@@ -148,14 +148,13 @@
 					</a>
 				</th>
 				<th class="nosort" align="left" width="20px">
-					<input type="checkbox" checked onclick="clickedSelectAll(this, this.up(4), 'case')"/>
+					<input id="id_checkbox_all_cases" type="checkbox" checked />
 				</th>
 				<th align="left" width="50px">
 					<a title="Sort by case ID" href="#testcases" onclick="sortCase('testcases', '{{ test_plan.plan_id }}', 'case_id')">
 						#
 					</a>
 				</th>
-				
 				<th align="left">
 					<a title="Sort by Summary" href="#testcases" onclick="sortCase('testcases', '{{ test_plan.plan_id }}', 'summary')">
 						Test Case Summary

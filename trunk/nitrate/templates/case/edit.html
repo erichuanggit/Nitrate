@@ -161,9 +161,13 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
                     <div class="" id="form_effect">{{ form.effect }}</div>
                 </div>
             </fieldset>
-            <fieldset class="no-border background-light-grey">
-                <h4 class="strong">Notifications:</h4>
-                {{ notify_form.as_p }}
+            <fieldset class="no-border notification">
+                <label class="strong">Send notification after editing:</label>
+                <input type="checkbox" id="id_default_tester_of_case" name="default_tester_of_case"><label for="id_default_tester_of_case">Default tester of case</label>
+				<input type="checkbox" id="id_authors_of_plans" name="authors_of_plans"><label for="id_authors_of_plans">Authors of plans</label>
+				<input type="checkbox" id="id_managers_of_runs" name="managers_of_runs"><label for="id_managers_of_runs">Managers of runs</label>
+				<input type="checkbox" id="id_default_testers_of_runs" name="default_testers_of_runs"><label for="id_default_testers_of_runs">Default testers of runs</label>
+				<input type="checkbox" id="id_assignees_of_case_runs" name="assignees_of_case_runs"><label for="id_assignees_of_case_runs">Assignees of case runs</label>
             </fieldset>
             <div id="control_box" class="submit-row">
                 <div class="errors">{{ form.errors }}</div>

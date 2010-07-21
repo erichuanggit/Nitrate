@@ -91,6 +91,9 @@ a:link.execute,a:visited.execute{ background:url(../images/sprites.png) no-repea
 .border-left{border-left:1px solid #ccc;}
 .border-right{border-right:1px solid #ccc;}
 .background-light-grey{background:#f5f5f5;}
+.notification{background:#f5f5f5; padding:10px;}
+.notification input{ margin:5px 5px 5px 10px;}
+.notification label{ margin:5px;}
 option{margin-left:3px;}
 .case_detail .ul-no-format{ list-style-type:disc}
 .ul-no-format{margin:0px;padding:0px; list-style:none}

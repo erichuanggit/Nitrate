@@ -674,6 +674,10 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         
         })
         
+        $('id_checkbox_all_cases').observe('click', function(e) {
+            clickedSelectAll(this, this.up(4), 'case');
+        })
+        
         // Bind click the tags in tags list to tags field in filter
         $$('#id_case_own_tags_list a[href="#testcases"]').invoke('observe', 'click',
             function(e) {
@@ -725,6 +729,10 @@ function constructPlanComponentsZone(container, parameters, callback)
             p['a'] = 'remove';
             
             constructPlanComponentsZone(container, p, callback)
+        })
+        
+        $('id_checkbox_all_component').observe('click', function(e) {
+            clickedSelectAll(this, this.up(4), 'component');
         })
     }
     
