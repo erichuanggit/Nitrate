@@ -41,4 +41,5 @@ ALTER TABLE test_cases ADD is_automated_proposed tinyint(4) NOT NULL DEFAULT 0 A
 ALTER TABLE test_case_run_status ADD auto_blinddown tinyint(4) NOT NULL DEFAULT 1;
 UPDATE test_case_run_status SET auto_blinddown = 0 WHERE name = 'RUNNING';
 
+-- Upgrade to 3.0.4
 ALTER TABLE test_cases ADD notes mediumtext;
