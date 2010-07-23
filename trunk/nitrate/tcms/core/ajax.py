@@ -245,16 +245,15 @@ def tag(request, template_name="management/get_tag.html"):
             return True
         
         def remove(self):
-#            p_id = self.request.REQUEST.get('plan_id','')
-#            if p_id:
-#                tp_cases_ids = TestCasePlan.objects.filter(pk = p_id).values_list('case')
-#                tag_ids = TestCaseTag.objects.filter(case__in = tp_cases_ids).distinct().values_list('tag')
-#                tags_in_plan = TestTag.objects.filter(id__in = tag_ids)
+            tp_case_ids = request.REQUEST.getlist('case')
+            if tp_case_ids:
+                tag_ids = TestCaseTag.objects.filter(case__in = tp_case_ids).distinct().values_list('tag')
+                tags_set = TestTag.objects.filter(id__in = tag_ids)
             for tag_str in self.tag:
                 try:
-                    tag = TestTag.objects.get(name = tag_str)
-                except TestTag.DoesNotExist:
-                    return "Tag %s does not exist." % tag_str
+                    tag = tags_set.filter(name = tag_str)[0]
+                except IndexError:
+                    return "Tag %s does not exist in current plan." % tag_str
                 
                 for o in self.obj:
                     try:
