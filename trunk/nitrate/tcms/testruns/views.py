@@ -636,34 +636,116 @@ def bug(request, run_id, case_run_id, template_name = 'run/execute_case_run.html
     func = getattr(crba, request.REQUEST['handle'])
     return func()
 
-def clone(request, run_id, template_name='run/clone.html'):
+def clone(request, template_name='run/clone.html'):
     """Clone test run to another build"""
-    from tcms.testruns.forms import RunCloneForm
+    import urllib
+    from tcms.testruns.forms import RunCloneForm, MulitpleRunsCloneForm
     
     SUB_MODULE_NAME = "runs"
     
-    try:
-        tr = TestRun.objects.select_related().get(run_id = run_id)
-    except ObjectDoesNotExist, error:
-        raise Http404(error)
+    trs = TestRun.objects.select_related()
+    trs = trs.filter(pk__in = request.REQUEST.getlist('run'))
     
-    clone_form = RunCloneForm(initial={
-        'summary': tr.summary,
-        'notes': tr.notes,
-        'manager': tr.manager.email,
-        'product': tr.plan.product_id,
-        'version': tr.plan.get_version_id,
-        'build': tr.build_id,
-        'default_tester': tr.default_tester_id and tr.default_tester.email or '',
-        'use_newest_case_text': True,
-    })
-    clone_form.populate(product_id = tr.plan.product_id)
+    if not trs:
+        raise Http404
+    
+    # Generate the clone run page for one run
+    if len(trs) == 1 and not request.REQUEST.get('submit'):
+        tr = trs[0]
+        form = RunCloneForm(initial={
+            'summary': tr.summary,
+            'notes': tr.notes,
+            'manager': tr.manager.email,
+            'product': tr.plan.product_id,
+            'version': tr.plan.get_version_id,
+            'build': tr.build_id,
+            'default_tester': tr.default_tester_id and tr.default_tester.email or '',
+            'use_newest_case_text': True,
+        })
+        form.populate(product_id = tr.plan.product_id)
+        
+        return direct_to_template(request, template_name, {
+            'module': MODULE_NAME,
+            'sub_module': SUB_MODULE_NAME,
+            'clone_form': form,
+            'test_run': tr,
+        })
+    
+    # Process multiple runs clone page
+    template_name = 'run/clone_multiple.html'
+    
+    if request.method == "POST":
+        form = MulitpleRunsCloneForm(request.REQUEST)
+        form.populate(trs = trs, product_id = request.REQUEST.get('product'))
+        if form.is_valid():
+            for tr in trs:
+                n_tr = TestRun.objects.create(
+                    product_version = form.cleaned_data['product_version'],
+                    plan_text_version = tr.plan_text_version,
+                    summary = tr.summary,
+                    notes = tr.notes,
+                    estimated_time = tr.estimated_time,
+                    plan = tr.plan,
+                    build = form.cleaned_data['build'],
+                    manager = form.cleaned_data['update_manager'] and form.cleaned_data['default_manager'] or tr.manager,
+                    default_tester = form.cleaned_data['update_default_tester'] and form.cleaned_data['default_tester'] or tr.default_tester,
+                )
+                
+                for tcr in tr.case_run.all():
+                    n_tr.add_case_run(
+                        case = tcr.case,
+                        assignee = form.cleaned_data['update_assignee'] and form.cleaned_data['assignee'] or tcr.assignee,
+                        case_text_version = form.cleaned_data['update_case_text'] and tcr.get_text_versions()[0] or tcr.case_text_version,
+                        build = form.cleaned_data['build'],
+                        notes = tcr.notes,
+                        sortkey = tcr.sortkey,
+                    )
+                
+                for env_value in tr.env_value.all():
+                    n_tr.add_env_value(env_value)
+                
+                if form.cleaned_data['clone_cc']:
+                    for cc in tr.cc.all():
+                        n_tr.add_cc(user = cc)
+                        
+                if form.cleaned_data['clone_tag']:
+                    for tag in tr.tag.all():
+                        n_tr.add_tag(tag = tag)
+                        
+            if len(trs) == 1:
+                return HttpResponseRedirect(
+                    reverse('tcms.testruns.views.get', args=[n_tr.pk])
+                )
+            
+            params = {
+                'product': form.cleaned_data['product'].pk,
+                'product_version': form.cleaned_data['product_version'].pk,
+                'build': form.cleaned_data['build'].pk
+            }
+            
+            return HttpResponseRedirect('%s?%s' % (
+                reverse('tcms.testruns.views.all'),
+                urllib.urlencode(params, True)
+            ))
+    else:
+        form = MulitpleRunsCloneForm(initial={
+            'run': trs.values_list('pk', flat=True),
+            'manager': request.user,
+            'default_tester': request.user,
+            'assignee': request.user,
+            'update_manager': False,
+            'update_default_tester': True,
+            'update_assignee': True,
+            'update_case_text': True,
+            'clone_cc': True,
+            'clone_tag': True,
+        })
+        form.populate(trs = trs)
     
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
-        'clone_form': clone_form,
-        'test_run': tr,
+        'clone_form': form,
     })
 
 def order_case(request, run_id):

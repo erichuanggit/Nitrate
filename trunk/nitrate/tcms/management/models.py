@@ -257,7 +257,7 @@ class TestBuild(TCMSActionModel):
         return q.all()
     
     @classmethod
-    def list_active(cls, query = {'is_active': True}):
+    def list_active(cls, query = {}):
         if isinstance(query, dict): query['is_active'] = True
         return cls.list(query)
     

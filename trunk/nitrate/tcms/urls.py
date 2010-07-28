@@ -71,8 +71,8 @@ urlpatterns = patterns('',
     }),
     
     # Testplans zone
-    (r'^plans/$', 'tcms.testplans.views.all'), 
     (r'^plan/new/$', 'tcms.testplans.views.new'),
+    (r'^plans/$', 'tcms.testplans.views.all'), 
     (r'^plans/clone/$', 'tcms.testplans.views.clone'),
     (r'^plans/component/$', 'tcms.testplans.views.component'),
     (r'^plan/(?P<plan_id>\d+)/$', 'tcms.testplans.views.get'),
@@ -85,9 +85,9 @@ urlpatterns = patterns('',
     (r'^plan/(?P<plan_id>\d+)/cases/$', 'tcms.testplans.views.cases'),
     
     # Testcases zone
+    (r'^case/new/$', 'tcms.testcases.views.new'),
     (r'^cases/$', 'tcms.testcases.views.all'),
     (r'^case/automated/$', 'tcms.testcases.views.automated'),
-    (r'^case/new/$', 'tcms.testcases.views.new'),
     (r'^cases/clone/$', 'tcms.testcases.views.clone'),
     (r'^case/(?P<case_id>\d+)/$', 'tcms.testcases.views.get'),
     (r'^case/(?P<case_id>\d+)/details/$', 'tcms.testcases.views.get_details'),
@@ -99,10 +99,10 @@ urlpatterns = patterns('',
     (r'^case/(?P<case_id>\d+)/plan/$', 'tcms.testcases.views.plan'),
     
     # Testruns zone
+    (r'^run/new/$', 'tcms.testruns.views.new'),
     (r'^runs/$', 'tcms.testruns.views.all'),
     (r'^runs/env_value/$', 'tcms.testruns.views.env_value'),
-    (r'^run/new/$', 'tcms.testruns.views.new'),
-    (r'^run/(?P<run_id>\d+)/clone/$', 'tcms.testruns.views.clone'),
+    (r'^runs/clone/$', 'tcms.testruns.views.clone'),
     (r'^run/suggest_summary$', 'tcms.testruns.views.suggest_summary'),
     (r'^run/(?P<run_id>\d+)/$', 'tcms.testruns.views.get'),
     (r'^run/(?P<run_id>\d+)/delete/$', 'tcms.testruns.views.delete'),

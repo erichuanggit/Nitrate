@@ -653,20 +653,33 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     $('dialog').hide('');
                     $('dialog').update('');
                     $('dialog').show();
-                    var html = '<div class="dia_title" style=" margin:10px 20px;">You have successfully remove <span class="red">'+ parameters.tags + '</span>&nbsp;in the following case:</div><div class="dialog_content">';
-                    $('dialog').update(html);
+                    if(!returnobj.rc)
+                    {
+                        var html = '<div class="dia_title" style=" margin:10px 20px;">You have successfully remove <span class="red">'+ parameters.tags + '</span>&nbsp;in the following case:</div><div class="dialog_content">';
+                        $('dialog').update(html);
+
+                        returnobj.each(function(i) {
+                            html += '<div class="dia_content" style=" margin:10px 20px;">'+i.pk + ' &nbsp; ' + i.fields.summary+'</div>';
+                        });
+                        $('dialog').update(html);
+                    }
+
+                    else
+                    {
+                        var html = '<div class="dia_title" style=" margin:10px 20px;"><span class="red">' + returnobj.response + '</span>';
+                        $('dialog').update(html);
+                    }
                     
-                    returnobj.each(function(i) {
-                        html += '<div class="dia_content" style=" margin:10px 20px;">'+i.pk + ' &nbsp; ' + i.fields.summary+'</div>';
-                    });
-                    $('dialog').update(html);
                     
                     html +='</div><input class="dia_btn_close sprites" onclick="this.up(0).hide()" type="button" value="Close" style=" margin:10px 20px;"/>';
                     
                     $('dialog').update(html);
-                    p = $('id_form_cases').serialize(true);
-                    p.a = 'initial';
-                    constructPlanDetailsCasesZone(container, plan_id, p);
+                    if(!returnobj.rc)
+                    {
+                        p = $('id_form_cases').serialize(true);
+                        p.a = 'initial';
+                        constructPlanDetailsCasesZone(container, plan_id, p);
+                    }
                 };
                 var format = 'serialized';
                 removeBatchTag(parameters, c, format)
@@ -800,7 +813,8 @@ function constructBatchTagProcessDialog(){
             parameters: {
                 info_type: 'tags',
                 format: 'ulli',
-                field: 'name'
+                plan_id: this.plan_id,
+                field: 'name',
             }
         }
     );

@@ -28,9 +28,10 @@ from django.utils import simplejson
 from django.views.generic.simple import direct_to_template
 from django.contrib.auth.decorators import user_passes_test
 
-from tcms.testplans.models import TestPlan
-from tcms.testcases.models import TestCase
+from tcms.testplans.models import TestPlan, TestCasePlan
+from tcms.testcases.models import TestCase, TestCaseTag
 from tcms.testruns.models import TestRun, TestCaseRun
+from tcms.management.models import TestTag
 
 from tcms.core.utils import get_string_combinations
 
@@ -108,7 +109,12 @@ def info(request):
             )
         
         def tags(self):
-            from tcms.management.models import TestTag
+            p_id = self.request.REQUEST.get('plan_id','')
+            if p_id:
+                tp_cases_ids = TestCasePlan.objects.filter(pk = p_id).values_list('case')
+                tag_ids = TestCaseTag.objects.filter(case__in = tp_cases_ids).distinct().values_list('tag')
+                tags_in_plan = TestTag.objects.filter(id__in = tag_ids)
+
             query = strip_parameters(request, self.internal_parameters)
             #FIXME: Performance needs to be improved. 
             #When type too long will cause a response latency.
@@ -125,9 +131,15 @@ def info(request):
             if tagname != None:
                 seq = get_string_combinations(tagname)
                 s = "|".join(["Q(name__startswith = '%s')" % item for item in seq])
-                return TestTag.objects.filter(eval(s))
+                if tags_in_plan:
+                    return tags_in_plan.filter(eval(s))
+                else:
+                    return TestTag.objects.filter(eval(s))
             else:
-                return TestTag.objects.filter(**query)
+                if tags_in_plan:
+                    return tags_in_plan.filter(**query)
+                else:
+                    return TestTag.objects.filter(**query)
 
         def users(self):
             from django.contrib.auth.models import User
@@ -219,25 +231,36 @@ def tag(request, template_name="management/get_tag.html"):
         def __init__(self, obj, tag):
             self.obj = obj
             self.tag = TestTag.string_to_list(tag)
+            self.request = request
             
         def add(self):
             for tag_str in self.tag:
-                tag, c = TestTag.objects.get_or_create(name = tag_str)
-                for o in self.obj:
-                    o.add_tag(tag)
+                try:
+                    tag, c = TestTag.objects.get_or_create(name = tag_str)
+                    for o in self.obj:
+                        o.add_tag(tag)
+                except:
+                    return "Error when adding %s" % self.tag
+
+            return True
         
         def remove(self):
+            tp_case_ids = request.REQUEST.getlist('case')
+            if tp_case_ids:
+                tag_ids = TestCaseTag.objects.filter(case__in = tp_case_ids).distinct().values_list('tag')
+                tags_set = TestTag.objects.filter(id__in = tag_ids)
             for tag_str in self.tag:
                 try:
-                    tag = TestTag.objects.get(name = tag_str)
-                except:
-                    pass
+                    tag = tags_set.filter(name = tag_str)[0]
+                except IndexError:
+                    return "Tag %s does not exist in current plan." % tag_str
                 
                 for o in self.obj:
                     try:
                         o.remove_tag(tag)
                     except:
-                        pass
+                        return "Remove tag %s error." % tag
+            return True
     
     objects = Objects(request, template_name)
     template_name, obj = objects.get()
@@ -247,8 +270,10 @@ def tag(request, template_name="management/get_tag.html"):
     if q_action:
         tag_actions = TagActions(obj = obj, tag = q_tag)
         func = getattr(tag_actions, q_action)
-        func()
-    
+        response = func()
+        if response != True:
+            return HttpResponse(simplejson.dumps({'response': response, 'rc': 1}))
+
     del q_tag, q_action
     
     # Response to batch operations

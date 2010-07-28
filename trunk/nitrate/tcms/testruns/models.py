@@ -433,7 +433,7 @@ class TestCaseRun(TCMSActionModel):
     
     def get_text_versions(self):
         return TestCaseText.objects.filter(
-            case_id = self.case_id
+            case__pk = self.case.pk
         ).values_list('case_text_version', flat=True)
     
     def get_text_with_version(self, case_text_version = None):
