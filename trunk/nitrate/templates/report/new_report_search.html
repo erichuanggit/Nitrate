@@ -1,0 +1,86 @@
+{% extends "tcms_base.html" %}
+
+{% block subtitle %}Reporting{% endblock %}
+
+{% block custom_stylesheet %}
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/print.css" media="print" />
+{% endblock %}
+
+{% block custom_javascript %}
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/fastinit.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/tablesort.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/report.js"></script>
+<script type="text/javascript">
+Nitrate.Utils.after_page_load(Nitrate.Report.List.on_load);
+</script>
+{% endblock %}
+
+{% block contents %}
+<div id="content">
+	<div class="crumble"><a href="{% url tcms.core.views.index %}">Home</a> >> Reporting</div>
+	<div class="report_title_bg">Prodcut --show report what you want to see</div>
+	{% include "report/form/search.html" %}
+    <div class="report_title_bg">
+    Environment --show coverage report
+    <div class="absoluteright">
+    <a href="#" id='coverage_search'>Hide the coverage report</a>
+    </div>
+    </div>
+    <div id="coverage_report_search">
+    {% include "report/form/search_env.html" %}
+    </div>
+    <div class="button_box" >
+        <input type="submit" size="7" value="Create Report" name="" title="Create Report" />
+        <input type="reset" size="7" value="Save Query" name="" title="Save Query" />
+    </div>
+    
+    <div class="report_bar"><span>Product Report</span></div>
+    <table class="table_style" cellpadding="0" cellspacing="0" border="0" width="100%" id="id_table_cases" >
+        <thead>
+            <tr>
+                <th align="left" class="sortcol sortdesc" >Product</th>
+                <th align="left" class="sortcol">Plan</th>
+                <th align="left" class="sortcol">Run</th>
+                <th align="left" class="sortcol">Case-Run</th>
+                <th align="left" class="sortcol">Passed Case-Run</th>
+                <th align="left" class="sortcol">Failed Case-Run</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class='odd'>
+                <td><a href="new_report_detail.html">Red Hat Enterprise Linux 6</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" class="report_pass"><a href="#">90%</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+            </tr>
+            <tr class='even'>
+                <td><a href="#">Red Hat Enterprise Linux 6</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" class="" ><a href="#">90%</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+            </tr>
+            <tr class='odd'>
+                <td><a href="#">Red Hat Enterprise Linux 6</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" class="" ><a href="#">90%</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+            </tr>
+            <tr class='even'>
+                <td><a href="#">Red Hat Enterprise Linux 6</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" class="" ><a href="#">90%</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+            </tr>
+            
+        </tbody>
+	</table>
+</div>
+{% endblock %}

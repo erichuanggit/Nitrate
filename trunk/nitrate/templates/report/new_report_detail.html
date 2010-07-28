@@ -1,0 +1,220 @@
+{% extends "tcms_base.html" %}
+
+{% block subtitle %}Reporting{% endblock %}
+
+{% block custom_stylesheet %}
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/print.css" media="print" />
+{% endblock %}
+
+{% block custom_javascript %}
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/fastinit.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/tablesort.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/report.js"></script>
+<script type="text/javascript">
+Nitrate.Utils.after_page_load(Nitrate.Report.List.on_load);
+</script>
+{% endblock %}
+
+{% block contents %}
+<div id="content">
+	<div class="crumble"><a href="{% url tcms.core.views.index %}">Home</a>>>Reporting</div>
+  	<div class="report_title_bg">
+    Prodcut Name:Red Hat Enterpriese Linux 6<br />
+    Product Version:6.0<br />
+    Build:Build2    
+    </div>
+	
+    <table class="table_style" cellpadding="0" cellspacing="0" border="0" width="100%" id="id_table_cases" >
+        <thead>
+            <tr>
+                <th align="left" class="sortcol sortdesc" >Plan name</th>
+                <th align="left" class="sortcol">Run name</th>
+                <th align="left" class="sortcol">Passed case-run</th>
+                <th align="left" class="sortcol">Failed case-run</th>
+                <th align="left" class="sortcol">Blocked case-run</th>
+                <th align="left" class="sortcol">Error case-run</th>
+                <th align="left" class="sortcol">Idle case-run</th>
+                <th align="left" class="sortcol">Running case-run</th>
+                <th align="left" class="sortcol">Paused case-run</th>
+                <th align="left" class="sortcol">Total case-run</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td rowspan="3"><a href="#">Plan name aa</a></td>
+                <td valign="top"><a href="#">Run name aa</a></td>
+                <td valign="top"><a href="#">345</a></td>
+                <td valign="top"><a href="#">345</a></td>
+                <td valign="top"><a href="#">9</a></td>
+                <td valign="top"><a href="#">9</a></td>
+                <td valign="top"><a href="#">345</a></td>
+                <td valign="top"><a href="#">9</a></td>
+                <td valign="top"><a href="#">9</a></td>
+                <td valign="top"><a href="#">9</a></td>
+            </tr>
+            <tr>
+                <td valign="top" ><a href="#">Run name bb</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" class="" ><a href="#">9</a></td>
+                <td valign="top" ><a href="#">9</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" ><a href="#">9</a></td>
+                <td valign="top" ><a href="#">9</a></td>
+                <td valign="top" ><a href="#">9</a></td>
+            </tr>
+            <tr>
+                <td valign="top" ><a href="#">Run name cc</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" class="" ><a href="#">9</a></td>
+                <td valign="top" ><a href="#">9</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" ><a href="#">9</a></td>
+                <td valign="top" ><a href="#">9</a></td>
+                <td valign="top" ><a href="#">9</a></td>
+            </tr>
+            <tr>
+                <td rowspan="3"><a href="#">Plan name bb</a></td>
+                <td valign="top" ><a href="#">Run name baa</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" class="" ><a href="#">9</a></td>
+                <td valign="top" ><a href="#">9</a></td>
+                <td valign="top" ><a href="#">345</a></td>
+                <td valign="top" ><a href="#">9</a></td>
+                <td valign="top" ><a href="#">9</a></td>
+                <td valign="top" ><a href="#">9</a></td>
+            </tr>
+            <tr>
+              <td valign="top" ><a href="#">Run name  bbb</a></td>
+              <td valign="top" ><a href="#">34</a></td>
+              <td valign="top" ><a href="#">345</a></td>
+              <td valign="top" class="" ><a href="#">9</a></td>
+              <td valign="top" ><a href="#">9</a></td>
+              <td valign="top" ><a href="#">9</a></td>
+              <td valign="top" ><a href="#">9</a></td>
+              <td valign="top" ><a href="#">9</a></td>
+              <td valign="top" ><a href="#">9</a></td>
+            </tr>
+            <tr>
+              <td valign="top" ><a href="#">Run name  bcc</a></td>
+              <td valign="top" ><a href="#">345</a></td>
+              <td valign="top" ><a href="#">345</a></td>
+              <td valign="top" class="" ><a href="#">9</a></td>
+              <td valign="top" ><a href="#">9</a></td>
+              <td valign="top" ><a href="#">9</a></td>
+              <td valign="top" ><a href="#">9</a></td>
+              <td valign="top" ><a href="#">9</a></td>
+              <td valign="top" ><a href="#">9</a></td>
+            </tr>
+            
+        </tbody>
+	</table>
+    
+    <div class="failed_caserun">
+    ALl Failed Case-Run List
+    </div>
+    <table class="table_noborder" cellpadding="0" cellspacing="0" border="0" width="100%" id="id_table_cases" >
+        <tr>
+            <th align="left" class="sortcol sortdesc" width="60" >Case ID</th>
+            <th align="left" class="sortcol">Case name</th>
+            <th align="left" class="sortcol">Category</th>
+            <th align="left" class="sortcol">Tester</th>
+            <th align="left" class="sortcol">The Lastest Execute Time</th>
+       </tr>
+        <tr>
+          <td valign="top" ><a href="#">2323</a></td>
+          <td valign="top" ><a href="#">Fetch and Send emails</a></td>
+          <td valign="top" >Regression</td>
+          <td valign="top" >Junzhang</td>
+          <td valign="top" >2010-03-23 17:00 </td>
+        </tr>
+        <tr class="border-bottom">
+          <td valign="top" >Comment:</td>
+          <td valign="top" colspan="4">Have something wrong with the fethc and send email when something on somewhere <span class="grey">[junzhang 2010-03-24 16:00]</span></td>
+        </tr>
+        <tr>
+          <td valign="top" ><a href="#">2323</a></td>
+          <td valign="top" ><a href="#">Fetch and Send emails</a></td>
+          <td valign="top" >Regression</td>
+          <td valign="top" >Junzhang</td>
+          <td valign="top" >2010-03-23 17:00 </td>
+        </tr>
+        <tr class="border-bottom">
+          <td valign="top" >Comment:</td>
+          <td valign="top" colspan="4">Have something wrong with the fethc and send email when something on somewhere <span class="grey">[junzhang 2010-03-24 16:00]</span></td>
+        </tr>
+        <tr>
+          <td valign="top" ><a href="#">2323</a></td>
+          <td valign="top" ><a href="#">Fetch and Send emails</a></td>
+          <td valign="top" >Regression</td>
+          <td valign="top" >Junzhang</td>
+          <td valign="top" >2010-03-23 17:00 </td>
+        </tr>
+        <tr class="border-bottom">
+          <td valign="top" >Comment:</td>
+          <td valign="top" colspan="4">Have something wrong with the fethc and send email when something on somewhere <span class="grey">[junzhang 2010-03-24 16:00]</span></td>
+        </tr>
+        <tr>
+          <td valign="top" ><a href="#">2323</a></td>
+          <td valign="top" ><a href="#">Fetch and Send emails</a></td>
+          <td valign="top" >Regression</td>
+          <td valign="top" >Junzhang</td>
+          <td valign="top" >2010-03-23 17:00 </td>
+        </tr>
+        <tr class="border-bottom">
+          <td valign="top" >Comment:</td>
+          <td valign="top" colspan="4">Have something wrong with the fethc and send email when something on somewhere <span class="grey">[junzhang 2010-03-24 16:00]</span></td>
+        </tr>
+             
+    </table>
+    
+    <div class="blocked_caserun">
+    ALl Blocked Case-Run List
+    </div>
+    <table class="table_noborder" cellpadding="0" cellspacing="0" border="0" width="100%" id="id_table_cases" >
+        <tr>
+            <th align="left" class="sortcol sortdesc" width="60" >Case ID</th>
+            <th align="left" class="sortcol">Case name</th>
+            <th align="left" class="sortcol">Category</th>
+            <th align="left" class="sortcol">Tester</th>
+            <th align="left" class="sortcol">The Lastest Execute Time</th>
+       </tr>
+        <tr>
+          <td valign="top" ><a href="#">2323</a></td>
+          <td valign="top" ><a href="#">Fetch and Send emails</a></td>
+          <td valign="top" >Regression</td>
+          <td valign="top" >Junzhang</td>
+          <td valign="top" >2010-03-23 17:00 </td>
+        </tr>
+        <tr>
+          <td valign="top" >Comment:</td>
+          <td valign="top" colspan="4">Have something wrong with the fethc and send email when something on somewhere <span class="grey">[junzhang 2010-03-24 16:00]</span></td>
+        </tr>
+        <tr class="border-bottom">
+          <td valign="top" >Bug:</td>
+          <td valign="top" colspan="4"><a href="#">http://bugzilla.redhat.com/show_bug.cgi?id=56595</a> </td>
+        </tr>
+        <tr>
+          <td valign="top" ><a href="#">2323</a></td>
+          <td valign="top" ><a href="#">Fetch and Send emails</a></td>
+          <td valign="top" >Regression</td>
+          <td valign="top" >Junzhang</td>
+          <td valign="top" >2010-03-23 17:00 </td>
+        </tr>
+        <tr>
+          <td valign="top" >Comment:</td>
+          <td valign="top" colspan="4">Have something wrong with the fethc and send email when something on somewhere <span class="grey">[junzhang 2010-03-24 16:00]</span></td>
+        </tr>
+        <tr class="border-bottom">
+          <td valign="top" >Bug:</td>
+          <td valign="top" colspan="4"><a href="#">http://bugzilla.redhat.com/show_bug.cgi?id=56595</a></td>
+        </tr>
+       
+             
+    </table>
+    
+    
+</div>
+{% endblock %}
