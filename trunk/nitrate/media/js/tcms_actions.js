@@ -50,7 +50,11 @@ var default_messages = {
     'link': {
         'hide_filter': 'Hide filter options',
         'show_filter': 'Show filter options',
-    }
+    },
+	'report': {
+		'hide_search':'Hide the coverage search',
+		'show_search':'Show the coverage search'
+		}
 }
 
 function getURLParam()
