@@ -977,10 +977,10 @@ def env_value(request):
             self.trs = trs
         
         def has_no_perm(self, perm):
-            if self.request.user.has_perm(perm + '_tcmsenvrunvaluemap'):
-                return False
+            if not self.request.user.has_perm('testruns.' + perm + '_tcmsenvrunvaluemap'):
+                return {'rc': 1, 'response': 'Permission deined - %s' % perm}
             
-            return {'rc': 1, 'response': 'Permission deined - %s' % perm}
+            return False
         
         def get_env_value(self, env_value_id):
             return TCMSEnvValue.objects.get(id = env_value_id)

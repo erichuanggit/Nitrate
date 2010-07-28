@@ -503,15 +503,15 @@ function submitValue(run_id,value,hidebox,select_field,submitid){
     var success = function(t) {
         returnobj = t.responseText.evalJSON(true);
         if(returnobj.rc == 0){
-        
-        $(hidebox).innerHTML = new_value;
-        
-        $(hidebox).show();
-        select_field.hide();
-        $(submitid).hide();
-        }else{
-            alert('Submit values failed');
-            }
+            
+            $(hidebox).innerHTML = new_value;
+            
+            $(hidebox).show();
+            select_field.hide();
+            $(submitid).hide();
+        } else {
+            alert(returnobj.response);
+        }
     }
     
     var failure = function(t) {
@@ -539,8 +539,12 @@ function removeProperty(run_id,env_value_id)
         return false;
         
     var success = function(t) {
-        window.location.reload();
-       
+        returnobj = t.responseText.evalJSON(true);
+        if(returnobj.rc == 0){
+            window.location.reload();
+        } else {
+            alert(returnobj.response);
+        }
     }
     
     var failure = function(t) {
