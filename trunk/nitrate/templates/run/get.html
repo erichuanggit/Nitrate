@@ -41,24 +41,24 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 		{% endif %}
 		
 		{% if perms.testruns.add_testrun %}
-		<input type="button" value="Clone" title="Clone test run to other test build" onclick="window.location.href='{% url tcms.testruns.views.clone test_run.run_id %}'"/>
+		<input type="button" value="Clone" title="Clone test run to other test build" onclick="window.location.href='{% url tcms.testruns.views.clone %}?run={{ test_run.pk }}'"/>
 		{% else %}
 		<input type="button" value="Clone" disabled="true"/>
 		{% endif %}
 		{% if perms.testruns.change_testcaserun %}
-		<input type="button" value="Execute" title="Execute cases in this run" onclick="window.location.href='{% url tcms.testruns.views.execute test_run.run_id %}'">
+		<input type="button" value="Execute" title="Execute cases in this run" onclick="window.location.href='{% url tcms.testruns.views.execute test_run.pk %}'">
 		{% else %}
 		<input type="button" value="Execute" disabled="true">
 		{% endif %}
 		{% if perms.testruns.delete_testrun %}
 		{% ifequal test_run.manager user %}
-		<input type="button" value="Delete" title="Delete the run" onclick="window.location.href='{% url tcms.testruns.views.delete test_run.run_id %}'">
+		<input type="button" value="Delete" title="Delete the run" onclick="window.location.href='{% url tcms.testruns.views.delete test_run.pk %}'">
 		{% else %}
 		{% ifequal test_run.plan.author user %}
-		<input type="button" value="Delete" title="Delete the run" onclick="window.location.href='{% url tcms.testruns.views.delete test_run.run_id %}'">
+		<input type="button" value="Delete" title="Delete the run" onclick="window.location.href='{% url tcms.testruns.views.delete test_run.pk %}'">
 		{% endifequal %}
 		{% endifequal %}
-		<input type="button" value="Export" title="Export cases in this run" onclick="window.location.href='{% url tcms.testruns.views.export test_run.run_id %}?' + $('id_form_case_runs').serialize();" >
+		<input type="button" value="Export" title="Export cases in this run" onclick="window.location.href='{% url tcms.testruns.views.export test_run.pk %}?' + $('id_form_case_runs').serialize();" >
         {% endif %}
 	</div>
 	<h2 id="display_title">{{ test_run.summary }}</h2>

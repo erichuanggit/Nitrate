@@ -203,7 +203,7 @@ function set_up_choices(element, values, allow_blank)
     element.innerHTML = innerHTML;
 }
 
-function getBuildsByProductId(allow_blank, product_field, build_field)
+function getBuildsByProductId(allow_blank, product_field, build_field, is_active)
 {
     if(!product_field)
         var product_field = new String('id_product')
@@ -218,10 +218,14 @@ function getBuildsByProductId(allow_blank, product_field, build_field)
     }
     
     var product_id = $F(product_field);
-    var args = false;
+    var is_active = '';
     if($('value_sub_module')) {
         if($F('value_sub_module') == "new_run")
-            args = 'is_active'
+            is_active = true;
+    }
+    
+    if(is_active) {
+        is_active = true;
     }
     
     if(product_id == "")
@@ -258,7 +262,7 @@ function getBuildsByProductId(allow_blank, product_field, build_field)
         parameters: {
             info_type: 'builds',
             product_id: product_id,
-            args: args,
+            is_active: is_active,
         },
         requestHeaders: {Accept: 'application/json'},
         onSuccess: success, 
@@ -508,16 +512,16 @@ function checkProductField(product_field)
     return false;
 }
 
-function bind_build_selector_to_product(allow_blank, product_field, build_field)
+function bind_build_selector_to_product(allow_blank, product_field, build_field, active)
 {
     var product_field = checkProductField(product_field)
     
     if(product_field) {
         product_field.observe('change', getBuildsByProductId.curry(
-            allow_blank, product_field, build_field
+            allow_blank, product_field, build_field, active
         ));
         
-        getBuildsByProductId(allow_blank, product_field, build_field);
+        getBuildsByProductId(allow_blank, product_field, build_field, active);
     }
 }
 

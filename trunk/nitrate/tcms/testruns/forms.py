@@ -218,12 +218,10 @@ class SearchRunForm(forms.Form):
     summary = forms.CharField(required=False)
     plan = forms.CharField(required=False)
     product = forms.ModelChoiceField(
-        label='Product',
         queryset=Product.objects.all(),
         required=False
     )
     product_version = forms.ModelChoiceField(
-        label='Product Version',
         queryset=Version.objects.none(),
         required=False
     )
@@ -260,11 +258,15 @@ class SearchRunForm(forms.Form):
         # Seen at: http://my.opera.com/jacob7908/blog/2009/06/19/django-choicefield-queryset (Chinese)
         # Is this documented elsewhere?
         if product_id:
-            self.fields['product_version'].queryset = Version.objects.filter(product__id = product_id)
-            self.fields['build'].queryset = TestBuild.objects.filter(product__id = product_id)
+            self.fields['product_version'].queryset = Version.objects.filter(
+                product__pk = product_id
+            )
+            self.fields['build'].queryset = TestBuild.objects.filter(
+                product__pk = product_id
+            )
         else:
             self.fields['product_version'].queryset = Version.objects.all()
-            self.fields['build'].queryset = TestBuild.objects.filter(product__id = product_id)
+            self.fields['build'].queryset = TestBuild.list_active()
 
 # =========== Mist forms ==============
 
@@ -274,21 +276,65 @@ class RunCloneForm(BaseRunForm):
         queryset=TestBuild.objects.none(),
         empty_label=None,
     )
-    keep_orignal_manager = forms.BooleanField(
-        label='Keep orignal author, or change to ',
-        help_text='Unchecking will make me the author of the copied plan',
+
+class MulitpleRunsCloneForm(forms.Form):
+    run = forms.ModelMultipleChoiceField(
+        queryset=TestRun.objects.none(),
+        widget=forms.CheckboxSelectMultiple(),
+        required=False
+    )
+    product = forms.ModelChoiceField(
+        queryset=Product.objects.all(),
+        required=False
+    )
+    product_version = forms.ModelChoiceField(
+        queryset=Version.objects.none(),
+        required=False
+    )
+    build = forms.ModelChoiceField(
+        label='Build',
+        queryset=TestBuild.objects.none(),
+        empty_label=None,
+    )
+    manager = UserField(required=False)
+    default_tester = UserField(required=False)
+    assignee = UserField(required=False)
+    update_manager = forms.BooleanField(
+        help_text='Unchecking will keep the original manager',
         required=False,
     )
-    keep_orignal_default_tester = forms.BooleanField(
-        label='Keep orignal default tester, or change to ',
-        help_text='Unchecking will make me the author of the copied plan',
+    update_default_tester = forms.BooleanField(
+        help_text='Unchecking will keep the original default tester',
         required=False,
     )
-    use_newest_case_text = forms.BooleanField(
+    update_assignee = forms.BooleanField(
+        help_text='Unchecking will keep the original assignee of case runs',
+        required=False,
+    )
+    update_case_text = forms.BooleanField(
         label='Use newest case text(setup/actions/effects/breakdown)',
         help_text='Unchecking will make me the default tester of copied cases',
         required=False
     )
+    clone_cc = forms.BooleanField(
+        help_text='Unchecking it will not clone the CC',
+        required=False
+    )
+    clone_tag = forms.BooleanField(
+        help_text='Unchecking it will not clone the tags',
+        required=False
+    )
+    
+    def populate(self, trs, product_id = None):
+        self.fields['run'].queryset = TestRun.objects.filter(pk__in = trs)
+        
+        if product_id:
+            self.fields['product_version'].queryset = Version.objects.filter(
+                product__pk = product_id
+            )
+            self.fields['build'].queryset = TestBuild.objects.filter(
+                product__pk = product_id
+            )
 
 # ===========================================================================
 # Case run form
