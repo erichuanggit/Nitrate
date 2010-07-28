@@ -220,34 +220,13 @@ function toggleTestCaseContents(id, case_text_version, case_run_id)
 function changeTestCaseStatus(id, case_id)
 {
     var p = getTestCaseParam(id);
+    var value = $(p.case_status_select).value;
     
     var success = function(t) {
-        returnobj = t.responseText.evalJSON(true);
-        case_id = returnobj.case_id;
-        case_status_id = returnobj.case_status_id;
-        case_status = returnobj.case_status;
-        
-        $(p.case_status).innerHTML = case_status;
-        
-        $(p.case_status).show();
-        $(p.case_status_select).hide();
+        alert('Case ' + case_id + ' status changed.');	
     }
-    
-    var failure = function(t) {
-        alert("Update status failed");
-    }
-    
-    var url  = getURLParam().url_case_change_status;
-    var change_case_status_ajax = new Ajax.Request(url, {
-        method:'get',
-        parameters: {
-            handle: 'change',
-            'case': case_id,
-            new_case_status_id: $F(p.case_status_select),
-        }, 
-        onSuccess: success,
-        onFailure: failure
-    });
+        
+    changeCaseStatus(case_id, value, success);
 }
 
 function blinddownNextTestCaseContents(index_id) {
