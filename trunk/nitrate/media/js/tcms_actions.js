@@ -84,7 +84,8 @@ function getURLParam()
     
     param.url_search_case = '/cases/';
     param.url_create_case = '/case/create/';
-    param.url_cases_automated = '/case/automated/';
+    param.url_cases_automated = '/cases/automated/';
+    param.url_cases_component = '/cases/component/';
     param.url_modify_case = '/case/' + id + '/modify/';
     param.url_case_change_status = '/cases/changestatus/';
     param.url_change_case_order = '/case/' + id + '/changecaseorder/';
@@ -1082,4 +1083,30 @@ function clickedSelectAll(checkbox, form, name)
         $(form).adjacent('input[name='+ name + ']').invoke('setAttribute', 'checked', false);
         $(form).adjacent('input[name='+ name + ']').invoke('removeAttribute', 'checked');
     }
+}
+
+function constructForm(content, action, form_observe, notice, s, c)
+{
+    var f = new Element('form', {'action': action});
+    
+    if (!s) {
+        var s = new Element('input', {'type': 'submit', 'value': 'Submit'}); // Submit button
+    }
+    
+    if (!c) {
+        var c = new Element('input', {'type': 'button', 'value': 'Cancel'}); // Cancel button
+        c.observe('click', function(e) {
+            clearDialog();
+        });
+    }
+    
+    if(form_observe) {
+        f.observe('submit', form_observe);
+    }
+    
+    f.update(content);
+    f.appendChild(s);
+    f.appendChild(c);
+    
+    return f
 }

@@ -295,13 +295,11 @@ class XMLRPCUpdateCaseForm(XMLRPCBaseCaseForm):
         required = False,
     )
     product = forms.ModelChoiceField(
-        label = "Product",
         queryset = Product.objects.all(),
         empty_label = None,
         required = False,
     )
     category = forms.ModelChoiceField(
-        label = "Category", 
         queryset = TestCaseCategory.objects.none(),
         empty_label = None,
         required = False,
@@ -469,3 +467,26 @@ class CaseBugForm(forms.ModelForm):
     class Meta:
         model = TestCaseBug
 
+class CaseComponentForm(forms.Form):
+    product = forms.ModelChoiceField(
+        queryset = Product.objects.all(),
+        empty_label = None,
+        required = False,
+    )
+    category = forms.ModelChoiceField(
+        queryset = TestCaseCategory.objects.none(),
+        empty_label = None,
+        required = False,
+    )
+    component = forms.ModelMultipleChoiceField(
+        label = "Components",
+        queryset = Component.objects.none(),
+        required = False,
+    )
+    def populate(self, product_id = None):
+        if product_id:
+            self.fields['category'].queryset = TestCaseCategory.objects.filter(product__id = product_id)
+            self.fields['component'].queryset = Component.objects.filter(product__id = product_id)
+        else:
+            self.fields['category'].queryset = TestCaseCategory.objects.all()
+            self.fields['component'].queryset = Component.objects.all()

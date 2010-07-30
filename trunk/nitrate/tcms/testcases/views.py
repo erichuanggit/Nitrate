@@ -724,6 +724,65 @@ def clone(request, template_name='case/clone.html'):
         'clone_form': clone_form,
     })
 
+@user_passes_test(lambda u: u.has_perm('testcases.add_testcasecomponent'))
+def component(request):
+    """
+    Management test case components
+    """
+    # FIXME: It will update product/category/component at one time so far.
+    # We may disconnect the component from case product in future.
+    from tcms.core import forms
+    from forms import CaseComponentForm
+    
+    class ComponentActions(object):
+        """Component actions"""
+        def __init__(self, request, tcs):
+            self.ajax_response = {'rc': 0, 'response': 'ok'}
+            self.request = request
+            self.tcs = tcs
+            self.product_id = request.REQUEST.get('product')
+            
+        def __get_form(self):
+            self.form = CaseComponentForm(request.REQUEST)
+            self.form.populate(product_id = self.product_id)
+            return self.form
+        
+        # FIXME: add/remove/clear need to be done
+        
+        def update(self):
+            form = self.__get_form()
+            if not form.is_valid():
+                return self.render_ajax(forms.errors_to_list(form))
+            
+            self.tcs.update(category = self.form.cleaned_data['category'])
+            for tc in self.tcs:
+                tc.clear_components()
+                for c in form.cleaned_data['component']:
+                    tc.add_component(component = c)
+            
+            return self.render_ajax(self.ajax_response)
+        
+        def render_ajax(self, response):
+            return HttpResponse(simplejson.dumps(self.ajax_response))
+        
+        def render_form(self):
+            form = CaseComponentForm(initial={
+                'product': self.product_id,
+                'category': self.request.REQUEST.get('category'),
+                'component': self.request.REQUEST.getlist('component'),
+            })
+            form.populate(product_id = self.product_id)
+            
+            return HttpResponse(form.as_p())
+    
+    tcs = TestCase.objects.filter(pk__in = request.REQUEST.getlist('case'))
+    if not tcs:
+        raise Http404
+    
+    cas = ComponentActions(request = request, tcs = tcs)
+    func = getattr(cas, request.REQUEST.get('a', 'render_form'))
+    return func()
+
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcaseattachment'))
 def attachment(request, case_id, template_name='case/attachment.html'):
     """Manage test case attachments"""

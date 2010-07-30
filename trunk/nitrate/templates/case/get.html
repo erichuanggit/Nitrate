@@ -9,6 +9,13 @@
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
 <script type="text/javascript">
 Nitrate.Utils.after_page_load(Nitrate.TestCases.Details.on_load);
+
+Nitrate.TestCases.Instance = {
+	pk: {{ test_case.pk }},
+	product_id: {{ test_case.category.product.pk }},
+	category_id: {{ test_case.category_id }},
+	author_id: {{ test_plan.author_id }},
+}
 </script>
 {% endblock %}
 

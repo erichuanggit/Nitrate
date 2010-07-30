@@ -21,7 +21,7 @@
 		</tr>
 		{% endfor %}
 		
-		{% if perms.management.add_testattachment %}
+		
 		<tr>
 			<td colspan="3">
 				<div class="addtag">
@@ -29,11 +29,14 @@
 					<span class="tit">Add attachment</span>
 					<a href="{% url tcms.testcases.views.attachment test_case.case_id %}?from_plan={{ test_plan.plan_id }}" class="addlink">add</a> 
 					{% endcomment %}
-					Use <a href="{% url tcms.testcases.views.edit test_case.pk %}">Edit</a> function to modify.
+					{% if perms.management.change_testcase %}
+					<input id="id_update_component" type="button" value="Update Product/Category/Component" />
+					<lable class="grey">You also can use <a href="{% url tcms.testcases.views.edit test_case.pk %}">Edit</a> function to modify.</label>
+					{% else %}
+					<input id="id_update_component" type="button" value="Update Product/Category/Component" disabled />
+					{% endif %}
 				</div>
 			</td>
 		</tr>
-		{% endif %}
-		
 	</tbody>
 </table>

@@ -23,6 +23,8 @@ from django.views.generic.simple import direct_to_template
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import simplejson
+
 from tcms.core.utils import Prompt
 from tcms.core.utils.raw_sql import RawSQL
 
@@ -924,7 +926,7 @@ def component(request, template_name = 'plan/get_component.html'):
         
         def remove(self):
             if not self.request.user.has_perm('testplans.delete_testplancomponent'):
-                if self.is_ajax():
+                if self.request.is_ajax():
                     return HttpResponse(simplejson.dumps(self.__msgs__['permission_denied']))
                 
                 return self.render(message = self.__msgs__['permission_denied']['response'])

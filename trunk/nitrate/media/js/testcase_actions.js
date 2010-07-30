@@ -63,6 +63,47 @@ Nitrate.TestCases.Details.on_load = function()
         }
     })
     
+    $('id_update_component').observe('click', function(e) {
+        if(this.diabled)
+            return false;
+        
+        var params = {
+            'case': Nitrate.TestCases.Instance.pk,
+            'product': Nitrate.TestCases.Instance.product_id,
+            'category': Nitrate.TestCases.Instance.category_id,
+            // 'component': 
+        };
+        
+        var form_observe = function(e) {
+            e.stop();
+            
+            var params = this.serialize(true);
+            params['a'] = 'update';
+            params['case'] = Nitrate.TestCases.Instance.pk
+            
+            var url = getURLParam().url_cases_component;
+            var success = function(t) {
+                returnobj = t.responseText.evalJSON(true);
+                
+                if (returnobj.rc == 0) {
+                    window.location.reload();
+                } else {
+                    alert(returnobj.response);
+                    return false;
+                }
+            }
+            
+            new Ajax.Request(url, {
+                method: this.method,
+                parameters: params,
+                onSuccess: success,
+                onFailure: json_failure,
+            })
+        }
+        
+        renderComponentForm(getDialog(), params, form_observe);
+    });
+    
     if(window.location.hash) {
         fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
     }
@@ -525,4 +566,29 @@ function taggleAllCasesCheckbox(container)
         $$('#' + container + ' input[type="checkbox"][name="case"]').each( function(t) { t.checked = false; });
         $$('#' + container + ' tr').each(function(e) { e.removeClassName('selection_row')});
     }
+}
+
+function renderComponentForm(container, parameters, form_observe)
+{
+    var d = new Element('div');
+    if(!container)
+        var container = getDialog();
+    container.show();
+    
+    var callback = function(t) {
+        var action = getURLParam().url_cases_component;
+        var notice = '';
+        
+        var f = constructForm(d.innerHTML, action, form_observe, notice);
+        container.update(f);
+    }
+    
+    var url = getURLParam().url_cases_component;
+    
+    new Ajax.Updater(d, url, {
+        method: 'post',
+        parameters: parameters,
+        onComplete: callback,
+        onFailure: html_failure,
+    })
 }

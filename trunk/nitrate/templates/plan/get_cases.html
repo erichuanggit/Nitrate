@@ -86,20 +86,27 @@
             Tag:
             
             {% if perms.testcases.add_testcasetag %}
-             <input type="button" value="Add" id="id_add_case_tags" class="add" />
+            <input type="button" value="Add" id="id_add_case_tags" class="add" />
+			{% else %}
+			<input type="button" value="Add" id="id_add_case_tags" class="add" disabled />
             {% endif %}
+			
             {% if perms.testcases.delete_testcasetag %}
             <input type="button" value="Remove" id="id_remove_case_tags" class="delete" /> |
+			{% else %}
+			<input type="button" value="Remove" id="id_remove_case_tags" class="delete" diabled /> |
             {% endif %}
-             
-            <input type="button" value="Automated" title="change automated" class="automated sprites" id="batch_automated" />
-            
-           {% if perms.testcases.change_testcase %}
-            <input type="button" value="Default tester" title="change default tester" class="assignee sprites" onclick="changePlanCaseDefaultTester(this.up(2), this.up(3), {{ test_plan.plan_id }})" />  
-            {% else%}
-            <input type="button" value="Default tester" title="change default tester" class="assigneedisable sprites" onclick="changePlanCaseDefaultTester(this.up(2), this.up(3), {{ test_plan.plan_id }})"  disabled="disabled"/>
-            
+			
+            {% if perms.testcases.change_testcase %}
+			<input id="id_batch_component" type="button" value="Product/Category/Component" />
+            <input id="batch_automated"  class="automated sprites" type="button" value="Automated" title="change automated" />
+            <input type="button" class="assignee sprites" value="Default tester" title="change default tester" onclick="changePlanCaseDefaultTester(this.up(2), this.up(3), {{ test_plan.plan_id }})" />
+            {% else %}
+			<input id="id_batch_component" type="button" value="Product/Category/Component" disabled />
+			<input type="button" value="Automated" title="change automated" class="automated sprites" id="batch_automated" />
+            <input type="button" value="Default tester" title="change default tester" class="assigneedisable sprites" disabled />
             {% endif %}
+			
 			{% if perms.testcases.change_testcase %}
             <select name="new_case_status_id" id="new_case_set_status">
             	<option title="please choose a status" value="">Set status</option>
@@ -114,7 +121,10 @@
 				{% endfor %}
             </select>
 			{% else %}
-			<select name="new_priority_id" id="new_case_priority" disabled="disabled">
+			<select name="new_case_status_id" id="new_case_set_status" disabled>
+            	<option title="please choose a status" value="">Set status</option>
+            </select>
+			<select name="new_priority_id" id="new_case_priority" disabled>
             	<option title="please choose a priority" value="">Set priority</option>
             </select>
 			{% endif %}

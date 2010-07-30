@@ -350,10 +350,9 @@ class TestCase(TCMSActionModel):
     
     def clear_components(self):
         try:
-            tcc = TestCaseComponent.objects.filter(
+            return TestCaseComponent.objects.filter(
                 case = self,
-            )
-            tcc.delete()
+            ).delete()
         except:
             raise
     

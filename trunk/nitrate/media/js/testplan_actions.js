@@ -587,6 +587,50 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             });
         })
         
+        $('id_batch_component').observe('click', function(e) {
+            if(this.diabled)
+                return false;
+                
+            var params = {
+                'case': $('id_form_cases').serialize(true)['case'],
+                'product': Nitrate.TestPlans.Instance.product_id
+            };
+            
+            var form_observe = function(e) {
+                e.stop();
+                if(!$('id_form_cases').serialize(true)['case']){
+                    alert(default_messages.alert.no_case_selected);
+                    return false;
+                }
+                
+                var params = this.serialize(true);
+                params['a'] = 'update';
+                params['case'] = $('id_form_cases').serialize(true)['case'];
+                
+                var url = getURLParam().url_cases_component;
+                var success = function(t) {
+                    returnobj = t.responseText.evalJSON(true);
+                    
+                    if (returnobj.rc == 0) {
+                        constructPlanDetailsCasesZone(container, plan_id, parameters);
+                        clearDialog();
+                    } else {
+                        alert(returnobj.response);
+                        return false;
+                    }
+                }
+                
+                new Ajax.Request(url, {
+                    method: this.method,
+                    parameters: params,
+                    onSuccess: success,
+                    onFailure: json_failure,
+                })
+            }
+            
+            renderComponentForm(getDialog(), params, form_observe);
+        })
+        
         // Observe the batch add case button
         $('id_add_case_tags').observe('click',function(e) {
             if(!$('id_form_cases').serialize(true)['case']){
@@ -763,29 +807,25 @@ function constructPlanComponentModificationDialog(container)
         var container = getDialog();
     container.show();
     
-    var f = new Element('form', {'action': getURLParam().url_plan_components});
-    var s = new Element('input', {'type': 'submit', 'name': 'a', 'value': 'Update'}); // Submit button
-    var c = new Element('input', {'type': 'button', 'value': 'Cancel'}); // Cancel button
+    var d = new Element('div');
     
     var parameters = {
         a: 'get_form',
         plan: Nitrate.TestPlans.Instance.pk,
     };
     
-    f.observe('submit', function(e) {
-        e.stop();
-        constructPlanComponentsZone('components', this.serialize());
-        clearDialog();
-    })
-    
-    c.observe('click', function(e) {
-        clearDialog();
-    })
-    
     var callback = function(t) {
+        var action = getURLParam().url_plan_components;
+        var form_observe = function(e) {
+            e.stop();
+            constructPlanComponentsZone('components', this.serialize());
+            clearDialog();
+        };
+        var notice = '';
+        var s = new Element('input', {'type': 'submit', 'name': 'a', 'value': 'Update'}); // Submit button
+        
+        var f = constructForm(d.innerHTML, action, form_observe, notice, s);
         container.update(f);
-        f.appendChild(s);
-        f.appendChild(c);
         
         // FIXME: Split the select to two columns, javascript buggy here.
         /*
@@ -795,7 +835,7 @@ function constructPlanComponentModificationDialog(container)
     }
     
     // Get the form and insert into the dialog.
-    constructPlanComponentsZone(f, parameters, callback);
+    constructPlanComponentsZone(d, parameters, callback);
 }
 
 function constructBatchTagProcessDialog(){
