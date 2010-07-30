@@ -264,9 +264,19 @@ function changeTestCaseStatus(id, case_id)
     var value = $(p.case_status_select).value;
     
     var success = function(t) {
-        alert('Case ' + case_id + ' status changed.');	
-    }
+        returnobj = t.responseText.evalJSON(true); 
+        case_status_id = returnobj.case_status_id; 
         
+        for (var i = 0; (node = $(p.case_status_select).options[i]); i++) {
+           if(node.selected)
+               var case_status = node.innerHTML;
+        }
+        
+        $(p.case_status).innerHTML = case_status;
+        $(p.case_status).show(); 
+        $(p.case_status_select).hide();
+    }
+    
     changeCaseStatus(case_id, value, success);
 }
 
