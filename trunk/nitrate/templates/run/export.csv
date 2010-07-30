@@ -1,2 +1,3 @@
-{% for tcr in tcrs %}{% autoescape off %}Case run ID:{{tcr.pk}}, Case ID:{{tcr.case.pk}}, Case summary:{{tcr.case.summary}}, Category:{{tcr.case.category}}, Status:{{tcr.case.case_status}}{% endautoescape %}
+Case Run ID, Case ID, Category, Status, Summary
+{% for tcr in tcrs %}{% autoescape off %}{{tcr.pk}}, {{tcr.case.pk}}, {{tcr.case.category}}, {{tcr.case.case_status}}, {{tcr.case.summary}}{% endautoescape %}
 {% endfor %}

@@ -397,6 +397,8 @@ def edit(request, case_id, template_name = 'case/edit.html'):
     else:
         tp = None
     
+    #CaseNotifyForm default to None
+    n_form = None
     # If the form is submitted
     if request.method == "POST":
         form = EditCaseForm(request.REQUEST)
