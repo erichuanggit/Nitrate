@@ -3,7 +3,7 @@
 
 Name:           nitrate
 Version:        3.0.4
-Release:        1
+Release:        2
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -111,6 +111,9 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
+* Fri Jul 30 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.4-2
+- Fixed #619247 - Cannot update test case status
+
 * Wed Jul 21 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.4-1
 - First open sourced version.
 - Added all of docs lacked for installation/upgrading/usage.
