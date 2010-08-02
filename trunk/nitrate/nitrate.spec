@@ -3,7 +3,7 @@
 
 Name:           nitrate
 Version:        3.0.4
-Release:        2
+Release:        3
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -111,6 +111,10 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
+* Fri Aug 2 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.4-3
+- Fixed #612797 - The Property in Environment can not be deleted
+- Fixed #616463 - Remove property doesn't work in TCMS
+
 * Fri Jul 30 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.4-2
 - Fixed #619247 - Cannot update test case status
 
