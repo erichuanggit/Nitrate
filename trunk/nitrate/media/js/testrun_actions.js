@@ -13,13 +13,19 @@ Nitrate.TestRuns.List.on_load = function()
     bind_build_selector_to_product(true, $('id_product'));
     
     if($('testruns_table')) {
-        SortableTable.setup({
-            rowEvenClass : 'evenRow',
-            rowOddClass : 'oddRow',
-            nosortClass : 'nosort'
+//        SortableTable.setup({
+//            rowEvenClass : 'evenRow',
+//            rowOddClass : 'oddRow',
+//            nosortClass : 'nosort'
+//        });
+//
+//        SortableTable.init('testruns_table');
+        TableKit.Sortable.init('testruns_table',
+        {
+            rowEvenClass : 'roweven',
+            rowOddClass : 'rowodd',
+            nosortClass : 'nosort'	
         });
-
-        SortableTable.init('testruns_table');
     }
 
     $('id_search_people').name = $F('id_people_type');
