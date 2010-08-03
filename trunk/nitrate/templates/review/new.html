@@ -8,8 +8,8 @@
 {% endblock %}
 
 {% block custom_javascript %}
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/fastinit.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/tablesort.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/fastinit.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/tablekit.js"></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/tablednd.js'></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testreview_actions.js'></script>
@@ -122,14 +122,14 @@ Nitrate.Utils.after_page_load(Nitrate.TestReviews.New.on_load);
 			<thead>
 				<tr>
 					<th class="nosort"align="left" width="4%"	></th>
-					<th class="sortcol" align="left" width="4%" >#</th>
-					<th class="sortcol" align="left" width="26%" >Test Case Summary</th>
-					<th class="sortcol" align="left" width="20%">Author</th>
-					<th class="sortcol" align="left" width="20%">Created Date</th>
-					<th class="sortcol sortaec" align="left" width="12%">Status</th>
-					<th class="sortcol" align="left" width="8%">Category</th>
-					<th class="sortcol" align="left"  width="8%" >Priority</th>
-					<th class="sortcol" align="left" width="10%">Action</th>
+					<th class="number" align="left" width="4%" >#</th>
+					<th class="text" align="left" width="26%" >Test Case Summary</th>
+					<th class="text" align="left" width="20%">Author</th>
+					<th class="date-iso" align="left" width="20%">Created Date</th>
+					<th class="sortable" align="left" width="12%">Status</th>
+					<th class="text" align="left" width="8%">Category</th>
+					<th class="text" align="left"  width="8%" >Priority</th>
+					<th class="sortable" align="left" width="10%">Action</th>
 				</tr>
 			</thead>
 			<tbody>

@@ -7,8 +7,8 @@
 {% block custom_stylesheet %}
 {% endblock %}
 {% block custom_javascript %}
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/fastinit.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/tablesort.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/fastinit.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/tablekit.js"></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
 <script type="text/javascript">
 Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
@@ -51,16 +51,16 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
             	<th width="20" class="nosort">
 					<input type="checkbox" id="id_checkbox_all_case" title="Select all/Select none">
 				</th>
-				<th align="left" width="50" class="sortcol sortdesc">ID</th>
-				<th align="left" class="sortcol">Summary</th>
-				<th align="left" width="100" class="sortcol">Author</th>
-				<th align="left" width="130" class="sortcol">Default Tester</th>
-                <th align="left" width="140" class="sortcol">Automated</th>
-                <th align="left" width="90" class="sortcol">Status</th>
-				<th align="left" width="120" class="sortcol">Category</th>
-				<th align="left" width="60" class="sortcol">Priority</th>
+				<th align="left" width="50" class="number">ID</th>
+				<th align="left" class="text">Summary</th>
+				<th align="left" width="100" class="text">Author</th>
+				<th align="left" width="130" class="text">Default Tester</th>
+                <th align="left" width="140" class="text">Automated</th>
+                <th align="left" width="90" class="text">Status</th>
+				<th align="left" width="120" class="text">Category</th>
+				<th align="left" width="60" class="text">Priority</th>
 				
-				<th align="left" width="140" class="sortcol">Created</th>
+				<th align="left" width="140" class="date-iso">Created</th>
 			</tr>
 		</thead>
 		<tbody>

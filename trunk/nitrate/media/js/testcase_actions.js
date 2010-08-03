@@ -15,13 +15,20 @@ Nitrate.TestCases.List.on_load = function()
     });
     
     if($('testcases_table')) {
-        SortableTable.setup({
-            rowEvenClass : 'evenRow',
-            rowOddClass : 'oddRow',
+//        SortableTable.setup({
+//            rowEvenClass : 'evenRow',
+//            rowOddClass : 'oddRow',
+//            nosortClass : 'nosort'
+//        });
+//        
+//        SortableTable.init('testcases_table');
+
+        TableKit.Sortable.init('testcases_table',
+        {
+        	rowEvenClass : 'roweven',
+            rowOddClass : 'rowodd',
             nosortClass : 'nosort'
         });
-        
-        SortableTable.init('testcases_table');
     }
 }
 

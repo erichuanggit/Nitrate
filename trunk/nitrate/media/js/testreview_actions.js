@@ -4,7 +4,8 @@ Nitrate.TestReviews.Details = {};
 
 Nitrate.TestReviews.New.on_load = function()
 {
-    SortableTable.init('testcases');
+//    SortableTable.init('testcases');
+    TableKit.Sortable.init('testcases');
 }
 
 Nitrate.TestReviews.Details.on_load = function()

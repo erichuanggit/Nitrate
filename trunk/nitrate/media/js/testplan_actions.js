@@ -37,13 +37,20 @@ Nitrate.TestPlans.List.on_load = function()
     
 
     if($('testplans_table')) {
-        SortableTable.setup({
-            rowEvenClass : 'evenRow',
-            rowOddClass : 'oddRow',
+//        SortableTable.setup({
+//            rowEvenClass : 'evenRow',
+//            rowOddClass : 'oddRow',
+//            nosortClass : 'nosort'
+//        });
+//
+//        SortableTable.init('testplans_table');
+        
+        TableKit.Sortable.init('testplans_table',
+        {
+            rowEvenClass : 'roweven',
+            rowOddClass : 'rowodd',
             nosortClass : 'nosort'
         });
-
-        SortableTable.init('testplans_table');
     }
 
     if($('column_add')) {
@@ -91,8 +98,10 @@ Nitrate.TestPlans.Details.on_load = function()
     constructTagZone('tag', { plan: plan_id });
     constructPlanComponentsZone('components');
     
-    SortableTable.init('testruns_table');
-    SortableTable.init('testreview_table');
+//    SortableTable.init('testruns_table');
+//    SortableTable.init('testreview_table');
+    TableKit.Sortable.init('testruns_table');
+    TableKit.Sortable.init('testreview_table');
     
     $$('li.tab a').invoke('observe', 'click', function(i) {
         $$('div.tab_list').each(function(t) {
