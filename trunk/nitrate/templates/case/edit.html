@@ -162,12 +162,17 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
                 </div>
             </fieldset>
             <fieldset class="no-border notification">
-                <label class="strong">Send notification after editing:</label>
-                <input type="checkbox" id="id_default_tester_of_case" name="default_tester_of_case"><label for="id_default_tester_of_case">Default tester of case</label>
-				<input type="checkbox" id="id_authors_of_plans" name="authors_of_plans"><label for="id_authors_of_plans">Authors of plans</label>
-				<input type="checkbox" id="id_managers_of_runs" name="managers_of_runs"><label for="id_managers_of_runs">Managers of runs</label>
-				<input type="checkbox" id="id_default_testers_of_runs" name="default_testers_of_runs"><label for="id_default_testers_of_runs">Default testers of runs</label>
-				<input type="checkbox" id="id_assignees_of_case_runs" name="assignees_of_case_runs"><label for="id_assignees_of_case_runs">Assignees of case runs</label>
+                <label class="strong">Send new case instance after editing <label class="grey">(The author of this case will receive the notification by default)</label>:</label>
+                <div>
+                    {{ notify_form.editor }}{{ notify_form.editor.label }}
+                    {{ notify_form.default_tester_of_case }}{{ notify_form.default_tester_of_case.label }}
+                    {{ notify_form.authors_of_plans }}{{ notify_form.authors_of_plans.label }}
+                    {{ notify_form.managers_of_runs }}{{ notify_form.managers_of_runs.label }}
+                    {{ notify_form.default_testers_of_runs }}{{ notify_form.default_testers_of_runs.label }}
+                    {{ notify_form.assignees_of_case_runs }}{{ notify_form.assignees_of_case_runs.label }}
+                    <br />
+                    {{ notify_form.speicfic_person.label }}: {{ notify_form.speicfic_person }}<label class="grey">{{ notify_form.speicfic_person.help_text }}</label>
+                </div>
             </fieldset>
             <div id="control_box" class="submit-row">
                 <div class="errors">{{ form.errors }}</div>

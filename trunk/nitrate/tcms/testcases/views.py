@@ -479,7 +479,14 @@ def edit(request, case_id, template_name = 'case/edit.html'):
                         tc.case_run.values_list('assignee__email', flat=True)
                     )
                 
+                if n_form.cleaned_data['speicfic_person']:
+                    n_to.extend(n_form.cleaned_data['speicfic_person'])
+                
                 n_to = list(set(n_to))
+                
+                if not n_form.cleaned_data['editor']:
+                    n_to.remove(request.user.email)
+                
                 # Sending the mail with threading
                 EditCaseNotifyThread(
                     instance = tc,

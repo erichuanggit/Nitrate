@@ -19,14 +19,13 @@
 from mailto import *
 from prompt import *
 
-def string_to_list(tags, spliter = ','):
+def string_to_list(strs, spliter = ','):
     """Convert the string to list"""
-    if isinstance(tags, list):
-        tag_list = map(lambda t: str(t).strip(), tags)
+    if isinstance(strs, list):
+        str_list = map(lambda t: str(t).strip(), strs)
     else:
-        tag_list = map(lambda t: str(t).strip(), tags.split(spliter))
-    del tags
-    return [t for t in tag_list if t]
+        str_list = map(lambda t: str(t).strip(), strs.split(spliter))
+    return [s for s in str_list if s]
 
 def form_errors_to_list(form):
     """

@@ -20,7 +20,7 @@ from datetime import timedelta
 
 from django import forms
 
-from tcms.core.forms import UserField, TimedeltaFormField, TinyMCEWidget
+from tcms.core.forms import UserField, TimedeltaFormField, MultipleEmailField, TinyMCEWidget
 from tcms.core.forms.widgets import SECONDS_PER_MIN, SECONDS_PER_HOUR
 
 from tcms.testplans.models import TestPlan
@@ -235,11 +235,16 @@ class EditCaseForm(BaseCaseForm):
     pass
 
 class CaseNotifyForm(forms.Form):
+    editor = forms.BooleanField(required = False)
     default_tester_of_case = forms.BooleanField(required = False)
     authors_of_plans = forms.BooleanField(required = False)
     managers_of_runs = forms.BooleanField(required = False)
     default_testers_of_runs = forms.BooleanField(required = False)
     assignees_of_case_runs = forms.BooleanField(required = False)
+    speicfic_person = MultipleEmailField(
+        help_text = 'Multiple types are split with comma.',
+        required = False
+    )
 
 # =========== Forms for  XML-RPC functions ==============
 

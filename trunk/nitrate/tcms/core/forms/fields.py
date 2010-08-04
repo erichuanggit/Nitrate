@@ -16,13 +16,13 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-from xml.parsers.expat import ExpatError
-
 from django import forms
 from django.db.models import Q
 from django.forms import ValidationError
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
+
+from tcms.core.utils import string_to_list
 
 from widgets import *
 
@@ -70,3 +70,15 @@ class TimedeltaFormField(forms.Field):
             except ValueError, TypeError:
                 raise forms.ValidationError(self.error_messages['invalid'])
         return i
+
+class MultipleEmailField(forms.EmailField):
+    def clean(self, value):
+        """
+        Validates that the input matches the regular expression. Returns a
+        Unicode object.
+        """
+        value = super(forms.CharField, self).clean(value)
+        if value == u'':
+            return value
+        
+        return [v for v in string_to_list(strs = value) if self.regex.search(v)]
