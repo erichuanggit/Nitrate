@@ -6,8 +6,8 @@
 {% endblock %}
 
 {% block custom_javascript %}
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/fastinit.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/tablesort.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/fastinit.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/tablekit.js"></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testrun_actions.js'></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/management_actions.js'></script>
 <script type="text/javascript">
@@ -50,14 +50,14 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Addcase.on_load);
 							<img id="blind_icon_{{ forloop.counter }}" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
 						</a>
 					</th>
-					<th  class="sortcol" align="left" width="4%">#</th>
-					<th  class="sortcol" align="left" width="40%" >Test Case Summary</th>
-					<th  class="sortcol" align="left" width="13%">Created Date</th>
-					<th  class="sortcol" align="left"  width="7%" >Author</th>
-					<th  class="sortcol" align="left"  width="7%" >Tester</th>
-					<th  class="sortcol" align="left"  width="7%" >Priority</th>
-					<th  class="sortcol" align="left"  width="7%" >Plan</th>
-					<th  class="sortcol" align="left" width="7%">Action</th>
+					<th  class="sortable" align="left" width="4%">#</th>
+					<th  class="sortable" align="left" width="40%" >Test Case Summary</th>
+					<th  class="sortable" align="left" width="13%">Created Date</th>
+					<th  class="sortable" align="left"  width="7%" >Author</th>
+					<th  class="sortable" align="left"  width="7%" >Tester</th>
+					<th  class="sortable" align="left"  width="7%" >Priority</th>
+					<th  class="sortable" align="left"  width="7%" >Plan</th>
+					<th  class="sortable" align="left" width="7%">Action</th>
 				</tr>
 			</thead>
 			<tbody>

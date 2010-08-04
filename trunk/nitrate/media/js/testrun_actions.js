@@ -13,13 +13,6 @@ Nitrate.TestRuns.List.on_load = function()
     bind_build_selector_to_product(true, $('id_product'));
     
     if($('testruns_table')) {
-//        SortableTable.setup({
-//            rowEvenClass : 'evenRow',
-//            rowOddClass : 'oddRow',
-//            nosortClass : 'nosort'
-//        });
-//
-//        SortableTable.init('testruns_table');
         TableKit.Sortable.init('testruns_table',
         {
             rowEvenClass : 'roweven',
@@ -65,20 +58,18 @@ Nitrate.TestRuns.Details.on_load = function()
 Nitrate.TestRuns.New.on_load = function()
 {
     if($('testcases')) {
-        SortableTable.setup({
-            nosortClass : 'nosort'
-        });
-
-        SortableTable.init('testcases');
+          TableKit.Sortable.init('testcases',
+          {
+          	 nosortClass : 'nosort'
+          });
     }
     if($('testcases_filter')) {
-        SortableTable.setup({
-            rowEvenClass : 'even',
-            rowOddClass : 'odd',
+        TableKit.Sortable.init('testcases_filter',
+        {
+            rowEvenClass : 'roweven',
+            rowOddClass : 'rowodd',
             nosortClass : 'nosort'
         });
-
-        SortableTable.init('testcases_filter');
     }
 
 }

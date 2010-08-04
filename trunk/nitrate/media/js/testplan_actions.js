@@ -37,14 +37,6 @@ Nitrate.TestPlans.List.on_load = function()
     
 
     if($('testplans_table')) {
-//        SortableTable.setup({
-//            rowEvenClass : 'evenRow',
-//            rowOddClass : 'oddRow',
-//            nosortClass : 'nosort'
-//        });
-//
-//        SortableTable.init('testplans_table');
-        
         TableKit.Sortable.init('testplans_table',
         {
             rowEvenClass : 'roweven',
@@ -98,8 +90,6 @@ Nitrate.TestPlans.Details.on_load = function()
     constructTagZone('tag', { plan: plan_id });
     constructPlanComponentsZone('components');
     
-//    SortableTable.init('testruns_table');
-//    SortableTable.init('testreview_table');
     TableKit.Sortable.init('testruns_table');
     TableKit.Sortable.init('testreview_table');
     

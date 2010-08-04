@@ -7,8 +7,8 @@
 {% endblock %}
 
 {% block custom_javascript %}
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/fastinit.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/tablesort.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/fastinit.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/tablekit.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}/js/report.js"></script>
 <script type="text/javascript">
 Nitrate.Utils.after_page_load(Nitrate.Report.Builds.on_load);
@@ -108,11 +108,11 @@ Nitrate.Utils.after_page_load(Nitrate.Report.Builds.on_load);
 		<table class="list report" id="report_build" border="0" cellspacing="0" cellpadding="0" width="100%">
 			<thead>
 				<tr>
-					<th class="sortcol sortasc" width="5%">ID</th>
-					<th class="sortcol">BUILD</th>
-					<th class="sortcol">RUNS (Finished/ Total)</th>
-					<th class="sortcol">Testing Cases</th>
-					<th class="sortcol">Failed Cases</th>
+					<th class="sortable sortasc" width="5%">ID</th>
+					<th class="sortable">BUILD</th>
+					<th class="sortable">RUNS (Finished/ Total)</th>
+					<th class="sortable">Testing Cases</th>
+					<th class="sortable">Failed Cases</th>
 				</tr>
 			</thead>
 			<tbody>
