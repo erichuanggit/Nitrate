@@ -199,6 +199,8 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .actions .proposed{ padding-left:16px;}
 .actions .confirmed{padding-left:16px; background-position:0 -40px;}
 .actions .disabled{padding-left:16px; background-position:0 -160px;}
+.tag_add{ background-position:0 -148px;padding-left:16px;}
+.tag_delete{ background-position:0 -166px;padding-left:16px;}
 
 .automated{ padding-left:16px; background-position:0 -131px;}
 
