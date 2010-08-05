@@ -3,6 +3,7 @@
 
 import os
 import urllib2
+import socket
 from sgmllib import SGMLParser
 from django.core.mail import send_mail
 from pprint import pprint
@@ -23,7 +24,7 @@ PRODUCTS_CONFIG = (
     # ('Red Hat Enterprise Linux 5', 'RHEL5.2-', 'http://download.devel.redhat.com/rel-eng/'),
 )
 
-HOST_NAME = os.environ.get('HOSTNAME')
+HOST_NAME = socket.gethostname()
 
 MAIL_SUBJECT = '[TCMS] New builds has been synced from the tree - %s' % HOST_NAME
 MAIL_FROM = 'noreply@redhat.com'
