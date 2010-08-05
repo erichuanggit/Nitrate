@@ -458,11 +458,13 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .selection_row { background:#f3f8fe; border:0px; }
 .progress-bar{ width:100px; background:#fff url(../images/evenbg.png) repeat-x; height:24px; border:1px solid #ccc; vertical-align:middle; margin:3px 0px 2px 0px; font-size:12px; text-align:right; }
 .progress-bar .percent{ position:absolute; text-align:center; width:100px; color:#333; line-height:24px; height:24px; }
+.percent a:hover{ color:#000; text-decoration:underline}
 .progress-inner{ height:24px; background:#78BAE6 url(../images/evenbg.png) repeat-x; color:#333; float:left; text-align:center; left:0px; top:0px; }
-.progress-failed{ height:24px; background:#F53D00 url(../images/evenbg.png) repeat-x; color:#D7670B; float:right; }
+.progress-failed{ height:24px; background:url(../images/progress_failed.png) repeat-x left top #ea0018; color:#D7670B; float:right; }
+.progress-passed{ height:24px; background:url(../images/progress_pass.png) repeat-x left top #a3d05f; color:#000; float:right; }
 .min-height-150{ min-height:150px; }
-.subject{ word-wrap:break-word;
-} /********************************list: cases list /runs list ***********************/
+.subject{ word-wrap:break-word;}
+ /********************************list: cases list /runs list ***********************/
 .list { width : 100%; table-layout:fixed; background:#fff; clear:left; }
 .list tfoot { background-color : #f1f1f1; }
 .list thead{ border:0; }
@@ -743,3 +745,4 @@ a:link.edit,a:visited.edit{ color:#333;}
 .table_noborder{ width:99%; margin:5px auto;border-collapse:collapse;}
 .table_noborder th{background:url(../images/table_header_bg.png) repeat-x left top; height:28px; line-height:28px;padding-left:5px; border:solid 1px #a2a2a2; border-top:none;border-collapse:collapse; }
 .table_noborder td{ padding-left:5px; min-height:25px; line-height:25px;}
+.margin-top{ margin-top:10px;}

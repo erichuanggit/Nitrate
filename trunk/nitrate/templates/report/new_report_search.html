@@ -20,67 +20,99 @@ Nitrate.Utils.after_page_load(Nitrate.Report.List.on_load);
 	<div class="crumble"><a href="{% url tcms.core.views.index %}">Home</a> >> Reporting</div>
 	<div class="report_title_bg">Prodcut --show report what you want to see</div>
 	{% include "report/form/search.html" %}
-    <div class="report_title_bg">
-    Environment --show coverage report
-    <div class="absoluteright">
-    <a href="#" id='coverage_search'>Hide the coverage report</a>
-    </div>
-    </div>
-    <div id="coverage_report_search">
-    {% include "report/form/search_env.html" %}
-    </div>
+    
     <div class="button_box" >
         <input type="submit" size="7" value="Create Report" name="" title="Create Report" />
         <input type="reset" size="7" value="Save Query" name="" title="Save Query" />
     </div>
     
-    <div class="report_bar"><span>Product Report</span></div>
-    <table class="table_style" cellpadding="0" cellspacing="0" border="0" width="100%" id="id_table_cases" >
+    <div class="report_bar">
+    	<span>Prodcut Name:Red Hat Enterpriese Linux 6<br /></span>
+    	<span>Product Version:6.0<br /></span>
+	</div>
+    
+    
+	
+    <table class="list border-bottom" cellpadding="0" cellspacing="0" border="0"  id="id_table_cases" >
         <thead>
             <tr>
-                <th align="left" class="sortcol sortdesc" >Product</th>
+                <th align="left" class="sortcol">Build</th>
                 <th align="left" class="sortcol">Plan</th>
                 <th align="left" class="sortcol">Run</th>
                 <th align="left" class="sortcol">Case-Run</th>
-                <th align="left" class="sortcol">Passed Case-Run</th>
-                <th align="left" class="sortcol">Failed Case-Run</th>
+                <th align="left" class="sortcol">Passed case-run</th>
+                <th align="left" class="sortcol">Failed case-run</th>
             </tr>
         </thead>
         <tbody>
-            <tr class='odd'>
-                <td><a href="new_report_detail.html">Red Hat Enterprise Linux 6</a></td>
-                <td valign="top" ><a href="#">345</a></td>
-                <td valign="top" ><a href="#">345</a></td>
-                <td valign="top" ><a href="#">345</a></td>
-                <td valign="top" class="report_pass"><a href="#">90%</a></td>
-                <td valign="top" ><a href="#">345</a></td>
+            <tr>
+                <td><a href="new_report_detail.html">Build2</a></td>
+                <td valign="top"><a href="#">10</a></td>
+                <td valign="top"><a href="#">20</a></td>
+                <td valign="top"><a href="#">50</a></td>
+                <td valign="top">
+                <div class="progress-bar">
+                    <div class="progress-inner" style="width:auto;  margin-right:-50px;text-align:cente">
+                        <div class="progress-passed" style="width:95px;">
+                            &nbsp;
+                        </div>
+                    </div>
+                    <div class="percent"><a href="#">95% (49)</a></div>
+				</div>
+                
+                </td>
+                <td valign="top">
+                <div class="progress-bar">
+                    <div class="progress-inner" style="width:auto;  margin-right:-50px;text-align:cente">
+                        <div class="progress-failed" style="width:3px;">
+                            &nbsp;
+                        </div>
+                    </div>
+                    <div class="percent"> <a href="#">4% (2)</a></div>
+				</div>
+                
+                </td>
             </tr>
-            <tr class='even'>
-                <td><a href="#">Red Hat Enterprise Linux 6</a></td>
-                <td valign="top" ><a href="#">345</a></td>
-                <td valign="top" ><a href="#">345</a></td>
-                <td valign="top" ><a href="#">345</a></td>
-                <td valign="top" class="" ><a href="#">90%</a></td>
-                <td valign="top" ><a href="#">345</a></td>
+            <tr>
+                <td><a href="#">Build3</a></td>
+                <td valign="top"><a href="#">10</a></td>
+                <td valign="top"><a href="#">20</a></td>
+                <td valign="top"><a href="#">100</a></td>
+                <td valign="top">
+                <div class="progress-bar">
+                    <div class="progress-inner" style="width:auto;  margin-right:-50px;text-align:cente">
+                        <div class="progress-failed" style="width:50px;">
+                            &nbsp;
+                        </div>
+                    </div>
+                    <div class="percent"><a href="#">50% (50)</a></div>
+				</div>
+                
+                </td>
+                <td valign="top">
+                <div class="progress-bar">
+                    <div class="progress-inner" style="width:auto;  margin-right:-50px;text-align:cente">
+                        <div class="progress-failed" style="width:50px;">
+                            &nbsp;
+                        </div>
+                    </div>
+                    <div class="percent"><a href="#">50% (50)</a></div>
+				</div>
+                </td>
             </tr>
-            <tr class='odd'>
-                <td><a href="#">Red Hat Enterprise Linux 6</a></td>
-                <td valign="top" ><a href="#">345</a></td>
-                <td valign="top" ><a href="#">345</a></td>
-                <td valign="top" ><a href="#">345</a></td>
-                <td valign="top" class="" ><a href="#">90%</a></td>
-                <td valign="top" ><a href="#">345</a></td>
+            <tr>
+                <td>Total (2 build)</td>
+                <td valign="top"><a href="#">20</a></td>
+                <td valign="top"><a href="#">40</a></td>
+                <td valign="top"><a href="#">150</a></td>
+                <td valign="top"><a href="#">99</a></td>
+                <td valign="top"><a href="#">52</a></td>
             </tr>
-            <tr class='even'>
-                <td><a href="#">Red Hat Enterprise Linux 6</a></td>
-                <td valign="top" ><a href="#">345</a></td>
-                <td valign="top" ><a href="#">345</a></td>
-                <td valign="top" ><a href="#">345</a></td>
-                <td valign="top" class="" ><a href="#">90%</a></td>
-                <td valign="top" ><a href="#">345</a></td>
-            </tr>
-            
-        </tbody>
+      </tbody>
 	</table>
+    
+   
+    
+    
 </div>
 {% endblock %}

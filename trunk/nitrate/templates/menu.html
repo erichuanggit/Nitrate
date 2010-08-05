@@ -66,7 +66,17 @@
         </li>
         <li class="menuline"></li>
         <li class="nav_li {% ifequal module 'report' %} current{% endifequal %}" onclick="window.location='{% url tcms.report.views.index %}'">
-        <a href="{% url tcms.report.views.index %}">REPORTING</a></li>
+        <a href="{% url tcms.report.views.index %}">REPORTING</a>
+        	<ul  id="submenu_report" class="nav_sub"  style="display:none;">
+                <li onclick="window.location='../tt/report/new_report_overview.html'">
+                    <a href="../report/new_report_overview.html">Overview Report</a>
+                </li>
+                <li onclick="window.location='new_report_search.html'">
+                    <a href="../report/new_report_search.html">Customize Report</a>
+                </li>
+            </ul>
+        
+        </li>
         <li class="menuline"></li>
         {% if user.is_staff %}
         <li  class="nav_li{% if not module %} current{% endif %}" onclick="window.location='{{ SETTINGS.ADMIN_PREFIX }}'">
