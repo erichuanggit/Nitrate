@@ -1,6 +1,12 @@
 #!/usr/bin/python
 # encoding: utf-8
 
+import os
+import urllib2
+from sgmllib import SGMLParser
+from django.core.mail import send_mail
+from pprint import pprint
+
 # =========================================
 # Settings
 # =========================================
@@ -17,19 +23,15 @@ PRODUCTS_CONFIG = (
     # ('Red Hat Enterprise Linux 5', 'RHEL5.2-', 'http://download.devel.redhat.com/rel-eng/'),
 )
 
-MAIL_SUBJECT = '[TCMS] New builds has been synced from the tree.'
+HOST_NAME = os.environ.get('HOSTNAME')
+
+MAIL_SUBJECT = '[TCMS] New builds has been synced from the tree - %s' % HOST_NAME
 MAIL_FROM = 'noreply@redhat.com'
-MAIL_HEADER = 'Following new builds has been synced from the tree:\n\n'
+MAIL_HEADER = 'Following new builds has been synced from the tree:\n\n- %s -\n\n' % HOST_NAME
 
 # =========================================
 # Code starting
 # =========================================
-
-import os
-import urllib2
-from sgmllib import SGMLParser
-from django.core.mail import send_mail
-from pprint import pprint
 
 os.environ['DJANGO_SETTINGS_MODULE'] = TCMS_SETTINGS
 
