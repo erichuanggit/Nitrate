@@ -24,8 +24,8 @@ Nitrate.Report.Builds.on_load = function()
 		if($('report_build')) {
 	        TableKit.Sortable.init('report_build',
 	        {
-                rowEvenClass : 'evenRow',
-                rowOddClass : 'oddRow',
+                rowEvenClass : 'roweven',
+                rowOddClass : 'rowodd',
                 nosortClass : 'nosort'
             });
 	    }

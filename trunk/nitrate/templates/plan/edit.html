@@ -41,7 +41,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Edit.on_load);
 			</a>
 		</span>
 	</div>
-	<form action="{% url tcms.testplans.views.edit test_plan.plan_id %}" method="post">
+	<form action="{% url tcms.testplans.views.edit test_plan.plan_id %}" method="post" enctype="multipart/form-data">
 		<div id="" class="Detailform border-1">
 			<table class="editor" cellspacing="0">
 				<tr>
@@ -98,6 +98,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Edit.on_load);
 						<div id="display_summary"  class="mec">
 							{{ form.summary }}
 						</div>
+                        <div >{{ form.summary.errors }}</div>
+                        <span>Or upload a plan document</span>
+                        {{ form.upload_plan_text }}
+                        <input type="submit" value="Upload" />
+                        <span class="grey">Html, Plain text or ODT is acceptable.</span>
+                        <div >{{ form.upload_plan_text.errors }}</div>
 						{% comment %}
 						<span>
 							<input type="button" id="id_btn_upload_plan_summary"  value="Upload plan document..." />

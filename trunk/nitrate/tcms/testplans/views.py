@@ -282,7 +282,7 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
     # If the form is submitted
     if request.method == "POST":
         from datetime import datetime
-        form = EditPlanForm(request.REQUEST)
+        form = EditPlanForm(request.POST, request.FILES)
         if request.REQUEST.get('product'):
             form.populate(product_id = request.REQUEST['product'])
         else:
@@ -290,6 +290,18 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
 
         #FIXME: Error handle
         if form.is_valid():
+            if form.cleaned_data.get('upload_plan_text'):
+                # Set the summary form field to the uploaded text
+                form.data['summary'] = form.cleaned_data['summary']
+
+                # Generate the form
+                return direct_to_template(request, template_name, {
+                    'module': MODULE_NAME,
+                    'sub_module': SUB_MODULE_NAME,
+                    'form' : form,
+                    'test_plan': tp,
+                })
+
             if request.user.has_perm('testplans.change_testplan'):
                 tp.name = form.cleaned_data['name']
                 tp.product = form.cleaned_data['product']

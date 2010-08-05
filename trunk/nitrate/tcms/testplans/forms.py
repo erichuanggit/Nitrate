@@ -333,7 +333,12 @@ class NewPlanForm(BasePlanForm):
             cleaned_data['summary'] = cleaned_data['upload_plan_text']
         return cleaned_data
 
-class EditPlanForm(BasePlanForm):
+class EditPlanForm(NewPlanForm):
+    default_product_version = forms.ModelChoiceField(
+        label = "Product Version",
+        queryset = Version.objects.all(),
+        empty_label = None,
+        )
     is_active = forms.BooleanField(label="Active", required=False)
 
 # =========== Forms for search/filter ==============
