@@ -172,19 +172,30 @@ function splitString(str, num)
 function set_up_choices(element, values, allow_blank)
 {
     var innerHTML = "";
-    var selected_id = element.value;
-
+    var selected_ids = new Array();
+    
+    if(!element.multiple) {
+        // Process the single select box
+        selected_ids.push(element.value);
+    } else {
+        // Process the select box with multiple attribute
+        for (var i = 0; (node = element.options[i]); i++) {
+           if(node.selected)
+               selected_ids.push(node.value)
+        }
+    }
+    
     // Set up blank option, if there is one:
     if (allow_blank) {
         innerHTML += '<option value="">---------</option>';
     }
-
+    
     // Add an <option> for each value:
     values.each( function(item) {
         var item_id = item[0];
         var item_name = item[1];
         var optionHTML = '<option value="' + item_id + '"';
-
+        
         var display_item_name = item_name
         var cut_for_short = false;
         if(item_name.length > short_string_length) {
@@ -192,18 +203,19 @@ function set_up_choices(element, values, allow_blank)
             var cut_for_short = true;
         }
         
-        if (item_id==selected_id) {
-            optionHTML += ' selected="selected"';
-        }
+        selected_ids.each(function(i) {
+            if(i == item_id)
+                optionHTML += ' selected="selected"';
+        })
         
         if(cut_for_short) {
             optionHTML += ' title="' + item_name + '"';
         }
-
+        
         optionHTML += '>' + display_item_name + '</option>';
         innerHTML += optionHTML;
     });
-
+    
     // Copy it up to the element in the DOM:
     element.innerHTML = innerHTML;
 }
@@ -217,7 +229,7 @@ function getBuildsByProductId(allow_blank, product_field, build_field, is_active
         if($('id_build')) {
             var build_field = new String('id_build');
         } else {
-            alert('');
+            alert('Build field is not exist');
             return false;
         }
     }
@@ -248,7 +260,7 @@ function getBuildsByProductId(allow_blank, product_field, build_field, is_active
                        returnobj.collect(function(o) {
                            return [o.pk, o.fields.name];
                        }),
-                       allow_blank);       
+                       allow_blank);
         
         debug_output('Update builds completed');
         
@@ -341,7 +353,7 @@ function getVersionsByProductId(allow_blank, product_field, version_field)
         } else if ($('id_default_product_version')) {
             var version_field = new String('id_default_product_version');
         } else {
-            alert('');
+            alert('Version field is not exist');
             return false;
         }
     }
@@ -415,7 +427,7 @@ function getComponentsByProductId(allow_blank, product_field, component_field, c
         if($('id_component')) {
             var component_field = new String('id_component');
         } else {
-            alert('');
+            alert('Component field is not exist');
             return false;
         }
     }
@@ -466,7 +478,7 @@ function getCategorisByProductId(allow_blank, product_field, category_field)
         if($('id_category')) {
             var category_field = new String('id_category');
         } else {
-            alert('');
+            alert('Category field is not exist');
             return false;
         }
     }

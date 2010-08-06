@@ -316,3 +316,27 @@ class ReportSQL(object):
         WHERE com.id = %s \
         GROUP BY tcrs.name \
         ORDER BY tcrs.sortkey'
+    
+    # Custom Search Zone
+    custom_search_plans_count = 'SELECT COUNT(DISTINCT tps.plan_id) \
+        FROM test_plans tps \
+        LEFT JOIN test_runs trs ON tps.plan_id = trs.plan_id \
+        LEFT JOIN test_builds tbs ON trs.build_id = tbs.build_id \
+        WHERE trs.build_id = test_builds.build_id AND tps.plan_id = trs.plan_id \
+        GROUP BY tbs.build_id'
+    
+    custom_search_runs_count = 'SELECT COUNT(DISTINCT run_id) \
+        FROM test_runs \
+        WHERE test_runs.build_id = test_builds.build_id'
+    
+    custom_search_case_runs_count = 'SELECT COUNT(DISTINCT case_run_id) \
+        FROM test_case_runs \
+        WHERE test_case_runs.build_id = test_builds.build_id'
+    
+    custom_details_case_run_count = 'SELECT tcrs.name \
+        AS test_case_status, COUNT(tcr.case_id) AS case_run_count \
+        FROM test_case_run_status tcrs          \
+        LEFT JOIN test_case_runs tcr ON tcrs.case_run_status_id = tcr.case_run_status_id \
+        WHERE tcr.run_id = %s \
+        GROUP BY tcrs.name \
+        ORDER BY tcrs.sortkey'
