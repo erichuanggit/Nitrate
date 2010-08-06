@@ -72,7 +72,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 		</thead>
 		<tbody>
 			{% for test_run in test_runs %}
-			<tr class="{% cycle 'odd' 'even' %}">
+			<tr class="{% cycle 'rowodd' 'roweven' %}">
 				<td><a href="{% url tcms.testruns.views.get test_run.run_id %}"/ >{{ test_run.run_id }}</a></td>
 				<td><a href="{% url tcms.testruns.views.get test_run.run_id %}"/>{{ test_run.summary|striptags }}</a></td>
 				<td><a href="mailto:{{ test_run.manager.email }}" title="Send email to {{ test_run.manager.email }}">{{ test_run.manager}}</a></td>

@@ -455,8 +455,9 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 /***********************Testcase Start***************************/
 .control { padding:10px; }
 .float-tip{ width:80%; float:left; margin:10px; padding:10px 10px 10px 40px; background:#FFFAD7 url(../images/tip_bg.png) no-repeat 10px; -moz-box-shadow:1px 1px 1px #333; }
-.even,.evenRow{ background:#ffffff; }
-.odd, .oddRow { background:#f6f6f6; }
+.even,.evenRow, .rowodd{ background:#ffffff; }
+.odd, .oddRow, .roweven{ background:#f6f6f6; }
+
 .selection_row { background:#f3f8fe; border:0px; }
 .progress-bar{ width:100px; background:#fff url(../images/evenbg.png) repeat-x; height:24px; border:1px solid #ccc; vertical-align:middle; margin:3px 0px 2px 0px; font-size:12px; text-align:right; }
 .progress-bar .percent{ position:absolute; text-align:center; width:100px; color:#333; line-height:24px; height:24px; }
