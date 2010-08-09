@@ -423,12 +423,14 @@ def edit(request, case_id, template_name = 'case/edit.html'):
                         field, getattr(tc, field), form.cleaned_data[field]
                     ))
                     setattr(tc, field, form.cleaned_data[field])
-            
-            if tc.default_tester != form.cleaned_data['default_tester']:
-                tc.log_action(request.user, 'Case default tester changed from %s to %s in edit page.' % (
-                    tc.default_tester_id and tc.default_tester, form.cleaned_data['default_tester']
-                ))
-                tc.default_tester = form.cleaned_data['default_tester']
+            try:
+                if tc.default_tester != form.cleaned_data['default_tester']:
+                    tc.log_action(request.user, 'Case default tester changed from %s to %s in edit page.' % (
+                        tc.default_tester_id and tc.default_tester, form.cleaned_data['default_tester']
+                    ))
+                    tc.default_tester = form.cleaned_data['default_tester']
+            except ObjectDoesNotExist, error:
+                pass
             
             # FIXME: Buggy here, timedelta from form cleaned data need to convert.
             #if tc.estimated_time != form.cleaned_data['estimated_time']:
