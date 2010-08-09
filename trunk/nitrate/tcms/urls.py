@@ -138,11 +138,15 @@ urlpatterns = patterns('',
     # Management ajax zone
     
     # Report zone
-    (r'^report/$', 'tcms.report.views.index'),
+    (r'^report/$', 'django.views.generic.simple.redirect_to', {'url': 'overall/'}),
+    (r'^report/overall/$', 'tcms.report.views.overall'),
     (r'^report/product/(?P<product_id>\d+)/overview/$', 'tcms.report.views.overview'),
     (r'^report/product/(?P<product_id>\d+)/version/$', 'tcms.report.views.version'),
     (r'^report/product/(?P<product_id>\d+)/build/$', 'tcms.report.views.build'),
     (r'^report/product/(?P<product_id>\d+)/component/$', 'tcms.report.views.component'),
+    
+    (r'^report/custom/$', 'tcms.report.views.custom_search'),
+    (r'^report/custom/details/$', 'tcms.report.views.custom_details'),
 )
 
 # Debug zone

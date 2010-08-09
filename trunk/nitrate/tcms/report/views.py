@@ -25,8 +25,11 @@ from tcms.management.models import Classification, Product
 from tcms.core.utils.counter import CaseRunStatusCounter, RunsCounter
 from tcms.core.utils.raw_sql import ReportSQL as RawSQL
 
-def index(request, template_name='report/list.html'):
+MODULE_NAME = "report"
+
+def overall(request, template_name='report/list.html'):
     """Overall of products report"""
+    SUB_MODULE_NAME = 'overall'
     products = Product.objects.all()
     
     products = products.extra(select={
@@ -36,6 +39,8 @@ def index(request, template_name='report/list.html'):
     })
     
     return direct_to_template(request, template_name, {
+        'module': MODULE_NAME,
+        'sub_module': SUB_MODULE_NAME,
         'products': products
     })
     
@@ -75,7 +80,8 @@ def overview(request, product_id, template_name='report/overview.html'):
             setattr(case_run_counter, row[0] + '_percent', float(row[1]) / total * 100)
     
     return direct_to_template(request, template_name, {
-        'SUB_MODULE_NAME': SUB_MODULE_NAME,
+        'module': MODULE_NAME,
+        'sub_module': SUB_MODULE_NAME,
         'product': product,
         'runs_count': runs_count,
         'case_run_count': case_run_counter,
@@ -126,7 +132,8 @@ def version(request, product_id, template_name='report/version.html'):
                 setattr(case_run_counter, row[0] + '_percent', float(row[1]) / total * 100)
     
     return direct_to_template(request, template_name, {
-        'SUB_MODULE_NAME': SUB_MODULE_NAME,
+        'module': MODULE_NAME,
+        'sub_module': SUB_MODULE_NAME,
         'product': product,
         'versions': versions,
         'version': current_version,
@@ -173,7 +180,8 @@ def build(request, product_id, template_name='report/build.html'):
                 setattr(case_run_counter, row[0] + '_percent', float(row[1]) / total * 100)
     
     return direct_to_template(request, template_name, {
-        'SUB_MODULE_NAME': SUB_MODULE_NAME,
+        'module': MODULE_NAME,
+        'sub_module': SUB_MODULE_NAME,
         'product': product,
         'builds': builds,
         'build': current_build,
@@ -219,9 +227,119 @@ def component(request, product_id, template_name='report/component.html'):
                 setattr(case_run_counter, row[0] + '_percent', float(row[1]) / total * 100)
     
     return direct_to_template(request, template_name, {
-        'SUB_MODULE_NAME': SUB_MODULE_NAME,
+        'module': MODULE_NAME,
+        'sub_module': SUB_MODULE_NAME,
         'product': product,
         'components': components,
         'component': current_component,
         'case_run_count': case_run_counter
+    })
+
+def custom_search(request, template_name='report/custom_search.html'):
+    """Custom report with search function"""
+    from tcms.management.models import TestBuild
+    from forms import CustomSearchForm
+    
+    SUB_MODULE_NAME = 'custom_search'
+    
+    if request.REQUEST.get('a') == 'search':
+        form = CustomSearchForm(request.REQUEST)
+        form.populate(product_id = request.REQUEST.get('product'))
+        if form.is_valid():
+            tbs = TestBuild.objects
+            if form.cleaned_data['build_run__plan__name__icontains']:
+                tbs = tbs.filter(build_run__plan__name__icontains = form.cleaned_data['build_run__plan__name__icontains'])
+            
+            if form.cleaned_data['build_run__product_version']:
+                tbs = tbs.filter(build_run__product_version = form.cleaned_data['build_run__product_version'])
+                
+            if form.cleaned_data['pk__in']:
+                tbs = tbs.filter(pk__in = form.cleaned_data['pk__in'])
+                
+            if form.cleaned_data['product']:
+                tbs = tbs.filter(product = form.cleaned_data['product'])
+                
+            if form.cleaned_data['testcaserun__case__category']:
+                tbs = tbs.filter(testcaserun__case__category = form.cleaned_data['testcaserun__case__category'])
+                
+            if form.cleaned_data['testcaserun__case__component']:
+                tbs = tbs.filter(testcaserun__case__component = form.cleaned_data['testcaserun__case__component'])
+            
+            tbs = tbs.extra(select={
+                'plans_count': RawSQL.custom_search_plans_count,
+                'runs_count': RawSQL.custom_search_runs_count,
+                'case_runs_count': RawSQL.custom_search_case_runs_count,
+            })
+            
+            tbs = tbs.distinct()
+        else:
+            tbs = TestBuild.objects.none()
+    else:
+        form = CustomSearchForm()
+        tbs = TestBuild.objects.none()
+    
+    return direct_to_template(request, template_name, {
+        'module': MODULE_NAME,
+        'sub_module': SUB_MODULE_NAME,
+        'form': form,
+        'builds': tbs,
+    })
+
+def custom_details(request, template_name='report/custom_details.html'):
+    """Custom report with search function"""
+    from tcms.testplans.models import TestPlan
+    from tcms.testruns.models import TestCaseRun, TestCaseRunStatus, TestRun
+    from forms import CustomSearchDetailsForm
+    from pprint import pprint
+    SUB_MODULE_NAME = 'custom_search'
+    
+    form = CustomSearchDetailsForm(request.REQUEST)
+    form.populate(product_id = request.REQUEST.get('product'))
+    if form.is_valid():
+        tcrses = TestCaseRunStatus.objects.all()
+        
+        tps = TestPlan.objects
+        trs = TestRun.objects
+        tcrs = TestCaseRun.objects.select_related('case', 'case_run_status', 'tested_by')
+        
+        if form.cleaned_data['product']:
+            tps = tps.filter(run__build__product = form.cleaned_data['product'])
+            trs = trs.filter(build__product = form.cleaned_data['product'])
+            tcrs = tcrs.filter(run__build__product = form.cleaned_data['product'])
+            
+        if form.cleaned_data['build_run__product_version']:
+            tps = tps.filter(run__product_version = form.cleaned_data['build_run__product_version'])
+            trs = trs.filter(product_version = form.cleaned_data['build_run__product_version'])
+            tcrs = tcrs.filter(run__product_version = form.cleaned_data['build_run__product_version'])
+            
+        if form.cleaned_data['pk__in']:
+            tps = tps.filter(run__build = form.cleaned_data['pk__in'])
+            trs = trs.filter(build = form.cleaned_data['pk__in'])
+            tcrs = tcrs.filter(run__build = form.cleaned_data['pk__in'])
+        
+        tps = tps.distinct()
+        trs = trs.filter(plan__in = tps).distinct()
+        tcrs = tcrs.distinct()
+        
+        for tp in tps:
+            tp.runs = []
+            
+            for tr in trs:
+                if tp.plan_id == tr.plan_id:
+                    tp.runs.append(tr)
+        
+        cursor = connection.cursor()
+        for tr in trs:
+            cursor.execute(RawSQL.custom_details_case_run_count % tr.pk)
+            for s, n in cursor.fetchall():
+                setattr(tr, s, n)
+    
+    return direct_to_template(request, template_name, {
+        'module': MODULE_NAME,
+        'sub_module': SUB_MODULE_NAME,
+        'form': form,
+        'test_plans': tps,
+        'test_runs': trs,
+        'test_case_runs': tcrs,
+        'test_case_run_status': tcrses,
     })
