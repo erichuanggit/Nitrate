@@ -164,7 +164,7 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 
 .option_prefer lable{ margin-left:5px;}
 .comment li{margin:5px 0px;border:1px outset #fff; position:relative}
-.commentdelete{ width:16px;float:right; display:block; background-position:0 -16px;}
+.commentdelete{width:16px;float:right; display:block; background-position:0 -16px; margin-top:-18px;}
 /*****************************LAYOUT****************/
 #content{width:100%;float:left;z-index:1;}
 #header {width : 100%;float:left;}
@@ -682,7 +682,7 @@ ul.runcc{ margin:0px;}
 .casedoc ul,.casedoc ol{ padding-left:20px;}
 
 .loglink{ background:url(../images/loglink.png) left center no-repeat; width:16px; height:16px; padding-left:15px;}
-.envlog{ border-bottom:dotted 1px #aaa; min-height:25px; line-height:23px; padding:0;}
+.envlog{ border-bottom:dotted 1px #aaa; min-height:23px; line-height:20px; padding:0; margin-bottom:5px;}
 .envlog_time{ width:15%;padding:3px 0px 0 0px; float:left; text-align:center;}
 .envlog_who{ width:15%;padding:3px 5px 0 10px;float:left;}
 .envlog_content{ width:auto; padding:3px 5px 0 0px;float:left}

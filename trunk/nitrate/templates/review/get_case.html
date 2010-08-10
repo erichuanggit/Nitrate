@@ -15,6 +15,9 @@
 	</span>
     <span class="lab-150">{{ test_review_case.close_date }}</span>
     <span class="lab-150"><a href="mailto:{{ test_review_case.reviewer.email }}">{{ test_review_case.reviewer }}</a></span>
+    {% get_comment_count for test_review_case as comment_count %}
+    <span class="lab-80">{{ comment_count }}</span>
+    
     <span class="lab-100_right">
     <a class="editlink" href="{% url tcms.testcases.views.edit test_review_case.case.case_id %}?from_plan={{ testplan.plan_id }}">Edit</a>
     </span>
