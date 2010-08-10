@@ -34,14 +34,14 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 			<tr>
 				<th align="left" class="sortcol sortdesc" >Plan name</th>
 				<th align="left" class="sortcol">Run name</th>
-				<th align="left" class="sortcol">IDLE</th>
-				<th align="left" class="sortcol">RUNNING</th>
-				<th align="left" class="sortcol">PAUSED</th>
-				<th align="left" class="sortcol">PASSED</th>
-				<th align="left" class="sortcol">FAILED</th>
-				<th align="left" class="sortcol">BLOCKED</th>
-				<th align="left" class="sortcol">ERROR</th>
-				<th align="left" class="sortcol">WAIVED</th>
+				<th align="left" class="sortcol">Idle</th>
+				<th align="left" class="sortcol">Running</th>
+				<th align="left" class="sortcol">Paused</th>
+				<th align="left" class="sortcol">Passed</th>
+				<th align="left" class="sortcol">Failed</th>
+				<th align="left" class="sortcol">Blocked</th>
+				<th align="left" class="sortcol">Error</th>
+				<th align="left" class="sortcol">Waived</th>
 				<th align="left" class="sortcol">Total</th>
 			</tr>
 		</thead>
@@ -74,15 +74,17 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 	<table class="table_noborder" cellpadding="0" cellspacing="0" border="0" width="100%" id="id_table_cases" >
 		<tr>
 			<th align="left" class="sortcol sortdesc" width="60" >Case ID</th>
+            <th align="left" class="sortcol" width="100">Case Run ID</th>
 			<th align="left" class="sortcol">Case name</th>
-			<th align="left" class="sortcol">Category</th>
-			<th align="left" class="sortcol">Tester</th>
-			<th align="left" class="sortcol">The Lastest Execute Time</th>
+			<th align="left" class="sortcol" width="150">Category</th>
+			<th align="left" class="sortcol" width="120">Tester</th>
+			<th align="left" class="sortcol" width="200">The Lastest Execute Time</th>
 		</tr>
 		{% for test_case_run in test_case_runs %}
 		{% ifequal test_case_run.case_run_status.name 'FAILED' %}
 		<tr>
 			<td valign="top" ><a href="#">{{ test_case_run.case.pk }}</a></td>
+            <td valign="top"><a href="{% url tcms.testruns.views.execute test_case_run.run_id %}#caserun_{{ test_case_run.pk }}">{{ test_case_run.pk }}</td>
 			<td valign="top" ><a href="#">{{ test_case_run.case.summary }}</a></td>
 			<td valign="top" >{{ test_case_run.case.category }}</td>
 			<td valign="top" >{{ test_case_run.tested_by }}</td>
@@ -125,9 +127,9 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 			<th align="left" class="sortcol sortdesc" width="60">Case ID</th>
 			<th align="left" class="sortcol sortdesc" width="100">Case Run ID</th>
 			<th align="left" class="sortcol">Case name</th>
-			<th align="left" class="sortcol">Category</th>
-			<th align="left" class="sortcol">Tester</th>
-			<th align="left" class="sortcol">The Lastest Execute Time</th>
+			<th align="left" class="sortcol" width="150">Category</th>
+			<th align="left" class="sortcol" width="120">Tester</th>
+			<th align="left" class="sortcol" width="200">The Lastest Execute Time</th>
 		</tr>
 		{% for test_case_run in test_case_runs %}
 		{% ifequal test_case_run.case_run_status.name 'BLOCKED' %}
