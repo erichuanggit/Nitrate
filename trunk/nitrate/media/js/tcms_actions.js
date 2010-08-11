@@ -46,15 +46,16 @@ var default_messages = {
     'confirm': {
         'change_case_status': 'Are you sure to change the status?',
         'change_case_priority': 'Are you sure to change the priority?',
+        'remove_case_component': 'Are you sure you wish to delete these component(s)?\nThe action will unable to undo.'
     },
     'link': {
         'hide_filter': 'Hide filter options',
         'show_filter': 'Show filter options',
     },
-	'report': {
-		'hide_search':'Hide the coverage search',
-		'show_search':'Show the coverage search'
-		}
+    'report': {
+        'hide_search':'Hide the coverage search',
+        'show_search':'Show the coverage search'
+    }
 }
 
 function getURLParam()
@@ -101,7 +102,7 @@ function getURLParam()
 
 
 // Exceptions for Ajax
-var json_failure = function()
+var json_failure = function(t)
 {
     returnobj = t.responseText.evalJSON(true);
     if(returnobj.response)
@@ -115,6 +116,18 @@ var html_failure = function()
 {
     alert(default_messages.alert.ajax_failure);
     return false;
+}
+
+var json_success_refresh_page = function(t)
+{
+    returnobj = t.responseText.evalJSON(true);
+    
+    if (returnobj.rc == 0) {
+        window.location.reload();
+    } else {
+        alert(returnobj.response);
+        return false;
+    }
 }
 
 function setCookie(name, value, expires, path, domain, secure) { 

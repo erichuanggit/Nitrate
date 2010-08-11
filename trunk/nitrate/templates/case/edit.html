@@ -52,6 +52,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
                         <label class="strong">Product</label>
                         <div>{{ form.product }}</div>
                     </div>
+                    {% comment %}
                     <div class="data_row">
                         <input id="id_refresh_product" type="button" value="Refresh component/category" title="Refresh component and category after change product" />
                     </div>
@@ -60,6 +61,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
                         {{ form.component.errors }}
                         <div class="component_select">{{ form.component }}</div>
                     </div>
+                    {% endcomment %}
                     <div class="data_row">
                         <label class="strong">Default Tester</label>
                         <span >{{ form.default_tester }}</span>

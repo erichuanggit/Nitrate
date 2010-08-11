@@ -241,9 +241,8 @@ def custom_search(request, template_name='report/custom_search.html'):
     from forms import CustomSearchForm
     
     SUB_MODULE_NAME = 'custom_search'
-    from pprint import pprint
+    
     def calc_percent(x, y):
-        pprint([x, y])
         if not x or not y:
             return 0
         

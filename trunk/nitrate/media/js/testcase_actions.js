@@ -77,7 +77,6 @@ Nitrate.TestCases.Details.on_load = function()
             e.stop();
             
             var params = this.serialize(true);
-            params['a'] = 'update';
             params['case'] = Nitrate.TestCases.Instance.pk
             
             var url = getURLParam().url_cases_component;
@@ -103,6 +102,39 @@ Nitrate.TestCases.Details.on_load = function()
         renderComponentForm(getDialog(), params, form_observe);
     });
     
+    $('id_form_case_component').observe('submit', function(e) {
+        e.stop();
+        var parameters = {
+            'a': this.serialize(true)['a'],
+            'case': Nitrate.TestCases.Instance.pk,
+            'o_component': this.serialize(true)['component'],
+        };
+        
+        if(!parameters['o_component'])
+            return false
+        
+        var c = confirm(default_messages.confirm.remove_case_component);
+        if(!c)
+            return false
+        
+        updateCaseComponent(this.action, parameters, json_success_refresh_page);
+    })
+    
+    $$('.link_remove_component').invoke('observe', 'click', function(e) {
+        var c = confirm(default_messages.confirm.remove_case_component);
+        if(!c)
+            return false
+        
+        var form = $('id_form_case_component');
+        var parameters = {
+            'a': form.serialize(true)['a'],
+            'case': Nitrate.TestCases.Instance.pk,
+            'o_component': $$('input[name="component"]')[$$('.link_remove_component').indexOf(this)].value,
+        };
+        debug_output(parameters)
+        updateCaseComponent(form.action, parameters, json_success_refresh_page);
+    });
+    
     if(window.location.hash) {
         fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
     }
@@ -119,10 +151,10 @@ Nitrate.TestCases.Create.on_load = function()
 
 Nitrate.TestCases.Edit.on_load = function()
 {
-    // bind_category_selector_to_product(false, false, $('id_product'), $('id_category'));
+    bind_category_selector_to_product(false, false, $('id_product'), $('id_category'));
     // bind_component_selector_to_product(false, false, $('id_product'), $('id_component'));
     SelectFilter.init("id_component", "component", 0, "/admin_media/");
-    bindRefreshComponentCategoryByProduct($('id_refresh_product'));
+    // bindRefreshComponentCategoryByProduct($('id_refresh_product'));
 }
 
 Nitrate.TestCases.Clone.on_load = function()
@@ -588,8 +620,21 @@ function renderComponentForm(container, parameters, form_observe)
         var action = getURLParam().url_cases_component;
         var notice = '';
         
-        var f = constructForm(d.innerHTML, action, form_observe, notice);
+        var h = new Element('input', {'type': 'hidden', 'name': 'a', 'value': 'add'});
+        var a = new Element('input', {'type': 'submit', 'value': 'Add'});
+        var r = new Element('input', {'type': 'submit', 'value': 'Remove'});
+        var c = new Element('label');
+        c.appendChild(h);
+        c.appendChild(a);
+        c.appendChild(r);
+        
+        a.observe('click', function(e) { h.value = 'add'});
+        r.observe('click', function(e) {h.value = 'remove'});
+        
+        var f = constructForm(d.innerHTML, action, form_observe, notice, c);
         container.update(f);
+        
+        bind_component_selector_to_product(false, false, $('id_product'), $('id_o_component'));
     }
     
     var url = getURLParam().url_cases_component;
@@ -600,4 +645,14 @@ function renderComponentForm(container, parameters, form_observe)
         onComplete: callback,
         onFailure: html_failure,
     })
+}
+
+function updateCaseComponent(url, parameters, callback)
+{
+    new Ajax.Request(url, {
+         method: 'post',
+         parameters: parameters,
+         onSuccess: callback,
+         onFailure: json_failure
+     })
 }

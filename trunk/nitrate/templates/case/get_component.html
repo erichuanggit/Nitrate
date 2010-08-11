@@ -1,42 +1,53 @@
-<table class="list" cellspacing="0" cellspan="0" width="100%">
-	<thead>
-		<tr>
-			<th  class="table_width_checkbox" align="left"><input type="checkbox" disabled /></th>
-			<th align="left">Name</th>
-			<th align="left">Product</th>
-			{# <th align="left">Actions</th> #}
-		</tr>
-	</thead>
-	<tbody>
-		{% for component in test_case.component.all %}
-		<tr class="{% cycle 'odd' 'even' %}">
-			<td><input type="checkbox" name="component" value={{ component.pk }} disabled /></td>
-			<td>{{ component.name }}</td>
-			<td>{{ component.product }}</td>
-			{# <td>None</td> #}
-		</tr>
-		 {% empty %}
-		<tr>
-			<td colspan="3" align="center" class="grey">No component</td>
-		</tr>
-		{% endfor %}
-		
-		
-		<tr>
-			<td colspan="3">
-				<div class="addtag">
-					{% comment %}
-					<span class="tit">Add attachment</span>
-					<a href="{% url tcms.testcases.views.attachment test_case.case_id %}?from_plan={{ test_plan.plan_id }}" class="addlink">add</a> 
-					{% endcomment %}
-					{% if perms.management.change_testcase %}
-					<input id="id_update_component" type="button" value="Update Product/Category/Component" />
-					<lable class="grey">You also can use <a href="{% url tcms.testcases.views.edit test_case.pk %}">Edit</a> function to modify.</label>
+<form id="id_form_case_component" action="{% url tcms.testcases.views.component %}">
+	<table class="list" cellspacing="0" cellspan="0" width="100%">
+		<thead>
+			<tr>
+				<th  class="table_width_checkbox" align="left"><input type="checkbox" /></th>
+				<th align="left">Name</th>
+				<th align="left">Product</th>
+				<th align="left">Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for component in test_case.component.all %}
+			<tr class="{% cycle 'odd' 'even' %}">
+				<td><input type="checkbox" name="component" value="{{ component.pk }}" /></td>
+				<td>{{ component.name }}</td>
+				<td>{{ component.product }}</td>
+				<td>
+					{% if perms.testcases.delete_testcasecomponent %}
+					<a class="link_remove_component" href="javascript:void(0)">Remove</a>
 					{% else %}
-					<input id="id_update_component" type="button" value="Update Product/Category/Component" disabled />
+					None
 					{% endif %}
-				</div>
-			</td>
-		</tr>
-	</tbody>
-</table>
+				</td>
+			</tr>
+			 {% empty %}
+			<tr>
+				<td colspan="4" align="center" class="grey">No component</td>
+			</tr>
+			{% endfor %}
+			<tr>
+				<td colspan="4">
+					<div class="addtag">
+						{% comment %}
+						<span class="tit">Add attachment</span>
+						<a href="{% url tcms.testcases.views.attachment test_case.case_id %}?from_plan={{ test_plan.plan_id }}" class="addlink">add</a> 
+						{% endcomment %}
+						{% if perms.testcases.change_testcasecomponent %}
+						<input id="id_update_component" type="button" value="Update Component" />
+						{% else %}
+						<input id="id_update_component" type="button" value="Update Component" disabled />
+						{% endif %}
+					
+						{% if perms.testcases.delete_testcasecomponent %}
+						<input id="id_remove_component" type="submit" name="a" value="Remove" />
+						{% else %}
+						<input id="id_remove_component" type="button" value="Remove" disabled />
+						{% endif %}
+					</div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</form>

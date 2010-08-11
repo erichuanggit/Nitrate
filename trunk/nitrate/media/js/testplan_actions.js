@@ -603,7 +603,6 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 }
                 
                 var params = this.serialize(true);
-                params['a'] = 'update';
                 params['case'] = $('id_form_cases').serialize(true)['case'];
                 
                 var url = getURLParam().url_cases_component;
@@ -619,12 +618,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     }
                 }
                 
-                new Ajax.Request(url, {
-                    method: this.method,
-                    parameters: params,
-                    onSuccess: success,
-                    onFailure: json_failure,
-                })
+                updateCaseComponent(url, params, success);
             }
             
             renderComponentForm(getDialog(), params, form_observe);
