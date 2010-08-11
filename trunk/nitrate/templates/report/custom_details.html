@@ -54,59 +54,51 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 				{% endif %}
 				<td valign="top"><a href="{{ test_run.get_url_path }}">[{{ test_run.pk }}] {{ test_run.summary }}</a></td>
 				<td valign="top">
-                {% if test_run.IDEL %}
-                <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=idel">{{ test_run.IDEL }}</a>
+                {% if test_run.IDLE %}
+                <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=idel">{{ test_run.IDLE }}</a>
                 {% else %}
-                0
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.RUNNING %}
                 <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=running">{{ test_run.RUNNING }}</a>
                 {% else %}
-                0
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.PAUSED %}
                 <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=paused">{{ test_run.PAUSED }}</a>
                 {% else %}
-                0
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.PASSED %}
                 <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=passed">{{ test_run.PASSED }}</a>
                 {% else %}
-                0
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.FAILED %}
                 <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=failed">{{ test_run.FAILED }}</a>
                 {% else %}
-                0
                 {% endif%}
                 </td>
 				<td valign="top">
                 {% if test_run.BLOCKED %}
                 <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=blocked">{{ test_run.BLOCKED }}</a>
                 {% else %}
-                0
                 {% endif%}
                 </td>
 				<td valign="top">
                 {% if test_run.ERROR %}
                 <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=error">{{ test_run.ERROR }}</a>
                 {% else %}
-                0
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.WAIVED %}
                 <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=waived">{{ test_run.WAIVED }}</a>
                 {% else %}
-                0
                 {% endif %}
                 
                 </td>
@@ -114,7 +106,6 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
                 {% if test_run.case_run.count %}
                 <a href="{% url tcms.testruns.views.execute test_run.pk %}">{{ test_run.case_run.count }}</a>
                 {% else %}
-                0
                 {% endif %}
                 </td>
 			</tr>

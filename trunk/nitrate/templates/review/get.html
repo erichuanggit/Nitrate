@@ -25,60 +25,76 @@ Nitrate.Utils.after_page_load(Nitrate.TestReviews.Details.on_load);
 		>> <a href="{% url tcms.testplans.views.get test_review.plan.plan_id %}#testreviews">{{ test_review.plan.plan_id }}:{{ test_review.plan }}</a>
 		>> Test review :{{ test_review.summary }}
 	</div>
-	<div class="control">
-	</div>
-
+	
 	<h2 id="display_title">{{ test_review.summary }}</h2>
-	<div class="Detailform">
-		<div class="">
-			<div class="cell">
-				<div class="sd">Test Plan</div>
-				<div><a href="{% url tcms.testplans.views.get test_review.plan_id %}">{{ test_review.plan.name }}</a></div>
-			</div>
-			<div class="cell">
-				<div class="sd">Product</div>
-				<div id="display_product">{{ test_review.plan.product }}</div>
-			</div>
-			<div class="cell">
-				<div class="sd">Product Version</div>
-				<div class="name">{{ test_review.plan.default_product_version }}</div>
-			</div>
-			<div class="cell">
-				<div class="sd">Author</div>
-				<div class="name"><a href="mailto:{{ test_review.author.email }}">{{ test_review.author.email }}</a></div>
-			</div>
-			<div class="cell">
-				<div class="sd">Default Reviewer</div>
-				{% for default_reviewer in test_review.default_reviewer.all %}
-				<div class="name"><a href="mailto:{{ default_reviewer.email }}">{{ default_reviewer.email }}</a></div>
-				{% endfor %}
-			</div>
-			<div class="cell">
-				<div class="sd">Started at</div>
-				<div class="name">{{ test_review.start_date }}</div>
-			</div>
-			<div class="cell">
-				<div class="sd">Stoped at</div>
-				<div class="name">{{ test_review.stop_date }}</div>
-			</div>
-			<div class="cell">
-				<div class="sd">Environment</div>
-				<div id="display_env" >
-					<dl class="ul-no-format">
-						{% for value in test_review.env_value.all %}
-						<dd>
-							<span class="sd" >{{ value.value.property }}: </span>{{ value.value }}test
-						</dd>
-						{% endfor %}
-						<dd>Not set environment for this review</dd>
-					</dl>
-				</div>
-			</div>
+    
+    <div class="listinfo_content">
+	<div class="leftlistinfo">
+		<div class="listinfo">
+			<span class="title">Test Plan</span>
+			<span class="listinfo_input">
+				<a href="{% url tcms.testplans.views.get test_review.plan_id %}">{{ test_review.plan.name }}</a>
+			</span>
 		</div>
-	</div>
+        <div class="listinfo">
+			<span class="title">Product</span>
+			<span class="listinfo_input">
+				{{ test_review.plan.product }}
+			</span>
+		</div>
+        <div class="listinfo">
+			<span class="title">Default Reviewer</span>
+			<span class="listinfo_input">
+				<a href="mailto:{{ default_reviewer.email }}">{{ default_reviewer.email }}</a>
+			</span>
+		</div>
+        <div class="listinfo">
+			<span class="title">Environment</span>
+			<span class="listinfo_input">
+				<dl class="ul-no-format">
+                    {% for value in test_review.env_value.all %}
+                    <dd>
+                        <span class="sd" >{{ value.value.property }}: </span>{{ value.value }}test
+                    </dd>
+                    {% endfor %}
+                    <dd>Not set environment for this review</dd>
+                </dl>
+			</span>
+		</div>
+     </div>
+     
+     <div class="rightlistinfo">
+		<div class="listinfo">
+			<span class="title">Author</span>
+			<span class="listinfo_input">
+				<a href="mailto:{{ test_review.author.email }}">{{ test_review.author.email }}</a>
+			</span>
+		</div>
+        <div class="listinfo">
+			<span class="title">Product Version</span>
+			<span class="listinfo_input">
+				{{ test_review.plan.default_product_version }}
+			</span>
+		</div>
+        <div class="listinfo">
+			<span class="title">Started at</span>
+			<span class="listinfo_input">
+				{{ test_review.start_date }}
+			</span>
+		</div>
+        <div class="listinfo">
+			<span class="title">Stoped at</span>
+			<span class="listinfo_input">
+				{{ test_review.stop_date }}
+			</span>
+		</div>
+     </div>
+    
+    
+	
 	{% if test_review_cases %}
 	<div class="Detailform">
-		<div class="mixbar border-1"> 
+		<div class="mixbar border-1 margin-top"> 
 			<span class="tit">Cases: {{ test_review_cases|length }}</span>
 		</div>
 		<div class="list case_review listheader" id="id_table_cases" cellspacing="0" cellspan="0">
