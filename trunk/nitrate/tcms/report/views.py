@@ -241,34 +241,29 @@ def custom_search(request, template_name='report/custom_search.html'):
     from forms import CustomSearchForm
     
     SUB_MODULE_NAME = 'custom_search'
+    from pprint import pprint
+    def calc_percent(x, y):
+        pprint([x, y])
+        if not x or not y:
+            return 0
+        
+        return float(x)/y*100
     
     if request.REQUEST.get('a') == 'search':
         form = CustomSearchForm(request.REQUEST)
         form.populate(product_id = request.REQUEST.get('product'))
         if form.is_valid():
             tbs = TestBuild.objects
-            if form.cleaned_data['build_run__plan__name__icontains']:
-                tbs = tbs.filter(build_run__plan__name__icontains = form.cleaned_data['build_run__plan__name__icontains'])
-            
-            if form.cleaned_data['build_run__product_version']:
-                tbs = tbs.filter(build_run__product_version = form.cleaned_data['build_run__product_version'])
-                
-            if form.cleaned_data['pk__in']:
-                tbs = tbs.filter(pk__in = form.cleaned_data['pk__in'])
-                
-            if form.cleaned_data['product']:
-                tbs = tbs.filter(product = form.cleaned_data['product'])
-                
-            if form.cleaned_data['testcaserun__case__category']:
-                tbs = tbs.filter(testcaserun__case__category = form.cleaned_data['testcaserun__case__category'])
-                
-            if form.cleaned_data['testcaserun__case__component']:
-                tbs = tbs.filter(testcaserun__case__component = form.cleaned_data['testcaserun__case__component'])
+            for k, v in form.fields.items():
+                if form.cleaned_data[k]:
+                    tbs = tbs.filter(**{k: form.cleaned_data[k]})
             
             tbs = tbs.extra(select={
                 'plans_count': RawSQL.custom_search_plans_count,
                 'runs_count': RawSQL.custom_search_runs_count,
                 'case_runs_count': RawSQL.custom_search_case_runs_count,
+                'case_runs_passed_count': RawSQL.custom_search_case_runs_passed_count,
+                'case_runs_failed_count': RawSQL.custom_search_case_runs_failed_count,
             })
             
             tbs = tbs.distinct()
@@ -277,6 +272,10 @@ def custom_search(request, template_name='report/custom_search.html'):
     else:
         form = CustomSearchForm()
         tbs = TestBuild.objects.none()
+    
+    for tb in tbs:
+        tb.case_runs_passed_percent = calc_percent(tb.case_runs_passed_count, tb.case_runs_count)
+        tb.case_runs_failed_percent = calc_percent(tb.case_runs_failed_count, tb.case_runs_count)
     
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,

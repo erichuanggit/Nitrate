@@ -53,22 +53,22 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomSearch.on_load);
 				<td valign="top">
 				<div class="progress-bar">
 					<div class="progress-inner" style="width:auto;	margin-right:-50px;text-align:cente">
-						<div class="progress-passed" style="width:95px;">
+						<div class="progress-passed" style="width:{{ build.case_runs_passed_percent|floatformat:0 }}px;">
 							&nbsp;
 						</div>
 					</div>
-					<div class="percent"><a href="#">95% (49)</a></div>
+					<div class="percent">{{ build.case_runs_passed_percent|floatformat }}% ({{ build.case_runs_passed_count }})</div>
 				</div>
 				
 				</td>
 				<td valign="top">
 				<div class="progress-bar">
 					<div class="progress-inner" style="width:auto;	margin-right:-50px;text-align:cente">
-						<div class="progress-failed" style="width:3px;">
+						<div class="progress-failed" style="width:{{ build.case_runs_failed_percent|floatformat:0 }}px;">
 							&nbsp;
 						</div>
 					</div>
-					<div class="percent"> <a href="#">4% (2)</a></div>
+					<div class="percent">{{ build.case_runs_failed_percent|floatformat }}% ({{ build.case_runs_failed_count }})</div>
 				</div>
 				
 				</td>
