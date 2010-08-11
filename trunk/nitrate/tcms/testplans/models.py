@@ -256,7 +256,7 @@ class TestPlan(TCMSActionModel):
         return self.get_url(request)
     
     def get_url_path(self, request = None):
-        return reverse('tcms.testruns.views.get', args=[self.pk, ])
+        return reverse('tcms.testplans.views.get', args=[self.pk, ])
     
     def get_default_product_version(self):
         """
