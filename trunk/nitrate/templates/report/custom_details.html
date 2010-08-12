@@ -31,7 +31,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
     <table cellpadding="0" cellspacing="0" class="table_noborder" border="0">
     	{% for build in builds %}
         <tr>
-            <td width="200"><strong>{{ build }}</strong></td>
+            <td width="300"><strong>{{ build }}</strong></td>
             <td width="60">Plan <span class="red">{{ build.plans_count }}</span></td>
             <td width="60">Run <span class="red"> {{ build.runs_count }}</span></td>
             <td width="120">Passed Case-Run</td>
@@ -54,7 +54,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
                 <div class="percent">{{ build.case_runs_failed_percent|floatformat }}% ({{ build.case_runs_failed_count }})</div>
             </div>
             </td>
-            <td>&nbsp;</td>
+            <td >&nbsp;</td>
         </tr>
        {% endfor %} 
     </table>
