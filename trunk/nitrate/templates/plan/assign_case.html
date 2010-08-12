@@ -113,11 +113,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.AssignCases.on_load);
 			</thead>
 			<tbody id="casecontainer">
 				{% for testcase in testplan_relate_testcase %}
-				{% if forloop.counter|divisibleby:"2" %}
-				<tr class="odd">
-					{% else %}
-					<tr class="even">
-						{% endif %}
+				<tr class="{% cycle 'odd', 'even' %}">
 						<td align="left"><input type="checkbox" name="case_id" value="{{ testcase.case_id }}" /></td>
 						<td align="left">
 							<a href="/case/{{ testcase.case_id }}/?from_plan={{ testplan.plan_id }}">{{ testcase.case_id }}</a>
