@@ -23,7 +23,7 @@ function setFooter() {
 			var contentHeight =	document.getElementById('content').offsetHeight;
 			var footerElement = document.getElementById('footer');
 			var footerHeight  = footerElement.offsetHeight;
-			if (windowHeight - (contentHeight + footerHeight) >=20) {
+			if (windowHeight - (contentHeight + footerHeight) >=150) {
 				footerElement.style.position = 'absolute'
 				footerElement.style.bottom=0+'px';
 				footerElement.style.height='20'+'px';
