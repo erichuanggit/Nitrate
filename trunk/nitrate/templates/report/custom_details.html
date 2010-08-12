@@ -19,7 +19,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 
 {% block contents %}
 <div id="content">
-	<div class="sprites crumble"><a href="{% url tcms.core.views.index %}">Home</a>>>Reporting</div>
+	<div class="sprites crumble"><a href="{% url tcms.core.views.index %}">Home</a> >> <a href="{% url tcms.report.views.custom_search %}">Customization</a> >> {% for build in builds %}{{ build }}{% endfor %}</div>
 	<div class="report_title_bg">
 		<form action="{% url tcms.report.views.custom_details %}">
 			{{ form.product.label }}: {{ form.product }}<br />
@@ -28,7 +28,35 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 			<input type="submit" />
 		</form>
 	</div>
-	
+    <table cellpadding="0" cellspacing="0" class="table_style_noborder" border="0">
+    	{% for build in builds %}
+        <tr>
+            <td>{{ build }}</td>
+            <td>Plan <span class="red">{{ build.plans_count }}</span></td>
+            <td>Run <span class="red"> {{ build.runs_count }}</span></td>
+            <td widtd="100">Passed Case-Run</td>
+            <td><div class="progress-bar">
+                <div class="progress-inner" style="width:auto;	margin-right:-50px;text-align:cente">
+                    <div class="progress-passed" style="width:{{ build.case_runs_passed_percent|floatformat:0 }}px;">
+                        &nbsp;
+                    </div>
+                </div>
+                <div class="percent">{{ build.case_runs_passed_percent|floatformat }}% ({{ build.case_runs_passed_count }})</div>
+            </div></td>
+            <td width="100">Failed Case-Run</td>
+            <td>
+             <div class="progress-bar">
+                <div class="progress-inner" style="width:auto;	margin-right:-50px;text-align:cente">
+                    <div class="progress-failed" style="width:{{ build.case_runs_failed_percent|floatformat:0 }}px;">
+                        &nbsp;
+                    </div>
+                </div>
+                <div class="percent">{{ build.case_runs_failed_percent|floatformat }}% ({{ build.case_runs_failed_count }})</div>
+            </div>
+            </td>
+        </tr>
+       {% endfor %} 
+    </table>
 	<table class="table_style" cellpadding="0" cellspacing="0" border="0" width="100%" id="id_table_cases" >
 		<thead>
 			<tr>
@@ -100,7 +128,6 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
                 <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=waived">{{ test_run.WAIVED }}</a>
                 {% else %}
                 {% endif %}
-                
                 </td>
 				<td valign="top">
                 {% if test_run.case_run.count %}
@@ -111,9 +138,20 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 			</tr>
 			{% endfor %}
 			{% endfor %}
+            <tr>
+            <td colspan="2" align="right" style="padding-right:10px;">Total</td>
+            <td>{{ build.case_runs_idle_count }}</td>
+            <td>{{ build.case_runs_running_count }}</td>
+            <td>{{ build.case_runs_paused_count }}</td>
+            <td>{{ build.case_runs_passed_count }}</td>
+            <td>{{ build.case_runs_failed_count }}</td>
+            <td>{{ build.case_runs_blocked_count }}</td>
+            <td>{{ build.case_runs_error_count }}</td>
+            <td>{{ build.case_runs_waived_count }}</td>
+            <td>{{ build.case_runs_count }}</td>
+            </tr>
 		</tbody>
 	</table>
-
 	<div class="failed_caserun">
 		All Failed Case-Run List
 	</div>
