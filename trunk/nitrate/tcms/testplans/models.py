@@ -118,22 +118,9 @@ class TestPlan(TCMSActionModel):
         if query.get('search'):
             q = q.filter(Q(plan_id__icontains = query['search']) \
                             | Q(name__icontains = query['search']))
-            del query['search']
-        
-        start = query.get('creation_date_start','')
-        end = query.get('creation_date_end','')
-        if start and end:
-            q = q.filter(Q(create_date__range = (start,end)))
-            del query['creation_date_start'], query['creation_date_end']
-        elif start:
-            q = q.filter(Q(create_date__gte = start))
-            del query['creation_date_start']
-        else:
-            q = q.filter(Q(create_date__lte = end))
-            del query['creation_date_end']
         
         return q.filter(**query).distinct()
-
+    
     def confirmed_case(self):
         return self.case.filter(case_status__name = 'CONFIRMED')
     

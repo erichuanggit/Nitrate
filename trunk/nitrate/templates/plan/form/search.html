@@ -41,11 +41,11 @@
     </div>
     <div class="listinfo">
         <span class="title"><label for="id_creation_date_start">Created after:</label></span>
-        <span class="listinfo_input" id=creation_sdate>{{ search_plan_form.creation_date_start }}</span>
+        <span class="listinfo_input" id=creation_sdate>{{ search_plan_form.create_date__gte }}</span>
     </div>
     <div class="listinfo">
         <span class="title"><label for="id_creation_date">Created before:</label></span>
-        <span class="listinfo_input" id=creation_sdate>{{ search_plan_form.creation_date_end }}</span>
+        <span class="listinfo_input" id=creation_sdate>{{ search_plan_form.create_date__lte }}</span>
     </div>
     <div class="listinfo">
         <span class="title">{{ search_plan_form.errors }}</span>
