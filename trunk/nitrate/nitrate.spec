@@ -3,7 +3,7 @@
 
 Name:           nitrate
 Version:        3.1.0
-Release:        1
+Release:        2
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -111,6 +111,9 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
+* Thu Aug 12 2010 Xuqing Kuang <xkuang@redhat.com> 3.1.0-2
+- Enhanced the reporting feature.
+
 * Thu Aug 12 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.0-1
 - Fixed #612803 - add an export feature for test case runs, can export …
 - Fixed #609777 - Tag autocomplete for "remove tag" shows all possible …

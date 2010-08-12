@@ -299,10 +299,10 @@ def custom_details(request, template_name='report/custom_details.html'):
         tcrses = TestCaseRunStatus.objects.all()
         
         tbs = TestBuild.objects.filter(pk__in = request.REQUEST.getlist('pk__in'))
-        tps = TestPlan.objects.filter(run__build__in = tbs)
-        trs = TestRun.objects.filter(build__in = tbs)
+        tps = TestPlan.objects.filter(run__case_run__build__in = tbs)
+        trs = TestRun.objects.filter(case_run__build__in = tbs)
         tcrs = TestCaseRun.objects.select_related('case', 'case_run_status', 'tested_by')
-        tcrs = tcrs.filter(run__build__in = tbs)
+        tcrs = tcrs.filter(build__in = tbs)
         
         if form.cleaned_data['product']:
             tps = tps.filter(run__build__product = form.cleaned_data['product'])
