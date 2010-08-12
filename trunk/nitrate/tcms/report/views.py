@@ -22,6 +22,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 from tcms.management.models import Classification, Product
+from tcms.core.utils import calc_percent
 from tcms.core.utils.counter import CaseRunStatusCounter, RunsCounter
 from tcms.core.utils.raw_sql import ReportSQL as RawSQL
 
@@ -238,15 +239,12 @@ def component(request, product_id, template_name='report/component.html'):
 def custom_search(request, template_name='report/custom_search.html'):
     """Custom report with search function"""
     from tcms.management.models import TestBuild
+    from tcms.testruns.models import TestCaseRunStatus
     from forms import CustomSearchForm
     
     SUB_MODULE_NAME = 'custom_search'
     
-    def calc_percent(x, y):
-        if not x or not y:
-            return 0
-        
-        return float(x)/y*100
+    default_case_run_status = TestCaseRunStatus.objects.filter(name__in = ['passed', 'failed'])
     
     if request.REQUEST.get('a') == 'search':
         form = CustomSearchForm(request.REQUEST)
@@ -257,13 +255,14 @@ def custom_search(request, template_name='report/custom_search.html'):
                 if form.cleaned_data[k]:
                     tbs = tbs.filter(**{k: form.cleaned_data[k]})
             
-            tbs = tbs.extra(select={
+            extra_query = {
                 'plans_count': RawSQL.custom_search_plans_count,
                 'runs_count': RawSQL.custom_search_runs_count,
                 'case_runs_count': RawSQL.custom_search_case_runs_count,
-                'case_runs_passed_count': RawSQL.custom_search_case_runs_passed_count,
-                'case_runs_failed_count': RawSQL.custom_search_case_runs_failed_count,
-            })
+            }
+            for tcrss in default_case_run_status:
+                extra_query['case_run_%s_count' % tcrss.name.lower()] = RawSQL.custom_search_case_runs_count_by_status % tcrss.pk
+            tbs = tbs.extra(select=extra_query)
             
             tbs = tbs.distinct()
         else:
@@ -272,9 +271,9 @@ def custom_search(request, template_name='report/custom_search.html'):
         form = CustomSearchForm()
         tbs = TestBuild.objects.none()
     
-    for tb in tbs:
-        tb.case_runs_passed_percent = calc_percent(tb.case_runs_passed_count, tb.case_runs_count)
-        tb.case_runs_failed_percent = calc_percent(tb.case_runs_failed_count, tb.case_runs_count)
+    for tcrss in default_case_run_status:
+        for tb in tbs:
+            setattr(tb, 'case_runs_%s_percent' % tcrss.name.lower(), calc_percent(getattr(tb, 'case_run_%s_count' % tcrss.name.lower()), tb.case_runs_count))
     
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
@@ -285,20 +284,25 @@ def custom_search(request, template_name='report/custom_search.html'):
 
 def custom_details(request, template_name='report/custom_details.html'):
     """Custom report with search function"""
+    from tcms.management.models import TestBuild
     from tcms.testplans.models import TestPlan
     from tcms.testruns.models import TestCaseRun, TestCaseRunStatus, TestRun
     from forms import CustomSearchDetailsForm
     from pprint import pprint
     SUB_MODULE_NAME = 'custom_search'
     
+    default_case_run_status = TestCaseRunStatus.objects.all()
+    
     form = CustomSearchDetailsForm(request.REQUEST)
     form.populate(product_id = request.REQUEST.get('product'))
     if form.is_valid():
         tcrses = TestCaseRunStatus.objects.all()
         
-        tps = TestPlan.objects
-        trs = TestRun.objects
+        tbs = TestBuild.objects.filter(pk__in = request.REQUEST.getlist('pk__in'))
+        tps = TestPlan.objects.filter(run__build__in = tbs)
+        trs = TestRun.objects.filter(build__in = tbs)
         tcrs = TestCaseRun.objects.select_related('case', 'case_run_status', 'tested_by')
+        tcrs = tcrs.filter(run__build__in = tbs)
         
         if form.cleaned_data['product']:
             tps = tps.filter(run__build__product = form.cleaned_data['product'])
@@ -309,12 +313,17 @@ def custom_details(request, template_name='report/custom_details.html'):
             tps = tps.filter(run__product_version = form.cleaned_data['build_run__product_version'])
             trs = trs.filter(product_version = form.cleaned_data['build_run__product_version'])
             tcrs = tcrs.filter(run__product_version = form.cleaned_data['build_run__product_version'])
-            
-        if form.cleaned_data['pk__in']:
-            tps = tps.filter(run__build = form.cleaned_data['pk__in'])
-            trs = trs.filter(build = form.cleaned_data['pk__in'])
-            tcrs = tcrs.filter(run__build = form.cleaned_data['pk__in'])
         
+        extra_query = {
+            'plans_count': RawSQL.custom_search_plans_count,
+            'runs_count': RawSQL.custom_search_runs_count,
+            'case_runs_count': RawSQL.custom_search_case_runs_count,
+        }
+        
+        for tcrss in default_case_run_status:
+            extra_query['case_run_' + tcrss.name.lower() + '_count'] = RawSQL.custom_search_case_runs_count_by_status % tcrss.pk
+        
+        tbs = tbs.extra(select=extra_query)
         tps = tps.distinct()
         trs = trs.filter(plan__in = tps).distinct()
         tcrs = tcrs.distinct()
@@ -331,11 +340,16 @@ def custom_details(request, template_name='report/custom_details.html'):
             cursor.execute(RawSQL.custom_details_case_run_count % tr.pk)
             for s, n in cursor.fetchall():
                 setattr(tr, s, n)
+        
+        for tcrss in default_case_run_status:
+            for tb in tbs:
+                setattr(tb, 'case_runs_%s_percent' % tcrss.name.lower(), calc_percent(getattr(tb, 'case_run_%s_count' % tcrss.name.lower()), tb.case_runs_count))
     
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'form': form,
+        'test_builds': tbs,
         'test_plans': tps,
         'test_runs': trs,
         'test_case_runs': tcrs,

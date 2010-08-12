@@ -53,3 +53,8 @@ def get_string_combinations(s):
     """
     return s, s.lower(), s.upper(), s.capitalize()
 
+def calc_percent(x, y):
+    if not x or not y:
+        return 0
+    
+    return float(x)/y*100
