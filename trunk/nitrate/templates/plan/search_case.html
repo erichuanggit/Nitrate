@@ -20,7 +20,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.SearchCase.on_load);
 		<input id="value_plan_id" type="hidden" name="plan_id" value="{{ test_plan.plan_id }}" />
 		<input id="value_product_id" type="hidden" mame="product_id" value="{{ test_plan.product_id }}">
 	</div>
-	<div class="crumble">
+	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
 		>> <a href="{% url tcms.testplans.views.all %}">Planning</a>
 		>> <a href="{% url tcms.testplans.views.get test_plan.plan_id %}">{{ test_plan.plan_id }}: {{ test_plan.name }}</a>

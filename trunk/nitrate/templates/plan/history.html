@@ -11,7 +11,7 @@
 
 {% block contents %}
 <div id="content">
-	<div class="crumble">
+	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
 		>> <a href="{% url tcms.testplans.views.all %}">Planning</a>
 		>> <a href="{% url tcms.testplans.views.get testplan.plan_id %}">{{ testplan.plan_id }}: {{ testplan.name }}</a>

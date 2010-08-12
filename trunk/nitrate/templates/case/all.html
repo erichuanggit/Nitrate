@@ -16,7 +16,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 {% endblock %}
 {% block contents %}
 <div id="content">
-	<div class="crumble">
+	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a> >>
 		{% if query_result %}
 		<a href="{% url tcms.testcases.views.all %}">Search Cases</a> >> Search result

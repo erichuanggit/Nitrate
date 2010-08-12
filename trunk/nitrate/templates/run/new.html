@@ -27,7 +27,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 		<input id="value_module" type="hidden" name="module" value="{{ module }}" />
 		<input id="value_sub_module" type="hidden" name="sub_module" value="{{ sub_module }}" />
 	</div>
-	<div class="crumble">
+	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
 		>> <a href="{% url tcms.testplans.views.all %}">...</a>
 		>> <a href="{% url tcms.testplans.views.get test_plan.plan_id %}">{{ test_plan.plan_id }}: {{ test_plan.name }}</a>

@@ -19,7 +19,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestReviews.Details.on_load);
 {% load comments %}
 <div id="content">
 	<!-- Store some values for easier javascript acccess -->
-	<div class="crumble">
+	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
 		>> <a href="{% url tcms.testplans.views.all %}">Plans</a>
 		>> <a href="{% url tcms.testplans.views.get test_review.plan.plan_id %}#testreviews">{{ test_review.plan.plan_id }}:{{ test_review.plan }}</a>
