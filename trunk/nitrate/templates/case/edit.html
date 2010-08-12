@@ -63,13 +63,14 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
                     </div>
                     {% endcomment %}
                     <div class="data_row">
-                        <label>Default Tester</label>
-                        <span >{{ form.default_tester }}</span>
-                    </div>
-                    <div class="data_row">
                         <label>Category</label>
                         <span id="form_category" >{{ form.category }}</span><a href="{{ ADMIN_PREFIX }}/testcases/testcasecategory/add/" class="addlink" onclick="return showAddAnotherPopup(this);" id="id_addt_product_casecategory" target="_blank">Add Category</a><span class="grey">After Add and Refresh page</span>
                     </div>
+                    <div class="data_row">
+                        <label>Default Tester</label>
+                        <span >{{ form.default_tester }}</span>
+                    </div>
+                    
                     <div class="data_row">
                         <label>Estimated Time</label>
                         <div id="form_estimated_time" >
