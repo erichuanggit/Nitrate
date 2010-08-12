@@ -23,7 +23,7 @@ from django.contrib.auth.models import User
 from tcms.core.lib.xml2dict.xml2dict import XML2Dict
 
 from tcms.core.forms.fields import TimedeltaFormField
-from tcms.core.forms.widgets import TinyMCEWidget
+from tcms.core.forms.widgets import TinyMCEWidget, DateTimeWidget
 
 from tcms.management.models import Component, Product, Version, TCMSEnvGroup, Priority, TestTag
 from tcms.testcases.models import TestCaseStatus, TestCaseCategory, TestCaseTag
@@ -372,6 +372,8 @@ class SearchPlanForm(forms.Form):
     case__default_tester__username__startswith = forms.CharField(required = False)
     tag__name__in = forms.CharField(required = False)
     is_active = forms.BooleanField(required = False)
+    creation_date_start = forms.DateTimeField(required = False, widget = DateTimeWidget)
+    creation_date_end = forms.DateTimeField(required = False, widget = DateTimeWidget)
     
     def clean_tag__name__in(self):
         return TestTag.string_to_list(self.cleaned_data['tag__name__in'])

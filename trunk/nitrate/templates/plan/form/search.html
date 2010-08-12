@@ -39,7 +39,14 @@
         <span class="title"><label for="id_tag">Tag</label></span>
         <span class="listinfo_input">  {{ search_plan_form.tag__name__in }}</span>
     </div>
-    
+    <div class="listinfo">
+        <span class="title"><label for="id_creation_date_start">Created after:</label></span>
+        <span class="listinfo_input" id=creation_sdate>{{ search_plan_form.creation_date_start }}</span>
+    </div>
+    <div class="listinfo">
+        <span class="title"><label for="id_creation_date">Created before:</label></span>
+        <span class="listinfo_input" id=creation_sdate>{{ search_plan_form.creation_date_end }}</span>
+    </div>
     <div class="listinfo">
         <span class="title">{{ search_plan_form.errors }}</span>
     </div>
