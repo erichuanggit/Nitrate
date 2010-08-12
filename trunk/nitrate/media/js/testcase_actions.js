@@ -135,6 +135,8 @@ Nitrate.TestCases.Details.on_load = function()
         updateCaseComponent(form.action, parameters, json_success_refresh_page);
     });
     
+    bindSelectAllCheckbox($('id_checkbox_all_components'), $('id_form_case_component'), 'component');
+    
     if(window.location.hash) {
         fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
     }

@@ -1110,6 +1110,13 @@ function clickedSelectAll(checkbox, form, name)
     }
 }
 
+function bindSelectAllCheckbox(element, form, name)
+{
+    $(element).observe('click', function(e) {
+        clickedSelectAll(this, form, name);
+    })
+}
+
 function constructForm(content, action, form_observe, notice, s, c)
 {
     var f = new Element('form', {'action': action});

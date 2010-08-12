@@ -118,6 +118,7 @@ class TestPlan(TCMSActionModel):
         if query.get('search'):
             q = q.filter(Q(plan_id__icontains = query['search']) \
                             | Q(name__icontains = query['search']))
+            del query['search']
         
         return q.filter(**query).distinct()
     
