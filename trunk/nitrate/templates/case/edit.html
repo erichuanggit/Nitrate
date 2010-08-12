@@ -45,11 +45,11 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
             <fieldset class="no-border background-light-grey">
                 <div class="editor-side">
                     <div class="data_row">
-                        <label id="item_title" class="strong">Summary</label>
+                        <label id="item_title">Summary</label>
                         <div id="form_title" class="name summary" tabindex="1">{{ form.summary }}</div>
                     </div>
                     <div class="data_row">
-                        <label class="strong">Product</label>
+                        <label>Product</label>
                         <div>{{ form.product }}</div>
                     </div>
                     {% comment %}
@@ -57,24 +57,36 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
                         <input id="id_refresh_product" type="button" value="Refresh component/category" title="Refresh component and category after change product" />
                     </div>
                     <div class="data_row">
-                        <label class="strong">Component </label>
+                        <label>Component </label>
                         {{ form.component.errors }}
                         <div class="component_select">{{ form.component }}</div>
                     </div>
                     {% endcomment %}
                     <div class="data_row">
-                        <label class="strong">Default Tester</label>
+                        <label>Default Tester</label>
                         <span >{{ form.default_tester }}</span>
                     </div>
                     <div class="data_row">
-                        <label class="strong">Category</label>
+                        <label>Category</label>
                         <span id="form_category" >{{ form.category }}</span><a href="{{ ADMIN_PREFIX }}/testcases/testcasecategory/add/" class="addlink" onclick="return showAddAnotherPopup(this);" id="id_addt_product_casecategory" target="_blank">Add Category</a><span class="grey">After Add and Refresh page</span>
                     </div>
                     <div class="data_row">
-                        <label class="strong">Estimated Time</label>
+                        <label>Estimated Time</label>
                         <div id="form_estimated_time" >
                             <div class="time">{{ form.estimated_time }}</div>
                         </div>
+                    </div>
+                    <div class="data_row">
+                        <label >Status</label>
+                        <span id="form_status" >{{ form.case_status }}</span>
+                    </div>
+                    <div class="data_row">
+                        <label >Arguments</label>
+                        <span id="form_arguments" >{{ form.arguments }}</span>
+                    </div>
+                    <div class="data_row">
+                        <label >Notes</label>
+                        <span id="form_notes" >{{ form.notes }}</span>
                     </div>
                     
                 </div>
@@ -135,18 +147,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
                         <label>Priority</label>
                         <span id="form_priority" >{{ form.priority }}</span>
                     </div>
-                    <div class="data_row">
-                        <label >Status</label>
-                        <span id="form_status" >{{ form.case_status }}</span>
-                    </div>
-                    <div class="data_row">
-                        <label >Arguments</label>
-                        <span id="form_arguments" >{{ form.arguments }}</span>
-                    </div>
-                    <div class="data_row">
-                        <label >Notes</label>
-                        <span id="form_notes" >{{ form.notes }}</span>
-                    </div>
+                    
                 </div>
             </fieldset>
             <fieldset class="no-border background-light-grey">

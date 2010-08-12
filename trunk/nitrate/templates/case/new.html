@@ -55,9 +55,16 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Create.on_load);
 						<div class="component_select">{{ form.component }}</div>
 						<div class="errors">{{ form.component.errors }}</div>
 					</div>
+                    <div class="data_row">
+						<label class="lab strong">Category</label>
+						{{ form.category }}
+						
+                        <a href="{{ ADMIN_PREFIX }}/testcases/testcasecategory/add/" class="addlink" onclick="return showAddAnotherPopup(this);" id="id_addt_product_casecategory" target="_blank">Add Category</a><span class="grey">After Add and Refresh page</span><span class="errors">{{ form.category.errors }}</span>
+					</div>
 					<div class="data_row">
 						<input id="id_refresh_product" type="button" value="Refresh component/category" title="Refresh component and category after change product" />
 					</div>
+                    
 				</div>
 				<div class="editor-side">
 					<div class="data_row">
@@ -96,12 +103,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Create.on_load);
 						<label >Default Tester:</label>
 						{{ form.default_tester }}<div class="errors">{{ form.default_tester.errors }}</div>
 					</div>
-					<div class="data_row">
-						<label class="lab strong">Category</label>
-						{{ form.category }}
-						
-                        <a href="{{ ADMIN_PREFIX }}/testcases/testcasecategory/add/" class="addlink" onclick="return showAddAnotherPopup(this);" id="id_addt_product_casecategory" target="_blank">Add Category</a><span class="grey">After Add and Refresh page</span><span class="errors">{{ form.category.errors }}</span>
-					</div>
+					
 					<div class="data_row">
 						<label >Estimated Time</label>
 						<div class="time">

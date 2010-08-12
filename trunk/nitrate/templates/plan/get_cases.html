@@ -88,25 +88,25 @@
             {% if perms.testcases.add_testcasetag %}
             <input type="button" value="Add" id="id_add_case_tags" class="tag_add sprites" />
 			{% else %} 
-			<input type="button" value="Add" id="id_add_case_tags" class="tag_add sprites" disabled />
+			<input type="button" value="Add" id="id_add_case_tags" class="tag_add_disabled sprites" disabled="disabled" />
             {% endif %}
 			
             {% if perms.testcases.delete_testcasetag %}
             <input type="button" value="Remove" id="id_remove_case_tags" class="tag_delete sprites" /> |
 			{% else %}
-			<input type="button" value="Remove" id="id_remove_case_tags" class="tag_delete sprites" diabled /> |
+			<input type="button" value="Remove" id="id_remove_case_tags" class="tag_delete_disabled sprites" disabled="disabled" /> |
             {% endif %}
 			
             {% if perms.testcases.change_testcase %}
 			
             <input id="batch_automated"  class="automated sprites" type="button" value="Automated" title="change automated" />
             <input type="button" class="assignee sprites" value="Default tester" title="change default tester" onclick="changePlanCaseDefaultTester(this.up(2), this.up(3), {{ test_plan.plan_id }})" />
-            <input id="id_batch_component" type="button" value="Component" />
+            <input id="id_batch_component" type="button" value="Component" class="sprites component" />
             {% else %}
 			
-			<input type="button" value="Automated" title="change automated" class="automated sprites" id="batch_automated" />
+			<input type="button" value="Automated" title="change automated" class="automated_disabled sprites" id="batch_automated" disabled="disabled" />
             <input type="button" value="Default tester" title="change default tester" class="assigneedisable sprites" disabled />
-            <input id="id_batch_component" type="button" value="Product/Category/Component" disabled />
+            <input id="id_batch_component" type="button" value="Component" class="sprites component_disabled" disabled="disabled"/>
             {% endif %}
 			
 			{% if perms.testcases.change_testcase %}

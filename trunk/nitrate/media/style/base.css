@@ -141,6 +141,8 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .golink{padding-left:20px;background:url(../images/execute_link.png) no-repeat left center; font-size:12px}
 .viewall{margin-left:10px;color:#666;font-size:0.9em;float:left; background:url(../images/hand.png) no-repeat left center; padding-left:28px; padding-top:5px;}
 .help{margin-left:10px;color:#666;font-size:0.9em;float:left;}
+.component{ background-position:0 -615px; padding-left:16px;}
+.component_disabled{background-position:0 -633px;padding-left:16px;}
 
 .system_help{background:url("../images/icon_system_help.png") 5px 2px no-repeat; padding:0 0 5px 25px;color:#52677A;}
 .system_alert{background:url("../images/icon_system_alert.png") top left no-repeat; padding-left:20px;color:#bd7f04;}
@@ -201,8 +203,11 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .actions .disabled{padding-left:16px; background-position:0 -160px;}
 .tag_add{ background-position:0 -148px;padding-left:16px;}
 .tag_delete{ background-position:0 -166px;padding-left:16px;}
+.tag_delete_disabled{ background-position:0 -670px; padding-left:16px;}
+.tag_add_disabled{ background-position:0 -652px; padding-left:16px;}
 
 .automated{ padding-left:16px; background-position:0 -131px;}
+.automated_disabled{ background-position:0 -688px; padding-left:16px;}
 
 /*********************icons*****************/
 #response {display: none;}
@@ -293,13 +298,14 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .last_login{ width:100%; }
 .groups select{ float:left; }
 /**********************Admin calendar************/
-.calendarbox , .clockbox{ border:1px solid #666; font-size:0.9em; }
+#calendarlink1{ vertical-align:middle}
+.calendarbox , .clockbox{ border:1px solid #666; font-size:0.9em; width:200px; font-family:"Trebuchet MS",Sans,Verdana,Arial,sans-serif }
 .clockbox h2{ font-size:1.0em;  }
-.calendarbox caption{ margin:0px; }
+.calendarbox caption{ margin:0px; text-align:center; color:#fff }
 .calendarbox table{ border:none; }
-.calendarbox table td{ padding:0px; border:none; margin:0px; line-height:15px; }
+.calendarbox table td{ padding:0px; border:none; margin:0px; line-height:15px; padding-left:10px; }
 .calendar caption{ margin:0px; border-top:1px solid #ccc; font-size:1.0em; padding:0px; }
-.calendar-shortcuts{ float:left; font-size:.8em; text-align:center; margin:0px; padding:0px; }
+.calendar-shortcuts{ float:left; width:100%; text-align:center; margin:0px; padding:0px; }
 .calendarnav-previous{ width:50%; float:left; line-height:15px; }
 .calendarnav-next{ float:right; line-height:15px; width:50%; text-align:right; }
 .calendar-cancel{ float:left; width:100%; text-align:center; padding:0px; margin:0px; clear:left; }
@@ -751,4 +757,6 @@ a:link.edit,a:visited.edit{ color:#333;}
 .table_noborder th{background:url(../images/table_header_bg.png) repeat-x left top; height:26px; line-height:26px;padding-left:5px; border:solid 1px #a2a2a2; border-top:none;border-collapse:collapse; }
 .table_noborder td{ padding-left:5px; min-height:25px; line-height:25px;}
 .margin-top{ margin-top:10px;}
+
 #id_pk__in{ max-height:80px;}
+#id_notes{ max-height:40px;}

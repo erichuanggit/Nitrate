@@ -17,6 +17,10 @@
         <span class="listinfo_input">{{ search_plan_form.type }}</span>
     </div>
     <div class="listinfo">
+        <span class="title"><label for="id_tag">Tag</label></span>
+        <span class="listinfo_input">  {{ search_plan_form.tag__name__in }}</span>
+    </div>
+    <div class="listinfo">
         <span class="title"><label for="id_is_active">Active</label></span>
         <span class="listinfo_input"> {{ search_plan_form.is_active }} <span class="grey">Uncheck will search active and inactive plans</span></span>
     </div>
@@ -35,10 +39,7 @@
         <span class="title"><label for="id_env_group_id">Environment Group</label></span>
             <span class="listinfo_input">{{ search_plan_form.env_group }}</span>
     </div>
-    <div class="listinfo">
-        <span class="title"><label for="id_tag">Tag</label></span>
-        <span class="listinfo_input">  {{ search_plan_form.tag__name__in }}</span>
-    </div>
+    
     <div class="listinfo">
         <span class="title"><label for="id_creation_date_start">Created after:</label></span>
         <span class="listinfo_input" id=creation_sdate>{{ search_plan_form.create_date__gte }}</span>
