@@ -261,7 +261,7 @@ def custom_search(request, template_name='report/custom_search.html'):
                 'case_runs_count': RawSQL.custom_search_case_runs_count,
             }
             for tcrss in default_case_run_status:
-                extra_query['case_run_%s_count' % tcrss.name.lower()] = RawSQL.custom_search_case_runs_count_by_status % tcrss.pk
+                extra_query['case_runs_%s_count' % tcrss.name.lower()] = RawSQL.custom_search_case_runs_count_by_status % tcrss.pk
             tbs = tbs.extra(select=extra_query)
             
             tbs = tbs.distinct()
@@ -273,7 +273,7 @@ def custom_search(request, template_name='report/custom_search.html'):
     
     for tcrss in default_case_run_status:
         for tb in tbs:
-            setattr(tb, 'case_runs_%s_percent' % tcrss.name.lower(), calc_percent(getattr(tb, 'case_run_%s_count' % tcrss.name.lower()), tb.case_runs_count))
+            setattr(tb, 'case_runs_%s_percent' % tcrss.name.lower(), calc_percent(getattr(tb, 'case_runs_%s_count' % tcrss.name.lower()), tb.case_runs_count))
     
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
@@ -321,7 +321,7 @@ def custom_details(request, template_name='report/custom_details.html'):
         }
         
         for tcrss in default_case_run_status:
-            extra_query['case_run_' + tcrss.name.lower() + '_count'] = RawSQL.custom_search_case_runs_count_by_status % tcrss.pk
+            extra_query['case_runs_' + tcrss.name.lower() + '_count'] = RawSQL.custom_search_case_runs_count_by_status % tcrss.pk
         
         tbs = tbs.extra(select=extra_query)
         tps = tps.distinct()
@@ -343,7 +343,7 @@ def custom_details(request, template_name='report/custom_details.html'):
         
         for tcrss in default_case_run_status:
             for tb in tbs:
-                setattr(tb, 'case_runs_%s_percent' % tcrss.name.lower(), calc_percent(getattr(tb, 'case_run_%s_count' % tcrss.name.lower()), tb.case_runs_count))
+                setattr(tb, 'case_runs_%s_percent' % tcrss.name.lower(), calc_percent(getattr(tb, 'case_runs_%s_count' % tcrss.name.lower()), tb.case_runs_count))
     
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
