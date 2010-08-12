@@ -16,8 +16,8 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-VERSION = (3, 0, 3, 'final', 2, True)
-XMLRPC_VERSION = (0, 1, 1, 'final', 2)
+VERSION = (3, 1, 0, 'final', 1, True)
+XMLRPC_VERSION = (1, 0, 0, 'final', 1)
 
 def get_version():
     import os.path.dirname

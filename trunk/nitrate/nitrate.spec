@@ -2,8 +2,8 @@
 %define use_pylint 0
 
 Name:           nitrate
-Version:        3.0.4
-Release:        3
+Version:        3.1.0
+Release:        1
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -111,6 +111,20 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
+* Thu Aug 12 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.0-1
+* Fixed #612803, add an export feature for test case runs, can export …
+* Fixed #609777, Tag autocomplete for "remove tag" shows all possible …
+* Completed Feature #578887 - Clone all test runs for a particular build of …
+* Fixed #618710 - Env value for test run permission checking
+* Completed feature #599313 - [REF] Mass edit test case components
+* Fixed #619247 - Cannot update test case status
+* Fixed #591823. Sort by "completed" can work correctly.
+* Fixed #618183 and #619403 - Notification of case editing issue
+* Fixed #599448, add upload feature while editing a plan.
+* Fixed #621777,"TCMS gives error message on screen after edit->save …
+* Fixed #598409 "RFE: add plan creation date search criteria", add a …
+* Completed new report with customization
+
 * Fri Aug 2 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.4-3
 - Fixed #612797 - The Property in Environment can not be deleted
 - Fixed #616463 - Remove property doesn't work in TCMS
