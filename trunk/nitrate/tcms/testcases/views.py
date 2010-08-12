@@ -481,8 +481,8 @@ def edit(request, case_id, template_name = 'case/edit.html'):
                         tc.case_run.values_list('assignee__email', flat=True)
                     )
                 
-                if n_form.cleaned_data['speicfic_person']:
-                    n_to.extend(n_form.cleaned_data['speicfic_person'])
+                if n_form.cleaned_data['specific_person']:
+                    n_to.extend(n_form.cleaned_data['specific_person'])
                 
                 n_to = list(set(n_to))
                 

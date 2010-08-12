@@ -333,13 +333,9 @@ class ReportSQL(object):
         FROM test_case_runs \
         WHERE test_case_runs.build_id = test_builds.build_id'
     
-    custom_search_case_runs_passed_count = 'SELECT COUNT(DISTINCT case_run_id) \
+    custom_search_case_runs_count_by_status = 'SELECT COUNT(DISTINCT case_run_id) \
         FROM test_case_runs \
-        WHERE test_case_runs.build_id = test_builds.build_id AND test_case_runs.case_run_status_id = 2'
-    
-    custom_search_case_runs_failed_count = 'SELECT COUNT(DISTINCT case_run_id) \
-        FROM test_case_runs \
-        WHERE test_case_runs.build_id = test_builds.build_id AND test_case_runs.case_run_status_id = 3'
+        WHERE test_case_runs.build_id = test_builds.build_id AND test_case_runs.case_run_status_id = %s'
     
     custom_details_case_run_count = 'SELECT tcrs.name \
         AS test_case_status, COUNT(tcr.case_id) AS case_run_count \

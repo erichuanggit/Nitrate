@@ -23,7 +23,7 @@ import tcms
 from setuptools import setup, find_packages
 
 PACKAGE_NAME = 'Nitrate'
-PACKAGE_VER = '3.0.4'
+PACKAGE_VER = '3.1.0'
 PACKAGE_DESC = 'Test Case Management System'
 PACKAGE_URL = 'https://fedorahosted.org/nitrate/browser/trunk/nitrate'
 

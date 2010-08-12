@@ -1,7 +1,7 @@
 // Create a dictionary to avoid polluting the global namespace:
 var Nitrate = {};
 Nitrate.Utils = {};
-var short_string_length = 35;
+var short_string_length = 100;
 
 /*
     Utility function.

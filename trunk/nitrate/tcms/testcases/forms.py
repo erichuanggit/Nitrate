@@ -241,7 +241,7 @@ class CaseNotifyForm(forms.Form):
     managers_of_runs = forms.BooleanField(required = False)
     default_testers_of_runs = forms.BooleanField(required = False)
     assignees_of_case_runs = forms.BooleanField(required = False)
-    speicfic_person = MultipleEmailField(
+    specific_person = MultipleEmailField(
         help_text = 'Multiple types are split with comma.',
         required = False
     )

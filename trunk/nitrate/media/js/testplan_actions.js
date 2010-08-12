@@ -139,6 +139,12 @@ Nitrate.TestPlans.SearchCase.on_load = function()
             // bind_version_selector_to_product(true);
         }
     }
+    
+    if($('id_table_cases')) {
+        TableKit.Sortable.init('id_table_cases');
+    }
+    
+    bindSelectAllCheckbox($('id_checkbox_all_cases'), $('id_form_cases'), 'case');
 }
 
 Nitrate.TestPlans.Clone.on_load = function()

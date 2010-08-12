@@ -75,5 +75,4 @@ class CustomSearchDetailsForm(CustomSearchForm):
     pk__in = forms.ModelChoiceField(
         label = 'Build',
         queryset = TestBuild.objects.none(),
-        required = False, empty_label = None,
     )

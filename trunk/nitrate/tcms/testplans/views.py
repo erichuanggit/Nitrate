@@ -676,6 +676,7 @@ def cases(request, plan_id):
             
             if request.REQUEST.get('action') == 'search':
                 form = SearchCaseForm(request.REQUEST)
+                form.populate(product_id = request.REQUEST.get('product'))
                 if form.is_valid():
                     tcs = TestCase.list(form.cleaned_data)
                     tcs = tcs.select_related(
