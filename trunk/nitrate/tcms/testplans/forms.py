@@ -373,10 +373,16 @@ class SearchPlanForm(forms.Form):
     tag__name__in = forms.CharField(required = False)
     is_active = forms.BooleanField(required = False)
     create_date__gte = forms.DateTimeField(
-        label = 'Create after', required = False, widget = DateTimeWidget
+        label = 'Create after', required = False,
+        widget = forms.DateInput(attrs={
+            'class': 'vDateField',
+        })
     )
     create_date__lte = forms.DateTimeField(
-        label = 'Create before', required = False, widget = DateTimeWidget
+        label = 'Create before', required = False,
+        widget = forms.DateInput(attrs={
+            'class': 'vDateField',
+        })
     )
     
     def clean_tag__name__in(self):
