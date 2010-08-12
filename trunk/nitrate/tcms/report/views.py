@@ -349,7 +349,7 @@ def custom_details(request, template_name='report/custom_details.html'):
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'form': form,
-        'test_builds': tbs,
+        'builds': tbs,
         'test_plans': tps,
         'test_runs': trs,
         'test_case_runs': tcrs,
