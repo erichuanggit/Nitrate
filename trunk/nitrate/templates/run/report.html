@@ -2,14 +2,12 @@
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<title>{{ testrun.summary }}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<meta http-equiv="Content-Language" content="utf-8" />
 	<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/print.css" media="all" />
-    
     <style>
     body{background:#235D9F; height:100%}
     </style>
@@ -79,26 +77,26 @@
 		<h2>Run test cases:</h2>
 		<table  class="list border-1" cellpadding="0" cellspacing="0">
 			<tr>
-				<th height="25px">Closed at</th>
-				<th>ID</th>
+				<th width="100px">Case-Run ID</th>
+                <th width="100">Case ID</th>
 				<th>Summary</th>
-				<th>Case ID</th>
-				<th>Tested by</th>
-				<th>Category</th>
-				<th>Status</th>
+				<th width="100">Tested by</th>
+				<th width="150">Category</th>
+				<th width="100">Status</th>
+                <th width="160" height="25px">Closed at</th>
 			</tr>
 			{% for test_case_run in test_case_runs %}
 			<tr>
-				<td>{{ test_case_run.close_date }}</td>
-				<td>{{ test_case_run.case_run_id }}</td>
+ 				<td>{{ test_case_run.case_run_id }}</td>
+                <td>{{ test_case_run.case_id }}</td>
 				<td>{{ test_case_run.case.summary }}</td>
-				<td>{{ test_case_run.case_id }}</td>
-				<td>{{ test_case_run.tested_by.email }}</td>
+				<td>{{ test_case_run.tested_by }}</td>
 				<td>{{ test_case_run.case.category }}</td>
 				<td><span class="highlight">{{ test_case_run.case_run_status.name|upper }}</span></td>
+                <td>{{ test_case_run.close_date }}</td>
 			</tr>
             {% comment %}
-			<!--{% if test_case_run.log %}
+			{% if test_case_run.log %}
 			<tr>
 				<td class="sep" align="right" valign="top"><span class="notes">Logs:</span></td>
 				<td class="sep" align="left" valign="top" colspan="7">
@@ -109,7 +107,7 @@
 						 
 				</span></td>
 			</tr>
-			{% endif %}-->
+			{% endif %}
             {% endcomment %}
 		
 			{% get_comment_list for test_case_run as comments %}
