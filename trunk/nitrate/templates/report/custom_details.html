@@ -25,7 +25,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 			{{ form.product.label }}: {{ form.product }}<br />
 			{{ form.build_run__product_version.label }}: {{ form.build_run__product_version }}<br />
 			{{ form.pk__in.label }}: {{ form.pk__in }}<br />
-			<input type="submit" />
+			<input type="submit" value="Submit" />
 		</form>
 	</div>
     <table cellpadding="0" cellspacing="0" class="table_noborder" border="0">
@@ -162,19 +162,27 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 		<tr>
 			<th align="left" class="sortcol sortdesc" width="60" >Case ID</th>
             <th align="left" class="sortcol" width="100">Case Run ID</th>
-			<th align="left" class="sortcol">Case name</th>
+			<th align="left" class="sortcol">Summary</th>
 			<th align="left" class="sortcol" width="150">Category</th>
 			<th align="left" class="sortcol" width="120">Tester</th>
-			<th align="left" class="sortcol" width="200">The Lastest Execute Time</th>
+            <th align="left" class="sortcol" width="120">Bugs</th>
+			<th align="left" class="sortcol" width="200">Lastest Execute Time</th>
 		</tr>
 		{% for test_case_run in test_case_runs %}
 		{% ifequal test_case_run.case_run_status.name 'FAILED' %}
 		<tr>
 			<td valign="top" ><a href="#">{{ test_case_run.case.pk }}</a></td>
             <td valign="top"><a href="{% url tcms.testruns.views.execute test_case_run.run_id %}#caserun_{{ test_case_run.pk }}">{{ test_case_run.pk }}</a></td>
-			<td valign="top" ><a href="{% url tcms.testruns.views.execute test_case_run.run_id %}#caserun_{{ test_case_run.pk }}">{{ test_case_run.case.summary }}</a></td>
+			<td valign="top" >{{ test_case_run.case.summary }}</td>
 			<td valign="top" >{{ test_case_run.case.category }}</td>
 			<td valign="top" >{{ test_case_run.tested_by }}</td>
+            <td valign="top" >
+            {% for bug in test_case_run.get_bugs %}
+            <a href="{{ bug.get_absolute_url }}">{{ bug }}</a>,
+            {% empty %}
+            <span class="grey">0</span>
+            {% endfor %}
+            </td>
 			<td valign="top" >{{ test_case_run.close_date }}</td>
 		</tr>
 		{% get_comment_list for test_case_run as comments %}
@@ -216,7 +224,8 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 			<th align="left" class="sortcol">Case name</th>
 			<th align="left" class="sortcol" width="150">Category</th>
 			<th align="left" class="sortcol" width="120">Tester</th>
-			<th align="left" class="sortcol" width="200">The Lastest Execute Time</th>
+            <th align="left" class="sortcol" width="120">Bugs</th>
+			<th align="left" class="sortcol" width="200">Lastest Execute Time</th>
 		</tr>
 		{% for test_case_run in test_case_runs %}
 		{% ifequal test_case_run.case_run_status.name 'BLOCKED' %}
@@ -226,6 +235,13 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 			<td valign="top"><a href="{{ test_case_run.case.get_url_path }}">{{ test_case_run.case.summary }}</a></td>
 			<td valign="top">{{ test_case_run.case.category }}</td>
 			<td valign="top">{{ test_case_run.tested_by }}</td>
+            <td valign="top">
+            {% for bug in test_case_run.get_bugs %}
+            <a href="{{ bug.get_absolute_url }}">{{ bug }}</a>,
+            {% empty %}
+            <span class="grey">0</span>
+            {% endfor %}
+            </td>
 			<td valign="top">{{ test_case_run.close_date }}</td>
 		</tr>
 		{% get_comment_list for test_case_run as comments %}
