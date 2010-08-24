@@ -29,9 +29,11 @@ body { font-size:12px;width:100%;min-width:1200px;line-height:16px;font-family:V
 
 .clear{ clear:both}
 .absoluteright{position:absolute; right:5px; top:0px;}
-.sprites{border:none;background:url("../images/sprites.png") no-repeat;height:16px; line-height:16px;font-size:12px; cursor:pointer}
+.sprites{border:none;background:url("../images/sprites.png") no-repeat;height:16px; line-height:16px;font-size:12px;}
 .radius{box-shadow: 2px 2px 2px #c5c3c3;-moz-box-shadow: 5px 5px 5px #c5c3c3;-webkit-box-shadow: 5px 5px 5px #c5c3c3;-moz-border-radius: 5px;-khtml-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px; border:solid 1px #CCC }
 .red{color:red;}
+.left_float{ float:left}
+
 /*---------------header-----------------*/
 a.banner_login{ color:red;}
 .crumble{ background-position:0 -185px; background-repeat:repeat-x;padding-left:10px;color:#333; height:33px; line-height:33px;}
@@ -65,13 +67,14 @@ a.banner_login{ color:red;}
 .tableheaderleft{background-position:0 -265px; width:100%; height:37px; position:absolute; left:-1px; top:0px; padding-left:8px;text-shadow:0 1px 0 #FFFFFF;text-align:left; line-height:37px; font-size:14px; font-weight:bold;}
 .tableheaderright{ background-position:0 -305px; width:8px; height:37px; position:absolute; right:-1px; top:-0px;}
 .tablefooter{ background-position:0 -346px; background-repeat:repeat-x;height:36px; line-height:36px;position:relative; padding-left:8px; text-shadow:0 1px 0 #FFFFFF;font-weight:normal}
-.tablefooterleft{ background-position:0 -386px;width:100%; height:36px; line-height:36px; position:absolute; left:-1px; bottom:0px;padding-left:8px; text-align:left}
+.tablefooterleft{ background-position:0 -386px;width:8px; height:36px; line-height:36px; position:absolute; left:-1px; bottom:0px; text-align:left}
 .tablefooterright{ background-position:0 -427px;width:8px; height:36px; position:absolute; right:-1px; bottom:0px; font-weight:normal;}
 .home_table td{ padding:3px 0 3px 8px; border-bottom:solid 1px #b6b4b4;}
 .home_table_bar{background-position:0 -465px;background-repeat:repeat-x;background-color:#eeeded;border-right:solid 1px #b6b4b4; padding:5px 0; }
 a.seeall:link,a.seeall:visited{ color:#002f5e; background:url(../images/sprites.png) no-repeat 0 -64px; padding-left:16px; float:right; display:inline-block; margin:10px 10px; height:16px; line-height:16px;}
 a.seeall:hover{  color:#002f5e; background:url(../images/sprites.png) no-repeat 0 -64px; }
 a:link.execute,a:visited.execute{ background:url(../images/sprites.png) no-repeat left top; height:16px; padding-left:15px;}
+
 /* End Home */
 
 /* Error */
