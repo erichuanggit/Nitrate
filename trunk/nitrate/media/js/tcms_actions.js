@@ -44,9 +44,9 @@ var default_messages = {
         'ajax_failure': 'Commnucation with server got some unknown errors.'
     },
     'confirm': {
-        'change_case_status': 'Are you sure to change the status?',
-        'change_case_priority': 'Are you sure to change the priority?',
-        'remove_case_component': 'Are you sure you wish to delete these component(s)?\nThe action will unable to undo.'
+        'change_case_status': 'Are you sure you want to change the status?',
+        'change_case_priority': 'Are you sure you want to change the priority?',
+        'remove_case_component': 'Are you sure you want to delete these component(s)?\nThe action will unable to undo.'
     },
     'link': {
         'hide_filter': 'Hide filter options',
