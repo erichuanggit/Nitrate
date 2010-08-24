@@ -393,7 +393,7 @@ function delPlanCase(container, plan_id)
         return false;
     }
     
-    var test = confirm("Are you sure to remove test case(s) from this test plan?")
+    var test = confirm("Are you sure you want to remove test case(s) from this test plan?")
     if (test && $('id_form_cases')) {
         var success = function(t) {
             returnobj = t.responseText.evalJSON(true);
@@ -878,7 +878,7 @@ function toggleMultiSelect(){
 
 function changePlanCaseDefaultTester(form, container, plan_id)
 {
-    var p = prompt('Please type new email or username for assignee');
+    var p = prompt('Please type new email or username for default tester');
     if(!p)
         return false;
     
