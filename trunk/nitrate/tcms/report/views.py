@@ -246,7 +246,7 @@ def custom_search(request, template_name='report/custom_search.html'):
     
     default_case_run_status = TestCaseRunStatus.objects.filter(name__in = ['passed', 'failed'])
     
-    if request.REQUEST.get('a') == 'search':
+    if request.REQUEST.get('a', '').lower() == 'search':
         form = CustomSearchForm(request.REQUEST)
         form.populate(product_id = request.REQUEST.get('product'))
         if form.is_valid():
