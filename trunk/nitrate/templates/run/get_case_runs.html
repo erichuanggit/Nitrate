@@ -69,13 +69,13 @@
 			</td>
 		</tr>
 		<tr id="hidenRow_{{ forloop.counter }}"	 style="display: none;"	 class="hide">
-			<td id="id_case_text_{{ forloop.counter }}" class="left_panel" colspan="14">
+			<td id="id_case_text_{{ forloop.counter }}" class="left_panel" colspan="12">
 				<div class="ajax_loading"></div>
 			</td>
 		</tr>
         {% empty %}
         <tr>
-        	<td colspan="14" align="center">No case run found</td>
+        	<td colspan="12" align="center">No case run found</td>
 		{% endfor %}
 	</tbody>
 </table>
