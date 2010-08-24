@@ -17,13 +17,12 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomSearch.on_load);
 
 {% block contents %}
 <div id="content">
-	<div class="sprites crumble"><a href="{% url tcms.core.views.index %}">Home</a> >> Customization Reporting</div>
-	
-	<div class="report_title_bg">Product -- show report what you want to see</div>
+	<div class="sprites crumble"><a href="{% url tcms.core.views.index %}">Home</a> >> Custom Reporting</div>
+	<div class="report_title_bg">Report Options</div>
 	<form id="id_form_search" action="{% url tcms.report.views.custom_search %}">
 		{% include "report/form/search.html" %}
 		<div class="button_box" >
-			<input type="submit" name="a" value="search" title="Create report" />
+			<input type="submit" name="a" value="Search" title="Create report" />
 			{# <input type="reset" alue="Save Query" name="" title="Save Query" /> #}
 		</div>
 	</form>

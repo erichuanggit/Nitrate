@@ -19,7 +19,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 
 {% block contents %}
 <div id="content">
-	<div class="sprites crumble"><a href="{% url tcms.core.views.index %}">Home</a> >> <a href="{% url tcms.report.views.custom_search %}">Customization</a> >> {% for build in builds %}{{ build }}{% endfor %}</div>
+	<div class="sprites crumble"><a href="{% url tcms.core.views.index %}">Home</a> >> <a href="{% url tcms.report.views.custom_search %}">Custom</a> >> {% for build in builds %}{{ build }}{% endfor %}</div>
 	<div class="report_title_bg">
 		<form action="{% url tcms.report.views.custom_details %}">
 			{{ form.product.label }}: {{ form.product }}<br />
@@ -172,7 +172,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 		<tr>
 			<td valign="top" ><a href="#">{{ test_case_run.case.pk }}</a></td>
             <td valign="top"><a href="{% url tcms.testruns.views.execute test_case_run.run_id %}#caserun_{{ test_case_run.pk }}">{{ test_case_run.pk }}</a></td>
-			<td valign="top" ><a href="#">{{ test_case_run.case.summary }}</a></td>
+			<td valign="top" ><a href="{% url tcms.testruns.views.execute test_case_run.run_id %}#caserun_{{ test_case_run.pk }}">{{ test_case_run.case.summary }}</a></td>
 			<td valign="top" >{{ test_case_run.case.category }}</td>
 			<td valign="top" >{{ test_case_run.tested_by }}</td>
 			<td valign="top" >{{ test_case_run.close_date }}</td>
