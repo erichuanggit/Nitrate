@@ -304,6 +304,7 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
 
             if request.user.has_perm('testplans.change_testplan'):
                 tp.name = form.cleaned_data['name']
+                tp.parent_id = form.cleaned_data['parent_id']
                 tp.product = form.cleaned_data['product']
                 tp.default_product_version = form.cleaned_data['default_product_version']
                 tp.type = form.cleaned_data['type']
@@ -350,6 +351,7 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
             'product_version': tp.get_version_id(),
             'type': tp.type_id,
             'summary': tp.latest_text() and tp.latest_text().plan_text or '',
+            'parent_id': tp.parent_id,
             'env_group': env_group_id,
             'is_active': tp.is_active,
             'extra_link': tp.extra_link,
@@ -992,3 +994,17 @@ def component(request, template_name = 'plan/get_component.html'):
     
     action = getattr(cas, request.REQUEST.get('a', 'render').lower())
     return action()
+
+def treeview(request, plan_id):
+    tp = TestPlan.objects.get(plan_id = plan_id)
+    tp_parent = tp.get_parent()
+    ajax_response = {}
+    if tp_parent:
+        tp_sibling = tp.get_sibling()
+        siblings = list(tp_sibling.values('plan_id', 'name'))
+        for d in siblings:
+            d.update(name="<a href=/plan/%s>%s</a>" % (d.get('plan_id'), d.get('name')))
+
+        parent_name = "<a href=/plan/%s>%s</a>"%(tp_parent.pk, tp_parent.name) 
+        ajax_response = {'plan_id':tp_parent.pk, 'name':parent_name, 'siblings': siblings}
+    return HttpResponse(simplejson.dumps(ajax_response))

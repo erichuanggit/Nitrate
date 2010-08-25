@@ -905,3 +905,20 @@ function changePlanCaseDefaultTester(form, container, plan_id)
         callback
     )
 }
+
+function treenode(id, txt)
+{
+    this.id = id;
+    this.txt = txt;
+}
+
+function get_siblings(array)
+{
+    arr = new Array();
+    for(i = 0; i < array.length; i++)
+    {
+        sib = new treenode(array[i].plan_id, array[i].name);
+        arr.push(sib);
+    }
+    return arr;
+}

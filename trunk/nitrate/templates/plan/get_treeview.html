@@ -1,0 +1,61 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/js/lib/tafelTree/css/tree.css" />
+<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/livepipe/lib/prototype.js'></script>
+<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/livepipe/lib/scriptaculous.js'></script>
+<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/tafelTree/Tree.js'></script>
+
+<script type="text/javascript">
+// This structure represents one root node with two children
+var plan_id = $F('id_plan_id');
+
+url = '/plan/treeview/' + plan_id + '/';
+var struct;
+new Ajax.Request(url,{
+    method: 'get',
+    parameters: {plan_id: plan_id},
+    onSuccess: function(transport){
+        var response = transport.responseText.evalJSON() || "no response text";
+		if(response.name)
+		{
+		    var s = new treenode(response.plan_id, response.name);
+		    s.items = get_siblings($A(eval(response.siblings)));
+		    struct = [s];
+		}
+		else
+		{
+		    var s = new treenode('temp', 'No parent plan found');
+		    struct = [s];
+		}
+    },
+    	onFailure: function(){}
+    });
+
+
+// Tree initialisation. This function is called automatically
+// when the page finish to load
+var tree = null;
+function TafelTreeInit () {
+    tree = new TafelTree('myTree', struct, {
+    'generate' : true,
+    'imgBase' : '{{ MEDIA_URL }}/js/lib/tafelTree/imgs/',
+    "defaultImg" : "folder.gif",
+    "defaultImgOpen" : "folderopen.gif", 
+    "defaultImgClose" : "folder.gif",
+    "defaultImgSelected" : "folderopen.gif",
+    "defaultImgOpenSelected" : "folderopen.gif",
+    "defaultImgCloseSelected" : "folder.gif",
+    'width' : '100%', // default value : 100%
+    'height' : '150px', // default value : auto
+    'openAtLoad' : true,
+    'cookies' : false
+    });
+}
+</script>
+</head>
+<body>
+    <div id="myTree"></div>
+<script type="text/javascript">
+</script>
+</body>
+</html>

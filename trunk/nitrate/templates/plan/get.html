@@ -26,6 +26,7 @@ Nitrate.TestPlans.Instance = {
 	author_id: {{ test_plan.author_id }},
 }
 </script>
+
 {% endblock %}
 {% block contents %}
 <div id="content">
@@ -136,6 +137,9 @@ Nitrate.TestPlans.Instance = {
 			<li id="tab_tag" class="tab">
 				<a href="#log" title="log">Log</a>
 			</li>
+            <li id="tab_treeview" class="tab">
+                <a href="#treeview" title="treeview">Tree View</a>
+            </li>
 		</ul>
 		<div class="tab_list" id="document" style="display:none">
 			{% include "plan/get_docs.html" %}
@@ -155,6 +159,9 @@ Nitrate.TestPlans.Instance = {
 		<div class="tab_list" id="log"  style="display:none;">
 			{% include "plan/get_log.html" %}
 		</div>
+        <div class="tab_list" id="treeview"  style="display:none;">
+            {% include "plan/get_treeview.html" %}
+        </div>
 		<div id="testcases"  class="tab_list">
 			<div class="ajax_loading"></div>
 		</div>
