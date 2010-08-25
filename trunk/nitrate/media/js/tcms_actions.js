@@ -901,7 +901,7 @@ function previewPlan(container, parameters){
     }
     */
     
-    var url = new String('/plan/' + parameters.plan_id + '/');
+    var url = new String('/plan/' + parameters.plan_id.trim() + '/');
     
     new Ajax.Updater(container, url, {
         method: 'get',
