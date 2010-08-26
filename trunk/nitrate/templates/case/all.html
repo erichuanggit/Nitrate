@@ -1,6 +1,7 @@
 {% extends "tcms_base.html" %}
 
 {% load extra_filters %}
+{% load pagination_tags %}
 
 {% block subtitle %}Test cases{% endblock %}
 
@@ -64,6 +65,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 			</tr>
 		</thead>
 		<tbody>
+		{% autopaginate test_cases %}
 			{% for test_case in test_cases %}
 			<tr class="{% cycle 'odd' 'even' %}">
                 <td valign="top"><input type="checkbox" name="case" value="{{ test_case.case_id }}"></td>
@@ -111,6 +113,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 			{% endfor %}
 		</tbody>
 	</table>
+	{% paginate %}
     </form>
 	{% else %}
 	{% ifequal REQUEST_CONTENTS.a 'search' %}

@@ -97,6 +97,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.RemoteUserMiddleware',
+    'tcms.core.lib.django-pagination.pagination.middleware.PaginationMiddleware',
 )
 
 ROOT_URLCONF = 'tcms.urls'
@@ -127,7 +128,8 @@ INSTALLED_APPS = (
     'tcms.testcases',
     'tcms.testplans',
     'tcms.testruns',
-    'tcms.testreviews'
+    'tcms.testreviews',
+    'tcms.core.lib.django-pagination.pagination'
 )
 
 # RequestContext settings

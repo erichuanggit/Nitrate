@@ -1,6 +1,7 @@
 {% extends "tcms_base.html" %}
 
 {% load extra_filters %}
+{% load pagination_tags %}
 
 {% block subtitle %}Test plans{% endblock %}
 
@@ -91,6 +92,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
 				</tr>
 			</thead>
 			<tbody>
+			{% autopaginate test_plans %}
 				{% for test_plan in test_plans %}
 				<tr class="{% if not test_plan.is_active %}line-through inactive{% endif %}">
 					<td><input type="checkbox" name="plan_id" value="{{ test_plan.plan_id }}" title="Select/Unselect"></td>
@@ -115,6 +117,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
 				{% endfor %}
 			</tbody>
 		</table>
+		{% paginate %}
 	</form>
 	{% endif %}
 </div>
