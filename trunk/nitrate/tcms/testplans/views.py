@@ -203,12 +203,16 @@ def all(request, template_name = 'plan/all.html'):
         template_name = 'case/clone_select_plan.html'
         tps = tps.order_by('name')
 
+    per_page = request.REQUEST.get('per_page','20')
+    per_page = int(per_page)
+
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_plans' : tps,
         'query_result' : query_result,
         'search_plan_form' : search_form,
+        'per_page': per_page,
     })
 
 def get(request, plan_id, template_name = 'plan/get.html'):

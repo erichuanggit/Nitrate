@@ -65,7 +65,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 			</tr>
 		</thead>
 		<tbody>
-		{% autopaginate test_cases %}
+		{% autopaginate test_cases per_page %}
 			{% for test_case in test_cases %}
 			<tr class="{% cycle 'odd' 'even' %}">
                 <td valign="top"><input type="checkbox" name="case" value="{{ test_case.case_id }}"></td>
@@ -113,7 +113,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 			{% endfor %}
 		</tbody>
 	</table>
-	{% paginate %}
+    {% paginate %}
     </form>
 	{% else %}
 	{% ifequal REQUEST_CONTENTS.a 'search' %}

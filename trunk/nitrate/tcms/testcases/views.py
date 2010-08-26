@@ -301,6 +301,9 @@ def all(request, template_name="case/all.html"):
     else:
         ttags = TestTag.objects.filter(testcase__in = tcs).distinct()
     
+    per_page = request.REQUEST.get('per_page','20')
+    per_page = int(per_page)
+
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'test_cases': tcs,
@@ -311,6 +314,7 @@ def all(request, template_name="case/all.html"):
         'case_status': TestCaseStatus.objects.all(),
         'priorities': Priority.objects.all(),
         'case_own_tags': ttags,
+        'per_page': per_page,
     })
 
 def get(request, case_id, template_name = 'case/get.html'):

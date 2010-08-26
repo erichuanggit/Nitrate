@@ -22,5 +22,19 @@
     {% else %}
         <span class="disabled next">{% trans "Next" %} &rsaquo;&rsaquo;</span>
     {% endif %}
+    ({{ page_obj.start_index }}-{{ page_obj.end_index }}/{{ page_obj.paginator.count }}) | 
+    Per page: 
+    {% ifequal 25  page_obj.object_list|length %}25
+    {% else %}
+    <a href="?{{ getvars }}{{ hashtag }}&per_page=25" class="page">25</a>
+    {% endifequal %}
+    {% ifequal 50  page_obj.object_list|length %}50
+    {% else %}
+    <a href="?{{ getvars }}{{ hashtag }}&per_page=50" class="page">50</a>
+    {% endifequal %}
+    {% ifequal 100  page_obj.object_list|length %}100
+    {% else %}
+    <a href="?{{ getvars }}{{ hashtag }}&per_page=100" class="page">100</a>
+    {% endifequal %}
 </div>
 {% endif %}
