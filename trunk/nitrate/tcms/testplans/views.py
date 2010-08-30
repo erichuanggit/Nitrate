@@ -1001,10 +1001,13 @@ def component(request, template_name = 'plan/get_component.html'):
 
 def treeview(request, plan_id):
     tp = TestPlan.objects.get(plan_id = plan_id)
-    tp_parent = tp.get_parent()
+    try:
+        tp_parent = tp.parent
+    except ObjectDoesNotExist:
+        tp_parent = None
     ajax_response = {}
     if tp_parent:
-        tp_sibling = tp.get_sibling()
+        tp_sibling = tp_parent.child_set.all()
         siblings = list(tp_sibling.values('plan_id', 'name'))
         for d in siblings:
             d.update(name="<a href=/plan/%s>%s</a>" % (d.get('plan_id'), d.get('name')))
