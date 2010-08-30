@@ -60,7 +60,7 @@ class TestPlan(TCMSActionModel):
         null=True
     )
     
-    parent_id = models.IntegerField(db_column = 'parent_id')
+    parent = models.ForeignKey('self', blank=True, null=True, related_name='child_set')
     author = models.ForeignKey('auth.User')
     product = models.ForeignKey('management.Product', related_name='plan')
     type = models.ForeignKey(TestPlanType)

@@ -44,7 +44,7 @@ class CookieTransport(xmlrpclib.Transport):
     # Cribbed from xmlrpclib.Transport.send_user_agent 
     def send_cookies(self, connection, cookie_request):
         if self.cookiejar is None:
-            self.cookiejar = cookielib.CookieJar()
+            self.cookiejar = CookieJar()
         elif self.cookiejar:
             # Let the cookiejar figure out what cookies are appropriate
             self.cookiejar.add_cookie_header(cookie_request)
