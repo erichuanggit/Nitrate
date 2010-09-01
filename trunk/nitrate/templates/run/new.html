@@ -8,8 +8,8 @@
 {% endblock %}
 
 {% block custom_javascript %}
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/fastinit.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/tablesort.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/fastinit.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/tablekit.js"></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/createrun.js'></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testrun_actions.js'></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
@@ -56,7 +56,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 				<tr>
 					<td valign="top"><label class="strong" for="id_build_id">Build </label></td>
 					<td>{{ form.build }}<span class="errors">{{ form.build.errors }}</span> 
-                    <a href="{{ADMIN_PREFIX}}/management/testbuild/add/" class="addlink" onclick="return showAddAnotherPopup(this);" id="id_add_build">Add Build</a>	
+                    <a href="{{ADMIN_PREFIX}}/management/testbuild/add/" class="addlink" onclick="return showAddAnotherPopup(this);" id="add_id_build">Add Build</a>	
                     </td>
 				</tr>
 				{%comment%}
