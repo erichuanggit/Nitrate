@@ -660,7 +660,7 @@ def clone(request, template_name='run/clone.html'):
             'notes': tr.notes,
             'manager': tr.manager.email,
             'product': tr.plan.product_id,
-            'version': tr.plan.get_version_id,
+            'product_version': tr.get_version_id(),
             'build': tr.build_id,
             'default_tester': tr.default_tester_id and tr.default_tester.email or '',
             'use_newest_case_text': True,
