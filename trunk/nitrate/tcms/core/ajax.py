@@ -30,7 +30,7 @@ from django.contrib.auth.decorators import user_passes_test
 
 from tcms.testplans.models import TestPlan, TestCasePlan
 from tcms.testcases.models import TestCase, TestCaseTag
-from tcms.testruns.models import TestRun, TestCaseRun
+from tcms.testruns.models import TestRun, TestCaseRun, TestRunTag
 from tcms.management.models import TestTag
 
 from tcms.core.utils import get_string_combinations
@@ -246,9 +246,14 @@ def tag(request, template_name="management/get_tag.html"):
         
         def remove(self):
             tp_case_ids = request.REQUEST.getlist('case')
+            tp_run_ids = request.REQUEST.getlist('run')
             if tp_case_ids:
                 tag_ids = TestCaseTag.objects.filter(case__in = tp_case_ids).distinct().values_list('tag')
-                tags_set = TestTag.objects.filter(id__in = tag_ids)
+            elif tp_run_ids:
+                tag_ids = TestRunTag.objects.filter(run__in = tp_run_ids).distinct().values_list('tag')
+
+            tags_set = TestTag.objects.filter(id__in = tag_ids)
+
             for tag_str in self.tag:
                 try:
                     tag = tags_set.filter(name = tag_str)[0]

@@ -278,31 +278,6 @@ class TestPlan(TCMSActionModel):
         version = self.get_default_product_version()
         return version and version.id or None
 
-    def get_parent(self):
-        """Return parent plan if exist, else return None"""
-
-        if self.parent_id:
-            try:
-                return TestPlan.objects.get(pk = self.parent_id)
-            except ObjectDoesNotExist:
-                return None
-        else:
-            return None
-
-    def get_children(self):
-        """Return QuerySet with the parent_id equals to current plan id."""
-
-        return TestPlan.objects.filter(parent_id = self.plan_id)
-
-    def get_sibling(self):
-        """Return siblings if exists, else None"""
-
-        parent = self.get_parent()
-        if parent:
-            return parent.get_children()
-
-        else:
-            return None
 
 class TestPlanText(TCMSActionModel):
     plan = models.ForeignKey(
