@@ -534,10 +534,14 @@ def clone(request, template_name = 'plan/clone.html'):
                     reverse('tcms.testplans.views.get', args = [tp_dest.plan_id, ])
                 )
             else:
+                from tcms.management.models import Version
                 args = {
                     'action': 'search',
-                    'product': form.cleaned_data['product'].id,
-                    'product_version': form.cleaned_data['default_product_version'].id,
+                    'product': clone_form.cleaned_data['product'].id,
+                    'default_product_version': Version.string_to_id(
+                        product_id = clone_form.cleaned_data['product'].id,
+                        value = clone_form.cleaned_data['default_product_version']
+                    )
                 }
 
                 url_args = urlencode(args)
