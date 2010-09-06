@@ -43,6 +43,7 @@ Nitrate.TestPlans.TreeView = {
 		var c_plan, p_plan, b_plans, ch_plans, tc_plan;
 		
 		// Get the current plan
+		/*
 		var p1 = { pk: plan_id, t: 'ajax'};
 		var c1 = function(t) {
 			var returnobj = t.responseText.evalJSON(true);
@@ -54,6 +55,8 @@ Nitrate.TestPlans.TreeView = {
 			alert('Plan ' + plan_id + ' can not found in database');
 			return false;
 		}
+		*/
+		c_plan = Nitrate.TestPlans.Instance;
 		
 		// Get the parent plan
 		if(c_plan.fields.parent) {

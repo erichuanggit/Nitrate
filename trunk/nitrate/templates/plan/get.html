@@ -22,8 +22,17 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Details.on_load);
 
 Nitrate.TestPlans.Instance = {
 	pk: {{ test_plan.pk }},
-	product_id: {{ test_plan.product_id }},
-	author_id: {{ test_plan.author_id }},
+	fields: {
+		name: '{{ test_plan.name }}',
+		product_id: {{ test_plan.product_id }},
+		author_id: {{ test_plan.author_id }},
+		parent: {{ test_plan.parent.pk|default:'null' }}
+	},
+	extras: {
+		num_cases: {{ test_plan.case.count }},
+		num_runs: {{ test_plan.run.count }},
+		num_children: {{ test_plan.child_set.count }}
+	}
 }
 </script>
 
