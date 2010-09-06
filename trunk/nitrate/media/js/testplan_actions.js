@@ -136,8 +136,7 @@ Nitrate.TestPlans.TreeView = {
 			
 			switch (container_clns[i]) {
 				case 'expand':
-					console.log(this.adjacent('ul'));
-					this.adjacent('ul').invoke('hide');
+					this.adjacent('ul')[0].hide();
 					e_container.removeClassName('expand')
 					e_container.addClassName('collapse');
 					break;
@@ -146,11 +145,11 @@ Nitrate.TestPlans.TreeView = {
 						var c = function(t) {
 							var returnobj = t.responseText.evalJSON(true);
 							returnobj = tree.utils.convert('obj_to_list', returnobj);
-							console.log(returnobj);
 							tree.insert(obj, returnobj);
-							tree.render_page();
-						}
-
+							var ul = tree.render(returnobj);
+							e_container.appendChild(ul);
+						};
+						
 						var p = {
 							parent__pk: e_pk.innerHTML,
 							t: 'ajax',
@@ -158,7 +157,7 @@ Nitrate.TestPlans.TreeView = {
 						tree.filter(p, c);
 					};
 					
-					this.adjacent('ul').invoke('show');
+					this.adjacent('ul')[0].show();
 					e_container.removeClassName('collapse');
 					e_container.addClassName('expand')
 					break;
