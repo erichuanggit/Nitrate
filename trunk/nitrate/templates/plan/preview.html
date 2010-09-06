@@ -1,15 +1,12 @@
-<form id="id_form_plan_preview" class="hidden">
-	<input type="hidden" name="plan_id" value="{{ test_plan.plan_id }}" />
-</form>
-
+{% for test_plan in test_plans %}
 <div class="listinfo_content">
+        <div class="listinfo">
+			<input id="id_preview_plan_{{ test_plan.pk }}" type="checkbox" name="plan_id" value="{{ test_plan.pk }}" checked />
+			<label for="id_preview_plan_{{ test_plan.pk }}">[{{ test_plan.pk }}] {{ test_plan.name }}</label>
+		</div>
 		<div class="listinfo">
 			<div class="title">Author</div>
 			<div id="display_author"><a href="mailto:{{ test_plan.author.email }}">{{ test_plan.author.email }}</a></div>
-		</div>
-        <div class="listinfo">
-			<div class="title">Plan Name</div>
-			<div id="display_product">{{ test_plan.name }}</div>
 		</div>
 		<div class="listinfo">
 			<div class="title">Product</div>
@@ -41,3 +38,9 @@
 		</div>
         <div class="clear"></div>
 </div>
+{% if not forloop.last %}
+<hr />
+{% endif %}
+{% empty %}
+The plan you specific is not exist in database.
+{% endfor %}

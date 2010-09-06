@@ -89,6 +89,7 @@ function getURLParam()
     param.url_create_case = '/case/create/';
     param.url_cases_automated = '/cases/automated/';
     param.url_cases_component = '/cases/component/';
+    param.url_case_plan = '/case/' + id + '/plan/';
     param.url_modify_case = '/case/' + id + '/modify/';
     param.url_case_change_status = '/cases/changestatus/';
     param.url_change_case_order = '/case/' + id + '/changecaseorder/';
@@ -890,27 +891,31 @@ function submitComment(container, parameters)
     })
 }
 
-function previewPlan(container, parameters){
-    if (!parameters.plan_id) {
+function previewPlan(parameters, action, callback) {
+    var dialog = getDialog();
+    
+    if (!parameters.pk__in) {
         alert('Plan is required');
         return false;
-    }
+    };
+    clearDialog();
+    dialog.show();
     
-    /*
-    if(!isInteger(parameters.plan_id)) {
-        alert('Plan ID must be a number');
-        return false;
-    }
-    */
+    parameters.t = 'html';
+    parameters.f = 'preview';
     
-    var url = new String('/plan/' + parameters.plan_id.trim() + '/');
+    var url = new String('/plans/');
+    var success = function(t) {
+        var form = constructForm(t.responseText, action, callback);
+        dialog.update(form);
+    };
     
-    new Ajax.Updater(container, url, {
+    new Ajax.Request(url, {
         method: 'get',
         parameters: parameters,
+        onSuccess: success,
+        onFaiulre: html_failure,
     })
-    
-    
 }
 
 function getInfo(parameters, callback, container, allow_blank, format)

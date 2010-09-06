@@ -26,40 +26,16 @@ Nitrate.TestCases.List.on_load = function()
 
 Nitrate.TestCases.Details.on_load = function()
 {
-    if($('id_case_id'))
-        case_id = $F('id_case_id');
-    else {
-        alert('Can not get the case id');
-        return false;
-    }
+    var case_id = Nitrate.TestCases.Instance.pk;
     
     constructTagZone('tag', { 'case': case_id });
+    constructPlanCaseZone($('plan'), case_id);
     
     $$('li.tab a').invoke('observe', 'click', function(i) {
-        $$('div.tab_list').invoke('hide');
+       $$('div.tab_list').invoke('hide');
        $$('li.tab').invoke('removeClassName', 'tab_focus');
        this.parentNode.addClassName('tab_focus');
        $(this.title).show();
-    })
-    
-    $('id_plan_form').observe('submit', function(e) {
-        e.stop();
-        $('id_preview_plan').show();
-        var container = $('id_preview_plan_container');
-        container.update('<div class="ajax_loading"></div>');
-        previewPlan(container, this.serialize(true));
-        
-    })
-    
-    $('id_addplan_confirm').observe('click',function(e){
-        if($('id_form_plan_preview')) {
-            var parameters = $('id_form_plan_preview').serialize(true);
-            plan_id=parameters.plan_id;
-            addPlantocase(plan_id, case_id, 'plan');
-        } else {
-            alert('The plan is not exist in database, please type another one.');
-            return false;
-        }
     })
     
     $('id_update_component').observe('click', function(e) {
@@ -521,36 +497,35 @@ function removeCaseBug(id)
     })
 }
 
-function constructAddPlan(container, case_id, parameters)
+function constructPlanCaseZone(container, case_id, parameters)
 {
     // $(container).update('<div class="ajax_loading"></div>');
     
     var complete = function(t) {
-        $('id_addplan_confirm').observe('click',function(e){
-            if($('id_form_plan_preview')) {
-                var parameters = $('id_form_plan_preview').serialize(true);
-                plan_id=parameters.plan_id;
-                addPlantocase(plan_id, case_id, 'plan');
-            } else {
-                alert('The plan is not exist in database, please type another one.');
-                return false;
-            }
-        })
-        
         $('id_plan_form').observe('submit', function(e) {
             e.stop();
-            $('id_preview_plan').show();
-            var container = $('id_preview_plan_container');
-            container.update('<div class="ajax_loading"></div>');
-            previewPlan(container, this.serialize(true));
+            
+            var callback = function(e) {
+                e.stop();
+                var plan_ids = this.serialize(true)['plan_id'];
+                if (!plan_ids) {
+                    alert('You must specific one plan at least!');
+                    return false;
+                }
+                
+                var p = {
+                    a: 'add',
+                    plan_id: plan_ids,
+                };
+                
+                constructPlanCaseZone(container, case_id, p);
+                clearDialog();
+            }
+            
+            previewPlan(this.serialize(true), getURLParam(case_id).url_case_plan, callback);
         })
-        
-        if($('message')) {
-            alert($('message').innerHTML);
-            return false;
-        }
     }
-    var url = new String('/case/' + case_id + '/plan/');
+    var url = getURLParam(case_id).url_case_plan;
     new Ajax.Updater(container, url, {
         method: 'get',
         parameters: parameters,
@@ -558,25 +533,16 @@ function constructAddPlan(container, case_id, parameters)
     })
 }
 
-function addPlantocase(plan_id, case_id, container)
-{
-    var parameters = {
-        handle: 'add',
-        plan_id: plan_id,
-    };
-    constructAddPlan(container, case_id, parameters)
-}
-
-function removePlantocase(plan_id, case_id, container)
+function removePlanFromCase(container, plan_id, case_id)
 {
     c = confirm('Are you sure to remove the case from this plan?');
     if(!c)
         return false;
     var parameters = {
-        handle: 'remove',
+        a: 'remove',
         plan_id: plan_id,
     };
-    constructAddPlan(container, case_id, parameters)
+    constructPlanCaseZone(container, case_id, parameters)
 }
 
 function bindRefreshComponentCategoryByProduct(btn_refresh) {

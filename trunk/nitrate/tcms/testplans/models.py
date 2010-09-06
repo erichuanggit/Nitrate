@@ -103,7 +103,6 @@ class TestPlan(TCMSActionModel):
     def list(cls, query = None):
         """docstring for list_plans"""
         from django.db.models import Q
-        from tcms.management.models import Version
         
         new_query = {}
         

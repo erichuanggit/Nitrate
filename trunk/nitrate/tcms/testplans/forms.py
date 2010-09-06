@@ -347,6 +347,7 @@ class EditPlanForm(NewPlanForm):
 
 class SearchPlanForm(forms.Form):
     pk = forms.IntegerField(required=False)
+    pk__in = forms.CharField(required=False)
     parent__pk = forms.IntegerField(required=False)
     search = forms.CharField(label="Search", required=False)
     plan_id = forms.IntegerField(label="Plan ID", required=False)
@@ -388,6 +389,9 @@ class SearchPlanForm(forms.Form):
             'class': 'vDateField',
         })
     )
+    def clean_pk__in(self):
+        from tcms.core.utils import string_to_list
+        return string_to_list(self.cleaned_data['pk__in'])
     
     def clean_tag__name__in(self):
         return TestTag.string_to_list(self.cleaned_data['tag__name__in'])

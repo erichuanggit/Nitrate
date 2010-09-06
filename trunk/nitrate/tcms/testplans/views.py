@@ -211,10 +211,14 @@ def all(request, template_name = 'plan/all.html'):
             tps,
             extras=('num_cases','num_runs', 'num_children', 'get_url_path')
         ))
-
+    
+    if request.REQUEST.get('t') == 'html':
+        if request.REQUEST.get('f') == 'preview':
+            template_name = 'plan/preview.html'
+    
     per_page = request.REQUEST.get('per_page','20')
     per_page = int(per_page)
-
+    
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,

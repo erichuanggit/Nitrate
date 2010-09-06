@@ -985,10 +985,16 @@ def plan(request, case_id):
     except ObjectsDoesNotExist, error:
         raise Http404(error)
     
-    if request.REQUEST.get('handle'):
+    if request.REQUEST.get('a'):
         # Search the plans from database
+        if not request.REQUEST.getlist('plan_id'):
+            return direct_to_template(request, 'case/get_plan.html', {
+                'testplans': tps,
+                'message': 'The case must specific one plan at leaset for some action',
+            })
+        
         tps = TestPlan.objects.filter(
-            plan_id__in = request.REQUEST.getlist('plan_id')
+            pk__in = request.REQUEST.getlist('plan_id')
         )
         
         if not tps:
@@ -998,12 +1004,12 @@ def plan(request, case_id):
             })
         
         # Add case plan action
-        if request.REQUEST['handle'] == 'add':
+        if request.REQUEST['a'] == 'add':
             for tp in tps:
                 tc.add_to_plan(tp)
         
         # Remove case plan action
-        if request.REQUEST['handle'] == 'remove':
+        if request.REQUEST['a'] == 'remove':
             for tp in tps:
                 tc.remove_plan(tp)
     
