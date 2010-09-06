@@ -192,7 +192,7 @@ Nitrate.TestPlans.TreeView = {
 				li.addClassName('collapse');
 			
 			if (data[i].is_current)
-				li.addClassName('bold');
+				li.addClassName('current');
 			
 			// Construct the items
 			var title = '[<a href="' + data[i].extras.get_url_path + '">' + data[i].pk + '</a>] ';
