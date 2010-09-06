@@ -21,6 +21,10 @@
 			<div id="display_type">{{ test_plan.type.name }}</div>
 		</div>
 		<div class="listinfo">
+			<div class="title">Parent</div>
+			<div id="display_type">{{ test_plan.parent.pk }}</div>
+		</div>
+		<div class="listinfo">
 			<div class="title">Reference Link</div>
 			<div>
 				{% if test_plan.extra_link %}
