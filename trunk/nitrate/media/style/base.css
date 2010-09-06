@@ -767,5 +767,10 @@ a:link.edit,a:visited.edit{ color:#333;}
 #id_notes{ max-height:40px;}
 
 #treeview ul { margin:0 20px;}
+#treeview ul li.expand,#treeview ul li.collapse{ list-style-type:none;}
+ 
 #treeview .bold ul li{ font-weight:normal;}
 #treeview .expand ul{ margin:0 20px;}
+.notes{}
+#treeview .collapse{ background:url(../images/t1.gif) no-repeat left top; padding-left:16px;}
+#treeview .expand{ background:url(../images/t2.gif) no-repeat left top; padding-left:16px;}
