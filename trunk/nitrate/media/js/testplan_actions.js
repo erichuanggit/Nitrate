@@ -33,9 +33,12 @@ Nitrate.TestPlans.List.on_load = function()
 {
     if($('id_product')) {
         bind_version_selector_to_product(true);
-    }
+    };
     
-
+    $('id_check_all_plans').observe('click', function(e) {
+        clickedSelectAll(this, $('plans_form'), 'plan_id');
+    });
+    
     if($('testplans_table')) {
         TableKit.Sortable.init('testplans_table',
         {
@@ -43,8 +46,8 @@ Nitrate.TestPlans.List.on_load = function()
             rowOddClass : 'rowodd',
             nosortClass : 'nosort'
         });
-    }
-
+    };
+    
     if($('column_add')) {
         $('column_add').observe('change', function(t) {
             switch(this.value) {
@@ -59,19 +62,16 @@ Nitrate.TestPlans.List.on_load = function()
                     $('col_product_veresion_option').hide();
                     break;
             }
-        })
-    }
+        });
+    };
     
-    $$('input[name="plan_id"]').each(function(e){
-        e.observe('click', function(t) {
-            if(e.checked) {
-                e.up(1).addClassName('selection_row');
-            } else {
-                e.up(1).removeClassName('selection_row');
-            }
-        })
-    })
-    
+    $$('input[name="plan_id"]').invoke('observe', 'click', function(t) {
+        if(this.checked) {
+            this.up(1).addClassName('selection_row');
+        } else {
+            this.up(1).removeClassName('selection_row');
+        };
+    });
 }
 
 Nitrate.TestPlans.Details.on_load = function()
