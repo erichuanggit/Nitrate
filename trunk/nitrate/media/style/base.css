@@ -719,7 +719,7 @@ a:link.edit,a:visited.edit{ color:#333;}
 .add_env_button input{ margin-right:5px; }
 
 /*Popup style*/
-#dialog{z-index:1000; position:fixed; left:50%; top:40%; margin-left:-250px; margin-top:-100px; background:url(../images/login_bg.png) repeat-x left top #e7e7e7;min-width:500px;min-height:200px;box-shadow: 2px 2px 2px #c5c3c3;-moz-border-radius: 5px;-khtml-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px; border:solid 1px #CCC;padding:10px;}
+#dialog{z-index:1000; position:fixed; left:50%; top:40%; margin-left:-250px; margin-top:-100px; background:url(../images/login_bg.png) repeat-x left top #e7e7e7;min-width:500px;min-height:200px;max-width:600px;max-height:400px;box-shadow: 2px 2px 2px #c5c3c3;-moz-border-radius: 5px;-khtml-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px; border:solid 1px #CCC;padding:10px; overflow:auto;}
 #dialog .dia_title{margin:10px 5px; font-weight: bold;}
 #dialog .dialog_content{ max-height:250px; overflow:auto}
 #dialog .dia_content{ margin:5px 10px;}
