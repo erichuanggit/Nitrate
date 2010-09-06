@@ -76,10 +76,12 @@ function getURLParam()
     param.url_change_user_group = '/management/account/' + id + '/changegroup/';
     param.url_change_user_status = '/management/account/' + id + '/changestatus/';
 
+    param.url_plans = '/plans/';
     param.url_plan_components  = '/plans/component/';
     param.url_modify_plan  = '/plan/' + id + '/modify/';
     param.url_plan_assign_case = '/plan/' + id + '/assigncase/apply/';
-    
+    param.url_plan_tree_view = '/plan/' + id + '/treeview/';
+
     param.url_change_case_run_status = '/run/' + id + '/execute/changestatus/';
     param.url_change_case_run_order = '/run/' + id + '/changecaserunorder/';
     

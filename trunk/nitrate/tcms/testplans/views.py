@@ -149,7 +149,7 @@ def all(request, template_name = 'plan/all.html'):
     SUB_MODULE_NAME = 'plans'
 
     # If it's not a search the page will be blank
-    tps = None
+    tps = TestPlan.objects.none()
     query_result = False
 
     # if it's a search request the page will be fill
@@ -159,7 +159,7 @@ def all(request, template_name = 'plan/all.html'):
             search_form.populate(product_id = request.REQUEST['product'])
         else:
             search_form.populate()
-
+        
         if search_form.is_valid():
             # Detemine the query is the user's plans and change the sub module value
             if request.REQUEST.get('author'):
@@ -191,6 +191,7 @@ def all(request, template_name = 'plan/all.html'):
             tps = tps.extra(select = {
                 'num_cases': RawSQL.num_cases,
                 'num_runs': RawSQL.num_runs,
+                'num_children': RawSQL.num_plans,
             })
     else:
 
@@ -202,6 +203,14 @@ def all(request, template_name = 'plan/all.html'):
     if request.REQUEST.get('action') == 'clone_case':
         template_name = 'case/clone_select_plan.html'
         tps = tps.order_by('name')
+
+    if request.REQUEST.get('t') == 'ajax':
+        from django.core import serializers
+        return HttpResponse(serializers.serialize(
+            request.REQUEST.get('f', 'json'),
+            tps,
+            extras=('num_cases','num_runs', 'num_children', 'get_url_path')
+        ))
 
     per_page = request.REQUEST.get('per_page','20')
     per_page = int(per_page)
@@ -1003,19 +1012,6 @@ def component(request, template_name = 'plan/get_component.html'):
     action = getattr(cas, request.REQUEST.get('a', 'render').lower())
     return action()
 
-def treeview(request, plan_id):
-    tp = TestPlan.objects.get(plan_id = plan_id)
-    try:
-        tp_parent = tp.parent
-    except ObjectDoesNotExist:
-        tp_parent = None
-    ajax_response = {}
-    if tp_parent:
-        tp_sibling = tp_parent.child_set.all()
-        siblings = list(tp_sibling.values('plan_id', 'name'))
-        for d in siblings:
-            d.update(name="<a href=/plan/%s>%s</a>" % (d.get('plan_id'), d.get('name')))
-
-        parent_name = "<a href=/plan/%s>%s</a>"%(tp_parent.pk, tp_parent.name) 
-        ajax_response = {'plan_id':tp_parent.pk, 'name':parent_name, 'siblings': siblings}
-    return HttpResponse(simplejson.dumps(ajax_response))
+def tree_view(request):
+    """Whole tree view for plans"""
+    #FIXME:

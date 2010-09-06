@@ -105,23 +105,22 @@ class TestPlan(TCMSActionModel):
         from django.db.models import Q
         from tcms.management.models import Version
         
-        new_query = query.copy()
-        query = {}
+        new_query = {}
         
-        for k, v in new_query.items():
-            if v:
-                query[k] = hasattr(v, 'strip') and v.strip() or v
+        for k, v in query.items():
+            if v and k not in ['action', 't', 'f', 'a']:
+                new_query[k] = hasattr(v, 'strip') and v.strip() or v
         
         # build a QuerySet:
         q = cls.objects
         # add any necessary filters to the query:
         
-        if query.get('search'):
-            q = q.filter(Q(plan_id__icontains = query['search']) \
-                            | Q(name__icontains = query['search']))
+        if new_query.get('search'):
+            q = q.filter(Q(plan_id__icontains = new_query['search']) \
+                            | Q(name__icontains = new_query['search']))
             del query['search']
         
-        return q.filter(**query).distinct()
+        return q.filter(**new_query).distinct()
     
     def confirmed_case(self):
         return self.case.filter(case_status__name = 'CONFIRMED')

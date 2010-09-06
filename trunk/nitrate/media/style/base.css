@@ -27,6 +27,7 @@ a:link,a:visited{color:#004481;text-decoration:none;}
 a:hover{text-decoration:underline;color:#F30;}
 body { font-size:12px;width:100%;min-width:1200px;line-height:16px;font-family:Verdana,Arial,sans-serif,Helvetica,Georgia; background:#fff;}
 
+.bold{ font-weight:bold; }
 .clear{ clear:both}
 .absoluteright{position:absolute; right:5px; top:0px;}
 .sprites{border:none;background:url("../images/sprites.png") no-repeat;height:16px; line-height:16px;font-size:12px;}
@@ -764,3 +765,7 @@ a:link.edit,a:visited.edit{ color:#333;}
 
 #id_pk__in{ max-height:80px; min-width:250px; width:-moz-fit-content;}
 #id_notes{ max-height:40px;}
+
+#treeview ul { margin:0 20px;}
+#treeview .bold ul li{ font-weight:normal;}
+#treeview .expand ul{ margin:0 20px;}

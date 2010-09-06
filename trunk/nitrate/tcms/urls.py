@@ -72,7 +72,8 @@ urlpatterns = patterns('',
     
     # Testplans zone
     (r'^plan/new/$', 'tcms.testplans.views.new'),
-    (r'^plans/$', 'tcms.testplans.views.all'), 
+    (r'^plans/$', 'tcms.testplans.views.all'),
+    (r'^plans/treeview/$', 'tcms.testplans.views.tree_view'),
     (r'^plans/clone/$', 'tcms.testplans.views.clone'),
     (r'^plans/component/$', 'tcms.testplans.views.component'),
     (r'^plan/(?P<plan_id>\d+)/$', 'tcms.testplans.views.get'),
@@ -83,7 +84,6 @@ urlpatterns = patterns('',
     (r'^plan/(?P<plan_id>\d+)/attachment/$', 'tcms.testplans.views.attachment'),
     (r'^plan/(?P<plan_id>\d+)/history/$', 'tcms.testplans.views.text_history'),
     (r'^plan/(?P<plan_id>\d+)/cases/$', 'tcms.testplans.views.cases'),
-    (r'^plan/treeview/(?P<plan_id>\d+)/$', 'tcms.testplans.views.treeview'),
     
     # Testcases zone
     (r'^case/new/$', 'tcms.testcases.views.new'),

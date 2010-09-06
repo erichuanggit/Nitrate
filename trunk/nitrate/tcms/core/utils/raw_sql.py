@@ -30,6 +30,10 @@ class RawSQL:
         FROM test_runs \
         WHERE test_runs.plan_id = test_plans.plan_id'
     
+    num_plans = 'SELECT COUNT(*) \
+        FROM test_plans AS ch_plans\
+        WHERE ch_plans.parent_id = test_plans.plan_id'
+    
     num_case_bugs = 'SELECT COUNT(*) \
         FROM test_case_bugs \
         WHERE test_case_bugs.case_id = test_cases.case_id'

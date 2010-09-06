@@ -6,6 +6,267 @@ Nitrate.TestPlans.Edit = {};
 Nitrate.TestPlans.SearchCase = {};
 Nitrate.TestPlans.Clone = {};
 
+Nitrate.TestPlans.TreeView = {
+	pk: new Number(),
+	data: new Object(),
+	tree_elements: new Element('div'),
+	default_container: 'id_tree_container',
+	default_parameters: {
+		t: 'ajax',
+	}, // FIXME: Doesn't make effect here.
+	
+	utils: {
+		convert: function(argument, data) {
+			switch(argument) {
+				case 'obj_to_list':
+					if (data.length != 0 && !data.length)
+						var data = Object.clone({0: data, length: 1});
+					return data;
+			};
+		},
+	},
+	
+	filter: function(parameters, callback) {
+		var url = getURLParam().url_plans;
+		new Ajax.Request(url, {
+			method: 'get',
+			parameters: parameters,
+			asynchronous: false,
+			onSuccess: callback,
+			onFailure: json_failure,
+		})
+	},
+	generate: function(plan_id) {
+		this.pk = plan_id;
+		
+		// Current, Parent, Brothers, Children, Temporary current
+		var c_plan, p_plan, b_plans, ch_plans, tc_plan;
+		
+		// Get the current plan
+		var p1 = { pk: plan_id, t: 'ajax'};
+		var c1 = function(t) {
+			var returnobj = t.responseText.evalJSON(true);
+			if (returnobj.length > 0)
+				c_plan = returnobj[0];
+		};
+		this.filter(p1, c1);
+		if(!c_plan) {
+			alert('Plan ' + plan_id + ' can not found in database');
+			return false;
+		}
+		
+		// Get the parent plan
+		if(c_plan.fields.parent) {
+			var p2 = { pk: c_plan.fields.parent, t: 'ajax'};
+			var c2 = function(t) {
+				var returnobj = t.responseText.evalJSON(true);
+				p_plan = returnobj[0];
+			}
+			this.filter(p2, c2);
+		}
+		
+		// Get the brother plans
+		if(c_plan.fields.parent) {
+			var p3 = { parent__pk: c_plan.fields.parent, t: 'ajax'};
+			var c3 = function(t) {
+				var returnobj = t.responseText.evalJSON(true);
+				b_plans = returnobj;
+			}
+			this.filter(p3, c3);
+		}
+		
+		// Get the child plans
+		var p4 = { 'parent__pk': c_plan.pk, 't': 'ajax'};
+		var c4 = function(t) {
+			var returnobj = t.responseText.evalJSON(true);
+			ch_plans = returnobj;
+		};
+		this.filter(p4, c4);
+		
+		// Combine all of plans
+		// Presume the plan have parent and brother at first
+		if(p_plan && b_plans) {
+			p_plan.children = b_plans;
+			tc_plan = this.traverse(p_plan.children, c_plan.pk);
+			tc_plan.is_current = true;
+			if (ch_plans)
+				tc_plan.children = ch_plans;
+			
+			if(p_plan.pk)
+				p_plan = this.utils.convert('obj_to_list', p_plan)
+			
+			this.data = p_plan;
+		} else {
+			c_plan.is_current = true;
+			if (ch_plans)
+				c_plan.children = ch_plans;
+			this.data = this.utils.convert('obj_to_list', c_plan);
+		};
+	},
+	up: function(e) {
+		var tree = Nitrate.TestPlans.TreeView;
+		
+		var p = {
+			pk: tree.data[0].fields.parent,
+			t: 'ajax'
+		};
+		
+		var c = function(t) {
+			var returnobj = t.responseText.evalJSON(true);
+			var parent_obj = {0: returnobj[0], length: 1};
+			parent_obj[0].children = tree.data;
+			tree.data = parent_obj;
+			tree.render_page();
+		}
+		
+		tree.filter(p, c);
+	},
+	blind: function(e) {
+		var tree = Nitrate.TestPlans.TreeView;
+		var e_container = this.up();
+		var e_pk = this.previous();
+		var container_clns = e_container.classNames().toArray();
+		
+		var pk = e_pk.innerHTML;
+		var obj = tree.traverse(tree.data, pk);
+		
+		for (i in container_clns) {
+			if(typeof(container_clns[i]) != 'string')
+				continue
+			
+			switch (container_clns[i]) {
+				case 'expand':
+					console.log(this.adjacent('ul'));
+					this.adjacent('ul').invoke('hide');
+					e_container.removeClassName('expand')
+					e_container.addClassName('collapse');
+					break;
+				case 'collapse':
+					if (typeof(obj.children) != 'object' || obj.children == []) {
+						var c = function(t) {
+							var returnobj = t.responseText.evalJSON(true);
+							returnobj = tree.utils.convert('obj_to_list', returnobj);
+							console.log(returnobj);
+							tree.insert(obj, returnobj);
+							tree.render_page();
+						}
+
+						var p = {
+							parent__pk: e_pk.innerHTML,
+							t: 'ajax',
+						};
+						tree.filter(p, c);
+					};
+					
+					this.adjacent('ul').invoke('show');
+					e_container.removeClassName('collapse');
+					e_container.addClassName('expand')
+					break;
+			}
+		};
+	},
+	render: function(data) {
+		var ul = new Element('ul');
+		
+		// Add the 'Up' button
+		if (!data && this.data) {
+			var data = this.data;
+			if (data && data[0].fields.parent) {
+				var li = new Element('li');
+				var btn = new Element('input', {'type': 'button', 'value': 'Up'});
+				li.update(btn);
+				btn.observe('click', this.up);
+				ul.appendChild(li);
+			};
+		}
+		
+		// Add the child plans to parent
+		for (i in data) {
+			if(!data[i].pk)
+				continue;
+			
+			var li = new Element('li');
+			if (data[i].extras.num_children && data[i].children)
+				li.addClassName('expand');
+			
+			if (data[i].extras.num_children && !data[i].children)
+				li.addClassName('collapse');
+			
+			if (data[i].is_current)
+				li.addClassName('bold');
+			
+			// Construct the items
+			var title = '[<a href="' + data[i].extras.get_url_path + '">' + data[i].pk + '</a>] ';
+			title += '<a class="plan_name" href="javascript:void(0);">' + data[i].fields.name + '</a>';
+			title += ' (';
+			if (data[i].extras.num_cases)
+				title += '<a href="' + data[i].extras.get_url_path + '#testcases">' + data[i].extras.num_cases + ' cases</a>, ';
+			else
+				title += '0 case, ';
+			
+			if (data[i].extras.num_runs)
+				title += '<a href="' + data[i].extras.get_url_path + '#testruns">' + data[i].extras.num_runs + ' runs</a>, ';
+			else
+				title += '0 runs, ';
+			
+			switch (data[i].extras.num_children) {
+				case 0:
+					title += '0 child';
+					break;
+				case 1:
+					title += '<a href="' + data[i].extras.get_url_path + '#treeview">' + '1 child</a>';
+					break;
+				default:
+					title += '<a href="' + data[i].extras.get_url_path + '#treeview">' + data[i].extras.num_children + ' children</a>';
+					break;
+			}
+			
+			title += ')';
+			
+			li.update(title);
+			ul.appendChild(li);
+			
+			// Observe the blind link click event
+			li.adjacent('a.plan_name').invoke('observe', 'click', this.blind);
+			
+			if(data[i].children)
+				li.appendChild(this.render(data[i].children));
+		};
+		
+		return ul;
+	},
+	render_page: function(container) {
+		if (!container)
+			container = this.default_container
+		
+		$(container).update(getAjaxLoading());
+		$(container).update(this.render());
+	},
+	traverse: function(data, pk) {
+		// http://stackoverflow.com/questions/3645678/javascript-get-a-reference-from-json-object-with-traverse
+		for (i in data) {
+			if (data[i] == [] || typeof(data[i]) != 'object')
+				continue
+			
+			if(typeof(data[i].pk) == 'number' && data[i].pk == pk)
+				return data[i];
+			
+			if (typeof(data[i].children) == 'object') {
+				var retVal = this.traverse(data[i].children, pk);
+				if (typeof(retVal) != 'undefined')
+					return retVal;
+			};
+		};
+	},
+	insert: function(node, data) {
+		if(node.children)
+			return node;
+		
+		node.children = data;
+		return node;
+	},
+};
+
 Nitrate.TestPlans.Create.on_load = function()
 {
     bind_version_selector_to_product(false, $('id_product'), $('id_product_version'));
@@ -76,14 +337,7 @@ Nitrate.TestPlans.List.on_load = function()
 
 Nitrate.TestPlans.Details.on_load = function()
 {
-    if($F('id_plan_id'))
-        plan_id = $F('id_plan_id');
-    else {
-        alert('Can not get the plan id');
-        return false;
-    }
-    
-    
+    var plan_id = Nitrate.TestPlans.Instance.pk;
     // regUrl('display_summary');
     
     constructPlanDetailsCasesZone('testcases', plan_id);
@@ -127,6 +381,9 @@ Nitrate.TestPlans.Details.on_load = function()
             updateObject('testplans.testplan', plan_id, 'is_active', 1, callback);
         })
     }
+    
+    Nitrate.TestPlans.TreeView.generate(plan_id);
+    Nitrate.TestPlans.TreeView.render_page();
 };
 
 Nitrate.TestPlans.SearchCase.on_load = function()

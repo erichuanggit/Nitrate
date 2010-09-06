@@ -346,6 +346,8 @@ class EditPlanForm(NewPlanForm):
 # =========== Forms for search/filter ==============
 
 class SearchPlanForm(forms.Form):
+    pk = forms.IntegerField(required=False)
+    parent__pk = forms.IntegerField(required=False)
     search = forms.CharField(label="Search", required=False)
     plan_id = forms.IntegerField(label="Plan ID", required=False)
     name__icontains = forms.CharField(label="Plan name", required=False)
