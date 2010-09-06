@@ -21,7 +21,8 @@ input,select,#header,.crumble,#footer,#response{ display:none}
 
 .body_bg{background:#235D9F;}
 .report_content{ background:#F3F8FD; width:98%; padding:10px 0; margin:0px auto; clear:both; min-height:600px;}
-.report_title{ color:#FFF; height:40px; line-height:40px; text-align:center; font-size:20px;}
+.report_title{ color:#FFF; height:80px; line-height:40px; text-align:center; font-size:20px;}
+.report_sub_title{ color:#fff; font-size:14px;}
 .mark a{color:green;}
 .mark{color:green;}
 .strong{font-weight:600;}

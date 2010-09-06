@@ -13,7 +13,9 @@
     </style>
 </head>
 <body>
-	<div class="report_title">Test Log Report</div>
+	<div class="report_title">
+    Test Log Report
+    <div class="report_sub_title">[{{ test_run.run_id }}] {{ test_run.summary}}</div></div>
 	<div class="report_content">
 	<div id="content">
         <div class="listcontent">
@@ -74,7 +76,7 @@
         </div>
 		{% if test_case_runs.count %}
         
-		<h2>Run test cases:</h2>
+		
 		<table  class="list border-1" cellpadding="0" cellspacing="0">
 			<tr>
 				<th width="100px">Case-Run ID</th>
@@ -102,7 +104,7 @@
 				<td class="sep" align="left" valign="top" colspan="7">
 					<span class="notes">
 						{% for log in test_case_run.log %}
-						<li>[{{ log.date }}] - [{{ log.who }}] - {{ log.action }}
+						<li>[{{ log.date }}] - [{{ log.who }}] - {{ log.action }}</li>
 						{% endfor %}
 						 
 				</span></td>
@@ -161,5 +163,6 @@
 		
 
 	</div>
+    </div>
 </body>
 </html>
