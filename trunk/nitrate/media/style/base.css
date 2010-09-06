@@ -73,7 +73,9 @@ a.banner_login{ color:red;}
 .home_table td{ padding:3px 0 3px 8px; border-bottom:solid 1px #b6b4b4;}
 .home_table_bar{background-position:0 -465px;background-repeat:repeat-x;background-color:#eeeded;border-right:solid 1px #b6b4b4; padding:5px 0; }
 a.seeall:link,a.seeall:visited{ color:#002f5e; background:url(../images/sprites.png) no-repeat 0 -64px; padding-left:16px; float:right; display:inline-block; margin:10px 10px; height:16px; line-height:16px;}
-a.seeall:hover{  color:#002f5e; background:url(../images/sprites.png) no-repeat 0 -64px; }
+a.seeall:hover{  color:#F00; }
+a.create:link,a.create:visited{ color:#002f5e; background:url(../images/sprites.png) no-repeat 0 -723px; padding-left:18px; float:right; display:inline-block; margin:10px 10px; height:16px; line-height:16px;}
+a.create:hover{  color:#F00; }
 a:link.execute,a:visited.execute{ background:url(../images/sprites.png) no-repeat left top; height:16px; padding-left:15px;}
 
 /* End Home */

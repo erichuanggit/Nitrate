@@ -93,8 +93,9 @@
 						</div>
 						{% else %}
 						<div class="sprites tablefooter">
-							<div class="sprites tablefooterleft">No plan belong to you</div>
-							<div class="sprites tablefooterright"><a href="{% url tcms.testplans.views.new %}">Create</a></div>
+							<div class="left_float">No plan belong to you</div>
+                            <div class="sprites tablefooterleft"></div>
+							<div class="sprites tablefooterright"></div><a class="create" href="{% url tcms.testplans.views.new %}">Create</a>
 						</div>
 						{% endif %}
 					</th>
