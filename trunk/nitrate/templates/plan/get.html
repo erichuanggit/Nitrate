@@ -50,16 +50,16 @@ Nitrate.TestPlans.Instance = {
 		<span id="id_buttons" class="button">
 			<input id="btn_edit" type="button" value="Edit plan " title="Edit test plan" onclick="window.location.href='{% url tcms.testplans.views.edit test_plan.plan_id %}'" {% if perms.testplans.change_testplan %}{% else%}disabled{% endif %}>
 			<input id="btn_clone" type="button" value="Clone plan" title="Clone this plan to other product" onclick="window.location.href='{% url tcms.testplans.views.clone %}?plan_id={{ test_plan.plan_id }}'" {% if perms.testplans.add_testplan %}{% else %}disabled{% endif %}>
-            {% if test_plan.is_active %}
-            <input id="btn_disable" type="button" value="Disable plan " title="Disabled this plan" {% if not perms.testplans.change_testplan %}disabled="true"{% endif %}>
-            {% else %}
-            <input id="btn_enable" type="button" value="Enable plan " title="Enabled this plan" {% if not perms.testplans.change_testplan %}disabled="true"{% endif %}>
-            {% endif %}
+			{% if test_plan.is_active %}
+			<input id="btn_disable" type="button" value="Disable plan " title="Disabled this plan" {% if not perms.testplans.change_testplan %}disabled="true"{% endif %}>
+			{% else %}
+			<input id="btn_enable" type="button" value="Enable plan " title="Enabled this plan" {% if not perms.testplans.change_testplan %}disabled="true"{% endif %}>
+			{% endif %}
 			{% comment %}
 			<input id="btn_report" type="button" value="Report " title="" onclick="window.location.href='{% url tcms.testplans.views.report test_plan.plan_id %}'">
 			{% endcomment %}
 			<input id="btn_export" type="button" value="Export all cases " title="Export all cases to XML file" onclick="window.location.href='{% url tcms.testplans.views.export test_plan.plan_id %}'">
-            
+			
 			<span class="right-action">
 				<img src="{{ MEDIA_URL}}/images/icon_printer.png" width="16px">
 				<a href="{% url tcms.testplans.views.printable test_plan.plan_id %}">Print Plan</a>
@@ -87,8 +87,8 @@ Nitrate.TestPlans.Instance = {
 				<div class="title">Plan Type</div>
 				<div id="display_type">{{ test_plan.type.name }}</div>
 			</div>
-         </div>
-        <div class="rightlistinfo">
+		 </div>
+		<div class="rightlistinfo">
 			<div class="listinfo">
 				<div class="title">Environment Group</div>
 				<div class="name">
@@ -112,13 +112,17 @@ Nitrate.TestPlans.Instance = {
 					{% endif %}
 				</div>
 			</div>
-            <div class="listinfo">
-            	<div class="title">Create Time</div>
-                {{test_plan.create_date}}
-                
-            </div>
+			<div class="listinfo">
+				<div class="title">Create Time</div>
+				{{test_plan.create_date}}
+				
+			</div>
+			<div class="listinfo">
+				<div class="title">Parent</div>
+				<a href="#treeview" onclick="fireEvent($('tab_treeview').down(), 'click');">{{ test_plan.parent.pk }}</a>
+			</div>
 		</div>
-        <div class="clear"></div>
+		<div class="clear"></div>
 	</div>
 	<div id="plan_detail">
 	<div class="Detailform border-1">
@@ -135,7 +139,7 @@ Nitrate.TestPlans.Instance = {
 			<li id="tab_testreviews"  class="tab">
 				<a href="#testreviews" title="testreviews">Reviews ({{ test_plan.review.count }})</a>
 			</li>
-			<li id="tab_components"  class="tab">
+			<li id="tab_components"	 class="tab">
 				<a href="#components" title="components">Default Components ({{ test_plan.component.count }})</a>
 			</li>
 			<li id="tab_attachment" class="tab">
@@ -147,9 +151,9 @@ Nitrate.TestPlans.Instance = {
 			<li id="tab_tag" class="tab">
 				<a href="#log" title="log">Log</a>
 			</li>
-            <li id="tab_treeview" class="tab">
-                <a href="#treeview" title="treeview">Tree View</a>
-            </li>
+			<li id="tab_treeview" class="tab">
+				<a href="#treeview" title="treeview">Tree View</a>
+			</li>
 		</ul>
 		<div class="tab_list" id="document" style="display:none">
 			{% include "plan/get_docs.html" %}
@@ -157,22 +161,22 @@ Nitrate.TestPlans.Instance = {
 		<div class="tab_list" id="attachment" style="display:none">
 			{% include "plan/get_attachments.html" %}
 		</div>
-		<div class="tab_list" id="testruns"  style="display:none;">
+		<div class="tab_list" id="testruns"	 style="display:none;">
 			{% include "plan/get_runs.html" %}
 		</div>
-		<div class="tab_list" id="testreviews"  style="display:none;">
+		<div class="tab_list" id="testreviews"	style="display:none;">
 			{% include "plan/get_reviews.html" %}
 		</div>
 		<div class="tab_list" id="components"  style="display:none;">
 			<div class="ajax_loading"></div>
 		</div>
-		<div class="tab_list" id="log"  style="display:none;">
+		<div class="tab_list" id="log"	style="display:none;">
 			{% include "plan/get_log.html" %}
 		</div>
-        <div class="tab_list" id="treeview"  style="display:none;">
-            {% include "plan/get_treeview.html" %}
-        </div>
-		<div id="testcases"  class="tab_list">
+		<div class="tab_list" id="treeview"	 style="display:none;">
+			{% include "plan/get_treeview.html" %}
+		</div>
+		<div id="testcases"	 class="tab_list">
 			<div class="ajax_loading"></div>
 		</div>
 		<div class="tab_list" id="tag" style="display:none">
