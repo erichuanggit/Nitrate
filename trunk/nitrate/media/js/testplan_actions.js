@@ -1245,6 +1245,7 @@ function addPlanChild(container, plan_id)
             tree.init(plan_id);
             tree.render_page();
             clearDialog();
+            alert(default_messages.alert.tree_reloaded);
         });
     };
     
