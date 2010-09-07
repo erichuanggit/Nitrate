@@ -104,7 +104,7 @@ def create(request, values):
       | name                    | String         | Required  |                                    |
       | type                    | Integer        | Required  | ID of plan type                    |
       | default_product_version | Integer        | Required  |                                    |
-      | parent_id               | Integer        | Optional  | Parent plan ID                     |                        |
+      | parent                  | Integer        | Optional  | Parent plan ID                     | 
       | is_active               | Boolean        | Optional  | 0: Archived 1: Active (Default 1)  |
       +-------------------------+----------------+-----------+------------------------------------+
 
@@ -137,7 +137,7 @@ def create(request, values):
             type = form.cleaned_data['type'],
             author = request.user,
             default_product_version = form.cleaned_data['default_product_version'],
-            parent_id = form.cleaned_data['parent_id'],
+            parent = form.cleaned_data['parent'],
             is_active = form.cleaned_data['is_active']
         ).serialize()
     else:
@@ -426,6 +426,7 @@ def update(request, plan_ids, values):
                  | type                    | Integer        |
                  | product                 | Integer        |
                  | default_product_version | Integer        |
+                 | parent                  | Integer        |
                  | is_active               | Boolean        |
                  | env_group               | Integer        |
                  +-------------------------+----------------+
@@ -460,6 +461,9 @@ def update(request, plan_ids, values):
         
         if form.cleaned_data['default_product_version']:
             tps.update(default_product_version = form.cleaned_data['default_product_version'])
+        
+        if form.cleaned_data['parent']:
+            tps.update(parent = form.cleaned_data['parent'])
         
         if isinstance(form.cleaned_data['is_active'], int):
             tps.update(is_active = form.cleaned_data['is_active'])
