@@ -25,7 +25,7 @@ Nitrate.TestPlans.TreeView = {
 			onFailure: json_failure,
 		})
 	},
-	generate: function(plan_id) {
+	init: function(plan_id) {
 		this.pk = plan_id;
 		
 		// Current, Parent, Brothers, Children, Temporary current
@@ -373,7 +373,7 @@ Nitrate.TestPlans.Details.on_load = function()
         })
     }
     
-    Nitrate.TestPlans.TreeView.generate(plan_id);
+    Nitrate.TestPlans.TreeView.init(plan_id);
     Nitrate.TestPlans.TreeView.render_page();
 };
 
@@ -1242,7 +1242,9 @@ function addPlanChild(container, plan_id)
         e.stop();
         var tree = Nitrate.TestPlans.TreeView;
         updateObject('testplans.testplan', this.serialize(true)['plan_id'], 'parent', plan_id, function(t) {
-            window.location.reload();
+            tree.init(plan_id);
+            tree.render_page();
+            clearDialog();
         });
     };
     
