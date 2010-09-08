@@ -96,7 +96,7 @@ for d in contrib templates media; do
 done
 
 for f in `find tcms/core/lib -name templates`; do
-    cp -r ${f}/* ${RPM_BUILD_ROOT}%{_datadir}/templates/;
+    cp -r ${f}/* ${RPM_BUILD_ROOT}%{_datadir}/%{name}/templates/;
 done
 
 # Install apache config for the app:
