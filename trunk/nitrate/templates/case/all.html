@@ -41,7 +41,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 	{% if test_cases %}
     <form id="cases_form" action="{% url tcms.testcases.views.clone %}" method="post">
     <div id="contentTab" class="mixbar">
-		<span class="tit">{{ test_cases|length }} Cases</span>
+		<span class="tit">{{ test_cases.count }} Cases</span>
         {% if perms.testcases.add_testcase %}
 		<span><input type="submit" value="Clone" title="clone selected test plans" /></span> 
 		{% endif %}
@@ -64,8 +64,8 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 				<th align="left" width="140" class="date-iso">Created</th>
 			</tr>
 		</thead>
-		<tbody>
 		{% autopaginate test_cases %}
+		<tbody>
 			{% for test_case in test_cases %}
 			<tr class="{% cycle 'odd' 'even' %}">
                 <td valign="top"><input type="checkbox" name="case" value="{{ test_case.case_id }}"></td>

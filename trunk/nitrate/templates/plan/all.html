@@ -53,7 +53,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
 	
 	{% if REQUEST_CONTENTS.items %}
     <div id="contentTab" class="mixbar">
-		<span class="tit">{{ test_plans|length }} Plans</span>
+		<span class="tit">{{ test_plans.count }} Plans</span>
 		{% if perms.testplans.add_testplan %}
 		<span>
 			<input type="button" name="" title="Create new test plan" onclick="window.location='{% url tcms.testplans.views.new %}'"value="New Test Plan" />
@@ -91,8 +91,8 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
 					<th class="nosort" align="left" width="80">Actions</th>
 				</tr>
 			</thead>
-			<tbody>
 			{% autopaginate test_plans %}
+			<tbody>
 				{% for test_plan in test_plans %}
 				<tr class="{% if not test_plan.is_active %}line-through inactive{% endif %}">
 					<td><input type="checkbox" name="plan_id" value="{{ test_plan.plan_id }}" title="Select/Unselect"></td>
