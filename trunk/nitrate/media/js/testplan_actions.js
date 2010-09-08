@@ -1220,7 +1220,7 @@ function changePlanParent(container, plan_id)
     constructPlanParentPreviewDialog(p, parameters, callback);
 }
 
-function addPlanChild(container, plan_id)
+function addPlanChildren(container, plan_id)
 {
     // container is not in using so far
     
@@ -1242,6 +1242,33 @@ function addPlanChild(container, plan_id)
         e.stop();
         var tree = Nitrate.TestPlans.TreeView;
         updateObject('testplans.testplan', this.serialize(true)['plan_id'], 'parent', plan_id, function(t) {
+            tree.init(plan_id);
+            tree.render_page();
+            clearDialog();
+            alert(default_messages.alert.tree_reloaded);
+        });
+    };
+    
+    constructPlanParentPreviewDialog(p, parameters, callback);
+}
+
+function removePlanChildren(container, plan_id)
+{
+    // container is not in using so far
+    
+    var tree = Nitrate.TestPlans.TreeView;
+    var p = prompt('Please type the plan ids you wish to remove the parent, multiple can split with comma.');
+    if(!p)
+        return false;
+    
+    var parameters = {
+        pk__in: p,
+    };
+    
+    var callback = function(e) {
+        e.stop();
+        var tree = Nitrate.TestPlans.TreeView;
+        updateObject('testplans.testplan', this.serialize(true)['plan_id'], 'parent', 0, function(t) {
             tree.init(plan_id);
             tree.render_page();
             clearDialog();
