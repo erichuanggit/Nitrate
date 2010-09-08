@@ -2,13 +2,13 @@
 %define use_pylint 0
 
 Name:           nitrate
-Version:        3.1.0
-Release:        2
+Version:        3.1.1
+Release:        1
 Summary:        Test Case Management System
 
 Group:          Development/Languages
 License:        Internal RH for now
-URL:            https://engineering.redhat.com/trac/testify20/browser/trunk/nitrate
+URL:            https://fedorahosted.org/nitrate/browser/trunk/nitrate
 Source0:        nitrate-%{version}-%{release}.tar.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -111,7 +111,33 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
-* Thu Aug 12 2010 Xuqing Kuang <xkuang@redhat.com> 3.1.0-2
+* Sep 8 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.1-1
+- improve the run report
+- Fixed UI bug #626720 - see all link does not work
+- Fixed UI Bug #625646 - Text changes for reporting UI
+- Fixed UI Bug #626237 - Text change for Test Plan UI
+- Fixed UI Bug #626719 - When expand case, the width is wrong by default
+- Fixed custom reporting search condition
+- Fixed UI Bug #624861 - Display related bugs in customization report
+- Fixed UI Bug #626276 - Reporting:link to failed test cases not working
+- Fixed UI Bug #625789 - Add Plan input field do not control its input and …
+- Added highcharts for future reporting
+- Add pagination feature for TCMS test plans, test cases and test runs using …
+- Fixed #628421 - Cannot remove test run tags.
+- Fixed UI Bug #625797 - test case run history should display test run summaries
+- Fixed #626638 - Product version is not copied from the original when …
+- Fixed #627235 - Adding a build requires reloading page.
+- Fixed UI Bug #629977 - test-run report does not contain test-run name
+- Completed feature #542660 - TCMS: [FEAT] - allow to add sub test suite for test plan
+- Refined add plan to case feature
+- Completed add multiple plan to a case feature
+- Fixed UI Bug #629508 - [TCMS]Create button and Test Plan box are overlapping
+- Fixed UI Bug #629508 - [TCMS]Create button and Test Plan box are overlapping
+- Fixed #627236 - s/2009/2010/ in footer
+- Fixed #629617 - remove white spaces from beginnig and at the end of …
+- Added parent modify feature to XML-RPC
+
+* Thu Aug 12 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.0-2
 - Enhanced the reporting feature.
 
 * Thu Aug 12 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.0-1
@@ -530,4 +556,3 @@ a problem.
 
 * Thu Feb 12 2009 David Malcolm <dmalcolm@redhat.com> - 0.13-1.svn1294
 - initial packaging
-
