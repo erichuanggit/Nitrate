@@ -786,8 +786,8 @@ a:link.edit,a:visited.edit{ color:#333;}
 #treeview .expand{ background:url(../images/t2.gif) no-repeat left top; padding-left:13px;}
 #id_tree_container{ min-height:130px;}
 #id_tree_container ul li{ list-style-type:none;}
-.node_edit{ background-position:0 -705px; padding-left:16px;}
-.node_add{ background-position:0 -723px; padding-left:18px;}
+.node_edit{ background-position:0 -705px; padding-left:16px; cursor:pointer}
+.node_add{ background-position:0 -723px; padding-left:18px; cursor:pointer}
 
 
 .pagination{ margin:10px 5px; float:right;}
