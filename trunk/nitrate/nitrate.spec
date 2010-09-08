@@ -95,6 +95,10 @@ for d in contrib templates media; do
     # chown -R root:root ${RPM_BUILD_ROOT}%{_datadir}/%{name}/${d};
 done
 
+for f in `find tcms/core/lib -name templates`; do
+    cp -r ${f}/* ${RPM_BUILD_ROOT}%{_datadir}/templates/;
+done
+
 # Install apache config for the app:
 install -m 0644 -D -p contrib/conf/nitrate-httpd.conf  ${RPM_BUILD_ROOT}%{_sysconfdir}/httpd/conf.d/%{name}.conf
 
