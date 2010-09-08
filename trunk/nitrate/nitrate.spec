@@ -111,7 +111,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
-* Sep 8 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.1-1
+* Wed Sep 8 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.1-1
 - improve the run report
 - Fixed UI bug #626720 - see all link does not work
 - Fixed UI Bug #625646 - Text changes for reporting UI
