@@ -73,7 +73,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 			</tr>
 		</thead>
 		<tbody>
-		{% autopaginate test_runs per_page %}
+		{% autopaginate test_runs %}
 			{% for test_run in test_runs %}
 			<tr class="{% cycle 'rowodd' 'roweven' %}">
 				<td><a href="{% url tcms.testruns.views.get test_run.run_id %}"/ >{{ test_run.run_id }}</a></td>
