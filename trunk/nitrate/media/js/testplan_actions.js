@@ -1188,7 +1188,7 @@ function changePlanParent(container, plan_id)
     }
     
     var parameters = {
-        plan_id: plan_id,
+        plan_id: p,
     };
     
     var callback = function(e) {

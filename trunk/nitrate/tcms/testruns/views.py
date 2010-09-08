@@ -244,8 +244,6 @@ def all(request, template_name = 'run/all.html'):
     else:
         search_form = SearchRunForm()
         # search_form.populate()
-    per_page = request.REQUEST.get('per_page','20')
-    per_page = int(per_page)
     
     return direct_to_template(request, template_name, { 
         'module': MODULE_NAME,
@@ -253,7 +251,6 @@ def all(request, template_name = 'run/all.html'):
         'test_runs': trs,
         'query_result': query_result,
         'search_form': search_form,
-        'per_page': per_page,
     })
 
 def get(request, run_id, template_name = 'run/get.html'):

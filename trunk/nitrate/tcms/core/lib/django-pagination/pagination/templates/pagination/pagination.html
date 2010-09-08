@@ -22,7 +22,10 @@
     {% else %}
         <span class="disabled next">{% trans "Next" %} &rsaquo;&rsaquo;</span>
     {% endif %}
-    ({{ page_obj.start_index }}-{{ page_obj.end_index }}/{{ page_obj.paginator.count }}) | 
+    ({{ page_obj.start_index }}-{{ page_obj.end_index }}/{{ page_obj.paginator.count }})
+    {% comment %}
+    {# Comment following code for handle the request by middleware in future #}
+    | 
     Per page: 
     {% ifequal 25  page_obj.object_list|length %}25
     {% else %}
@@ -36,5 +39,6 @@
     {% else %}
     <a href="?{{ getvars }}{{ hashtag }}&per_page=100" class="page">100</a>
     {% endifequal %}
+    {% endcomment %}
 </div>
 {% endif %}
