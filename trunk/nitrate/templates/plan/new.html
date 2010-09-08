@@ -59,7 +59,14 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Create.on_load);
 						<span class="name"> {{ form.type }} </span>
 						<div > {{ form.type.errors }} </div>
 					</td>
-				</tr>	
+				</tr>
+				<tr>
+					<td valign="top"><label class="lab" for="id_parent">Parent ID</label></td>
+					<td >
+						<span class="name">{{ form.parent }}</span>
+						<div>{{ form.parent.errors }}</div>
+					</td>
+				</tr>
 				<tr>
 					<td valign="top"><label class="lab" for="id_summary">Plan Document: </label></td>
 					<td>

@@ -11,6 +11,17 @@ Nitrate.Utils.after_page_load = function(callback) {
     Event.observe(window, 'load', callback);
 };
 
+
+Nitrate.Utils.convert = function(argument, data) {
+	switch(argument) {
+		case 'obj_to_list':
+			if (data.length != 0 && !data.length)
+				var data = Object.clone({0: data, length: 1});
+			return data;
+			break;
+	};
+}
+
 Event.observe(window, 'load', function(e) {
     var dropDownMenu = Class.create();
     
@@ -41,7 +52,8 @@ Event.observe(window, 'load', function(e) {
 var default_messages = {
     'alert': {
         'no_case_selected': 'No cases selected! Please select at least one case.',
-        'ajax_failure': 'Commnucation with server got some unknown errors.'
+        'ajax_failure': 'Commnucation with server got some unknown errors.',
+        'tree_reloaded': 'The tree has been reloaded.'
     },
     'confirm': {
         'change_case_status': 'Are you sure you want to change the status?',
@@ -891,22 +903,43 @@ function submitComment(container, parameters)
     })
 }
 
-function previewPlan(parameters, action, callback) {
+function previewPlan(parameters, action, callback, notice, s, c) {
     var dialog = getDialog();
     
-    if (!parameters.pk__in) {
-        alert('Plan is required');
-        return false;
-    };
     clearDialog();
     dialog.show();
     
     parameters.t = 'html';
     parameters.f = 'preview';
     
+    // constuct_list is not in using yet.
+    var construct_list = function(data) {
+        var ul = new Element('ul');
+        for (i in data) {
+            if(typeof(data[i]) != 'object')
+                continue
+            
+            var li = new Element('li');
+            var ck = new Element('input', {type: 'checkbox', name: 'plan_id', value: data[i].pk});
+            var title = new Element('label');
+            title.update(data[i].fields.name);
+            li.appendChild(ck);
+            li.appendChild(title);
+            ul.appendChild(li);
+        }
+        
+        return ul;
+    }
+    
     var url = new String('/plans/');
     var success = function(t) {
-        var form = constructForm(t.responseText, action, callback);
+        /*
+        var returnobj = Nitrate.Utils.convert('obj_to_list', t.responseText.evalJSON(true));
+        var html = construct_list(returnobj);
+        var form = constructForm(html, action, callback);
+        */
+        
+        var form = constructForm(t.responseText, action, callback, notice, s, c);
         dialog.update(form);
     };
     
@@ -975,13 +1008,10 @@ function updateObject(content_type, object_pk, field, value, callback)
 {
     var url = new String('/ajax/update/');
     
-    var success=function(t){
-        if(callback) {
+    var success = function(t) {
+        if(callback)
             callback(t);
-        }
     }
-    
-    var failure = function() {};
     
     var parameters = {
         content_type: content_type,
@@ -994,7 +1024,7 @@ function updateObject(content_type, object_pk, field, value, callback)
         method: 'post',
         parameters: parameters,
         onSuccess: success,
-        onFailure: failure
+        onFailure: json_failure
     })
 }
 
@@ -1124,9 +1154,13 @@ function bindSelectAllCheckbox(element, form, name)
     })
 }
 
-function constructForm(content, action, form_observe, notice, s, c)
+function constructForm(content, action, form_observe, info, s, c)
 {
     var f = new Element('form', {'action': action});
+    
+    var i = new Element('div', {className: 'alert'});
+    if(info)
+        i.update(info);
     
     if (!s) {
         var s = new Element('input', {'type': 'submit', 'value': 'Submit'}); // Submit button
@@ -1144,6 +1178,7 @@ function constructForm(content, action, form_observe, notice, s, c)
     }
     
     f.update(content);
+    f.appendChild(i);
     f.appendChild(s);
     f.appendChild(c);
     

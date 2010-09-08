@@ -15,17 +15,6 @@ Nitrate.TestPlans.TreeView = {
 		t: 'ajax',
 	}, // FIXME: Doesn't make effect here.
 	
-	utils: {
-		convert: function(argument, data) {
-			switch(argument) {
-				case 'obj_to_list':
-					if (data.length != 0 && !data.length)
-						var data = Object.clone({0: data, length: 1});
-					return data;
-			};
-		},
-	},
-	
 	filter: function(parameters, callback) {
 		var url = getURLParam().url_plans;
 		new Ajax.Request(url, {
@@ -36,7 +25,7 @@ Nitrate.TestPlans.TreeView = {
 			onFailure: json_failure,
 		})
 	},
-	generate: function(plan_id) {
+	init: function(plan_id) {
 		this.pk = plan_id;
 		
 		// Current, Parent, Brothers, Children, Temporary current
@@ -96,14 +85,14 @@ Nitrate.TestPlans.TreeView = {
 				tc_plan.children = ch_plans;
 			
 			if(p_plan.pk)
-				p_plan = this.utils.convert('obj_to_list', p_plan)
+				p_plan = Nitrate.Utils.convert('obj_to_list', p_plan)
 			
 			this.data = p_plan;
 		} else {
 			c_plan.is_current = true;
 			if (ch_plans)
 				c_plan.children = ch_plans;
-			this.data = this.utils.convert('obj_to_list', c_plan);
+			this.data = Nitrate.Utils.convert('obj_to_list', c_plan);
 		};
 	},
 	up: function(e) {
@@ -147,7 +136,7 @@ Nitrate.TestPlans.TreeView = {
 					if (typeof(obj.children) != 'object' || obj.children == []) {
 						var c = function(t) {
 							var returnobj = t.responseText.evalJSON(true);
-							returnobj = tree.utils.convert('obj_to_list', returnobj);
+							returnobj = Nitrate.Utils.convert('obj_to_list', returnobj);
 							tree.insert(obj, returnobj);
 							var ul = tree.render(returnobj);
 							e_container.appendChild(ul);
@@ -384,7 +373,7 @@ Nitrate.TestPlans.Details.on_load = function()
         })
     }
     
-    Nitrate.TestPlans.TreeView.generate(plan_id);
+    Nitrate.TestPlans.TreeView.init(plan_id);
     Nitrate.TestPlans.TreeView.render_page();
 };
 
@@ -1165,19 +1154,100 @@ function changePlanCaseDefaultTester(form, container, plan_id)
     )
 }
 
-function treenode(id, txt)
+function constructPlanParentPreviewDialog(plan_id, parameters, callback)
 {
-    this.id = id;
-    this.txt = txt;
+    var action = '';
+    var notice = 'All of operations will overwrite the exist data, and please do not make the tree to be a loop.';
+    /*
+    //FIXME: Overwrite is not availabel for updateObject function yet.
+    var s = new Element('span');
+    var s1 = new Element('input', {type: 'checkbox', name: 'overwrite'});
+    var s2 = new Element('label');
+    s2.update('Overwrite exist parent.');
+    var s3 = new Element('input', {type: 'submit'});
+    s.appendChild(s1);
+    s.appendChild(s2);
+    s.appendChild(s3);
+    */
+    
+    previewPlan(parameters, action, callback, notice);
 }
 
-function get_siblings(array)
+function changePlanParent(container, plan_id)
 {
-    arr = new Array();
-    for(i = 0; i < array.length; i++)
-    {
-        sib = new treenode(array[i].plan_id, array[i].name);
-        arr.push(sib);
+    // container is not in using so far
+    
+    var tree = Nitrate.TestPlans.TreeView;
+    var p = prompt('Please type the plan id you wish to change the parent to.');
+    if(!p)
+        return false;
+    
+    if (p == plan_id) {
+        alert('Nothing changed');
+        return false;
     }
-    return arr;
+    
+    var parameters = {
+        plan_id: plan_id,
+    };
+    
+    var callback = function(e) {
+        e.stop();
+        var tree = Nitrate.TestPlans.TreeView;
+        updateObject('testplans.testplan', plan_id, 'parent', this.serialize(true)['plan_id'], function(t) {
+            var plan;
+            var param = { plan_id: p, t: 'ajax' };
+            var c = function(t) {
+                plan = Nitrate.Utils.convert('obj_to_list', t.responseText.evalJSON(true));
+                
+                if (tree.data[0].pk == plan_id) {
+                    plan[0].children = Object.clone(tree.data);
+                    tree.data = plan;
+                    tree.render_page();
+                } else {
+                    plan[0].children = Object.clone(tree.data[0].children);
+                    tree.data = plan;
+                    tree.render_page();
+                };
+                
+                clearDialog();
+            };
+            
+            tree.filter(param, c)
+        });
+    };
+    
+    constructPlanParentPreviewDialog(p, parameters, callback);
+}
+
+function addPlanChild(container, plan_id)
+{
+    // container is not in using so far
+    
+    var tree = Nitrate.TestPlans.TreeView;
+    var p = prompt('Please type the plan ids you wish to add to current plan, multiple can split with comma.');
+    if(!p)
+        return false;
+    
+    if (p == tree.data[0].pk || p == plan_id) {
+        alert('Nothing changed');
+        return false;
+    }
+    
+    var parameters = {
+        pk__in: p,
+    };
+    
+    var callback = function(e) {
+        e.stop();
+        var tree = Nitrate.TestPlans.TreeView;
+        updateObject('testplans.testplan', this.serialize(true)['plan_id'], 'parent', plan_id, function(t) {
+            tree.init(plan_id);
+            tree.render_page();
+            clearDialog();
+            alert(default_messages.alert.tree_reloaded);
+        });
+    };
+    
+    constructPlanParentPreviewDialog(p, parameters, callback);
 }

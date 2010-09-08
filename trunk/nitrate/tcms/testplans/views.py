@@ -73,7 +73,8 @@ def new(request, template_name = 'plan/new.html'):
                 type = form.cleaned_data['type'],
                 name = form.cleaned_data['name'],
                 create_date = datetime.now(),
-                extra_link = form.cleaned_data['extra_link']
+                extra_link = form.cleaned_data['extra_link'],
+                parent = form.cleaned_data['parent'],
             )
 
             # Add test plan text
@@ -321,7 +322,7 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
 
             if request.user.has_perm('testplans.change_testplan'):
                 tp.name = form.cleaned_data['name']
-                tp.parent_id = form.cleaned_data['parent_id']
+                tp.parent = form.cleaned_data['parent']
                 tp.product = form.cleaned_data['product']
                 tp.default_product_version = form.cleaned_data['default_product_version']
                 tp.type = form.cleaned_data['type']
@@ -368,7 +369,7 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
             'product_version': tp.get_version_id(),
             'type': tp.type_id,
             'summary': tp.latest_text() and tp.latest_text().plan_text or '',
-            'parent_id': tp.parent_id,
+            'parent': tp.parent_id,
             'env_group': env_group_id,
             'is_active': tp.is_active,
             'extra_link': tp.extra_link,

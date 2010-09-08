@@ -522,7 +522,13 @@ function constructPlanCaseZone(container, case_id, parameters)
                 clearDialog();
             }
             
-            previewPlan(this.serialize(true), getURLParam(case_id).url_case_plan, callback);
+            var p = this.serialize(true)
+            if (!p.pk__in) {
+                alert('Plan is required');
+                return false;
+            };
+            
+            previewPlan(p, getURLParam(case_id).url_case_plan, callback);
         })
     }
     var url = getURLParam(case_id).url_case_plan;

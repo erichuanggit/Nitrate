@@ -237,7 +237,8 @@ class TestCase(TCMSActionModel):
         if query.get('case_status'):
             q = q.filter(case_status__in = query['case_status'])
         
-        plan_str = query.get('plan')
+        #If plan exists, remove leading and trailing whitespace from it.
+        plan_str = query.get('plan','').strip()
         if plan_str:
             try:
                 # Is it an integer?  If so treat as a plan_id:
