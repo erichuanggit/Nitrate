@@ -287,9 +287,11 @@ Nitrate.TestPlans.List.on_load = function()
         bind_version_selector_to_product(true);
     };
     
-    $('id_check_all_plans').observe('click', function(e) {
-        clickedSelectAll(this, $('plans_form'), 'plan_id');
-    });
+    if($('id_check_all_plans')) {
+        $('id_check_all_plans').observe('click', function(e) {
+            clickedSelectAll(this, $('plans_form'), 'plan_id');
+        });
+    }
     
     if($('testplans_table')) {
         TableKit.Sortable.init('testplans_table',

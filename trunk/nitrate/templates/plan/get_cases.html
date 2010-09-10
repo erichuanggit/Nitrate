@@ -17,6 +17,7 @@
 </div>
 <form id="id_form_cases" action="{% url tcms.testcases.views.all %}" method="get">
 	<input id="case_sort_by" type="hidden" name="case_sort_by" value="{{ REQUEST_CONTENTS.case_sort_by }}"/>
+	<input id="case_sort_by" type="hidden" name="plan" value="{{ REQUEST_CONTENTS.from_plan }}"/>
 	<div class="tab_navigation">
 		<div class="actions whitelink">
 			{% if perms.testcases.add_testcase %}
@@ -63,8 +64,8 @@
             
             |
 			Case(s):
-			<input type="button" class="export" title="Export selected cases into XML file" value="Export" onclick="window.location.href='{% url tcms.testplans.views.export test_plan.plan_id %}?' + $('id_form_cases').serialize();" />
-			<input type="button" class="print_view" value="Print"  title="print view of selected cases" onclick="window.location.href='{% url tcms.testplans.views.printable test_plan.plan_id %}?' + $('id_form_cases').serialize();" />
+			<input type="button" class="export" title="Export selected cases into XML file" value="Export" onclick="postToURL('{% url tcms.testcases.views.export %}', this.form.serialize(true))" />
+			<input type="button" class="print_view" value="Print"  title="print view of selected cases" onclick="postToURL('{% url tcms.testcases.views.printable %}', this.form.serialize(true))" />
 			{% if perms.testcases.add_testcase %}
 			
 			<input type="button" class="clone" value="Clone" title="Clone selected cases to another test plan" onclick="window.location.href='{% url tcms.testcases.views.clone %}?' + $('id_form_cases').serialize();" />

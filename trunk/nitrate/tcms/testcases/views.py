@@ -350,6 +350,57 @@ def get(request, case_id, template_name = 'case/get.html'):
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
     })
 
+def printable(request, template_name = 'case/printable.html'):
+    """Create the printable copy for plan/case"""
+    from tcms.testplans.models import TestPlan
+    
+    if not request.REQUEST.get('plan') and not request.REQUEST.get('case') \
+    and not request.REQUEST.get('case_status'):
+        raise Http404()
+    
+    if request.REQUEST.get('plan'):
+        tps = TestPlan.objects.filter(pk__in = request.REQUEST.getlist('plan'))
+    else:
+        tps = TestPlan.objects.none()
+    
+    if tps:
+        for tp in tps:
+            tp.case_list = tp.case.values_list('pk', flat=True)
+    
+    internal_query_maps = [
+        # [Web request string, database queryset]
+        ['plan', 'plan__pk__in'],
+        ['case', 'pk__in'],
+        ['case_status', 'case_status__pk__in']
+    ]
+    
+    query = {}
+    for iqm in internal_query_maps:
+        if request.REQUEST.get(iqm[0]):
+            query[iqm[1]] = request.REQUEST.getlist(iqm[0])
+    
+    # Disabled cases not show by default
+    if not query.get('case_status__pk__in'):
+        query['case_status__pk__in'] = TestCaseStatus.objects.exclude(
+            name = 'DISABLED'
+        ).values_list('pk', flat=True)
+    
+    tcs = TestCase.objects.filter(**query)
+    return direct_to_template(request, template_name, {
+        'test_plans': tps,
+        'test_cases': tcs,
+    })
+
+def export(request, template_name = 'case/export.xml'):
+    """Export the plan"""
+    from datetime import datetime
+    timestamp = datetime.now()
+    timestamp_str = '%02i-%02i-%02i' \
+        % (timestamp.year, timestamp.month, timestamp.day)
+    response = printable(request, template_name)
+    response['Content-Disposition'] = 'attachment; filename=tcms-testcases-%s.xml' % timestamp_str
+    return response
+
 def get_details(request, case_id, template_name = 'case/get_details.html'):
     """Get the case text with selected case text version"""
     from tcms.testruns.models import TestCaseRun

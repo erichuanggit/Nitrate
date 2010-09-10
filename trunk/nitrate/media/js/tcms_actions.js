@@ -677,7 +677,6 @@ function myCustomURLConverter(url, node, on_save) {
     return url;
 }
 
-
 function regUrl(container){
     var str=$(container).innerHTML;
     var reg=/(http:\/\/)?(www\.)(\w+\.)+\w+/ig;
@@ -712,25 +711,36 @@ function fireEvent(obj,evt){
 }
 
 // Stolen from http://stackoverflow.com/questions/133925/javascript-post-request-like-a-form-submit
-
 function postToURL(path, params, method) {
     method = method || "post"; // Set method to post by default, if not specified.
-
+    
     // The rest of this code assumes you are not using a library.
     // It can be made less wordy if you use one.
     var form = document.createElement("form");
     form.setAttribute("method", method);
     form.setAttribute("action", path);
-
+    
     for(var key in params) {
-        var hiddenField = document.createElement("input");
-        hiddenField.setAttribute("type", "hidden");
-        hiddenField.setAttribute("name", key);
-        hiddenField.setAttribute("value", params[key]);
-
-        form.appendChild(hiddenField);
+        if (typeof(params[key]) == 'object') {
+            for (var i in params[key]) {
+                if (typeof(params[key][i]) != 'string')
+                    continue
+                
+                var hiddenField = document.createElement("input");
+                hiddenField.setAttribute("type", "hidden");
+                hiddenField.setAttribute("name", key);
+                hiddenField.setAttribute("value", params[key][i]);
+                form.appendChild(hiddenField);
+            }
+        } else {
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", key);
+            hiddenField.setAttribute("value", params[key]);
+            form.appendChild(hiddenField);
+        }
     }
-
+    
     document.body.appendChild(form);    // Not entirely sure if this is necessary
     form.submit();
 }

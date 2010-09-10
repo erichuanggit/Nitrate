@@ -292,7 +292,13 @@ class TestPlanText(TCMSActionModel):
         db_table = u'test_plan_texts'
         ordering = ['plan', '-plan_text_version']
         unique_together = ('plan', 'plan_text_version')
-    
+    def get_plain_text(self):
+        from tcms.core.utils.html import html2text
+        
+        self.plan_text = html2text(self.plan_text)
+        
+        return self
+
 class TestPlanPermission(models.Model):
     userid = models.IntegerField(max_length=9, unique=True, primary_key=True)
     permissions = models.IntegerField(max_length=4)
