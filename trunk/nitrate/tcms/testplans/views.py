@@ -387,8 +387,6 @@ def printable(request, plan_id, template_name = 'plan/printable.html'):
         raise Http404
 
     cases = plan.case.all()
-    #Exclude disabled cases
-    cases = cases.exclude(case_status = 3)
 
     if request.REQUEST.get('case'):
         cases = cases.filter(case_id__in = request.REQUEST.getlist('case'))
