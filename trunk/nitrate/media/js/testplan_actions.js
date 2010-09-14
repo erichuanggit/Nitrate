@@ -1159,7 +1159,7 @@ function changePlanCaseDefaultTester(form, container, plan_id)
 function constructPlanParentPreviewDialog(plan_id, parameters, callback)
 {
     var action = '';
-    var notice = 'All of operations will overwrite the exist data, and please do not make the tree to be a loop.';
+    var notice = 'This operation will overwrite existing data';
     /*
     //FIXME: Overwrite is not availabel for updateObject function yet.
     var s = new Element('span');
@@ -1180,7 +1180,7 @@ function changePlanParent(container, plan_id)
     // container is not in using so far
     
     var tree = Nitrate.TestPlans.TreeView;
-    var p = prompt('Please type the plan id you wish to change the parent to.');
+    var p = prompt('Enter new parent plan ID');
     if(!p)
         return false;
     
@@ -1227,7 +1227,7 @@ function addPlanChildren(container, plan_id)
     // container is not in using so far
     
     var tree = Nitrate.TestPlans.TreeView;
-    var p = prompt('Please type the plan ids you wish to add to current plan, multiple can split with comma.');
+    var p = prompt('Enter a comma separated list of plan IDs');
     if(!p)
         return false;
     
@@ -1259,7 +1259,7 @@ function removePlanChildren(container, plan_id)
     // container is not in using so far
     
     var tree = Nitrate.TestPlans.TreeView;
-    var p = prompt('Please type the plan ids you wish to remove the parent, multiple can split with comma.');
+    var p = prompt('Enter a comma separated list of plan IDs to be removed');
     if(!p)
         return false;
     
