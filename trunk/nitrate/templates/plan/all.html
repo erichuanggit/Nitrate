@@ -52,30 +52,30 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
 	</form>
 	
 	{% if REQUEST_CONTENTS.items %}
-    <div id="contentTab" class="mixbar">
-		<span class="tit">{{ test_plans|length }} Plans</span>
-		{% if perms.testplans.add_testplan %}
-		<span>
-			<input type="button" name="" title="Create new test plan" onclick="window.location='{% url tcms.testplans.views.new %}'"value="New Test Plan" />
-		</span> 
-		{% endif %}
-		{% if perms.testplans.add_testplan %}
-		<span><input type="button" name="" onclick="window.location='{% url tcms.testplans.views.clone %}?' + $('plans_form').serialize()" value="Clone" title="clone selected test plans"/></span> 
-		{% endif %}
-		{% if testplans and perms.testplans.add_testplan %}
-		<span class="right-action">
-			Add Column
-			<select id="column_add">
-				<option></option>
-				{% comment %}
-				<option id="col_product_option" value="col_product">Product</option>
-				{% endcomment %}
-				<option id="col_product_veresion_option" value="col_product_version">Product Version</option>
-			</select>
-		</span>
-		{% endif %}
-	</div>
 	<form id="plans_form">
+	    <div id="contentTab" class="mixbar">
+			<span class="tit">{{ test_plans.count }} Plans</span>
+			<span>
+				{% if perms.testplans.add_testplan %}
+				<input type="button" title="Create new test plan" value="New Test Plan" onclick="window.location='{% url tcms.testplans.views.new %}'" />
+				<input type="button" value="Clone" title="clone selected test plans." onclick="postToURL('{% url tcms.testplans.views.clone %}', this.form.serialize(true), 'get')" />
+				{% endif %}
+				<input type="button" value="Printable copy" title="Create the printable copy for selected plans." onclick="postToURL('{% url tcms.testcases.views.printable %}', this.form.serialize(true))" />
+				<input type="button" value="Export" title="Export the cases for selected plans." onclick="postToURL('{% url tcms.testcases.views.export %}', this.form.serialize(true))" />
+			</span>
+			{% if testplans and perms.testplans.add_testplan %}
+			<span class="right-action">
+				Add Column
+				<select id="column_add">
+					<option></option>
+					{% comment %}
+					<option id="col_product_option" value="col_product">Product</option>
+					{% endcomment %}
+					<option id="col_product_veresion_option" value="col_product_version">Product Version</option>
+				</select>
+			</span>
+			{% endif %}
+		</div>
 		<table id="testplans_table" class="list border-bottom" cellpadding="0" cellspacing="0" border="0" style="table-layout:fixed;">
 			<thead>
 				<tr>
@@ -91,11 +91,11 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
 					<th class="nosort" align="left" width="80">Actions</th>
 				</tr>
 			</thead>
-			<tbody>
 			{% autopaginate test_plans %}
+			<tbody>
 				{% for test_plan in test_plans %}
 				<tr class="{% if not test_plan.is_active %}line-through inactive{% endif %}">
-					<td><input type="checkbox" name="plan_id" value="{{ test_plan.plan_id }}" title="Select/Unselect"></td>
+					<td><input type="checkbox" name="plan" value="{{ test_plan.pk }}" title="Select/Unselect"></td>
 					<td class="{% if not test_plan.is_active %}underline{% endif %}"><a href="{% url tcms.testplans.views.get test_plan.plan_id %}">{{ test_plan.plan_id }}</a></td>
 					<td  class="{% if not test_plan.is_active %}underline{% endif %}"><a href="{% url tcms.testplans.views.get test_plan.plan_id %}" title="Go to {{ test_plan.name }}">{{ test_plan }} </a></td>
 					<td><a title="Send email to {{ test_plan.author.email}}" href="mailto:{{ test_plan.author.email }}">{{ test_plan.author }}</a></td>

@@ -380,23 +380,6 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
         #'env_properties': testplan_env_properties,
     })
 
-def printable(request, plan_id, template_name = 'plan/printable.html'):
-    try:
-        plan = TestPlan.objects.get(plan_id = plan_id)
-    except ObjectDoesNotExist:
-        raise Http404
-
-    cases = plan.case.all()
-
-    if request.REQUEST.get('case'):
-        cases = cases.filter(case_id__in = request.REQUEST.getlist('case'))
-
-    return direct_to_template(request, template_name, {
-        'plan': plan,
-        'cases': cases,
-        'latest_html': plan.latest_text().plan_text
-    })
-
 @user_passes_test(lambda u: u.has_perm('testplans.add_testplan'))
 def clone(request, template_name = 'plan/clone.html'):
     from tcms.testcases.models import TestCase
@@ -404,7 +387,7 @@ def clone(request, template_name = 'plan/clone.html'):
 
     SUB_MODULE_NAME = 'plans'
 
-    if not request.REQUEST.get('plan_id'):
+    if not request.REQUEST.get('plan'):
         return HttpResponse(Prompt.render(
             request = request,
             info_type = Prompt.Info,
@@ -412,7 +395,7 @@ def clone(request, template_name = 'plan/clone.html'):
             next = 'javascript:window.history.go(-1)',
         ))
 
-    tps = TestPlan.objects.filter(plan_id__in = request.REQUEST.getlist('plan_id'))
+    tps = TestPlan.objects.filter(pk__in = request.REQUEST.getlist('plan'))
 
     if not tps:
         return HttpResponse(Prompt.render(
@@ -591,33 +574,6 @@ def clone(request, template_name = 'plan/clone.html'):
         'testplans': tps,
         'clone_form': clone_form,
     })
-
-def export(request, plan_id, template_name = 'plan/export.xml'):
-    """Export the plan"""
-    from datetime import datetime
-
-    try:
-        tp = TestPlan.objects.select_related().get(plan_id = plan_id)
-    except ObjectDoesNotExist, error:
-        raise Http404
-
-    if request.REQUEST.get('case'):
-        tcs = tp.case.filter(case_id__in = request.REQUEST.getlist('case'))
-    else:
-        tcs = tp.case.all()
-
-    timestamp = datetime.now()
-    timestamp_str = '%02i-%02i-%02i' \
-        % (timestamp.year, timestamp.month, timestamp.day)
-
-    response = direct_to_template(request, template_name, {
-        'test_plan': tp,
-        'test_cases': tcs,
-    })
-
-    response['Content-Disposition'] = 'attachment; filename=tcms-testcases-%s.xml' % timestamp_str
-
-    return response
 
 def attachment(request, plan_id, template_name = 'plan/attachment.html'):
     """Manage attached files"""

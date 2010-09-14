@@ -58,11 +58,11 @@ Nitrate.TestPlans.Instance = {
 			{% comment %}
 			<input id="btn_report" type="button" value="Report " title="" onclick="window.location.href='{% url tcms.testplans.views.report test_plan.plan_id %}'">
 			{% endcomment %}
-			<input id="btn_export" type="button" value="Export all cases " title="Export all cases to XML file" onclick="window.location.href='{% url tcms.testplans.views.export test_plan.plan_id %}'">
+			<input id="btn_export" type="button" value="Export all cases " title="Export all cases to XML file" onclick="window.location.href='{% url tcms.testcases.views.export %}?plan={{ test_plan.pk }}'">
 			
 			<span class="right-action">
 				<img src="{{ MEDIA_URL}}/images/icon_printer.png" width="16px">
-				<a href="{% url tcms.testplans.views.printable test_plan.plan_id %}">Print Plan</a>
+				<a href="{% url tcms.testcases.views.printable %}?plan={{ test_plan.pk }}">Print Plan</a>
 			</span>
 		</span>
 	</div>

@@ -39,17 +39,21 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 	</form>
 	<!--case list-->
 	{% if test_cases %}
-    <form id="cases_form" action="{% url tcms.testcases.views.clone %}" method="post">
-    <div id="contentTab" class="mixbar">
-		<span class="tit">{{ test_cases|length }} Cases</span>
-        {% if perms.testcases.add_testcase %}
-		<span><input type="submit" value="Clone" title="clone selected test plans" /></span> 
-		{% endif %}
+	<form id="cases_form" action="{% url tcms.testcases.views.clone %}" method="post">
+	<div id="contentTab" class="mixbar">
+		<span class="tit">{{ test_cases.count }} Cases</span>
+		<span>
+			{% if perms.testcases.add_testcase %}
+			<input type="submit" value="Clone" title="clone selected test plans" />
+			{% endif %}
+			<input type="button" value="Printable copy" title="Create the printable copy for selected cases." onclick="postToURL('{% url tcms.testcases.views.printable %}', this.form.serialize(true))" />
+			<input type="button" value="Export" title="Export the cases for selected cases." onclick="postToURL('{% url tcms.testcases.views.export %}', this.form.serialize(true))" />
+		</span> 
 	</div>
 	<table class="list border-bottom" id="testcases_table" cellpadding="0" cellspacing="0" border="0">
 		<thead>
 			<tr>
-            	<th width="20" class="nosort">
+				<th width="20" class="nosort">
 					<input type="checkbox" id="id_checkbox_all_case" title="Select all/Select none">
 				</th>
 				<th align="left" width="50" class="number">ID</th>
@@ -64,8 +68,8 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 				<th align="left" width="140" class="date-iso">Created</th>
 			</tr>
 		</thead>
-		<tbody>
 		{% autopaginate test_cases %}
+		<tbody>
 			{% for test_case in test_cases %}
 			<tr class="{% cycle 'odd' 'even' %}">
                 <td valign="top"><input type="checkbox" name="case" value="{{ test_case.case_id }}"></td>

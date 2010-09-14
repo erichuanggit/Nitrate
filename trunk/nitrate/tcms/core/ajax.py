@@ -312,24 +312,25 @@ def update(request):
     from django.utils import simplejson
     # Initial the response
     ajax_response = { 'rc': 0, 'response': 'ok' }
-
+	
     # Initial the data
     data = request.REQUEST.copy()
     ctype = data.get("content_type")
     object_pk = data.getlist("object_pk")
     field = data.get('field')
     value = data.get('value')
-
     
     if not field or not value or not object_pk or not ctype:
         ajax_response['rc'] = 1
         ajax_response['response'] = 'Following fields are required - content_type, object_pk, field and value.'
         return HttpResponse(simplejson.dumps(ajax_response))
-
+    
     # Convert the data type
     field = str(field)
     try:
         value = int(value)
+        if value == 0:
+            value = None
     except TypeError:
         value = str(value)
     except:
@@ -376,8 +377,7 @@ def update(request):
         except:
             raise
     
-    param = {field: value}
-    targets.update(**param)
+    targets.update(**{field: value})
     
     if hasattr(targets[0], 'mail_scene'):
         t = targets[0]
