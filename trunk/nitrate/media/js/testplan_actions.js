@@ -289,9 +289,9 @@ Nitrate.TestPlans.List.on_load = function()
     
     if($('id_check_all_plans')) {
         $('id_check_all_plans').observe('click', function(e) {
-            clickedSelectAll(this, $('plans_form'), 'plan_id');
+            clickedSelectAll(this, $('plans_form'), 'plan');
         });
-    }
+    };
     
     if($('testplans_table')) {
         TableKit.Sortable.init('testplans_table',

@@ -10,9 +10,11 @@ Nitrate.TestCases.List.on_load = function()
     bind_category_selector_to_product(true, true, $('id_product'), $('id_category'));
     bind_component_selector_to_product(true, true, $('id_product'), $('id_component'));
     
-    $('id_checkbox_all_case').observe('click', function(e) {
-        clickedSelectAll(this, this.up(4), 'case')
-    });
+    if($('id_checkbox_all_case')) {
+        $('id_checkbox_all_case').observe('click', function(e) {
+            clickedSelectAll(this, this.up(4), 'case')
+        });
+    }
     
     if($('testcases_table')) {
         TableKit.Sortable.init('testcases_table',
