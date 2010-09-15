@@ -48,7 +48,7 @@ def strip_parameters(request, skip_parameters):
     parameters = {}
     for dict_ in request.REQUEST.dicts:
         for k, v in dict_.items():
-            if k not in skip_parameters:
+            if k not in skip_parameters and v:
                 parameters[str(k)] = v
     
     return parameters
@@ -109,38 +109,20 @@ def info(request):
             )
         
         def tags(self):
-            p_id = self.request.REQUEST.get('plan_id','')
-            if p_id:
-                tp_cases_ids = TestCasePlan.objects.filter(pk = p_id).values_list('case')
-                tag_ids = TestCaseTag.objects.filter(case__in = tp_cases_ids).distinct().values_list('tag')
-                tags_in_plan = TestTag.objects.filter(id__in = tag_ids)
-
             query = strip_parameters(request, self.internal_parameters)
-            #FIXME: Performance needs to be improved. 
-            #When type too long will cause a response latency.
-            #tagname = query.get('name__startswith','')
-            #if tagname != None and len(tagname) <=10 :
-            #    seq = list(all_case_combinations(tagname))
-            #    s = "|".join(["Q(name__startswith = '%s')" %item for item in seq])
-            #    return TestTag.objects.filter(eval(s))
-            #else:
-            #    return TestTag.objects.filter(**query)
-
-            #Another way of handling this:
-            tagname = query.get('name__startswith','')
-            if tagname != None:
-                seq = get_string_combinations(tagname)
-                s = "|".join(["Q(name__startswith = '%s')" % item for item in seq])
-                if tags_in_plan:
-                    return tags_in_plan.filter(eval(s))
-                else:
-                    return TestTag.objects.filter(eval(s))
-            else:
-                if tags_in_plan:
-                    return tags_in_plan.filter(**query)
-                else:
-                    return TestTag.objects.filter(**query)
-
+            tags = TestTag.objects
+            # Generate the string combination, because we are using
+            # case sensitive table
+            if query.get('name__startswith'):
+                seq = get_string_combinations(query['name__startswith'])
+                tags = tags.filter(eval(
+                    '|'.join(["Q(name__startswith = '%s')" % item for item in seq])
+                ))
+                del query['name__startswith']
+            
+            tags = tags.filter(**query).distinct()
+            return tags
+        
         def users(self):
             from django.contrib.auth.models import User
             query = strip_parameters(self.request, self.internal_parameters)

@@ -887,7 +887,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 return false;
             }
             
-            constructBatchTagProcessDialog();
+            constructBatchTagProcessDialog(plan_id);
             
             // Observe the batch tag form submit
             $('id_batch_tag_form').observe('submit',function(e){
@@ -930,7 +930,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 return false;
             }
             
-            constructBatchTagProcessDialog();
+            constructBatchTagProcessDialog(plan_id);
             
             // Observe the batch tag form submit
             $('id_batch_tag_form').observe('submit',function(e){
@@ -1087,7 +1087,7 @@ function constructPlanComponentModificationDialog(container)
     constructPlanComponentsZone(d, parameters, callback);
 }
 
-function constructBatchTagProcessDialog(){
+function constructBatchTagProcessDialog(plan_id){
     $('dialog').show();
     $('dialog').update('<form id="id_batch_tag_form"><div class="dia_title" style=" margin:30px 20px;">Please type tag name:</div><div class="dia_content" style=" margin:30px 20px;"><input type="text" id="add_tag_plan" name="tags" style="width:300px; height:25px; border:solid  1px #ccc"/><div id="id_batch_add_tags_autocomplete"></div></div><div style=" margin:30px 20px;"><input type="submit" value="Submit"><input type="button" value="Cancel" onclick="this.up(2).hide();"></div></div></form>');
 
@@ -1102,7 +1102,7 @@ function constructBatchTagProcessDialog(){
             parameters: {
                 info_type: 'tags',
                 format: 'ulli',
-                plan_id: this.plan_id,
+                testcase__plan__pk: plan_id,
                 field: 'name',
             }
         }
