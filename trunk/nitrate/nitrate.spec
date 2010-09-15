@@ -3,7 +3,7 @@
 
 Name:           nitrate
 Version:        3.1.1
-Release:        1
+Release:        2
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -115,9 +115,18 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
+* Wed Sep 15 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.1-2
+- Optimized the performance for pagination
+- Fixed #630604 - disabled test cases included in /plan/<XYZ>/printable/
+- Fixed #564258 - [REF] Ability to export/print specified cases
+- Fixed UI Bug #626276 - [TCMS]reporting:link to failed test cases not working
+- Fixed UI Bug #633618 - Tree view - text changes
+- Fixed #633681 - JS error info in "search plan" and "search case" page …
+- Fixed #634045 - Tag auto-completion failed to work.
+
 * Wed Sep 8 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.1-1
 - improve the run report
-- Fixed UI bug #626720 - see all link does not work
+- Fixed UI Bug #626720 - see all link does not work
 - Fixed UI Bug #625646 - Text changes for reporting UI
 - Fixed UI Bug #626237 - Text change for Test Plan UI
 - Fixed UI Bug #626719 - When expand case, the width is wrong by default
