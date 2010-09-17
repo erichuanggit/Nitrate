@@ -3,7 +3,7 @@
 
 Name:           nitrate
 Version:        3.1.1
-Release:        2
+Release:        3
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -115,6 +115,9 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
+* Fri Sep 17 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.1-3
+- Fixed global plan search issue.
+
 * Wed Sep 15 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.1-2
 - Optimized the performance for pagination
 - Fixed #630604 - disabled test cases included in /plan/<XYZ>/printable/
