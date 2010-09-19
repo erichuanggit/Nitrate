@@ -54,10 +54,10 @@
 			
 			{% endif %}
 			{% if perms.testruns.add_testrun %}
-			<input type="button" class="new_run"  title="Make new test run form selected cases" value="Run" onclick="window.location.href='{% url tcms.testruns.views.new %}' + '?' + this.up(2).serialize();"/>
+			<input type="button" class="new_run"  title="Make new test run from selected cases" value="Run" onclick="window.location.href='{% url tcms.testruns.views.new %}' + '?' + this.up(2).serialize();"/>
 			
 			{% else %}
-			<input type="button" class="new_run"  disabled="true" title="Make new test run form selected cases" value="Run" />
+			<input type="button" class="new_run"  disabled="true" title="Make new test run from selected cases" value="Run" />
 			
 			{% endif %}
             
