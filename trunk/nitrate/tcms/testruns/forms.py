@@ -26,7 +26,7 @@ from tcms.testcases.models import TestCase
 from models import TestRun, TestCaseRunStatus
 
 STATUS_CHOICES = (
-    ('', ''),
+    ('', '---------'),
     ('running', 'Running'),
     ('finished', 'Finished')
 )

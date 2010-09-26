@@ -409,8 +409,7 @@ def create(request, values):
         # Add tag to the case
         for tag in TestTag.string_to_list(values.get('tag', [])):
             t, c = TestTag.objects.get_or_create(name = tag)
-            for tc in tcs:
-                tc.add_tag(tag = t)
+            tc.add_tag(tag = t)
     else:
         # Print the errors if the form is not passed validation.
         return forms.errors_to_list(form)
