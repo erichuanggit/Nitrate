@@ -44,5 +44,5 @@ UPDATE test_case_run_status SET auto_blinddown = 0 WHERE name = 'RUNNING';
 -- Upgrade to 3.0.4
 ALTER TABLE test_cases ADD notes mediumtext;
 
--- Add parent_id for table test_plans
+-- Upgrade to 3.1.1
 ALTER TABLE test_plans ADD COLUMN parent_id int unsigned;
