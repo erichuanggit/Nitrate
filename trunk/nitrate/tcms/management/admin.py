@@ -28,7 +28,7 @@ class ProductsAdmin(admin.ModelAdmin):
     search_fields = (('name','pk',))
     list_display = ('id', 'name', 'classification', 'description', 'default_milestone')
     list_filter = ('classification', )
-    exclude = ('milestone_url', 'default_milestone', 'vote_super_user', 'initial_owner', 'max_vote_super_bug')
+    # exclude = ('milestone_url', 'default_milestone', 'vote_super_user', 'initial_owner', 'max_vote_super_bug')
 
 class PriorityAdmin(admin.ModelAdmin):
     search_fields = (('value','pk',))

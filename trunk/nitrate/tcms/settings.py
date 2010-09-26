@@ -97,6 +97,9 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.RemoteUserMiddleware',
+    'django.contrib.csrf.middleware.CsrfMiddleware',
+    'django.contrib.csrf.middleware.CsrfViewMiddleware',
+    'django.contrib.csrf.middleware.CsrfResponseMiddleware',
     'tcms.core.lib.django-pagination.pagination.middleware.PaginationMiddleware',
 )
 

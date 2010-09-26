@@ -20,7 +20,10 @@ import xmlrpclib
 import kerberos
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.forms.fields import email_re
+try:
+    from django.core.validators import email_re
+except ImportError: # Django 1.1.1 compatible
+    from django.forms.fields import email_re
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.backends import ModelBackend, RemoteUserBackend
 
