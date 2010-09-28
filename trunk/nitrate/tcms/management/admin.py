@@ -26,9 +26,9 @@ class ClassificationAdmin(admin.ModelAdmin):
     
 class ProductsAdmin(admin.ModelAdmin):
     search_fields = (('name','pk',))
-    list_display = ('id', 'name', 'classification', 'description', 'default_milestone')
-    list_filter = ('classification', )
-    # exclude = ('milestone_url', 'default_milestone', 'vote_super_user', 'initial_owner', 'max_vote_super_bug')
+    list_display = ('id', 'name', 'classification', 'description')
+    list_filter = ('id', 'name', 'classification')
+    exclude = ('milestone_url', 'default_milestone', 'vote_super_user', 'max_vote_super_bug')
 
 class PriorityAdmin(admin.ModelAdmin):
     search_fields = (('value','pk',))
@@ -60,7 +60,7 @@ class AttachmentAdmin(admin.ModelAdmin):
     search_fields = (('file_name','pk',))
     list_display = ('attachment_id', 'file_name', 'submitter', 'description', 'create_date', 'mime_type')
 
-admin.site.disable_action('delete_selected')
+# admin.site.disable_action('delete_selected')
 admin.site.register(Classification, ClassificationAdmin)
 admin.site.register(Product, ProductsAdmin)
 admin.site.register(Priority, PriorityAdmin)
