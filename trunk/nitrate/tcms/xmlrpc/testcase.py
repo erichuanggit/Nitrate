@@ -22,6 +22,7 @@ from tcms.testcases.models import TestCase
 from utils import pre_process_ids, compare_list
 
 __all__ = (
+    'add_comment',
     'add_component',
     'add_tag',
     'add_to_run',
@@ -60,6 +61,38 @@ __all__ = (
 )
 
 @log_call
+def add_comment(request, case_ids, comment):
+    """
+    Description: Adds comments to selected test cases.
+
+    Params:      $case_ids - Integer/Array/String: An integer representing the ID in the database,
+                             an array of case_ids, or a string of comma separated case_ids.
+                 
+                 $comment - String - The comment
+
+    Returns:     Array: empty on success or an array of hashes with failure 
+                        codes if a failure occured.
+
+    Example:
+    # Add comment 'foobar' to case 1234
+    >>> TestCase.add_comment(1234, 'foobar')
+    # Add 'foobar' to cases list [56789, 12345]
+    >>> TestCase.add_comment([56789, 12345], 'foobar')
+    # Add 'foobar' to cases list '56789, 12345' with String
+    >>> TestCase.add_comment('56789, 12345', 'foobar')
+    """
+    from utils import Comment
+    object_pks = pre_process_ids(value = case_ids)
+    c = Comment(
+        request = request,
+        content_type = 'testcases.testcase',
+        object_pks = object_pks, 
+        comment = comment
+    )
+    
+    return c.add()
+
+@log_call
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasecomponent'))
 def add_component(request, case_ids, component_ids):
     """
@@ -68,10 +101,7 @@ def add_component(request, case_ids, component_ids):
     Params:      $case_ids - Integer/Array/String: An integer representing the ID in the database,
                              an array of case_ids, or a string of comma separated case_ids.
                  
-                 $component_ids - Integer/Array/String - The component ID, an array of Component IDs or
-                                  component hashes (components can be an array of IDs, a comma separated string of IDs,
-                                  an array of Hashes, or a single hash where the
-                                  component hash = {component => 'string', product => 'string'},
+                 $component_ids - Integer/Array/String - The component ID, an array of Component IDs
                                   or a comma separated list of component IDs 
 
     Returns:     Array: empty on success or an array of hashes with failure 

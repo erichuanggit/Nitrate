@@ -13,6 +13,7 @@
 		<br clear="all">
 		<div class="login radius">
 			<form id="id_login_form" action="{% url django.contrib.auth.views.login %}" method="POST">
+				{% csrf_token %}
 				{% if SETTINGS.MOTD_LOGIN %}
 				<div class="cc">{{ SETTINGS.MOTD_LOGIN|safe}}</div>
 				{% endif %}

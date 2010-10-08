@@ -21,6 +21,7 @@ from tcms.testruns.models import TestCaseRun, TestCaseRunStatus
 from utils import pre_process_ids
 
 __all__ = (
+    'add_comment',
     'attach_bug',
     'check_case_run_status',
     'create',
@@ -59,6 +60,39 @@ class GetCaseRun(object):
         return TestCaseRun.objects.get(**query)
 
 gcr = GetCaseRun()
+
+
+@log_call
+def add_comment(request, case_run_ids, comment):
+    """
+    Description: Adds comments to selected test case runs.
+
+    Params:      $case_run_ids - Integer/Array/String: An integer representing the ID in the database,
+                             an array of case_run_ids, or a string of comma separated case_run_ids.
+                 
+                 $comment - String - The comment
+
+    Returns:     Array: empty on success or an array of hashes with failure 
+                        codes if a failure occured.
+
+    Example:
+    # Add comment 'foobar' to case run 1234
+    >>> TestCaseRun.add_comment(1234, 'foobar')
+    # Add 'foobar' to case runs list [56789, 12345]
+    >>> TestCaseRun.add_comment([56789, 12345], 'foobar')
+    # Add 'foobar' to case runs list '56789, 12345' with String
+    >>> TestCaseRun.add_comment('56789, 12345', 'foobar')
+    """
+    from utils import Comment
+    object_pks = pre_process_ids(value = case_run_ids)
+    c = Comment(
+        request = request,
+        content_type = 'testruns.testcaserun',
+        object_pks = object_pks, 
+        comment = comment
+    )
+    
+    return c.add()
 
 @log_call
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasebug'))
