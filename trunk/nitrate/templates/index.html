@@ -49,7 +49,7 @@
 						{% if test_runs_count %}
 						<div class="sprites tablefooter"> 
                         <div class="left_float">
-                        {{ test_runs_count }} test run(s) related to you, here {% ifequal test_runs_count 1 %}is{% else %}are{% endifequal %} the latest {{ last_15_test_runs|length }}.</div>
+                        {{ test_runs_count }} test run(s) related to you need to be run, here {% ifequal test_runs_count 1 %}is{% else %}are{% endifequal %} the latest {{ last_15_test_runs|length }}.</div>
 							<div class="sprites tablefooterleft"></div>
                             
                             <a href="{% url tcms.testruns.views.all %}?people={{ user.email|iriencode }}&status=running" class="seeall"> SEE ALL</a>
