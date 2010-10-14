@@ -41,6 +41,10 @@ class SimpleForm(CommentDetailsForm):
         max_length=COMMENT_MAX_LENGTH,
     )
     
+    def clean_timestampe(self):
+        import time
+        return str(time.time()).split('.')[0]
+    
     def get_form(self):
         # Use our custom comment model instead of the built-in one.
         return SimpleForm
