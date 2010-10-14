@@ -1,9 +1,9 @@
 {% load comments %}
-
 <td id="id_case_text_{{ forloop.counter }}" colspan="12">
 	<table class="case_detail">
 		<tr>
 			<td valign="top">
+				<h1>It's review!</h1>
 				<h4>Setup:</h4>
 				<div class="content">{{ test_case_text.setup|safe }}</div>
 			</td>
@@ -64,6 +64,22 @@
 			<td class="" valign="top">
 				<h4>Expected Results:</h4>
 				<div class="content">{{ test_case_text.effect|safe }}</div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3" style="border:none; background:none">
+				{% get_comment_list for test_case as case_run_comments %}
+				<h4>Comments:</h4>
+				<ul class="comment ul-no-format">
+					{% for comment in case_run_comments %}
+					<li>
+						<span class="strong">{{ comment.user.email }}</span>
+						<span class="grey">{{ comment.submit_date }}</span><br/>
+						{{ comment.comment|linebreaksbr }} 
+					</li>
+					{% endfor %}
+				</ul>
+				
 			</td>
 		</tr>
 	</table>

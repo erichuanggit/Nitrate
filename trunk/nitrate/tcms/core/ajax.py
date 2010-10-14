@@ -253,21 +253,21 @@ def tag(request, template_name="management/get_tag.html"):
     template_name, obj = objects.get()
     
     q_tag = request.REQUEST.get('tags')
-    q_action = request.REQUEST.get('handle')
+    q_action = request.REQUEST.get('a')
     if q_action:
         tag_actions = TagActions(obj = obj, tag = q_tag)
         func = getattr(tag_actions, q_action)
         response = func()
         if response != True:
             return HttpResponse(simplejson.dumps({'response': response, 'rc': 1}))
-
+    
     del q_tag, q_action
     
     # Response to batch operations
-    if request.REQUEST.get('type') == 'json':
-        if request.REQUEST.get('format') == 'serialized':
+    if request.REQUEST.get('t') == 'json':
+        if request.REQUEST.get('f') == 'serialized':
             return HttpResponse(
-                serializers.serialize(request.REQUEST['type'], obj)
+                serializers.serialize(request.REQUEST['t'], obj)
             )
         
         return HttpResponse(simplejson.dumps({'response': 'ok'}))
@@ -291,10 +291,11 @@ def tag(request, template_name="management/get_tag.html"):
 
 def update(request):
     """Modify the object attributes"""
+    import datetime
     from django.utils import simplejson
     # Initial the response
     ajax_response = { 'rc': 0, 'response': 'ok' }
-	
+    
     # Initial the data
     data = request.REQUEST.copy()
     ctype = data.get("content_type")
@@ -347,12 +348,15 @@ def update(request):
         )
         return HttpResponse(simplejson.dumps(ajax_response))
     
+    if field.find('date') and value == 'NOW':
+        value = datetime.datetime.now()
+    
     if hasattr(targets[0], 'log_action'):
         try:
             for t in targets:
                 t.log_action(
                     who = request.user,
-                    action = 'Field %s changed from %s to %s in update function.' % (
+                    action = 'Field %s changed from %s to %s.' % (
                         field, getattr(t, field), value
                     )
                 )

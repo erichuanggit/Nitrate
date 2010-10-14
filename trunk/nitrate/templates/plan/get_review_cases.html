@@ -1,6 +1,6 @@
 {% load ifin %}
 <form action="{% url tcms.testcases.views.all %}" method="get">
-	<input type="hidden" name="type" value="case" />
+	<input type="hidden" name="type" value="review_case" />
 	<input type="hidden" name="case_sort_by" value="{{ REQUEST_CONTENTS.case_sort_by }}" />
 	<input type="hidden" name="plan" value="{{ REQUEST_CONTENTS.from_plan }}" />
 	<input type="hidden" name="from_plan" value="{{ REQUEST_CONTENTS.from_plan }}" />
@@ -23,9 +23,9 @@
 			<input type="button" class="search"	 disabled="true" value="Add cases from other plans"	 />
 			{% endif %}
 			<span class="reorder_case">
-				<a class="btn_filter filtercase" title="Click to show filter options">Show filter options</a>
+				<a class="filtercase" title="Click to show filter options">Show filter options</a>
 				{% if perms.testcases.change_testcase %}
-				<a class="btn_sort sortlink" title="Click me,then Drag and drop the rows to adjust the order,and click 'Done Sorting' link to submit your changes">Re-order cases</a>
+				<a class="sortlink" title="Click me,then Drag and drop the rows to adjust the order,and click 'Done Sorting' link to submit your changes">Re-order cases</a>
 				{% endif %}
 			</span>
 		</div>
@@ -80,13 +80,14 @@
 			
 			{% if perms.testcases.change_testcase %}
 			
-			<input type="button" value="Automated" title="change automated" class="btn_automated automated sprites" />
-			<input type="button" value="Default tester" title="change default tester" class="btn_default_tester assignee sprites" />
-			<input type="button" value="Component" class="btn_component sprites component" />
+			<input type="button" value="Automated" title="change automated" class="automated sprites" />
+			<input type="button" class="assignee sprites" value="Default tester" title="change default tester" onclick="changePlanCaseDefaultTester(this.up(2), this.up(3), {{ test_plan.plan_id }})" />
+			<input type="button" value="Component" class="sprites component" />
 			{% else %}
-			<input type="button" value="Automated" title="change automated" class="btn_automated automated_disabled sprites" disabled="Trues" />
-			<input type="button" value="Default tester" title="change default tester" class="btn_default_tester assigneedisable sprites" disabled />
-			<input id="id_batch_component" type="button" value="Component" class="btn_component sprites component_disabled" disabled="disabled"/>
+			
+			<input type="button" value="Automated" title="change automated" class="automated_disabled sprites" id="batch_automated" disabled="disabled" />
+			<input type="button" value="Default tester" title="change default tester" class="assigneedisable sprites" disabled />
+			<input id="id_batch_component" type="button" value="Component" class="sprites component_disabled" disabled="disabled"/>
 			{% endif %}
 			
 			{% if perms.testcases.change_testcase %}
@@ -192,9 +193,9 @@
 	</thead>
 	<tbody>
 		{% for test_case in test_cases %}
-		<tr class="case_title {% cycle 'odd' 'even' %}" >
+		<tr class=" title collapses {% cycle 'odd' 'even' %}" >
 			<td class="expandable">
-				<img class="collapse blind_icon" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
+				<img class="collapse" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
 			</td>
 			<td>
 				<input type="checkbox" name="case" value="{{ test_case.pk }}" class="checkbox" {% ifin test_case.pk selected_case_ids %}checked{% endifin %} />
@@ -227,17 +228,19 @@
 			<td class="col_priority_content expandable" align="center">{{ test_case.priority }}</td>
 			<td valign="top" width="8%" class="col_category_content expandable" style="display:none">{{ test_case.category }}</td>
 			<td class="col_sortkey_content" align="center">
-				<a href="javascript:void(0);" class="mark case_sortkey">{{ test_case.sortkey }}</a>
+				<div class="mark">
+					<a href="#" onclick="changeCaseOrder('{{ test_case.pk }}', '{{ test_case.sortkey }}', '{{ test_plan.pk }}')">{{ testcase.sortkey }}</a>
+				</div>
 			</td>
 			<td align="center" >
 				{% if perms.testcases.change_testcase %}
-				<a class="editlink" href="{% url tcms.testcases.views.edit test_case.case_id %}?from_plan={{ test_plan.plan_id }}">Edit</a>
+				<a class="editlink" href="{% url tcms.testcases.views.edit test_case.case_id %}?from_plan={{ test_splan.plan_id }}">Edit</a>
 				{% else %}
 				<span class="editlink grey">Edit</span>
 				{% endif %}
 			</td>
 		</tr>
-		<tr class="case_content hide" style="display: none;">
+		<tr class="hide" style="display: none;">
 			<td id="id_loading_{{ test_case.pk }}" colspan="12">
 				<div class="ajax_loading"></div>
 			</td>

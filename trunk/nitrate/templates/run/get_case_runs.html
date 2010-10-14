@@ -2,24 +2,24 @@
 	<thead>
 		<tr>
 			<th width="20">
-            {% if test_case_runs and perms.testruns.delete_testcaserun %}
+			{% if test_case_runs and perms.testruns.delete_testcaserun %}
 			<input id="id_check_all_button" type="checkbox" title="Select all cases/Select none case" />
 			{% else %}
 			<input id="id_check_all_button" type="checkbox" title="Select all cases/Select none case" disabled="disabled" />
 			{% endif %}
-            </th>
-			<th width="18">
-            	{% if test_case_runs and perms.testruns.delete_testcaserun %}
-				<a id="id_blind_all_link" href="javascript:blinddownAllCases()"	 title="Expand all cases">
-					<img id="id_blind_all_img" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
-				</a>
-                {% else %}
-                <a id="id_blind_all_link" href="javascript:blinddownAllCases()"	 title="Expand all cases" class="grey">
-					<img id="id_blind_all_img" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
-				</a>
-                {% endif %}
 			</th>
-            <th width="90">Case Run ID</th>
+			<th width="18">
+				{% if test_case_runs and perms.testruns.delete_testcaserun %}
+				<a id="id_blind_all_link" href="javascript:blinddownAllCases()" title="Expand all cases">
+					<img id="id_blind_all_img" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
+				</a>
+				{% else %}
+				<a id="id_blind_all_link" href="javascript:blinddownAllCases()" title="Expand all cases" class="grey">
+					<img id="id_blind_all_img" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
+				</a>
+				{% endif %}
+			</th>
+			<th width="90">Case Run ID</th>
 			<th width="60">Case ID</th>
 			<th>Summary</th>
 			<th width="80">Tester</th>
@@ -33,49 +33,50 @@
 	</thead>
 	<tbody>
 		{% for test_case_run in test_case_runs %}
-		<tr id="id_tr_case_{{ forloop.counter }}" class="{% cycle 'odd' 'even' %}">
-			<td>
-				<input type="checkbox" name="case_run" id="id_checkbox_case_{{ forloop.counter }}" value="{{ test_case_run.case_run_id }}" title="Select/Unselect" />
+		<tr class="case_title {% cycle 'odd' 'even' %}">
+			<td class="center">
+				<input type="checkbox" name="case_run" value="{{ test_case_run.pk }}" title="Select/Unselect" />
 				<input type="hidden" name="case" value="{{ test_case_run.case_id }}" />
+				<input type="hidden" name="case_text_version" value="{{ test_case_run.case_text_version }}" />
 			</td>
-			<td valign="middle" title="expand test case" onclick="toggleTestCaseContents('{{ forloop.counter }}', '{{ test_case_run.case_text_version }}', '{{ test_case_run.case_run_id }}')">
-				<img id="blind_icon_{{ forloop.counter }}" class="up" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="" />
+			<td title="expand test case" class="expandable center vmiddle">
+				<img class="blind_icon collapse" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="" />
 			</td>
-            <td onclick="toggleTestCaseContents('{{ forloop.counter }}', '{{ test_case_run.case_text_version }}', '{{ test_case_run.case_run_id }}')" align="center">
+			<td class="center">
 				<a href="#caserun_{{ test_case_run.case_run_id }}">{{ test_case_run.case_run_id }}</a>
 			</td>
-			<td>
+			<td class="expandable center">
 				<a href="{% url tcms.testcases.views.get test_case_run.case_id %}?from_plan={{ test_run.plan_id }}">{{ test_case_run.case_id }}</a>
 			</td>
-            
-			<td onclick="toggleTestCaseContents('{{ forloop.counter }}', '{{ test_case_run.case_text_version }}', '{{ test_case_run.case_run_id }}')">
+			
+			<td class="expandable">
 				<a id="link_{{ forloop.counter }}" href="#caserun_{{ test_case_run.case_run_id }}" title="Expand test case">{{ test_case_run.case.summary }}</a>
 			</td>
 			<td>
 				<a href="mailto:{{ test_case_run.tested_by.email }}" title="Send email to {{ test_case_run.tested_by.email }}">{{ test_case_run.tested_by }}</a>
 			</td>
 			<td><a href="mailto:{{ test_case_run.assignee.email }}" title="Send email to {{ test_case_run.assignee.email }}">{{ test_case_run.assignee }}</a></td>
-			<td onclick="toggleTestCaseContents('{{ forloop.counter }}', '{{ test_case_run.case_text_version }}', '{{ test_case_run.case_run_id }}')">{{ test_case_run.case.category }}</td>
-			<td onclick="toggleTestCaseContents('{{ forloop.counter }}', '{{ test_case_run.case_text_version }}', '{{ test_case_run.case_run_id }}')" align="center">{{ test_case_run.case.priority }}</td>
-			<td onclick="toggleTestCaseContents('{{ forloop.counter }}', '{{ test_case_run.case_text_version }}', '{{ test_case_run.case_run_id }}')" align="center"><span {% if test_case_run.num_bug %}class="have_bug"{% endif %}>{{ test_case_run.num_bug }}</span></td>
-			<td onclick="toggleTestCaseContents('{{ forloop.counter }}', '{{ test_case_run.case_text_version }}', '{{ test_case_run.case_run_id }}')">
+			<td class="expandable center">{{ test_case_run.case.category }}</td>
+			<td class="expandable center">{{ test_case_run.case.priority }}</td>
+			<td class="expandable center"><span {% if test_case_run.num_bug %}class="have_bug"{% endif %}>{{ test_case_run.num_bug }}</span></td>
+			<td class="expandable center">
 				<img src="{{ MEDIA_URL }}/images/{{ test_case_run.case_run_status.name|lower }}.png" sborder="0" alt="" />
 				<label>{{ test_case_run.case_run_status.name|upper }}</label>
 			</td>
-			<td onclick="toggleTestCaseContents('{{ forloop.counter }}', '{{ test_case_run.case_text_version }}', '{{ test_case_run.case_run_id }}')" align="center">
+			<td class="expandable center">
 				<span class="mark">
 					<a href="#" onclick="changeCaseRunOrder('{{ test_run.run_id }}', '{{ test_case_run.case_run_id }}', '{{ test_case_run.sortkey }}')">{{ test_case_run.sortkey }}</a>
 				</span>
 			</td>
 		</tr>
-		<tr id="hidenRow_{{ forloop.counter }}"	 style="display: none;"	 class="hide">
-			<td id="id_case_text_{{ forloop.counter }}" class="left_panel" colspan="12">
+		<tr class="case_content hide" style="display: none;">
+			<td id="id_loading_{{ test_case_run.case_id }}" class="left_panel" colspan="12">
 				<div class="ajax_loading"></div>
 			</td>
 		</tr>
-        {% empty %}
-        <tr>
-        	<td colspan="12" align="center">No case run found</td>
+		{% empty %}
+		<tr>
+			<td colspan="12" align="center">No case run found</td>
 		{% endfor %}
 	</tbody>
 </table>

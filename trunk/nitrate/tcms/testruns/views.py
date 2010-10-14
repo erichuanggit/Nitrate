@@ -301,40 +301,7 @@ def get(request, run_id, template_name = 'run/get.html'):
         'from_plan': request.GET.get('from_plan', False),
         'test_case_runs': tcrs,
         'test_case_run_bugs': tcr_bugs,
-    })
-
-def get_case_run(request, case_run_id, run_id = None, tr = None, response = None, template_name = 'run/execute_case_run.html'):
-    """Return the page content of test case run in execute process"""
-    if request.REQUEST.get('index_id'):
-        forloop = {
-            'counter': request.REQUEST['index_id']
-        }
-    else:
-        return Http404('Index id is required')
-    
-    if not tr and not run_id:
-        raise ValueError
-    
-    if run_id and not tr:
-        tr = TestRun.objects.get(run_id = run_id)
-    
-    # Refresh the test case run object
-    tcr = TestCaseRun.objects.select_related(
-        'case', 'case__priority', 'case__author', 'tested_by', 'case__attachment'
-        'assignee', 'build', 'case_run_status'
-    )
-    tcr = tcr.get(case_run_id = case_run_id)
-    
-    if request.REQUEST.get('type') == 'json':
-        from django.core.serializers import serialize
-        return HttpResponse(serialize('json', tcr))
-    
-    return direct_to_template(request, template_name, {
-        'test_case_run': tcr,
-        'testrun': tr,
-        'case_run_status': TestCaseRunStatus.objects.all,
-        'response': response,
-        'forloop': forloop,
+        'test_case_run_status': TestCaseRunStatus.objects.order_by('pk')
     })
 
 @user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
@@ -361,7 +328,7 @@ def edit(request, run_id, template_name = 'run/edit.html'):
         else:
             form.populate(product_id = tr.plan.product_id)
         
-        #FIXME: Error handle
+        #FIXME: Error handler
         if form.is_valid():
             tr.summary = form.cleaned_data['summary']
             # Permission hack
@@ -401,156 +368,29 @@ def edit(request, run_id, template_name = 'run/edit.html'):
 
 @user_passes_test(lambda u: u.has_perm('testruns.change_testcaserun'))
 def execute(request, run_id, template_name = 'run/execute.html'):
-    SUB_MODULE_NAME = "runs"
-    
-    tr = TestRun.objects.select_related().get(run_id = run_id)
-    
-    # Get the test cases belong to the run
-    testrun_relate_testcases = tr.case_run.all()
-    if request.REQUEST.get('case_run_status_id'):
-        testrun_relate_testcases = testrun_relate_testcases.filter(
-            case_run_status__id = request.REQUEST.get('case_run_status_id')
-        )
-    
-    if request.REQUEST.get('case_run_status'):
-        testrun_relate_testcases = testrun_relate_testcases.filter(
-            case_run_status__name = request.REQUEST.get('case_run_status').upper()
-        )
-    
-    testrun_relate_testcases = testrun_relate_testcases.select_related(
-        'case_run_status', 'build',
-        'case__components', 'tested_by',
-        'case__priority', 'case__category', 'case__author',
-        'case', 'assignee'
-    )
-    
-    for tcr in testrun_relate_testcases:
-        if not tcr.running_date:
-            tcr.running_date = datetime.now()
-            tcr.save()
-    
-    # Query all of case run status
-    case_run_status = TestCaseRunStatus.objects.all()
-    
-    return direct_to_template(request, template_name, {
-        'module': MODULE_NAME,
-        'sub_module': SUB_MODULE_NAME,
-        'testrun': tr,
-        'testrun_relate_testcases': testrun_relate_testcases,
-        'case_run_status': case_run_status,
-    })
-
-@user_passes_test(lambda u: u.has_perm('testruns.change_testcaserun'))
-def change_case_run_status(request, run_id, case_run_id, template_name='run/execute_case_run.html'):
-    from urllib import unquote
-    
-    ajax_response = { 'response': 'ok' }
-    
-    try:
-        # Get the test run
-        tr = TestRun.objects.get(run_id = run_id)
-        
-        # Get the test case run
-        tcr = TestCaseRun.objects.get(case_run_id = case_run_id)
-        
-        # Get the test case run status
-        tcr_status = TestCaseRunStatus.objects.get(id = request.REQUEST.get('case_run_status_id'))
-    except ObjectDoesNotExist, error:
-        ajax_response['response'] = error
-        
-        return get_case_run(
-            request = request,
-            case_run_id = tcr.case_run_id,
-            tr = tr,
-            response = ajax_response['response']
-        )
-    
-    # Check the confict case run status id
-    if str(tcr.case_run_status_id) != request.REQUEST.get(
-        'orig_case_run_status_id', str(tcr.case_run_status_id)
-    ):
-        ajax_response['response'] = 'Someone has done changes in the time you had this page open, The changes is refreshed in the page, please decide how the case run status.'
-        
-        return get_case_run(
-            request = request,
-            case_run_id = tcr.case_run_id,
-            tr = tr,
-            response = ajax_response['response']
-        )
-    
-    # Change the status change history
-    if tcr.case_run_status != tcr_status:
-        tcr.log_action(request.user, 'Status changed from %s to %s' % (
-            tcr.case_run_status.name,
-            tcr_status.name,
-        ))
-    
-    if not tcr.assignee_id or tcr.assignee != request.user:
-        tcr.log_action(request.user, 'Assignee changed from %s to %s by %s' % (
-            tcr.assignee_id and tcr.assignee,
-            request.user.email,
-            request.user.email,
-        ))
-    
-    # Change the information
-    tcr.tested_by = request.user
-    tcr.assignee = request.user
-    tcr.case_run_status_id = tcr_status.id
-    tcr.close_date = datetime.now()
-    
-    tcr.save()
-    # Did we just finish the last caserun in an unfinished run?
-    # If so, the run is now finished : (ticket #355):
-    if tr.stop_date is None:
-        if tr.check_all_case_runs(case_run_id = tcr.case_run_id):
-            tr.stop_date = datetime.now()
-            tr.save()
-    
-    return get_case_run(request, case_run_id = tcr.case_run_id, tr = tr)
+    """Execute test run"""
+    return get(request, run_id, template_name)
 
 def report(request, run_id, template_name = 'run/report.html'):
     return get(request, run_id, template_name)
 
-@user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
-def suggest_summary(request):
-    '''
-       Generate a suggested summary for a new run, as per:
-       [ NewRun_Name_autofill: the new run page shall contain a field for
-        entering the name of the new plan. If the user has not touched the
-        field, the field shall automatically populate with text of the form:
-          * (planname):(environmentname):(number of runs made with this plan/environment combo) 
-
-        and the field shall update as environments are selected, until the
-        user manually edits the field. For example, a sample value might read:
-          "OpenGL Performance:x86_64:001"          
-    '''
-    from django.utils.simplejson import dumps as json_dumps
-    from tcms.testplans.models import TestPlan
-    from tcms.management.models import TestEnvironment
-    
-    plan_id = request.GET['plan_id']
-    build_id = request.GET['build_id']
-    env_id = request.GET['env_id']
-    product_id = request.GET['product_id']
-    
-    numRuns = TestRun.objects.filter(
-        plan__plan_id=plan_id,
-        environment__environment_id=env_id
-    ).count()
-    plan = TestPlan.objects.get(plan_id=plan_id)
-    env = TestEnvironment.objects.get(environment_id=env_id)
-    summary = '%s:%s:%03i' % \
-              (plan.name, env.name, numRuns+1)
-    response = {'suggestedSummary': summary}
-    return HttpResponse(json_dumps(response))
+@user_passes_test(lambda u: u.has_perm('testruns.change_testcaserun'))
+def set_current(request, case_run_id):
+    """Set the case to be current"""
+    from django.utils import simplejson
+    try:
+        TestCaseRun.objects.get(pk = case_run_id).set_current()
+    except:
+        pass
+        
+    return HttpResponse(simplejson.dumps({'rc': 0, 'response': 'ok'}))
 
 @user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
-def bug(request, run_id, case_run_id, template_name = 'run/execute_case_run.html'):
+def bug(request, case_run_id, template_name = 'run/execute_case_run.html'):
     """
     Process the bugs for case runs
     """
-    # FIXME: Rewrite these codes for Ajax.Request
-    #        And write a render method to get the page.
+    from django.utils import simplejson
     from tcms.testcases.forms import CaseBugForm
     
     class CaseRunBugActions(object):
@@ -560,14 +400,17 @@ def bug(request, run_id, case_run_id, template_name = 'run/execute_case_run.html
             self.request = request
             self.case_run = case_run
             self.template_name = template_name
-       
+            self.default_ajax_response = {'rc': 0, 'response': 'ok'}
+        
         def add(self):
             if not self.request.user.has_perm('testcases.add_testcasebug'):
-                return self.render(response = 'Permission denied')
+                response = {'rc': 1, 'response': 'Permission denied'}
+                return self.ajax_response(response = response)
             
             form = CaseBugForm(request.REQUEST)
             if not form.is_valid():
-                return self.render(response = form.errors)
+                response = {'rc': 1, 'response': form.errors}
+                return self.ajax_response(response = response)
             
             tcr.add_bug(
                 bug_id = form.cleaned_data['bug_id'],
@@ -575,9 +418,15 @@ def bug(request, run_id, case_run_id, template_name = 'run/execute_case_run.html
                 summary = form.cleaned_data['summary'],
                 description = form.cleaned_data['description'],
             )
-            tcr.set_current()
+            # tcr.set_current()
             
-            return self.render()
+            return self.ajax_response()
+        
+        def ajax_response(self, response = None):
+            if not response:
+                response = self.default_ajax_response
+            
+            return HttpResponse(simplejson.dumps(response))
         
         def file(self):
             from django.conf import settings
@@ -590,24 +439,26 @@ def bug(request, run_id, case_run_id, template_name = 'run/execute_case_run.html
         
         def remove(self):
             if not self.request.user.has_perm('testcases.delete_testcasebug'):
-                return self.render(response = 'Permission denied')
+                response = {'rc': 1, 'response': 'Permission denied'}
+                return self.render(response = response)
             
             try:
-                self.case_run.remove_bug(self.request.REQUEST.get('id'))
+                self.case_run.remove_bug(self.request.REQUEST.get('pk'))
             except ObjectDoesNotExist, error:
-                return self.render(response = error)
+                response = {'rc': 1, 'response': error}
+                return self.render(response = response)
             
-            self.case_run.set_current()
+            # self.case_run.set_current()
             
-            return self.render()
+            return self.ajax_response()
         
-        def render(self, response = None):
-            return get_case_run(
-                request = self.request,
-                case_run_id = self.case_run.case_run_id,
-                run_id = self.case_run.run_id,
-                response = response,
-            )
+        #def render(self, response = None):
+        #    return get_case_run(
+        #        request = self.request,
+        #        case_run_id = self.case_run.case_run_id,
+        #        run_id = self.case_run.run_id,
+        #        response = response,
+        #    )
         
         def render_form(self):
             form = CaseBugForm(initial={
@@ -630,10 +481,10 @@ def bug(request, run_id, case_run_id, template_name = 'run/execute_case_run.html
         template_name = template_name
     )
     
-    if not request.REQUEST.get('handle') in crba.__all__:
-        return crba.render(response = 'Unrecognizable actions')
+    if not request.REQUEST.get('a') in crba.__all__:
+        return crba.ajax_response(response = {'rc': 1, 'response': 'Unrecognizable actions'})
     
-    func = getattr(crba, request.REQUEST['handle'])
+    func = getattr(crba, request.REQUEST['a'])
     return func()
 
 def clone(request, template_name='run/clone.html'):
@@ -1077,11 +928,11 @@ def env_value(request):
     
     run_env_actions = RunEnvActions(request, trs)
     
-    if not request.REQUEST.get('handle') in run_env_actions.__all__:
+    if not request.REQUEST.get('a') in run_env_actions.__all__:
         ajax_response = {'rc': 1, 'response': 'Unrecognizable actions'}
         return HttpResponse(simplejson.dumps(ajax_response))
     
-    func = getattr(run_env_actions, request.REQUEST['handle'])
+    func = getattr(run_env_actions, request.REQUEST['a'])
     
     try:
         return func()

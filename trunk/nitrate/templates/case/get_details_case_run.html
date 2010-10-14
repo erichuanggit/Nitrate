@@ -4,6 +4,7 @@
 	<table class="case_detail">
 		<tr>
 			<td valign="top">
+				<h1>It's case run!</h1>
 				<h4>Setup:</h4>
 				<div class="content">{{ test_case_text.setup|safe }}</div>
 			</td>
@@ -64,6 +65,32 @@
 			<td class="" valign="top">
 				<h4>Expected Results:</h4>
 				<div class="content">{{ test_case_text.effect|safe }}</div>
+			</td>
+		</tr>
+		<tr>
+		<td colspan="3" style="border:none; background:none">
+			<h4>Test Case Run Detail Information:</h4>
+			<div><span class="detail_title">Running Date:</span>{{ test_case_run.running_date }}</div>
+			<div><span class="detail_title">Close Date:</span>{{ test_case_run.close_date }}</div>
+			<div><span class="detail_title">Build:</span>{{ test_case_run.build }}</div>
+			<div><span class="detail_title">Text Version:</span>{{ test_case_run.case_text_version }}</div>
+			<div><span class="detail_title">Notes:</span>{{ test_case_run.notes }}</div>
+		</td>
+		</tr>
+		<tr>
+			<td colspan="3" style="border:none; background:none">
+				{% get_comment_list for test_case_run as case_run_comments %}
+				<h4> Comments:</h4>
+				<ul class="comment ul-no-format">
+					{% for comment in case_run_comments %}
+					<li>
+						<span class="strong">{{ comment.user.email }}</span>
+						<span class="grey">{{ comment.submit_date }}</span><br/>
+					{{ comment.comment|linebreaksbr }} 
+					</li>
+					{% endfor %}
+				</ul>
+				
 			</td>
 		</tr>
 	</table>

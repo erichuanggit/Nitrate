@@ -5,7 +5,6 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<meta http-equiv="Content-Language" content="utf-8" />
 	<link rel="Shortcut Icon" href="{{ MEDIA_URL }}/images/favicon.png" />
-	<link rel="icon" href="{{ MEDIA_URL }}/images/animated_favicon.gif" type="image/gif" >
 	<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/base.css" media="screen" />
 	<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/print.css" media="print" />
 	{% block custom_stylesheet %}{% endblock %}
@@ -14,6 +13,21 @@
 	<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/livepipe/src/livepipe.js'></script>
 	<script type="text/javascript" src='{{ MEDIA_URL }}/js/tcms_actions.js'></script>
 	{% block custom_javascript %}{% endblock %}
+	<script type="text/javascript">
+	{% if request.user.is_authenticated %}
+	Nitrate.User = {
+		pk: {{ request.user.pk }},
+		username: '{{ request.user.username }}',
+		email: '{{ request.user.email }}',
+	};
+	{% else %}
+	Nitrate.User = {
+		pk: null,
+		username: 'anonymous',
+		email: 'anonymous@anywhere.com',
+	};
+	{% endif %}
+	</script>
 </head>
 <body id="body">
 	{% comment %}

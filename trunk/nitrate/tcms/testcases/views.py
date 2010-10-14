@@ -51,25 +51,24 @@ def automated(request):
     
     ajax_response = {'rc': 0, 'response': 'ok'}
     
-    if request.method == 'POST':
-        form = CaseAutomatedForm(request.REQUEST)
-        #form.populate()
-        if form.is_valid():
-            tcs = TestCase.objects.filter(
-                pk__in = request.REQUEST.getlist('case')
-            )
+    form = CaseAutomatedForm(request.REQUEST)
+    #form.populate()
+    if form.is_valid():
+        tcs = TestCase.objects.filter(
+            pk__in = request.REQUEST.getlist('case')
+        )
+        
+        if form.cleaned_data['a'] == 'change':
+            if isinstance(form.cleaned_data['is_automated'], int):
+                tcs.update(is_automated = form.cleaned_data['is_automated'])
             
-            if form.cleaned_data['a'] == 'change':
-                if isinstance(form.cleaned_data['is_automated'], int):
-                    tcs.update(is_automated = form.cleaned_data['is_automated'])
-                
-                if isinstance(form.cleaned_data['is_automated_proposed'], bool):
-                    tcs.update(
-                        is_automated_proposed = form.cleaned_data['is_automated_proposed']
-                    )
-        else:
-            ajax_response['rc'] = 1
-            ajax_response['response'] = forms.errors_to_list(form)
+            if isinstance(form.cleaned_data['is_automated_proposed'], bool):
+                tcs.update(
+                    is_automated_proposed = form.cleaned_data['is_automated_proposed']
+                )
+    else:
+        ajax_response['rc'] = 1
+        ajax_response['response'] = forms.errors_to_list(form)
     
     return HttpResponse(simplejson.dumps(ajax_response))
 
@@ -225,29 +224,37 @@ def all(request, template_name="case/all.html"):
        -- [number]: When the plan ID defined, it will build the case page in plan
     """
     from forms import SearchCaseForm, CaseFilterForm
-    from tcms.testplans.forms import ImportCasesViaXMLForm
     
     from tcms.core.utils.raw_sql import RawSQL
     from tcms.testplans.models import TestPlan
     from tcms.management.models import Priority, TestTag
     
-    
     # Intial the plan in plan details page
     if request.REQUEST.get('from_plan'):
         tp = TestPlan.objects.get(pk = request.REQUEST['from_plan'])
-        template_name = 'plan/get_cases.html'
         SearchForm = CaseFilterForm
+        # Hacking for case plan
+        if request.REQUEST.get('c') == 'run_case': # 'c' is meaning component
+            template_name = 'plan/get_cases.html'
+        elif request.REQUEST.get('c') == 'review_case':
+            template_name = 'plan/get_review_cases.html'
     else:
         tp = TestPlan.objects.none()
         SearchForm = SearchCaseForm
     
     # Initial the form and template
-    d_status = TestCaseStatus.objects.exclude(name = 'DISABLED')
-    d_status_ids = d_status.values_list('pk', flat=True)
-    
     if request.REQUEST.get('a') in ('search', 'sort'):
         search_form = SearchForm(request.REQUEST)
     else:
+        # Hacking for case plan
+        confirmed_status_name = 'CONFIRMED'
+        if request.REQUEST.get('c') == 'run_case': # 'c' is meaning component
+            d_status = TestCaseStatus.objects.filter(name = confirmed_status_name)
+        elif request.REQUEST.get('c') == 'review_case':
+            d_status = TestCaseStatus.objects.exclude(name = confirmed_status_name)
+        
+        d_status_ids = d_status.values_list('pk', flat=True)
+        
         search_form = SearchForm(initial={
             'case_status': d_status_ids
         })
@@ -306,7 +313,6 @@ def all(request, template_name="case/all.html"):
         'test_cases': tcs,
         'test_plan': tp,
         'search_form': search_form,
-        'xml_form': ImportCasesViaXMLForm(initial = {'a': 'import_cases'}),
         'selected_case_ids': selected_case_ids,
         'case_status': TestCaseStatus.objects.all(),
         'priorities': Priority.objects.all(),
@@ -314,7 +320,11 @@ def all(request, template_name="case/all.html"):
     })
 
 def get(request, case_id, template_name = 'case/get.html'):
+    """Get the case content"""
+    from tcms.testruns.models import TestCaseRunStatus
     from tcms.core.utils.raw_sql import RawSQL
+    
+    # Get the case
     try:
         tc = TestCase.objects.select_related(
             'author', 'default_tester', 'category__name',
@@ -323,30 +333,54 @@ def get(request, case_id, template_name = 'case/get.html'):
     except ObjectDoesNotExist, error:
         raise Http404
     
+    # Get the test plans
+    tps = tc.plan.select_related('author', 'default_product', 'type').all()
+    
+    # Get the specific test plan
     if request.GET.get('from_plan'):
-        from tcms.testplans.models import TestPlan
-        tp = TestPlan.objects.select_related().get(
-            plan_id = request.GET.get('from_plan')
-        )
+        tp = tps.get(pk = request.REQUEST['from_plan'])
     else:
         tp = None
-        
-    tps = tc.plan.select_related().all()
+    
+    # Get the test case runs
     tcrs = tc.case_run.select_related(
         'run__summary', 'tested_by', 'assignee', 'case__category__name',
         'case__priority__name', 'case_run_status__name'
     ).all()
+    
     tcrs = tcrs.extra(select={
         'num_bug': RawSQL.num_case_run_bugs,
     })
     
-    tc.latest_text = tc.latest_text()
+    # Get the specific test case run
+    if request.REQUEST.get('case_run_id'):
+        tcr = tcrs.get(pk = request.REQUEST['case_run_id'])
+    else:
+        tcr = None
     
+    # Get the case texts
+    tc_text = tc.get_text_with_version(request.REQUEST.get('case_text_versions'))
+    
+    # Switch the templates for different module
+    templates = {
+        'case': 'case/get_details.html',
+        'review_case': 'case/get_details_review.html',
+        'case_run': 'case/get_details_case_run.html',
+        'execute_case_run': 'run/execute_case_run.html',
+    }
+    
+    if request.REQUEST.get('type'):
+        template_name = templates.get(request.REQUEST['type'], 'case')
+    
+    # Render the page
     return direct_to_template(request, template_name, {
         'test_case': tc,
         'test_plan': tp,
         'test_plans': tps,
         'test_case_runs': tcrs,
+        'test_case_run': tcr,
+        'test_case_text': tc_text,
+        'test_case_run_status': TestCaseRunStatus.objects.all(),
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
     })
 
@@ -400,37 +434,6 @@ def export(request, template_name = 'case/export.xml'):
     response = printable(request, template_name)
     response['Content-Disposition'] = 'attachment; filename=tcms-testcases-%s.xml' % timestamp_str
     return response
-
-def get_details(request, case_id, template_name = 'case/get_details.html'):
-    """Get the case text with selected case text version"""
-    from tcms.testruns.models import TestCaseRun
-    
-    try:
-        tc = TestCase.objects.get(case_id = case_id)
-    except ObjectDoesNotExist, error:
-        raise Http404(error)
-    
-    if request.REQUEST.get('case_run_id'):
-        tcr = TestCaseRun.objects.get(case_run_id = request.REQUEST['case_run_id'])
-        bugs = tcr.get_bugs()
-    else:
-        tcr = None
-        bugs = tc.get_bugs()
-    
-    if request.REQUEST.get('case_text_version') and request.REQUEST['case_text_version']:
-        try:
-            case_text = tc.text.get(case_text_version = request.REQUEST['case_text_version'])
-        except ObjectDoesNotExist:
-            case_text = tc.latest_text()
-    else:
-        case_text = tc.latest_text()
-    
-    return direct_to_template(request, template_name, {
-        'test_case': tc,
-        'test_case_run': tcr,
-        'bugs': bugs,
-        'case_text': case_text
-    })
 
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
 def edit(request, case_id, template_name = 'case/edit.html'):

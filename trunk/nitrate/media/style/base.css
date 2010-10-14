@@ -112,6 +112,7 @@ option{margin-left:3px;}
 pre{white-space:pre-wrap;word-break:break-all;word-wrap:break-word;width:100%;padding-left:10px;font-family : Verdana,Arial,sans-serif,Helvetica,Georgia;}
 hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .center{text-align:center;}
+.vmiddle{vertical-align:middle;}
 .helplink{float:right;padding-left:15px;background:url("../images/help.gif")  no-repeat 0px 5px ;}
 .helplink a{color:#fff;}
 .spacer{border-bottom:#8C71DC dotted 2px;float:left;text-align:left;font-weight:bold;color:#DC6F20;}
@@ -420,22 +421,27 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 #up:hover{background:url(../images/up_hover.png) no-repeat;}
 #down{ width:20px;  height:20px; float:left; }
 #down:hover{background:url(../images/down_hover.png) no-repeat;}
-.btn_passed{ background:url(../images/pass.png) no-repeat; height:25px; width:25px; border:0;}
-.btn_passed_ban{ background:url(../images/pass_ban.png) no-repeat; height:25px; width:25px; border:0;}
-.btn_failed { background:url(../images/failed.png) no-repeat; height:25px; width:25px;border:0;}
-.btn_failed_ban { border:0; background:url(../images/failed_ban.png) no-repeat; height:25px; width:25px;}
-.btn_blocked{ background:url(../images/blocked.png) no-repeat; height:25px; width:25px; border:0;}
-.btn_blocked_ban{ background:url(../images/blocked_ban.png) no-repeat; height:25px; width:25px; border:0;}
-.btn_idle{ background:url(../images/idle.png) no-repeat; height:25px; width:25px; border:0;}
-.btn_idle_ban{ background:url(../images/idle_ban.png) no-repeat; height:25px; width:25px; border:0;}
-.btn_paused{ background:url(../images/paused.png) no-repeat; height:25px; width:25px; border:0;}
-.btn_paused_ban{ background:url(../images/paused_ban.png) no-repeat; height:25px; width:25px; border:0;}
-.btn_error{ background:url(../images/error.png) no-repeat; height:25px; width:25px; border:0;}
-.btn_error_ban{ background:url(../images/error_ban.png) no-repeat; height:25px; width:25px; border:0;}
-.btn_running{ background:url(../images/running.png) no-repeat; height:25px; width:25px; border:0;}
-.btn_running_ban{ background:url(../images/running_ban.png) no-repeat; height:25px; width:25px; border:0;}
-.btn_waived{ background:url(../images/waived.png) no-repeat; height:25px; width:25px; border:0;}
-.btn_waived_ban{ background:url(../images/waived_ban.png) no-repeat; height:25px; width:25px; border:0;}
+.req { height: 28px; }
+.icon_status { padding-left: 28px; }
+
+.btn {height:25px; width:25px; border:0;}
+.btn_passed{ background:url(../images/pass.png) no-repeat; }
+.btn_passed[disabled="True"]{ background:url(../images/pass_ban.png) no-repeat;}
+.btn_failed { background:url(../images/failed.png) no-repeat; }
+.btn_failed[disabled="True"]{ border:0; background:url(../images/failed_ban.png) no-repeat;}
+.btn_blocked{ background:url(../images/blocked.png) no-repeat;}
+.btn_blocked[disabled="True"]{ background:url(../images/blocked_ban.png) no-repeat;}
+.btn_idle{ background:url(../images/idle.png) no-repeat;}
+.btn_idle[disabled="True"]{ background:url(../images/idle_ban.png) no-repeat;}
+.btn_paused{ background:url(../images/paused.png) no-repeat;}
+.btn_paused[disabled="True"]{ background:url(../images/paused_ban.png) no-repeat;}
+.btn_error{ background:url(../images/error.png) no-repeat;}
+.btn_error[disabled="True"]{ background:url(../images/error_ban.png) no-repeat;}
+.btn_running{ background:url(../images/running.png) no-repeat;}
+.btn_running[disabled="True"]{ background:url(../images/running_ban.png) no-repeat;}
+.btn_waived{ background:url(../images/waived.png) no-repeat;}
+.btn_waived[disabled="True"]{ background:url(../images/waived_ban.png) no-repeat;}
+
 .case_run{ width:100%; border-left:1px solid #ccc; border-right:1px solid #ccc; border-bottom:1px solid #ccc; float:left; padding:1px;}
 .run_evenRow{ background:#f1f1f1; width:100%; clear:both; padding:3px 0px; float:left;}
 .run_oddRow{ background:#fff; width:100%; padding:3px 0px; clear:both;}
@@ -448,7 +454,7 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .new_comment textarea[name='comment']{ width:600px;}
 .new_comment .submit-post{ margin:5px 0; cursor:pointer}
 .case_run .collapse-control{ width:30px; padding:2px; float:left; color:#333;}
-.case_run .buglink{ float:right; margin-right:40px; color:#fbbf2c;}
+.case_run .buglink{background:transparent url(../images/bug_fire.png) no-repeat;padding: 0px 15px;text-decoration:none; }
 .case_run .hiddenRow{ height:auto; float:left; width:100%;}
 .textbox{ border: #7F9DB9 1px solid;overflow:auto; width:60%;}
 /***********************Run End***************************/
@@ -716,11 +722,11 @@ a:link.edit,a:visited.edit{ color:#333;}
 #id_tags_autocomplete ul,#id_batch_add_tags_autocomplete ul{ width:154px; max-height:180px;overflow:auto; border:solid 1px #ccc; margin:1px 0 0 -1px;padding-bottom:10px; background:#fff}
 #id_tags_autocomplete ul li,#id_batch_add_tags_autocomplete ul li{ padding:3px 0 3px 5px; border-bottom:dotted 1px #ccc;}
 #id_tags_autocomplete ul li:hover,#id_batch_add_tags_autocomplete ul li:hover{ cursor:pointer; background:#efefef;padding:3px 0 3px 5px; border-bottom:dotted 1px #ccc;}
-#id_automated_form ul { list-style:none}
-#id_automated_form ul li{ margin-top:3px;}
-#id_automated_form ul li input{ margin-right:7px;}
-#id_automated_form p{ margin-left:10px; margin-top:5px;}
-#id_automated_form p input{ float:left}
+.automated_form ul { list-style:none}
+.automated_form ul li{ margin-top:3px;}
+.automated_form ul li input{ margin-right:7px;}
+.automated_form p{ margin-left:10px; margin-top:5px;}
+.automated_form p input{ float:left}
 
 /*table coulumu width*/
 .table_width_checkbox{ width:20px;}

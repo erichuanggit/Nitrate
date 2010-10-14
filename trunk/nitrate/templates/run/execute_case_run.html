@@ -1,195 +1,142 @@
 {% load comments %}
-<div id="id_tr_case_{{ forloop.counter }}" class="execute_case_run run_evenRow {% if test_case_run.is_current %} run_current {% endif %} {% ifequal test_case_run.assignee user%} mine {%endifequal%}" onclick="toggleTestCaseContents('{{ forloop.counter }}', '{{ test_case_run.case_text_version}}', '{{ test_case_run.case_run_id}}')">
-	{% if response %}
-	<div id='response'>{{ response }}</div>
-	{% endif %}
-	<span class="lab-20">{{ forloop.counter }}</span>
-	<div class="collapse-control">
-		{% if test_case_run.is_current %}
-		<a id="link_{{ forloop.counter }}">
-			<img  id="blind_icon_{{ forloop.counter }}" class="blind_link down" src="{{ MEDIA_URL }}/images/t2.gif" />
-		</a>
-		{% else %}
-		<a id="link_{{ forloop.counter }}">
-			<img style="float:left" id="blind_icon_{{ forloop.counter }}" class="blind_link up" src="{{ MEDIA_URL }}/images/t1.gif"/>
-		</a>
-		{% endif %}
-	</div>
-	<span class="lab-50">{{ test_case_run.case.priority.value }}</span>
-    <span class="lab-100" title="Case_Run ID">{{ test_case_run.case_run_id }}</span>
-    <span class="lab-50"><a href="{% url tcms.testcases.views.get test_case_run.case_id %}?from_plan={{ testrun.plan_id }}" title="Case ID">{{ test_case_run.case_id }}</a></span>
-	<div class="req">
-		<img id="id_case_run_status_icon_{{ forloop.counter }}" src="{{ MEDIA_URL }}/images/{{ test_case_run.case_run_status.name|lower }}.png" width="18px"/>
-		{% if test_case_run.is_current %}
-		<a id="blind_link_{{ forloop.counter }}" href="#caserun_{{ test_case_run.case_run_id }}">
-			{{ test_case_run.case.summary }}
-		</a>
-		{% else %}
-		<a id="blind_link_{{ forloop.counter }}" href="#caserun_{{ test_case_run.case_run_id }}">
-			{{ test_case_run.case.summary }}
-		</a>
-		{% endif %}
-		
-	</div>
-    <span class="lab-50_right"><span class="mark">{{ test_case_run.sortkey }}</span></span>
+
+<div class="grey right-action">
+	<label class="tit" >Author:</label>
+	<a href="mailto:{{ test_case_run.case.author.email }}">{{ test_case_run.case.author}}</a>
+	<label class="tit">Tester:</label>
+	<a href="mailto:{{ test_case_run.tested_by.email }}">{{ test_case_run.tested_by }}</a>
+	<label class="tit">Assignee:</label>
+	<a href="mailto:{{ test_case_run.assignee.email }}">{{ test_case_run.assignee}}</a>
+	<label class="tit">Category:</label>
+	{{ test_case_run.case.category }}
+	<label class="tit">Status:</label>
+	<span>{{ test_case_run.case_run_status }}</span>
 </div>
-<div class="hiddenRow {% if not test_case_run.is_current %}border-top{% endif %}" id="hidenRow_{{ forloop.counter }}" {% if not test_case_run.is_current %}style="display: none"{% endif %}>
-	<div class="grey right-action">
-		<label class="tit" >Author:</label>
-		<a href="mailto:{{ test_case_run.case.author.email }}">{{ test_case_run.case.author}}</a>
-		<label class="tit">Tester:</label>
-		<a id="id_link_assignee_{{ test_case_run.case_run_id }}" href="mailto:{{ test_case_run.tested_by.email }}">{{ test_case_run.tested_by }}</a>
-        <label class="tit">Assignee:</label>
-		<a id="id_link_assignee_{{ test_case_run.case_run_id }}" href="mailto:{{ test_case_run.assignee.email }}">{{ test_case_run.assignee}}</a>
-		<label class="tit">Category:</label>
-		{{ test_case_run.case.category }}
-		<label  class="tit">Status:</label>
-		<span id="case_run_status_{{ test_case_run.case_run_id }}" >{{ test_case_run.case_run_status }}</span>
-	</div>
-    
-	<table class="list case_detail">
-		<tr>
-			<td class="step_ul">
-				<h4>Setup:</h4>
-				{{ test_case_run.get_text_with_version.setup|safe }}
-			</td>
-			<td class="step_ul">
-				<h4>Breakdown:</h4>
-				{{ test_case_run.get_text_with_version.breakdown|safe }}
-			</td>
-             <td valign="top" rowspan="2" width="200" class="right_panel">
-             	<h4><span class="title strong">Attachment:</span></h4>
-                
-                <a href="{% url tcms.testcases.views.attachment test_case_run.case_id %}?from_plan={{ testrun.plan_id }}" class="addlink" target="_blank">Add Attachment</a>
-                
-                <ul class="ul-no-format" style="display:block; margin-left:16px;">
-                    {% for attachment in test_case_run.case.attachment.all %}
-                    <li>
-                        <a href="{% url tcms.core.files.check_file attachment.attachment_id %}">{{ attachment }}</a>
-                    </li>
-                    {% empty %}
-                    <li class="grey">No attachment found</li>
-                    {% endfor %}
-                    
-                </ul>
-                <h4><span class="title strong">Component:</span></h4>
-                
-                <ul class="ul-no-format" style="display:block; margin-left:16px;">
-                    {% for component in test_case_run.case.component.all %}
-                    <li id="display_component" >{{ component.name }}</li>
-                    {% empty %}
-                    <li class="grey">No component found</li>
-                    {% endfor %}
-                </ul>
-                <h4><span class="title strong">Tag:</span></h4>
-                <ul class="ul-no-format" style="display:block; margin-left:16px;">
-                    {% for tag in test_case_run.case.tag.all %}
-                    <li>{{ tag }}</li>
-                    {% empty %}
-                    <li class="grey">No tag found</li>
-                    {% endfor %}
-                </ul>
-                
-                <h4><span class="title strong">Related Bug:</span></h4>
-                
-                <a class="addlink" href="#bug" onclick="addCaseRunBug({{ forloop.counter }}, {{ testrun.run_id }}, {{ test_case_run.case_run_id }}, {{ test_case_run.case_id }})">Add a bug</a>
-                <a id="id_file_bug_{{ test_case_run.case_run_id }}" href="{% url tcms.testruns.views.bug testrun.run_id test_case_run.case_run_id %}?handle=file" target="_blank" class="buglink" title="File a bug on bugzilla">
-                    <img src="{{ MEDIA_URL }}/images/bug_fire.png" />
-                    File Bug
-                </a>
-                
-                <ul class="ul-no-format" style="display:block; margin-left:16px;">
-                   {% for bug in test_case_run.get_bugs %}
-                    <li class="listyledisc"><a href="{{ bug.get_absolute_url }}">{{ bug }}</a>
-                    <a href="javascript:void(0)" onclick="removeCaseRunBug({{ forloop.parentloop.counter }}, {{ testrun.run_id }}, {{ test_case_run.case_run_id }}, {{ bug.bug_id }}, {{ bug.id }})">
-                    <img src="{{ MEDIA_URL }}/images/icon_cross.png" width="12" height="12" title="remove this tag" />
-                    </a>
-                    </li>
-                    {% empty %}
-                    <li class="grey">No bug found</li>
-                    {% endfor %}
-                </ul>
-             
-             
-             </td>
-		</tr>
-		<tr>
-			<td class="step_ul">
-				<h4>Actions:</h4>
-				{{ test_case_run.get_text_with_version.action|safe }}
-			</td>
-			<td class="step_ul">
-				<h4>Expected Results:</h4>
-				{{ test_case_run.get_text_with_version.effect|safe }}
-			</td>
-		</tr>
-	</table>
-	<div class="runexecute_icon">
-		<form class="form_case_run_status" id="id_form_case_run_{{ test_case_run.case_run_id }}">
-			<input type="hidden" name="type" value="html" />
-			<input type="hidden" name="index_id" value="{{ forloop.counter }}">
-			<input type="hidden" name="run_id" value="{{ test_case_run.run_id }}">
-			<input type="hidden" name="case_run_id" value="{{ test_case_run.case_run_id }}" />
-			<input type="hidden" name="case_id" value="{{ test_case_run.case_id }}" />
-			<input type="hidden" name="orig_case_run_status_id" value="{{ test_case_run.case_run_status_id }}" />
-			<div id="id_statuButton_{{ test_case_run.case_run_id }}">
-				{% for crs in case_run_status %}
-				<input type="button"
-				{% ifequal test_case_run.case_run_status_id crs.id %}
-				class="btn_{{ crs.name|lower }}_ban" 
-				disabled="disabled"
-				{% else %}
-				class="btn_{{ crs.name|lower }}" 
-				{% endifequal %} 
-				title="Change case in run status to {{ crs.name }}"
-				onclick="changeCaseRunStatus({{ crs.pk }}, {{ crs.auto_blinddown }}, this.form)"
-				/>
+<table class="list case_detail">
+	<tr>
+		<td class="step_ul">
+			<h4>Setup:</h4>
+			{{ test_case_run.get_text_with_version.setup|safe }}
+		</td>
+		<td class="step_ul">
+			<h4>Breakdown:</h4>
+			{{ test_case_run.get_text_with_version.breakdown|safe }}
+		</td>
+		 <td valign="top" rowspan="2" width="200" class="right_panel">
+			<h4><span class="title strong">Attachment:</span></h4>
+			
+			<a href="{% url tcms.testcases.views.attachment test_case_run.case_id %}?from_plan={{ testrun.plan_id }}" class="addlink" target="_blank">Add Attachment</a>
+			
+			<ul class="ul-no-format" style="display:block; margin-left:16px;">
+				{% for attachment in test_case_run.case.attachment.all %}
+				<li>
+					<a href="{% url tcms.core.files.check_file attachment.attachment_id %}">{{ attachment }}</a>
+				</li>
+				{% empty %}
+				<li class="grey">No attachment found</li>
 				{% endfor %}
-			</div>
-		</form>
-	</div>
-	
-	<div class="row border-top border-bottom">
-		<div class="exist_comments">
-			<div>
-				<form action="{% url tcms.core.contrib.comments.views.all %}" method="get">
-					{% get_comment_form for test_case_run as form %}
-					{{ form.content_type }}
-					{{ form.object_pk }}
-                    {% get_comment_count for test_case_run as comment_count %}
-					<a class="link_show_comments" href="javascript:void(0)">Show comments</a>
-					<label>({{ comment_count }})</label>
-				</form>
-			</div>
-			<div style="display:none;" class="comment">
-				<div class="ajax_loading"></div>
-			</div>
-		</div>
-        
-		<div class="new_comment">
-			<form class="comment_form" action="{% comment_form_target %}" method="POST">
-				<table cellspacing="0" cellspan="0">
-					{% get_comment_form for test_case_run as comment_form %}
-					{{ comment_form.as_table }}
-					<tr>
-						<td></td>
-						<td align="left"><input type="submit" class="submit-post" value="Submit"></td>
-					</tr>
-				</table>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<a class="" onclick="$('case_run_notes_{{ test_case_run.case_run_id }}').toggle();">Change Log</a>
-		<span style="display:none" id="case_run_notes_{{ test_case_run.case_run_id }}">
-			<ul>
-				{% for log in test_case_run.log %}
-				<li>[{{ log.date }}] - [{{ log.who }}] - {{ log.action }}
+				
+			</ul>
+			<h4><span class="title strong">Component:</span></h4>
+			<ul class="ul-no-format" style="display:block; margin-left:16px;">
+				{% for component in test_case_run.case.component.all %}
+				<li>{{ component.name }}</li>
+				{% empty %}
+				<li class="grey">No component found</li>
 				{% endfor %}
 			</ul>
-		</span>
+			<h4><span class="title strong">Tag:</span></h4>
+			<ul class="ul-no-format" style="display:block; margin-left:16px;">
+				{% for tag in test_case_run.case.tag.all %}
+				<li>{{ tag }}</li>
+				{% empty %}
+				<li class="grey">No tag found</li>
+				{% endfor %}
+			</ul>
+			<h4><span class="title strong">Related Bug:</span></h4>
+			<a href="{% url tcms.testruns.views.bug test_case_run.pk %}?a=file" target="_blank" class="buglink" title="File a bug on bugzilla">File</a>
+			<a href="#bug" class="addlink" title="Add" onclick="addCaseRunBug(this.up(4).previous(), this.up(4), {{ test_case_run.case_id }}, {{ test_case_run.pk }})">Add</a>
+			<ul class="ul-no-format" style="display:block; margin-left:16px;">
+			   {% for bug in test_case_run.get_bugs %}
+				<li class="listyledisc"><a href="{{ bug.get_absolute_url }}">{{ bug }}</a>
+				<a href="javascript:void(0)" onclick="removeCaseRunBug(this.up(4).previous(), {{ test_case_run.pk }}, {{ bug.pk }})">
+				<img src="{{ MEDIA_URL }}/images/icon_cross.png" width="12" height="12" title="remove this tag" />
+				</a>
+				</li>
+				{% empty %}
+				<li class="grey">No bug found</li>
+				{% endfor %}
+			</ul>
+		 </td>
+	</tr>
+	<tr>
+		<td class="step_ul">
+			<h4>Actions:</h4>
+			{{ test_case_run.get_text_with_version.action|safe }}
+		</td>
+		<td class="step_ul">
+			<h4>Expected Results:</h4>
+			{{ test_case_run.get_text_with_version.effect|safe }}
+		</td>
+	</tr>
+</table>
+
+<div class="row border-top border-bottom">
+	<div class="exist_comments">
+		{% get_comment_list for test_case_run as comment_list %}
+		<ul class="ul-no-format comment">
+				{% for comment in comment_list %}
+				<li>
+					<span class="strong">{{ comment.user.email }}</span>
+					<span class="grey">{{ comment.submit_date }}</span>
+					{% ifequal comment.user user %}
+					<form action="{% url tcms.core.contrib.comments.views.delete %}" method="get">
+						<input type="hidden" name="comment_id" value="{{ comment.id }}" />
+						<a class="commentdelete sprites" href="javascript:void(0)" ></a>
+					</form>
+					{% endifequal %}
+					<br/>
+					<pre>{{ comment.comment|linebreaksbr }}</pre>
+				</li>
+				{% endfor %}
+		</ul>
+	</div>
+	
+	<div class="new_comment">
+		<form class="update_form" method="POST">
+			<table cellspacing="0" cellspan="0">
+				{% get_comment_form for test_case_run as comment_form %}
+				{{ comment_form.as_table }}
+				<tr>
+					<td>
+					</td>
+					<td align="right">
+						<input type="hidden" name="type" value="html" />
+						<input type="hidden" name="field" value="case_run_status" />
+						<input type="hidden" name="case_id" value="{{ test_case_run.case.pk }}" />
+						<input type="hidden" name="assignee" value="{{ test_case_run.assignee.pk }}" />
+						<input type="hidden" name="tested_by" value="{{ test_case_run.tested_by.pk }}" />
+						<input type="hidden" name="value" value="" />
+						{% for crs in test_case_run_status %}
+						<input type="submit" class="btn btn_{{ crs.name.lower }}" value="" {% ifequal crs test_case_run.case_run_status %}disabled="True"{% endifequal %} onclick="this.form.value.value={{ crs.pk }}" />
+						{% endfor %}
+						<input type="submit" class="submit-post" value="Submit">
+					</td>
+				</tr>
+			</table>
+		</form>
 	</div>
 </div>
+<div class="row">
+	<label>Change Log</label>
+	<ul>
+		{% for log in test_case_run.log %}
+		<li>[{{ log.date }}] - [{{ log.who }}] - {{ log.action }}</li>
+		{% empty %}
+		<li class="grey">No log recorded.</li>
+		{% endfor %}
+	</ul>
+</div>
 {% if response %}
-<div id="response">{{ response }}</div>
+<div>{{ response }}</div>
 {% endif %}

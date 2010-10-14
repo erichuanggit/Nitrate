@@ -17,16 +17,16 @@ Nitrate.TestRuns.List.on_load = function()
         {
             rowEvenClass : 'roweven',
             rowOddClass : 'rowodd',
-            nosortClass : 'nosort'	
+            nosortClass : 'nosort'  
         });
     }
-
+    
     $('id_search_people').name = $F('id_people_type');
     
     $('id_people_type').observe('change', function() {
         $('id_search_people').name = $F('id_people_type');
     })
-
+    
     $('run_column_add').observe('change', function(t) {
         switch(this.value) {
             case 'col_plan':
@@ -37,8 +37,6 @@ Nitrate.TestRuns.List.on_load = function()
         }
         
     })
-
-
 }
 
 Nitrate.TestRuns.Details.on_load = function()
@@ -50,6 +48,16 @@ Nitrate.TestRuns.Details.on_load = function()
         toggleAllCheckBoxes(this, 'id_table_cases', 'case_run');
     })
     
+    $$('.expandable').invoke('observe', 'click', function(e) {
+        var c = this.up(); // Container
+        var c_container = c.next(); // Content Containers
+        var case_id = c.getElementsBySelector('input[name="case"]')[0].value;
+        var case_run_id = c.getElementsBySelector('input[name="case_run"]')[0].value;
+        var case_text_version = c.getElementsBySelector('input[name="case_text_version"]')[0].value;
+        var type = 'case_run';
+        toggleTestCaseContents(type, c, c_container, case_id, case_text_version, case_run_id);
+    });
+    
     if(window.location.hash) {
         fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
     }
@@ -60,7 +68,7 @@ Nitrate.TestRuns.New.on_load = function()
     if($('testcases')) {
           TableKit.Sortable.init('testcases',
           {
-          	 nosortClass : 'nosort'
+             nosortClass : 'nosort'
           });
     }
     if($('testcases_filter')) {
@@ -82,9 +90,19 @@ Nitrate.TestRuns.Edit.on_load = function()
 
 Nitrate.TestRuns.Execute.on_load = function()
 {
-    // Bind the display
-    bindExecuteShowCommment('executeList');
-    bindExecuteCommentForm('executeList');
+    $$('.execute_case_run').invoke('observe', 'click', function(e) {
+        var type = 'execute_case_run';
+        var container = this.up();
+        var content_container = this.next();
+        var case_id = this.getElementsBySelector('input[name="case_id"]')[0].value;
+        var case_text_version = this.getElementsBySelector('input[name="case_text_version"]')[0].value;
+        var case_run_id = this.getElementsBySelector('input[name="case_run_id"]')[0].value;
+        var callback = function(t) {
+            content_container.getElementsBySelector('.update_form')[0].observe('submit', updateCaseRunStatus);
+        }
+        
+        toggleTestCaseContents(type, container, content_container, case_id, case_text_version, case_run_id, callback)
+    });
     
     if(window.location.hash) {
         blindupAllCases();
@@ -98,13 +116,13 @@ Nitrate.TestRuns.Execute.on_load = function()
             blindupAllCases();
         }
     })
-	if($('id_check_box_highlight').checked){
-		$$('.mine').invoke('addClassName','highlight');
-		}
-	$('id_check_box_highlight').observe('click',function(){
-		e=$$('.mine');
-		this.checked && e.invoke('addClassName','highlight') || e.invoke('removeClassName','highlight')
-		})
+    if($('id_check_box_highlight').checked)
+        $$('.mine').invoke('addClassName','highlight');
+    
+    $('id_check_box_highlight').observe('click', function(e) {
+        e=$$('.mine');
+        this.checked && e.invoke('addClassName','highlight') || e.invoke('removeClassName','highlight')
+    })
 }
 
 Nitrate.TestRuns.Clone.on_load = function()
@@ -132,91 +150,80 @@ Nitrate.TestRuns.AssignCase.on_load= function()
     })
 }
 
-function bindExecuteShowCommment(container, parameters)
+var updateCaseRunStatus = function(e)
 {
-    $(container).adjacent('a.link_show_comments').invoke('observe', 'click', function(e) {
-        var container = this.up(1).next();
-        
-        container.toggle();
-        constructCommentZone(container, this.parentNode.serialize(true));
-        
-        if(container.getStyle('display') == 'none')
-            this.update('Show comments');
-        else
-            this.update('Hide comments');
-    })
-}
+    e.stop();
+    var container = this.up(2);
+    var parent = container.up();
+    var title = container.previous();
+    var parameters = this.serialize(true);
+    var content_type = parameters['content_type'];
+    var object_pk = parameters['object_pk'];
+    var field = parameters['field'];
+    var value = parameters['value'];
 
-/*
-// Rewrite with observe in bindCommentDeleteLink() of tcms_actions.js
-
-function commentdelete(comment_id){
-    if(!confirm('Are you sure to delete the comment?'))
-        return false;
-    
-    var delete_link = this;
-    var success = function(t) {
-        returnobj = t.responseText.evalJSON(true);
+	// Callback when 
+    var callback = function(t, rtobj) {
+        // Reset the content to loading
+        var ajax_loading = getAjaxLoading();
+        ajax_loading.id = 'id_loading_' + parameters['case_id'];
+        container.update(ajax_loading);
         
-        if (returnobj.rc == 0) {
-            var container = delete_link.up(2);
-            var parameters = delete_link.up(2).previous().down().serialize(true);
-            constructCommentZone(container, parameters);
+        // Update the contents
+        if (parameters['value'] != '') {
+            var crs = Nitrate.TestRuns.CaseRunStatus;
+            var icon_status = parent.getElementsBySelector('.icon_status');
+            icon_status.each(function(item) {
+                for (i in crs) {
+                    if (typeof(crs[i]) == 'string' && item.hasClassName('btn_' + crs[i]))
+                        item.removeClassName('btn_' + crs[i]);
+                }
+                item.addClassName('btn_' + Nitrate.TestRuns.CaseRunStatus[value-1]);
+            })
+        }
+        
+        // Mark the case run to mine
+        if(!title.hasClassName('mine'))
+            title.addClassName('mine');
+        
+        // Blind down next case
+        fireEvent(title, 'click');
+        
+        if ($('id_check_box_auto_blinddown').checked && parameters['value'] != '') {
+            if(!parent.next()) {
+                alert(default_messages.alert.last_case_run);
+                return false;
+            }
+            
+            if(parent.next().down().next().getStyle('display') == 'none')
+                fireEvent(parent.next().down(), 'click');
         } else {
-            alert(returnobj.response);
+            fireEvent(title, 'click');
         }
     }
-    var failure = function(t) {
-        alert("Delete comment failed");
+    
+    // Add comment
+    if (parameters['comment'] != '') {
+        var c = new Element('div');
+        if(parameters['value'] != '')
+            submitComment(c, parameters);
+        else
+            submitComment(c, parameters, callback)
     }
-    var url = '/comments/delete/';
-    new Ajax.Request(url, {
-        method:'get',
-        parameters:{
-            'comment_id': comment_id,
-        },
-        onSuccess: success, 
-        onFailure: failure,
-    });
-}
-*/
-
-function unbindExecuteShowCommment(container)
-{
-    $(container).adjacent('a.link_show_comments').invoke('stopObserving', 'click');
-}
-
-function unbindCaseRunStatusForm(object)
-{
-    $$(object).invoke('stopObserving')
-}
-
-function bindCaseRunStatusForm(object)
-{
-    $$(object).invoke('observe', 'submit', function(e) {
-        e.stop();
-        changeCaseRunStatus(this);
-    })
-}
-
-function bindExecuteCommentForm(container)
-{
-    $(container).adjacent('form.comment_form').invoke('observe', 'submit', function(e) {
-        e.stop();
+    
+    // Update the object when changing the status
+    if(parameters['value'] != '') {
+        updateObject(content_type, object_pk, 'close_date', 'NOW');
+        updateObject(content_type, object_pk, field, value, callback);
         
-        var parameters = this.serialize(true);
-        var comment_container = this.up().previous().down().next();
-        if (parameters.comment) {
-            comment_container.show();
-            submitComment(comment_container, parameters);
-            this.elements['comment'].value = '';
-        }
-    })
-}
-
-function unbindExecuteCommentForm(container)
-{
-    $(container).adjacent('form.comment_form').invoke('stopObserving', 'submit');
+        if(parameters['assignee'] != Nitrate.User.pk)
+            updateObject(content_type, object_pk, 'assignee', Nitrate.User.pk);
+        if(parameters['tested_by'] != Nitrate.User.pk)
+            updateObject(content_type, object_pk, 'tested_by', Nitrate.User.pk);
+        
+        // Set the case run to be current
+        new Ajax.Request(getURLParam(object_pk).url_case_run_set_current);
+    }
 }
 
 function changeCaseRunOrder(run_id, case_run_id, sort_key)
@@ -274,7 +281,7 @@ function taggleSortCaseRun()
         });
         
         // Remove blind down arrow link
-        $$('#id_table_cases .blind_link').each(function(t) {
+        $$('#id_table_cases .blind_icon').each(function(t) {
             t.remove();
         });
         // Use the title to replace the blind down title link
@@ -286,6 +293,9 @@ function taggleSortCaseRun()
         $$('#id_table_cases .mark').each(function(t) {
             t.parentNode.update(t.innerHTML);
         });
+        
+        $$('#id_table_cases .case_content').invoke('remove');
+        $$('#id_table_cases .expandable').invoke('stopObserving');
         
         // init the tableDnD object
         var table = document.getElementById('id_table_cases');
@@ -310,79 +320,23 @@ function selectcase(){
     $('testcases_unselected').toggle();
 }
 
-function constructCaseRunZone(index_id, url, run_id, case_run_id, parameters, blind_next)
+function constructCaseRunZone(container, title_container, case_id)
 {
-    var p = getTestCaseParam(index_id);
-    $(p.case_run_container).update('<div class="ajax_loading"></div>');
-    
-    var complete = function(t) {
-        if($('response')) {
-            alert($('response').innerHTML);
-            return false;
-        }
-        
-        // Bind the display
-        unbindExecuteShowCommment('executeList');
-        unbindExecuteCommentForm('executeList');
-        
-        // Bind the display
-        bindExecuteShowCommment('executeList');
-        bindExecuteCommentForm('executeList');
-        
-        // Blind down next case content
-        var box_is_hidden = $(p.hidenbox).getStyle('display') == 'none'
-        if(blind_next) {
-            blinddownNextTestCaseContents(index_id);
-        } else if (parameters.auto_blinddown == false && box_is_hidden) {
-            fireEvent($(p.tr), 'click');
-        } else if (!$('id_check_box_auto_blinddown').checked && box_is_hidden) {
-            fireEvent($(p.tr), 'click');
-        }
+    if(container) {
+        var ajax_loading = getAjaxLoading();
+        ajax_loading.id = 'id_loading_' + case_id;
+        container.update(ajax_loading);
     }
     
-    var failure = function(t) { 
-        alert("Update status failed");
+    if(title_container) {
+        fireEvent(title_container, 'click');
+        fireEvent(title_container, 'click');
     }
-    
-    new Ajax.Updater(p.case_run_container, url, {
-        method:'get',
-        parameters: parameters,
-        onComplete: complete,
-        onFailure: failure
-    });
 }
 
-function changeCaseRunStatus(case_run_status_id, status_auto_blinddown, form)
+function addCaseRunBug(title_container, container, case_id, case_run_id, callback)
 {
-    var parameters = form.serialize(true);
-    var index_id = parameters.index_id;
-    var run_id = parameters.run_id;
-    var case_run_id = parameters.case_run_id;
-    
-    parameters.case_run_status_id = case_run_status_id;
-    
-    var auto_blinddown = $('id_check_box_auto_blinddown').checked;
-    
-    if (status_auto_blinddown == '0' || status_auto_blinddown == 'False')
-        var status_auto_blinddown = false
-    
-    if (status_auto_blinddown && auto_blinddown)
-        var auto_blinddown = true;
-    else
-        var auto_blinddown = false;
-    parameters.auto_blinddown = auto_blinddown;
-    
-    var url = '/run/' + run_id + '/caserun/' + case_run_id + '/changestatus/';
-    
-    constructCaseRunZone(
-        index_id, url, run_id, case_run_id, parameters, auto_blinddown
-    );
-}
-
-function addCaseRunBug(index_id, run_id, case_run_id, case_id)
-{
-    var p = getTestCaseParam(index_id);
-    
+    // FIXME: Popup dialog to select the bug system
     bug_id = prompt('Please input the bug id.');
     bug_id = Trim(bug_id);
     
@@ -399,45 +353,74 @@ function addCaseRunBug(index_id, run_id, case_run_id, case_id)
         return false;
     }
     
-    var url = '/run/' + run_id + '/caserun/' + case_run_id + '/bug/';
-    var parameter = {
-        handle: 'add',
-        index_id: index_id,
-        run: run_id,
+    var url = getURLParam(case_run_id).url_case_run_bug;
+    var parameters = {
+        a: 'add',
         case_run: case_run_id,
-        'case': case_id,
         bug_system: 1, // FIXME: Temporary solution here.
         bug_id: bug_id,
     }
+    parameters['case'] = case_id;
     
-    constructCaseRunZone(
-        index_id, url, run_id, case_run_id, parameter
-    );
+    var success = function(t) {
+        var returnobj = t.responseText.evalJSON();
+        
+        if(returnobj.rc == 0) {
+            if (callback)
+                return callback();
+            
+            return constructCaseRunZone(container, title_container, case_id);
+        } else {
+            alert(returnobj.response);
+            return false;
+        }
+    }
+    
+    new Ajax.Request(url, {
+        method: 'get',
+        parameters: parameters,
+        onSuccess: success,
+        onFailure: json_failure,
+    })
 }
-function removeCaseRunBug(index_id, run_id, case_run_id, bug_id, id)
+function removeCaseRunBug(bug_id, parameters, callback)
 {   
-    var p = getTestCaseParam(index_id);
-    
     if(!bug_id)
         return false;
     
     if(!confirm('Are you sure to remove the bug?'))
         return false;
     
-    var url = '/run/' + run_id + '/caserun/' + case_run_id + '/bug/';
+    var url = '/caserun/' + case_run_id + '/bug/';
     
     var parameter = {
-        handle: 'remove',
+        a: 'remove',
         index_id: index_id,
         run: run_id,
         case_run: case_run_id,
         bug_id: bug_id,
-        id: id,
     }
     
-    constructCaseRunZone(
-        index_id, url, run_id, case_run_id, parameter
-    );
+   var success = function(t) {
+		var returnobj = t.responseText.evalJSON();
+		
+		if(returnobj.rc == 0) {
+			if (callback)
+				return callback();
+			
+			return constructCaseRunZone(container, title_container);
+		} else {
+			alert(returnobj.response);
+			return false;
+		}
+	}
+	
+	new Ajax.Request(url, {
+		method: 'get',
+		parameters: parameters,
+		onSuccess: success,
+		onFailure: json_failure,
+	})
 }
 
 
@@ -448,7 +431,6 @@ function delCaseRun(run_id)
     if(response)
         window.location.href='removecaserun/?' + $('id_form_case_runs').serialize();
 }
-
 
 function editValue(form,hidebox,selectid,submitid)
 {
@@ -519,7 +501,7 @@ function submitValue(run_id,value,hidebox,select_field,submitid){
     new Ajax.Request(url, {
         method:'get',
         parameters: {
-            'handle': 'change',
+            'a': 'change',
             'old_env_value_id': value,
             'new_env_value_id': select_field.value,
             'run_id' : run_id,
@@ -551,7 +533,7 @@ function removeProperty(run_id,env_value_id)
     new Ajax.Request(url, {
         method:'get',
         parameters:{
-            'handle' : 'remove',
+            'a' : 'remove',
             'info_type' : 'env_values',
             'env_value_id' : env_value_id,
             'run_id' : run_id,
@@ -658,7 +640,7 @@ function add_property_to_env(run_id,env_value_id)
     new Ajax.Request(url, {
         method:'get',
         parameters:{
-            'handle' : 'add',
+            'a' : 'add',
             'info_type' : 'env_values',
             'env_value_id' : env_value_id,
             'run_id' : run_id,
@@ -681,7 +663,7 @@ function addRunTag(container, run_id)
     new Ajax.Updater(container, url, {
         method: 'get',
         parameters: {
-            handle: 'add',
+            a: 'add',
             run: run_id,
             tags: tag,
         },
@@ -697,7 +679,7 @@ function removeRuntag(container, run_id, tag)
     new Ajax.Updater(container, url, {
         method: 'get',
         parameters: {
-            handle: 'remove',
+            a: 'remove',
             run: run_id,
             tags: tag,
         },

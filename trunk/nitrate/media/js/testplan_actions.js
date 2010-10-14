@@ -7,255 +7,255 @@ Nitrate.TestPlans.SearchCase = {};
 Nitrate.TestPlans.Clone = {};
 
 Nitrate.TestPlans.TreeView = {
-	pk: new Number(),
-	data: new Object(),
-	tree_elements: new Element('div'),
-	default_container: 'id_tree_container',
-	default_parameters: {
-		t: 'ajax',
-	}, // FIXME: Doesn't make effect here.
-	
-	filter: function(parameters, callback) {
-		var url = getURLParam().url_plans;
-		new Ajax.Request(url, {
-			method: 'get',
-			parameters: parameters,
-			asynchronous: false,
-			onSuccess: callback,
-			onFailure: json_failure,
-		})
-	},
-	init: function(plan_id) {
-		this.pk = plan_id;
-		
-		// Current, Parent, Brothers, Children, Temporary current
-		var c_plan, p_plan, b_plans, ch_plans, tc_plan;
-		
-		// Get the current plan
-		/*
-		var p1 = { pk: plan_id, t: 'ajax'};
-		var c1 = function(t) {
-			var returnobj = t.responseText.evalJSON(true);
-			if (returnobj.length > 0)
-				c_plan = returnobj[0];
-		};
-		this.filter(p1, c1);
-		if(!c_plan) {
-			alert('Plan ' + plan_id + ' can not found in database');
-			return false;
-		}
-		*/
-		c_plan = Nitrate.TestPlans.Instance;
-		
-		// Get the parent plan
-		if(c_plan.fields.parent) {
-			var p2 = { pk: c_plan.fields.parent, t: 'ajax'};
-			var c2 = function(t) {
-				var returnobj = t.responseText.evalJSON(true);
-				p_plan = returnobj[0];
-			}
-			this.filter(p2, c2);
-		}
-		
-		// Get the brother plans
-		if(c_plan.fields.parent) {
-			var p3 = { parent__pk: c_plan.fields.parent, t: 'ajax'};
-			var c3 = function(t) {
-				var returnobj = t.responseText.evalJSON(true);
-				b_plans = returnobj;
-			}
-			this.filter(p3, c3);
-		}
-		
-		// Get the child plans
-		var p4 = { 'parent__pk': c_plan.pk, 't': 'ajax'};
-		var c4 = function(t) {
-			var returnobj = t.responseText.evalJSON(true);
-			ch_plans = returnobj;
-		};
-		this.filter(p4, c4);
-		
-		// Combine all of plans
-		// Presume the plan have parent and brother at first
-		if(p_plan && b_plans) {
-			p_plan.children = b_plans;
-			tc_plan = this.traverse(p_plan.children, c_plan.pk);
-			tc_plan.is_current = true;
-			if (ch_plans)
-				tc_plan.children = ch_plans;
-			
-			if(p_plan.pk)
-				p_plan = Nitrate.Utils.convert('obj_to_list', p_plan)
-			
-			this.data = p_plan;
-		} else {
-			c_plan.is_current = true;
-			if (ch_plans)
-				c_plan.children = ch_plans;
-			this.data = Nitrate.Utils.convert('obj_to_list', c_plan);
-		};
-	},
-	up: function(e) {
-		var tree = Nitrate.TestPlans.TreeView;
-		
-		var p = {
-			pk: tree.data[0].fields.parent,
-			t: 'ajax'
-		};
-		
-		var c = function(t) {
-			var returnobj = t.responseText.evalJSON(true);
-			var parent_obj = {0: returnobj[0], length: 1};
-			parent_obj[0].children = tree.data;
-			tree.data = parent_obj;
-			tree.render_page();
-		}
-		
-		tree.filter(p, c);
-	},
-	blind: function(e) {
-		var tree = Nitrate.TestPlans.TreeView;
-		var e_container = this.up();
-		var e_pk = this.previous();
-		var container_clns = e_container.classNames().toArray();
-		
-		var pk = e_pk.innerHTML;
-		var obj = tree.traverse(tree.data, pk);
-		
-		for (i in container_clns) {
-			if(typeof(container_clns[i]) != 'string')
-				continue
-			
-			switch (container_clns[i]) {
-				case 'expand':
-					this.adjacent('ul')[0].hide();
-					e_container.removeClassName('expand')
-					e_container.addClassName('collapse');
-					break;
-				case 'collapse':
-					if (typeof(obj.children) != 'object' || obj.children == []) {
-						var c = function(t) {
-							var returnobj = t.responseText.evalJSON(true);
-							returnobj = Nitrate.Utils.convert('obj_to_list', returnobj);
-							tree.insert(obj, returnobj);
-							var ul = tree.render(returnobj);
-							e_container.appendChild(ul);
-						};
-						
-						var p = {
-							parent__pk: e_pk.innerHTML,
-							t: 'ajax',
-						};
-						tree.filter(p, c);
-					};
-					
-					this.adjacent('ul')[0].show();
-					e_container.removeClassName('collapse');
-					e_container.addClassName('expand')
-					break;
-			}
-		};
-	},
-	render: function(data) {
-		var ul = new Element('ul');
-		
-		// Add the 'Up' button
-		if (!data && this.data) {
-			var data = this.data;
-			if (data && data[0].fields.parent) {
-				var li = new Element('li');
-				var btn = new Element('input', {'type': 'button', 'value': 'Up'});
-				li.update(btn);
-				btn.observe('click', this.up);
-				ul.appendChild(li);
-			};
-		}
-		
-		// Add the child plans to parent
-		for (i in data) {
-			if(!data[i].pk)
-				continue;
-			
-			var li = new Element('li');
-			if (data[i].extras.num_children && data[i].children)
-				li.addClassName('expand');
-			
-			if (data[i].extras.num_children && !data[i].children)
-				li.addClassName('collapse');
-			
-			if (data[i].is_current)
-				li.addClassName('current');
-			
-			// Construct the items
-			var title = '[<a href="' + data[i].extras.get_url_path + '">' + data[i].pk + '</a>] ';
-			title += '<a class="plan_name" href="javascript:void(0);">' + data[i].fields.name + '</a>';
-			title += ' (';
-			if (data[i].extras.num_cases)
-				title += '<a href="' + data[i].extras.get_url_path + '#testcases">' + data[i].extras.num_cases + ' cases</a>, ';
-			else
-				title += '0 case, ';
-			
-			if (data[i].extras.num_runs)
-				title += '<a href="' + data[i].extras.get_url_path + '#testruns">' + data[i].extras.num_runs + ' runs</a>, ';
-			else
-				title += '0 runs, ';
-			
-			switch (data[i].extras.num_children) {
-				case 0:
-					title += '0 child';
-					break;
-				case 1:
-					title += '<a href="' + data[i].extras.get_url_path + '#treeview">' + '1 child</a>';
-					break;
-				default:
-					title += '<a href="' + data[i].extras.get_url_path + '#treeview">' + data[i].extras.num_children + ' children</a>';
-					break;
-			}
-			
-			title += ')';
-			
-			li.update(title);
-			ul.appendChild(li);
-			
-			// Observe the blind link click event
-			li.adjacent('a.plan_name').invoke('observe', 'click', this.blind);
-			
-			if(data[i].children)
-				li.appendChild(this.render(data[i].children));
-		};
-		
-		return ul;
-	},
-	render_page: function(container) {
-		if (!container)
-			container = this.default_container
-		
-		$(container).update(getAjaxLoading());
-		$(container).update(this.render());
-	},
-	traverse: function(data, pk) {
-		// http://stackoverflow.com/questions/3645678/javascript-get-a-reference-from-json-object-with-traverse
-		for (i in data) {
-			if (data[i] == [] || typeof(data[i]) != 'object')
-				continue
-			
-			if(typeof(data[i].pk) == 'number' && data[i].pk == pk)
-				return data[i];
-			
-			if (typeof(data[i].children) == 'object') {
-				var retVal = this.traverse(data[i].children, pk);
-				if (typeof(retVal) != 'undefined')
-					return retVal;
-			};
-		};
-	},
-	insert: function(node, data) {
-		if(node.children)
-			return node;
-		
-		node.children = data;
-		return node;
-	},
+    pk: new Number(),
+    data: new Object(),
+    tree_elements: new Element('div'),
+    default_container: 'id_tree_container',
+    default_parameters: {
+        t: 'ajax',
+    }, // FIXME: Doesn't make effect here.
+    
+    filter: function(parameters, callback) {
+        var url = getURLParam().url_plans;
+        new Ajax.Request(url, {
+            method: 'get',
+            parameters: parameters,
+            asynchronous: false,
+            onSuccess: callback,
+            onFailure: json_failure,
+        })
+    },
+    init: function(plan_id) {
+        this.pk = plan_id;
+        
+        // Current, Parent, Brothers, Children, Temporary current
+        var c_plan, p_plan, b_plans, ch_plans, tc_plan;
+        
+        // Get the current plan
+        /*
+        var p1 = { pk: plan_id, t: 'ajax'};
+        var c1 = function(t) {
+            var returnobj = t.responseText.evalJSON(true);
+            if (returnobj.length > 0)
+                c_plan = returnobj[0];
+        };
+        this.filter(p1, c1);
+        if(!c_plan) {
+            alert('Plan ' + plan_id + ' can not found in database');
+            return false;
+        }
+        */
+        c_plan = Nitrate.TestPlans.Instance;
+        
+        // Get the parent plan
+        if(c_plan.fields.parent) {
+            var p2 = { pk: c_plan.fields.parent, t: 'ajax'};
+            var c2 = function(t) {
+                var returnobj = t.responseText.evalJSON(true);
+                p_plan = returnobj[0];
+            }
+            this.filter(p2, c2);
+        }
+        
+        // Get the brother plans
+        if(c_plan.fields.parent) {
+            var p3 = { parent__pk: c_plan.fields.parent, t: 'ajax'};
+            var c3 = function(t) {
+                var returnobj = t.responseText.evalJSON(true);
+                b_plans = returnobj;
+            }
+            this.filter(p3, c3);
+        }
+        
+        // Get the child plans
+        var p4 = { 'parent__pk': c_plan.pk, 't': 'ajax'};
+        var c4 = function(t) {
+            var returnobj = t.responseText.evalJSON(true);
+            ch_plans = returnobj;
+        };
+        this.filter(p4, c4);
+        
+        // Combine all of plans
+        // Presume the plan have parent and brother at first
+        if(p_plan && b_plans) {
+            p_plan.children = b_plans;
+            tc_plan = this.traverse(p_plan.children, c_plan.pk);
+            tc_plan.is_current = true;
+            if (ch_plans)
+                tc_plan.children = ch_plans;
+            
+            if(p_plan.pk)
+                p_plan = Nitrate.Utils.convert('obj_to_list', p_plan)
+            
+            this.data = p_plan;
+        } else {
+            c_plan.is_current = true;
+            if (ch_plans)
+                c_plan.children = ch_plans;
+            this.data = Nitrate.Utils.convert('obj_to_list', c_plan);
+        };
+    },
+    up: function(e) {
+        var tree = Nitrate.TestPlans.TreeView;
+        
+        var p = {
+            pk: tree.data[0].fields.parent,
+            t: 'ajax'
+        };
+        
+        var c = function(t) {
+            var returnobj = t.responseText.evalJSON(true);
+            var parent_obj = {0: returnobj[0], length: 1};
+            parent_obj[0].children = tree.data;
+            tree.data = parent_obj;
+            tree.render_page();
+        }
+        
+        tree.filter(p, c);
+    },
+    blind: function(e) {
+        var tree = Nitrate.TestPlans.TreeView;
+        var e_container = this.up();
+        var e_pk = this.previous();
+        var container_clns = e_container.classNames().toArray();
+        
+        var pk = e_pk.innerHTML;
+        var obj = tree.traverse(tree.data, pk);
+        
+        for (i in container_clns) {
+            if(typeof(container_clns[i]) != 'string')
+                continue
+            
+            switch (container_clns[i]) {
+                case 'expand':
+                    this.adjacent('ul')[0].hide();
+                    e_container.removeClassName('expand')
+                    e_container.addClassName('collapse');
+                    break;
+                case 'collapse':
+                    if (typeof(obj.children) != 'object' || obj.children == []) {
+                        var c = function(t) {
+                            var returnobj = t.responseText.evalJSON(true);
+                            returnobj = Nitrate.Utils.convert('obj_to_list', returnobj);
+                            tree.insert(obj, returnobj);
+                            var ul = tree.render(returnobj);
+                            e_container.appendChild(ul);
+                        };
+                        
+                        var p = {
+                            parent__pk: e_pk.innerHTML,
+                            t: 'ajax',
+                        };
+                        tree.filter(p, c);
+                    };
+                    
+                    this.adjacent('ul')[0].show();
+                    e_container.removeClassName('collapse');
+                    e_container.addClassName('expand')
+                    break;
+            }
+        };
+    },
+    render: function(data) {
+        var ul = new Element('ul');
+        
+        // Add the 'Up' button
+        if (!data && this.data) {
+            var data = this.data;
+            if (data && data[0].fields.parent) {
+                var li = new Element('li');
+                var btn = new Element('input', {'type': 'button', 'value': 'Up'});
+                li.update(btn);
+                btn.observe('click', this.up);
+                ul.appendChild(li);
+            };
+        }
+        
+        // Add the child plans to parent
+        for (i in data) {
+            if(!data[i].pk)
+                continue;
+            
+            var li = new Element('li');
+            if (data[i].extras.num_children && data[i].children)
+                li.addClassName('expand');
+            
+            if (data[i].extras.num_children && !data[i].children)
+                li.addClassName('collapse');
+            
+            if (data[i].is_current)
+                li.addClassName('current');
+            
+            // Construct the items
+            var title = '[<a href="' + data[i].extras.get_url_path + '">' + data[i].pk + '</a>] ';
+            title += '<a class="plan_name" href="javascript:void(0);">' + data[i].fields.name + '</a>';
+            title += ' (';
+            if (data[i].extras.num_cases)
+                title += '<a href="' + data[i].extras.get_url_path + '#testcases">' + data[i].extras.num_cases + ' cases</a>, ';
+            else
+                title += '0 case, ';
+            
+            if (data[i].extras.num_runs)
+                title += '<a href="' + data[i].extras.get_url_path + '#testruns">' + data[i].extras.num_runs + ' runs</a>, ';
+            else
+                title += '0 runs, ';
+            
+            switch (data[i].extras.num_children) {
+                case 0:
+                    title += '0 child';
+                    break;
+                case 1:
+                    title += '<a href="' + data[i].extras.get_url_path + '#treeview">' + '1 child</a>';
+                    break;
+                default:
+                    title += '<a href="' + data[i].extras.get_url_path + '#treeview">' + data[i].extras.num_children + ' children</a>';
+                    break;
+            }
+            
+            title += ')';
+            
+            li.update(title);
+            ul.appendChild(li);
+            
+            // Observe the blind link click event
+            li.adjacent('a.plan_name').invoke('observe', 'click', this.blind);
+            
+            if(data[i].children)
+                li.appendChild(this.render(data[i].children));
+        };
+        
+        return ul;
+    },
+    render_page: function(container) {
+        if (!container)
+            container = this.default_container
+        
+        $(container).update(getAjaxLoading());
+        $(container).update(this.render());
+    },
+    traverse: function(data, pk) {
+        // http://stackoverflow.com/questions/3645678/javascript-get-a-reference-from-json-object-with-traverse
+        for (i in data) {
+            if (data[i] == [] || typeof(data[i]) != 'object')
+                continue
+            
+            if(typeof(data[i].pk) == 'number' && data[i].pk == pk)
+                return data[i];
+            
+            if (typeof(data[i].children) == 'object') {
+                var retVal = this.traverse(data[i].children, pk);
+                if (typeof(retVal) != 'undefined')
+                    return retVal;
+            };
+        };
+    },
+    insert: function(node, data) {
+        if(node.children)
+            return node;
+        
+        node.children = data;
+        return node;
+    },
 };
 
 Nitrate.TestPlans.Create.on_load = function()
@@ -333,10 +333,25 @@ Nitrate.TestPlans.Details.on_load = function()
     var plan_id = Nitrate.TestPlans.Instance.pk;
     // regUrl('display_summary');
     
-    constructPlanDetailsCasesZone('testcases', plan_id);
+    var run_case_params = {
+        'a': 'initial',
+        'c': 'run_case',
+        'from_plan': plan_id
+    }
+    
+    constructPlanDetailsCasesZone('testcases', plan_id, run_case_params);
+    
+    var review_case_params = {
+        'a': 'initial',
+        'c': 'review_case',
+        'from_plan': plan_id
+    }
+    constructPlanDetailsCasesZone('reviewcases', plan_id, review_case_params);
+    
     constructTagZone('tag', { plan: plan_id });
     constructPlanComponentsZone('components');
     
+    new Draggable('id_import_case_zone');
     TableKit.Sortable.init('testruns_table');
     TableKit.Sortable.init('testreview_table');
     
@@ -350,28 +365,32 @@ Nitrate.TestPlans.Details.on_load = function()
         })
         this.parentNode.addClassName('tab_focus');
         
-        $(this.title).show();
+        var tab_array = this.href.toArray();
+        var tab = '';
+        for (var i = tab_array.indexOf('#') + 1; i < tab_array.length; i++)
+            tab += tab_array[i]
+        $(tab).show();
     })
     
     if(window.location.hash) {
         fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
     }
-
+    
+    $('tab_testcases').observe('mousedown', function(e) {
+        if (this.classNames().toArray().indexOf('tab_focus') == -1) {
+            constructPlanDetailsCasesZone('testcases', plan_id, run_case_params);
+        }
+    })
+    
     if($('btn_disable')) {
-        $('btn_disable').observe('click',function(e){
-            var callback = function() {
-                window.location.reload(true);
-            }
-            updateObject('testplans.testplan', plan_id, 'is_active', 0, callback);
+        $('btn_disable').observe('click', function(e){
+            updateObject('testplans.testplan', plan_id, 'is_active', 0, reloadWindow);
         })
     }
-
+    
     if($('btn_enable')) {
-        $('btn_enable').observe('click',function(e){
-            var callback = function() {
-                window.location.reload(true);
-            }
-            updateObject('testplans.testplan', plan_id, 'is_active', 1, callback);
+        $('btn_enable').observe('click', function(e) {
+            updateObject('testplans.testplan', plan_id, 'is_active', 1, reloadWindow);
         })
     }
     
@@ -574,68 +593,8 @@ function createUploadPlanSummaryZone()
     });
 }
 
-function taggleSort() { 
-    if($('id_sort').innerHTML != 'Done Sorting'){
-        // $('id_sort_control').show();
-        // Remove the unsortable case text
-        $('id_blind_all_link').remove(); // Remove blind all link
-        
-        // Remove case text
-        $$('#id_table_cases .hide').each(function(t) {
-            t.remove();
-        });
-        
-        // Remove blind down arrow link
-        $$('#id_table_cases .blind_link').each(function(t) {
-            t.remove();
-        });
-        
-        // Remove change status link, default the link is hidden
-        $$('#id_table_cases .show_change_status_link').each(function(t) {
-            t.remove();
-        });
-        
-        // Use the selector content to replace the selector
-        $$('#id_table_cases .change_status_selector').each(function(t) {
-            var w = t.selectedIndex;
-            t.replace((new Element('span')).update(t.options[w].text));
-        });
-        
-        // Use the title to replace the blind down title link
-        $$('#id_table_cases .blind_title_link').each(function(t) {
-            t.replace((new Element('span')).update(t.innerHTML));
-        });
-        
-        // Use the sortkey content to replace change sort key link
-        $$('#id_table_cases .mark').each(function(t) {
-            t.update(t.down().innerHTML);
-        });
-        
-        // init the tableDnD object
-        var table = document.getElementById('id_table_cases');
-        var tableDnD = new TableDnD();
-        tableDnD.init(table);
-        $('id_sort').innerHTML='Done Sorting';
-        $$('#id_table_cases td').invoke('addClassName', 'cursor_move');
-        //alert('Drag and drop the rows to adjust the order, click "Done Sorting" link to submit your changes, otherwise please refresh the page to cancel.');
-    } else {
-        // $('id_sort_control').hide();
-        $('id_sort').replace((new Element('span')).update('...Submitting changes'));
-        
-        $$('#id_table_cases input[type=checkbox]').each(function(t) {
-            t.checked = true;
-            t.disabled = false;
-        });
-        
-        var parameters = $('id_form_cases').serialize(true);
-        parameters.a = 'order_cases';
-        postToURL('cases/', parameters)
-    }
-}
-
-function delPlanCase(container, plan_id) 
+function unlinkCasePlan(container, parameters) 
 {
-    var parameters = $('id_form_cases').serialize(true);
     parameters.a = 'delete_cases';
     
     if(!parameters['case']) {
@@ -643,74 +602,60 @@ function delPlanCase(container, plan_id)
         return false;
     }
     
-    var test = confirm("Are you sure you want to remove test case(s) from this test plan?")
-    if (test && $('id_form_cases')) {
-        var success = function(t) {
-            returnobj = t.responseText.evalJSON(true);
-            
-            if(returnobj.response == 'ok') {
-                parameters.a = 'initial';
-                constructPlanDetailsCasesZone(container, plan_id, parameters);
-                return true;
-            }
-            
-            alert(returnobj.response);
+    var c = confirm("Are you sure you want to remove test case(s) from this test plan?");
+    if (!c)
+        return false;
+    
+    var success = function(t) {
+        returnobj = t.responseText.evalJSON(true);
+        if(returnobj.rc == 0) {
+            parameters.a = 'initial';
+            constructPlanDetailsCasesZone(container, parameters.from_plan, parameters);
+            return true;
         }
         
-        var failure = function(t) {
-            alert('Remove failed');
-            return false;
-        }
-        
-        var url = new String('cases/');
-        new Ajax.Request(url, {
-            method: 'get',
-            parameters: parameters,
-            onSuccess: success,
-            onFailure: failure
-        })
+        alert(returnobj.response);
     }
+    
+    var url = new String('cases/');
+    new Ajax.Request(url, {
+        method: 'post',
+        parameters: parameters,
+        onSuccess: success,
+        onFailure: json_failure
+    })
 }
 
 function constructPlanDetailsCasesZone(container, plan_id, parameters)
 {
-    $(container).update('<div class="ajax_loading"></div>');
+    if (typeof(container) != 'object')
+        container = $(container)
+    
+    container.update('<div class="ajax_loading"></div>');
     
     if(!parameters)
         var parameters = {'a': 'initial', 'from_plan': plan_id}
     
     complete = function(t) {
-        new Draggable('id_import_case_zone');
+        var form = container.childElements()[0];
+        var table = container.childElements()[1];
         
-        $('id_form_cases').observe('submit', function(e) {
+        // Presume the first form element is the form
+        if (!form.tagName == 'FORM') {
+            alert('form element of container is not a form');
+            return false;
+        };
+        
+        var filter = form.adjacent('.list_filter')[0];
+        
+        form.observe('submit', function(e) {
             e.stop();
-            var p = this.serialize();
-            constructPlanDetailsCasesZone(container, plan_id, p);
+            var params = serialzeCaseForm(form, table);
+            constructPlanDetailsCasesZone(container, plan_id, params);
         })
         
-        if($('id_sort'))
-            $('id_sort').observe('click', taggleSort); 
-        // $('case_new_selector').observe('onchange',newcase);
-        
-        /*
-        $('filter_priority_trigger').observe('click', function(m){
-            $('filter_priority').toggle();
-        });
-        */
-        
-        $('id_filtercase').observe('click', function(t) {
-            var element = $('list_filter_m');
-            if(element.getStyle('display') == 'none'){
-                element.show();
-                this.update(default_messages.link.hide_filter);
-            } else {
-                element.hide();
-                this.update(default_messages.link.show_filter);
-            }
-        })
-        
-        
-        $$('input[name="case"]').invoke('observe', 'click', function(t) {
+        // Change the case backgroud after selected
+        form.adjacent('input[name="case"]').invoke('observe', 'click', function(e) {
             if(this.checked) {
                 this.up(1).addClassName('selection_row');
             } else {
@@ -718,281 +663,315 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             }
         })
         
-        $('new_case_set_status').observe('change',function(t) {
-            if(!this.value)
-                return false;
+        // Observe the check all selectbox
+        if(form.adjacent('input[value="all"]')) {
+            var element = form.adjacent('input[value="all"]')[0];
             
-            if(!$('id_form_cases').serialize(true)['case']){
-                alert(default_messages.alert.no_case_selected);
-                return false;
-            }
-            
-            var c = confirm(default_messages.confirm.change_case_status);
-            if(!c)
-                return false;
-            
-            var parameters = $('id_form_cases').serialize(true);
-            
-            var s_callback = function(t) {
-                returnobj = t.responseText.evalJSON(true);
-                
-                if(returnobj.rc == 0) {
-                    constructPlanDetailsCasesZone(container, plan_id, parameters);
-                } else {
-                    alert(returnobj.response);
-                    return false;
-                }
-            }
-            
-            changeCaseStatus(parameters['case'], this.value, s_callback);
-        })
+            element.observe('click', function(e) {
+                clickedSelectAll(this, this.up(4), 'case');
+            })
+        }
         
-        $('new_case_priority').observe('change', function(t) {
-            if(!this.value)
-                return false;
-            
-            if(!$('id_form_cases').serialize(true)['case']){
-                alert(default_messages.alert.no_case_selected);
-                return false;
-            }
-            
-            var c=confirm(default_messages.confirm.change_case_priority)
-            if(!c)
-                return false;
-            
-            var parameters = $('id_form_cases').serialize(true);
-            
-            var s_callback = function(t) {
-                returnobj = t.responseText.evalJSON(true);
-                
-                if(returnobj.rc == 0) {
-                    constructPlanDetailsCasesZone(container, plan_id, parameters);
+        if(form.adjacent('.btn_filter')) {
+            var element = form.adjacent('.btn_filter')[0];
+            element.observe('click', function(t) {
+                if(filter.getStyle('display') == 'none'){
+                    filter.show();
+                    this.update(default_messages.link.hide_filter);
                 } else {
-                    alert(returnobj.response);
-                    return false
+                    filter.hide();
+                    this.update(default_messages.link.show_filter);
                 }
-            }
-            
-            changeCasePriority(parameters['case'], this.value, s_callback);
-        })
+            })
+        }
         
-        // Observe the batch case automated status button
-        $('batch_automated').observe('click', function(e) {
-            if(!$('id_form_cases').serialize(true)['case']){
-                alert(default_messages.alert.no_case_selected);
-                return false;
-            }
-            
-            $('dialog').update('<div class="ajax_loading"></div>');
-            $('dialog').show();
-            
-            // Generate the contents of dialog
-            var form_content = '<form id="id_form_batch_automated" action="/cases/automated/" method="get"><div class="dia_title" style=" margin:30px 20px;">Please select automation status:</div><div class="dia_content" style=" margin:30px 20px;">';
-            form_content += '<div id="id_automated_form"><div class="ajax_loading"></div></div>';
-            form_content += '</div><div id="id_form_batch_autoated_actions" style="margin:30px 20px; display:none;"><input type="submit" value="Submit"><input type="button" value="Cancel" onclick="this.up(2).hide();"></div></div></form>';
-            $('dialog').update(form_content);
-
-            // Callback for getForm, it will display the submit buttons for the form
-            var parameters = {'a': 'change',}
-            var callback = function(e) {
-                $('id_form_batch_autoated_actions').show();
-            }
-            getForm(
-                'id_automated_form', 'testcases.CaseAutomatedForm', parameters, callback
-            );
-
-            // Observe the batch automated form submit event
-            // Change the automated status for selected cases
-            $('id_form_batch_automated').observe('submit', function(e) {
-                e.stop();
+        // Bind click the tags in tags list to tags field in filter
+        if(form.adjacent('.taglist a[href="#testcases"]')) {
+            var elements = form.adjacent('.taglist a');
+            elements.invoke('observe', 'click', function(e) {
+                if(filter.style.display == 'none')
+                    fireEvent(form.adjacent('.filtercase')[0], 'click');
                 
-                var parameters = this.serialize(true);
-                parameters['case'] = $('id_form_cases').serialize(true)['case'];
-
-                // Hard code to determine the parameters here.
-                /*
-                // FIXME: Always return false here.
-                if(!parameters['case'] || !parameters['o_is_automated'] || !parameters['o_is_automated_proposed'])
-                    return false;
-                */
-                
-                var success = function(t) {
+                addItemsToTextBoxAsList(this.innerHTML, form.tag__name__in);
+            })
+        }
+        
+        // Bind the sort link
+        if(form.adjacent('.btn_sort')) {
+            var element = form.adjacent('.btn_sort')[0];
+            element.observe('click', function(e) {
+                var params = serialzeCaseForm(form, table);
+                var callback = function(t) {
                     returnobj = t.responseText.evalJSON(true);
-
-                    if (returnobj.rc != 0) {
-                        var errors = '';
-                        returnobj.response.each(function(m) {
-                            errors += m[0] + ': ' + m[1] + "\n";
-                        });
-                        alert(errors);
+                    if(returnobj.rc != 0) {
+                        alert(returnobj.response);
                         return false;
                     }
-                    
-                    parameters = $('id_form_cases').serialize(true);
                     parameters.a = 'initial';
                     constructPlanDetailsCasesZone(container, plan_id, parameters);
-                    $('dialog').hide();
                 }
-                
-                new Ajax.Request(getURLParam().url_cases_automated, {
-                    method: 'post',
-                    parameters: parameters,
-                    onSuccess: success,
-                });
+                resortCasesDragAndDrop(container, this, form, table, params, callback);
             });
-        })
+        }
         
-        $('id_batch_component').observe('click', function(e) {
-            if(this.diabled)
-                return false;
-                
-            var params = {
-                'case': $('id_form_cases').serialize(true)['case'],
-                'product': Nitrate.TestPlans.Instance.product_id
-            };
+        // Bind batch change case status selector
+        if(form.adjacent('select[name="new_case_status_id"]')) {
+            var element = form.adjacent('select[name="new_case_status_id"]')[0];
             
-            var form_observe = function(e) {
-                e.stop();
-                if(!$('id_form_cases').serialize(true)['case']){
+            element.observe('change',function(t) {
+                var params = serialzeCaseForm(form, table);
+                
+                if(!this.value)
+                    return false;
+                
+                if(!params['case']){
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
                 
-                var params = this.serialize(true);
-                params['case'] = $('id_form_cases').serialize(true)['case'];
+                var c = confirm(default_messages.confirm.change_case_status);
+                if(!c)
+                    return false;
                 
-                var url = getURLParam().url_cases_component;
-                var success = function(t) {
+                var callback = function(t) {
                     returnobj = t.responseText.evalJSON(true);
                     
-                    if (returnobj.rc == 0) {
-                        constructPlanDetailsCasesZone(container, plan_id, parameters);
-                        clearDialog();
+                    if(returnobj.rc == 0) {
+                        constructPlanDetailsCasesZone(container, plan_id, params);
                     } else {
                         alert(returnobj.response);
                         return false;
                     }
                 }
                 
-                updateCaseComponent(url, params, success);
-            }
+                changeCaseStatus(params['case'], this.value, callback);
+            })
+        }
+        
+        if(form.adjacent('select[name="new_priority_id"]')) {
+            var element = form.adjacent('select[name="new_priority_id"]')[0];
             
-            renderComponentForm(getDialog(), params, form_observe);
-        })
+            element.observe('change', function(t) {
+                var params = serialzeCaseForm(form, table);
+                if(!this.value)
+                    return false;
+                
+                if(!params['case']){
+                    alert(default_messages.alert.no_case_selected);
+                    return false;
+                }
+                
+                var c=confirm(default_messages.confirm.change_case_priority)
+                if(!c)
+                    return false;
+                
+                var callback = function(t) {
+                    returnobj = t.responseText.evalJSON(true);
+                    
+                    if(returnobj.rc != 0) {
+                        alert(returnobj.response);
+                        return false
+                    };
+                    
+                    constructPlanDetailsCasesZone(container, plan_id, params);
+                }
+                
+                changeCasePriority(params['case'], this.value, callback);
+            })
+        }
+        
+        // Observe the batch case automated status button
+        if (form.adjacent('input.btn_automated')) {
+            var element = form.adjacent('input.btn_automated')[0];
+            element.observe('click', function(e) {
+                var params = serialzeCaseForm(form, table);
+                params['a'] = 'change';
+                var c = getDialog();
+                var callback = function(t) {
+                    returnobj = t.responseText.evalJSON(true);
+                    
+                    if(returnobj.rc != 0) {
+                        alert(returnobj.response);
+                        return false
+                    };
+                    
+                    params.a = 'initial';
+                    constructPlanDetailsCasesZone(container, plan_id, params);
+                    clearDialog(c);
+                };
+                
+                constructCaseAutomatedForm(c, params, callback);
+            })
+        }
+        
+        if(form.adjacent('input.btn_component')) {
+            var element = form.adjacent('input.btn_component')[0];
+            element.observe('click', function(e) {
+                if(this.diabled)
+                    return false;
+                var c = getDialog();
+                var params = {
+                    'case': serializeCaseFromInputList(table),
+                    'product': Nitrate.TestPlans.Instance.fields.product_id
+                };
+                
+                var form_observe = function(e) {
+                    e.stop();
+                    
+                    var params = this.serialize(true);
+                    params['case'] = serializeCaseFromInputList(table);
+                    if(params['case'].length == 0){
+                        alert(default_messages.alert.no_case_selected);
+                        return false;
+                    }
+                    
+                    var url = getURLParam().url_cases_component;
+                    var callback = function(t) {
+                        returnobj = t.responseText.evalJSON(true);
+                        
+                        if (returnobj.rc != 0) {
+                            alert(returnobj.response);
+                            return false;
+                        }
+                        parameters['case'] = params['case']
+                        constructPlanDetailsCasesZone(container, plan_id, parameters);
+                        clearDialog(c);
+                    }
+                    
+                    updateCaseComponent(url, params, callback);
+                }
+                renderComponentForm(c, params, form_observe);
+            })
+        };
+        
+        if(form.adjacent('input.btn_default_tester')) {
+            var element = form.adjacent('input.btn_default_tester')[0];
+            element.observe('click', function(e) {
+                var case_pks = serializeCaseFromInputList(table);
+                
+                if(case_pks.length == 0){
+                    alert(default_messages.alert.no_case_selected);
+                    return false;
+                }
+                
+                var callback = function(t) {
+                    var returnobj = t.responseText.evalJSON();
+                    
+                    if (returnobj.rc != 0) {
+                        alert(returnobj.response);
+                        return false
+                    };
+                    
+                    constructPlanDetailsCasesZone(container, plan_id, parameters);
+                }
+                
+                changePlanCaseDefaultTester(table, case_pks, callback);
+            })
+        }
+        
+        // Tag call back
+        // Callback for display the cases that just added tags
+        var tag_callback = function(t) {
+            var dialog = getDialog();
+            
+            returnobj = t.responseText.evalJSON(true);
+            if (returnobj.rc && returnobj.rc == 1) {
+                alert(returnobj.response);
+                clearDialog(dialog);
+                return false;
+            };
+            
+            clearDialog(dialog);
+            dialog.show();
+            var html = '<div class="dia_title" style=" margin:10px 20px;">You have successfully operate tags in the following case:</div><div class="dialog_content">';
+            dialog.update(html);
+            
+            returnobj.each(function(i) {
+                html += '<div class="dia_content" style=" margin:10px 20px;">'+i.pk + ' &nbsp; ' + i.fields.summary+'</div>';
+            });
+            dialog.update(html);
+            
+            html +='</div><input class="dia_btn_close sprites" onclick="this.up(0).hide()" type="button" value="Close" style=" margin:10px 20px;"/>';
+            
+            dialog.update(html);
+            params = serialzeCaseForm(form, table);
+            params.a = 'initial';
+            constructPlanDetailsCasesZone(container, plan_id, params);
+        };
         
         // Observe the batch add case button
-        $('id_add_case_tags').observe('click',function(e) {
-            if(!$('id_form_cases').serialize(true)['case']){
-                alert(default_messages.alert.no_case_selected);
-                return false;
-            }
-            
-            constructBatchTagProcessDialog(plan_id);
-            
-            // Observe the batch tag form submit
-            $('id_batch_tag_form').observe('submit',function(e){
-                e.stop();
-                var parameters = this.serialize(true);
-                parameters['case'] = $('id_form_cases').serialize(true)['case'];
-                if(!parameters.tags)
+        if(form.adjacent('input.tag_add')) {
+            var element = form.adjacent('input.tag_add')[0];
+            element.observe('click',function(e) {
+                if(serializeCaseFromInputList(table).length == 0){
+                    alert(default_messages.alert.no_case_selected);
                     return false;
-                                
-                // Callback for display the cases that just added tags
-                var c = function(t) {
-                    returnobj = t.responseText.evalJSON(true);
-                    $('dialog').hide('');
-                    $('dialog').update('');
-                    $('dialog').show();
-                    var html = '<div class="dia_title" style=" margin:10px 20px;">You have successfully add <span class="red">'+ parameters.tags + '</span>&nbsp;in the following case:</div><div class="dialog_content">';
-                    $('dialog').update(html);
-                    
-                    returnobj.each(function(i) {
-                        html += '<div class="dia_content" style=" margin:10px 20px;">'+i.pk + ' &nbsp; ' + i.fields.summary+'</div>';
-                    });
-                    $('dialog').update(html);
-                    
-                    html +='</div><input class="dia_btn_close sprites" onclick="this.up(0).hide()" type="button" value="Close" style=" margin:10px 20px;"/>';
-                    
-                    $('dialog').update(html);
-                    p = $('id_form_cases').serialize(true);
-                    p.a = 'initial';
-                    constructPlanDetailsCasesZone(container, plan_id, p);
-                };
-                var format = 'serialized';
-                addBatchTag(parameters, c, format);
-            })
-        })
-
-        // Observe the batch remove tag function
-        $('id_remove_case_tags').observe('click',function(e) {
-            if(!$('id_form_cases').serialize(true)['case']){
-                alert(default_messages.alert.no_case_selected);
-                return false;
-            }
-            
-            constructBatchTagProcessDialog(plan_id);
-            
-            // Observe the batch tag form submit
-            $('id_batch_tag_form').observe('submit',function(e){
-                e.stop();
-                var parameters = this.serialize(true);
-                parameters['case'] = $('id_form_cases').serialize(true)['case'];
-                if(!parameters.tags)
-                    return false;
-                                
-                // Callback for display the cases that just added tags
-                var c = function(t) {
-                    returnobj = t.responseText.evalJSON(true);
-                    $('dialog').hide('');
-                    $('dialog').update('');
-                    $('dialog').show();
-                    if(!returnobj.rc)
-                    {
-                        var html = '<div class="dia_title" style=" margin:10px 20px;">You have successfully remove <span class="red">'+ parameters.tags + '</span>&nbsp;in the following case:</div><div class="dialog_content">';
-                        $('dialog').update(html);
-
-                        returnobj.each(function(i) {
-                            html += '<div class="dia_content" style=" margin:10px 20px;">'+i.pk + ' &nbsp; ' + i.fields.summary+'</div>';
-                        });
-                        $('dialog').update(html);
-                    }
-
-                    else
-                    {
-                        var html = '<div class="dia_title" style=" margin:10px 20px;"><span class="red">' + returnobj.response + '</span>';
-                        $('dialog').update(html);
-                    }
-                    
-                    
-                    html +='</div><input class="dia_btn_close sprites" onclick="this.up(0).hide()" type="button" value="Close" style=" margin:10px 20px;"/>';
-                    
-                    $('dialog').update(html);
-                    if(!returnobj.rc)
-                    {
-                        p = $('id_form_cases').serialize(true);
-                        p.a = 'initial';
-                        constructPlanDetailsCasesZone(container, plan_id, p);
-                    }
-                };
-                var format = 'serialized';
-                removeBatchTag(parameters, c, format)
-             })
-        
-        })
-        
-        $('id_checkbox_all_cases').observe('click', function(e) {
-            clickedSelectAll(this, this.up(4), 'case');
-        })
-        
-        // Bind click the tags in tags list to tags field in filter
-        $$('#id_case_own_tags_list a[href="#testcases"]').invoke('observe', 'click',
-            function(e) {
-                if($('list_filter_m').style.display == 'none')
-                    fireEvent($('id_filtercase'), 'click');
+                }
                 
-                addItemsToTextBoxAsList(this.innerHTML, $('id_form_cases').tag__name__in);
-            }
-        )
+                constructBatchTagProcessDialog(plan_id);
+                
+                // Observe the batch tag form submit
+                $('id_batch_tag_form').observe('submit',function(e){
+                    e.stop();
+                    var params = this.serialize(true);
+                    params['case'] = serializeCaseFromInputList(table);
+                    if(!params.tags)
+                        return false;
+                    
+                    var format = 'serialized';
+                    addBatchTag(params, tag_callback, format);
+                })
+            })
+        }
+        
+        // Observe the batch remove tag function
+        if(form.adjacent('input.tag_delete')) {
+            var element = form.adjacent('input.tag_delete')[0];
+            element.observe('click',function(e) {
+                if(serializeCaseFromInputList(table).length == 0){
+                    alert(default_messages.alert.no_case_selected);
+                    return false;
+                }
+                
+                constructBatchTagProcessDialog(plan_id);
+                
+                // Observe the batch tag form submit
+                $('id_batch_tag_form').observe('submit',function(e) {
+                    e.stop();
+                    var params = this.serialize(true);
+                    params['case'] = serializeCaseFromInputList(table);
+                    if(!params.tags)
+                        return false;
+                    
+                    // Callback for display the cases that just added tags
+                    var format = 'serialized';
+                    removeBatchTag(params, tag_callback, format)
+                 })
+            })
+        }
+        
+        // Observe the expand the case contents action
+        table.adjacent('.expandable').invoke('observe', 'click', function(e) {
+            var c = this.up(); // Container
+            var c_container = this.up().next(); // Content Containers
+            var case_id = c.adjacent('input[name="case"]')[0].value;
+            var type = form.adjacent('input[name="type"]')[0].value;
+            toggleTestCaseContents(type, c, c_container, case_id);
+        })
+        
+        // Observe the change sortkey
+        table.adjacent('.case_sortkey').invoke('observe', 'click', function(e) {
+            var c = this.up(); // Container
+            var params = {
+                'case': c.adjacent('input[name="case"]')[0].value,
+                'sortkey': this.innerHTML,
+            };
+            var callback = function(t) {
+                constructPlanDetailsCasesZone(container, plan_id, parameters);
+            };
+            
+            changeCaseOrder(params, callback)
+        })
     }
     
     var url = getURLParam().url_search_case;
@@ -1002,7 +981,6 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         onComplete: complete,
         onFailure: json_failure
     })
-    
 }
 
 function constructPlanComponentsZone(container, parameters, callback)
@@ -1126,7 +1104,7 @@ function toggleMultiSelect(){
     $('filter_priority_selector_multiple').toggle();
 }
 
-function changePlanCaseDefaultTester(form, container, plan_id)
+function changePlanCaseDefaultTester(container, case_ids, callback)
 {
     var p = prompt('Please type new email or username for default tester');
     if(!p)
@@ -1137,21 +1115,11 @@ function changePlanCaseDefaultTester(form, container, plan_id)
           'email__startswith': p,
     }
     
-    var callback = function(t) {
-        var returnobj = t.responseText.evalJSON(true);
-        if (returnobj.rc != 0) {
-            alert(returnobj.response);
-            return false;
-        }
-        
-        constructPlanDetailsCasesZone(container, plan_id);
-    }
-    
     getInfoAndUpdateObject(
         parameters,
         'testcases.testcase',
-        form.serialize(true)['case'],
-        'default_tester_id',
+        case_ids,
+        'default_tester',
         callback
     )
 }
@@ -1279,4 +1247,58 @@ function removePlanChildren(container, plan_id)
     };
     
     constructPlanParentPreviewDialog(p, parameters, callback);
+}
+
+function resortCasesDragAndDrop(container, button, form, table, parameters, callback)
+{
+    if (button.innerHTML != 'Done Sorting') {
+        // Remove the elements affact the page
+        form.adjacent('.blind_all_link').invoke('remove'); // Remove blind all link
+        form.adjacent('.case_content').invoke('remove');
+        form.adjacent('.blind_icon').invoke('remove');
+        form.adjacent('.show_change_status_link').invoke('remove');
+        table.adjacent('.expandable').invoke('stopObserving');
+        
+        // Use the selector content to replace the selector
+        form.adjacent('.change_status_selector').each(function(t) {
+            var w = t.selectedIndex;
+            t.replace((new Element('span')).update(t.options[w].text));
+        });
+        
+        /*
+        // Use the title to replace the blind down title link
+        form.adjacent('.blind_title_link').each(function(t) {
+            t.replace((new Element('span')).update(t.innerHTML));
+        });
+        
+        // Use the sortkey content to replace change sort key link
+        form.adjacent('.mark').each(function(t) {
+            t.update(t.down().innerHTML);
+        });
+        */
+        
+        console.log(button)
+        // init the tableDnD object
+        new TableDnD().init(table);
+        button.innerHTML = 'Done Sorting';
+        table.adjacent('tr').invoke('addClassName', 'cursor_move');
+    } else {
+        // $('id_sort_control').hide();
+        button.replace((new Element('span')).update('...Submitting changes'));
+        
+        table.adjacent('input[type=checkbox]').each(function(t) {
+            t.checked = true;
+            t.disabled = false;
+        });
+        
+        parameters.a = 'order_cases';
+        
+        var url = new String('cases/');
+        new Ajax.Request(url, {
+            method: 'post',
+            parameters: parameters,
+            onSuccess: callback,
+            onFailure: json_failure
+        })
+    }
 }

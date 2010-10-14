@@ -12,7 +12,7 @@
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/tablednd.js'></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}/js/testplan_actions.js"></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
-<script type="text/javascript" src="/admin/jsi18n/"></script>
+{# <script type="text/javascript" src="/admin/jsi18n/"></script> #}
 <script type="text/javascript" src="{{ ADMIN_MEDIA_PREFIX }}js/core.js"></script>
 <script type="text/javascript" src="{{ ADMIN_MEDIA_PREFIX }}js/SelectFilter2.js"></script>
 <script type="text/javascript" src="{{ ADMIN_MEDIA_PREFIX }}js/SelectBox.js"></script>
@@ -49,7 +49,7 @@ Nitrate.TestPlans.Instance = {
 	<div class="control">
 		<span id="id_buttons" class="button">
 			<input id="btn_edit" type="button" value="Edit plan " title="Edit test plan" onclick="window.location.href='{% url tcms.testplans.views.edit test_plan.plan_id %}'" {% if perms.testplans.change_testplan %}{% else%}disabled{% endif %}>
-			<input id="btn_clone" type="button" value="Clone plan" title="Clone this plan to other product" onclick="window.location.href='{% url tcms.testplans.views.clone %}?plan_id={{ test_plan.plan_id }}'" {% if perms.testplans.add_testplan %}{% else %}disabled{% endif %}>
+			<input id="btn_clone" type="button" value="Clone plan" title="Clone this plan to other product" onclick="window.location.href='{% url tcms.testplans.views.clone %}?plan={{ test_plan.plan_id }}'" {% if perms.testplans.add_testplan %}{% else %}disabled{% endif %}>
 			{% if test_plan.is_active %}
 			<input id="btn_disable" type="button" value="Disable plan " title="Disabled this plan" {% if not perms.testplans.change_testplan %}disabled="true"{% endif %}>
 			{% else %}
@@ -125,64 +125,88 @@ Nitrate.TestPlans.Instance = {
 		<div class="clear"></div>
 	</div>
 	<div id="plan_detail">
-	<div class="Detailform border-1">
-		<ul id="contentTab" class="content_tab">
-			<li id="tab_document" class="tab">
-				<a href="#document" title="document">Document</a>
-			</li>
-			<li id="tab_testcases" class="tab tab_focus">
-				<a href="#testcases" title="testcases">Cases ({{ test_plan.case.count }})</a>
-			</li>
-			<li id="tab_testruns"  class="tab">
-				<a href="#testruns" title="testruns">Runs ({{ test_plan.run.count }} )</a>
-			</li>
-			<li id="tab_testreviews"  class="tab">
-				<a href="#testreviews" title="testreviews">Reviews ({{ test_plan.review.count }})</a>
-			</li>
-			<li id="tab_components"	 class="tab">
-				<a href="#components" title="components">Default Components ({{ test_plan.component.count }})</a>
-			</li>
-			<li id="tab_attachment" class="tab">
-				<a href="#attachment" title="attachment">Attachments ({{ test_plan.attachment.count }})</a>
-			</li>
-			<li id="tab_tag" class="tab">
-				<a href="#tag" title="tag">Tags ({{ test_plan.tag.count }})</a>
-			</li>
-			<li id="tab_tag" class="tab">
-				<a href="#log" title="log">Log</a>
-			</li>
-			<li id="tab_treeview" class="tab">
-				<a href="#treeview" title="treeview">Tree View</a>
-			</li>
-		</ul>
-		<div class="tab_list" id="document" style="display:none">
-			{% include "plan/get_docs.html" %}
-		</div>
-		<div class="tab_list" id="attachment" style="display:none">
-			{% include "plan/get_attachments.html" %}
-		</div>
-		<div class="tab_list" id="testruns"	 style="display:none;">
-			{% include "plan/get_runs.html" %}
-		</div>
-		<div class="tab_list" id="testreviews"	style="display:none;">
-			{% include "plan/get_reviews.html" %}
-		</div>
-		<div class="tab_list" id="components"  style="display:none;">
-			<div class="ajax_loading"></div>
-		</div>
-		<div class="tab_list" id="log"	style="display:none;">
-			{% include "plan/get_log.html" %}
-		</div>
-		<div class="tab_list" id="treeview"	 style="display:none;">
-			{% include "plan/get_treeview.html" %}
-		</div>
-		<div id="testcases"	 class="tab_list">
-			<div class="ajax_loading"></div>
-		</div>
-		<div class="tab_list" id="tag" style="display:none">
-			<div class="ajax_loading"></div>
+		<div class="Detailform border-1">
+			<ul id="contentTab" class="content_tab">
+				<li id="tab_document" class="tab">
+					<a href="#document" title="document">Document</a>
+				</li>
+				<li id="tab_testcases" class="tab tab_focus">
+					<a href="#testcases" title="testcases">Cases ({{ test_plan.run_case.count }}/{{ test_plan.case.count }})</a>
+				</li>
+				<li id="tab_testcases" class="tab">
+					<a href="#reviewcases" title="reviewcases">Review Cases ({{ test_plan.review_case.count }})</a>
+				</li>
+				<li id="tab_testruns"  class="tab">
+					<a href="#testruns" title="testruns">Runs ({{ test_plan.run.count }})</a>
+				</li>
+				{% comment %}
+				<li id="tab_testreviews"  class="tab">
+					<a href="#testreviews" title="testreviews">Reviews ({{ test_plan.review.count }})</a>
+				</li>
+				{% endcomment %}
+				<li id="tab_components"	 class="tab">
+					<a href="#components" title="components">Default Components ({{ test_plan.component.count }})</a>
+				</li>
+				<li id="tab_attachment" class="tab">
+					<a href="#attachment" title="attachment">Attachments ({{ test_plan.attachment.count }})</a>
+				</li>
+				<li id="tab_tag" class="tab">
+					<a href="#tag" title="tag">Tags ({{ test_plan.tag.count }})</a>
+				</li>
+				<li id="tab_tag" class="tab">
+					<a href="#log" title="log">Log</a>
+				</li>
+				<li id="tab_treeview" class="tab">
+					<a href="#treeview" title="treeview">Tree View</a>
+				</li>
+			</ul>
+			<div id="document" class="tab_list" style="display:none">
+				{% include "plan/get_docs.html" %}
+			</div>
+			<div id="attachment" class="tab_list" style="display:none">
+				{% include "plan/get_attachments.html" %}
+			</div>
+			<div id="testruns" class="tab_list" style="display:none;">
+				{% include "plan/get_runs.html" %}
+			</div>
+			<div id="testreviews" class="tab_list" style="display:none;">
+				{% include "plan/get_reviews.html" %}
+			</div>
+			<div id="components" class="tab_list" style="display:none;">
+				<div class="ajax_loading"></div>
+			</div>
+			<div id="log" class="tab_list" style="display:none;">
+				{% include "plan/get_log.html" %}
+			</div>
+			<div id="treeview" class="tab_list" style="display:none;">
+				{% include "plan/get_treeview.html" %}
+			</div>
+			<div id="reviewcases" class="tab_list" style="display:none">
+				<div class="ajax_loading"></div>
+			</div>
+			<div id="testcases"	 class="tab_list">
+				<div class="ajax_loading"></div>
+			</div>
+			<div id="tag" class="tab_list" style="display:none">
+				<div class="ajax_loading"></div>
+			</div>
 		</div>
 	</div>
+	<div class="popup" id="id_import_case_zone" {% if xml_form.xml_file.errors %}{% else %}style="display:none;"{% endif %}>
+		<div class="submit-row">
+			<input type="button" value="x" onclick="parentNode.parentNode.hide(); $('import-error').innerHTML='';">
+		</div>
+		<form action="{% url tcms.testplans.views.cases test_plan.plan_id %}" method="POST" enctype="multipart/form-data">
+			<div  class="right-bar" >
+				<label class="errors" id="import-error">{{ xml_form.xml_file.errors }}</label>	
+				{{ xml_form.a }}
+				<label><b>Import XML file:</b></label>
+				{{ xml_form.xml_file }}
+				<input type="submit" value="Import" />
+				<br/>
+				<label class="grey">{{ xml_form.xml_file.help_text }}</label>
+			</div>
+		</form>
 	</div>
 </div>
 {% endblock %}

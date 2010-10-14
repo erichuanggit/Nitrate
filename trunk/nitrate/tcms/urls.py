@@ -36,7 +36,7 @@ urlpatterns = patterns('',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     
     # Uncomment the next line to enable the admin:
-    (r'^admin/(.*)', admin.site.root),
+    (r'^admin/(.*)', include(admin.site.urls)),
     
     # Index and static zone
     (r'^$', 'tcms.core.views.index'),
@@ -92,7 +92,6 @@ urlpatterns = patterns('',
     (r'^cases/printable/$', 'tcms.testcases.views.printable'),
     (r'^cases/export/$', 'tcms.testcases.views.export'),
     (r'^case/(?P<case_id>\d+)/$', 'tcms.testcases.views.get'),
-    (r'^case/(?P<case_id>\d+)/details/$', 'tcms.testcases.views.get_details'),
     (r'^case/(?P<case_id>\d+)/edit/$', 'tcms.testcases.views.edit'),
     (r'^case/(?P<case_id>\d+)/history/$', 'tcms.testcases.views.text_history'),
     (r'^case/(?P<case_id>\d+)/attachment/$', 'tcms.testcases.views.attachment'),
@@ -105,7 +104,6 @@ urlpatterns = patterns('',
     (r'^runs/$', 'tcms.testruns.views.all'),
     (r'^runs/env_value/$', 'tcms.testruns.views.env_value'),
     (r'^runs/clone/$', 'tcms.testruns.views.clone'),
-    (r'^run/suggest_summary$', 'tcms.testruns.views.suggest_summary'),
     (r'^run/(?P<run_id>\d+)/$', 'tcms.testruns.views.get'),
     (r'^run/(?P<run_id>\d+)/delete/$', 'tcms.testruns.views.delete'),
     (r'^run/(?P<run_id>\d+)/execute/$', 'tcms.testruns.views.execute'),
@@ -120,9 +118,8 @@ urlpatterns = patterns('',
     (r'^run/(?P<run_id>\d+)/update/$', 'tcms.testruns.views.update'),
     (r'^run/(?P<run_id>\d+)/export/$', 'tcms.testruns.views.export'),
     
-    (r'^run/(?P<run_id>\d+)/caserun/(?P<case_run_id>\d+)/changestatus/$', 'tcms.testruns.views.change_case_run_status'),
-    (r'^run/(?P<run_id>\d+)/caserun/(?P<case_run_id>\d+)/bug/$', 'tcms.testruns.views.bug'),
-    #(r'^run/(?P<run_id>\d+)/caserun/(?P<case_run_id>\d+)/tag/$', 'tcms.testruns.views.process_tag'),
+    (r'^caserun/(?P<case_run_id>\d+)/current/$', 'tcms.testruns.views.set_current'),
+    (r'^caserun/(?P<case_run_id>\d+)/bug/$', 'tcms.testruns.views.bug'),
     
     # Review zone
     (r'^plan/(?P<plan_id>\d+)/newreview/$', 'tcms.testreviews.views.new'),

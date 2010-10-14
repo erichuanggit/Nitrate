@@ -19,7 +19,7 @@ Nitrate.TestCases.List.on_load = function()
     if($('testcases_table')) {
         TableKit.Sortable.init('testcases_table',
         {
-        	rowEvenClass : 'roweven',
+            rowEvenClass : 'roweven',
             rowOddClass : 'rowodd',
             nosortClass : 'nosort'
         });
@@ -218,56 +218,43 @@ function getTestCaseNextParam(id)
 }
 
 
-function toggleTestCaseContents(id, case_text_version, case_run_id)
+function toggleTestCaseContents(type, container, content_container, case_id, case_text_version, case_run_id, callback)
 {
-    // FIXME: It will be replaced with CSS Selector
-    var p = getTestCaseParam(id);
+    if (typeof(container) != 'object')
+        var container = $(container)
     
-    var failure = function(t) {
-        alert('Update case text failed')
-    }
+    if(typeof(content_container) != 'object')
+        var content_container = $(content_container)
     
-    if($(p.hidenbox) && $(p.hidenbox).getStyle('display') == 'none') {
-        $(p.hidenbox).show();
+    content_container.toggle();
+    
+    if ($('id_loading_' + case_id)) {
+        var url = getURLParam(case_id).url_case_details;
+        var parameters = {
+            type: type,
+            case_text_version: case_text_version,
+            case_run_id: case_run_id,
+        };
         
-        if($(p.blind_icon)) {
-            $(p.blind_icon).removeClassName('up');
-            $(p.blind_icon).addClassName('down');
-        }
-        
-        if($(p.blind_icon))
-            $(p.blind_icon).src = "/media/images/t2.gif";
-        
-        if($(p.case_text)) {
-            url = '/case/' + $$('input[name="case"]')[id-1].value + '/details/'
-            new Ajax.Updater(p.hidenbox, url, {
-                method: 'get',
-                parameters: {
-                    case_text_version: case_text_version,
-                    case_run_id: case_run_id,
-                },
-                onFailure: failure
-            })
-        }
+        new Ajax.Updater(content_container, url, {
+            method: 'get',
+            parameters: parameters,
+            onComplete: callback,
+            onFailure: html_failure
+        });
+    };
+    
+    var blind_icon = container.getElementsBySelector('.blind_icon')[0]
+    if (content_container.getStyle('display') == 'none') {
+        $(blind_icon).removeClassName('collapse');
+        $(blind_icon).addClassName('expand');
+        $(blind_icon).src = "/media/images/t1.gif";
     } else {
-        $(p.hidenbox).hide();
-        
-        if($(p.blind_icon)) {
-            $(p.blind_icon).removeClassName('down');
-            $(p.blind_icon).addClassName('up');
-        }
-        
-        if($(p.blind_icon))
-            $(p.blind_icon).src = "/media/images/t1.gif";
+        $(blind_icon).removeClassName('expand');
+        $(blind_icon).addClassName('collapse');
+        $(blind_icon).src = "/media/images/t2.gif";
     }
 }
-
-//function toggleTestCaseContents(id)
-//{
-    // FIXME: It will be replaced with CSS Selector
-    //$('hidenRow_'+id).toggle();
-        
-//}
 
 function changeTestCaseStatus(id, case_id)
 {
@@ -328,7 +315,7 @@ function toggleAllCheckBoxes(element, container, name)
 
 function blinddownAllCases()
 {
-    $$('.up').each(function(e){
+    $$('.collapse').each(function(e){
         fireEvent(e, 'click');
     })
     
@@ -340,7 +327,7 @@ function blinddownAllCases()
 
 function blindupAllCases()
 {
-    $$('.down').each(function(e){
+    $$('.expand').each(function(e){
         fireEvent(e, 'click');
     })
     
@@ -350,9 +337,9 @@ function blindupAllCases()
     }
 }
 
-function changeCaseOrder(case_id, sort_key, plan_id)
+function changeCaseOrder(parameters, callback)
 {
-    nsk = prompt('Enter your new order number', sort_key)   // New sort key
+    nsk = prompt('Enter your new order number', parameters['sortkey'])   // New sort key
     
     if(!nsk)
         return false
@@ -367,34 +354,17 @@ function changeCaseOrder(case_id, sort_key, plan_id)
         return false;
     }
     
-    if(nsk == sort_key) {
+    if(nsk == parameters['sortkey']) {
         alert('Nothing changed');
         return false;
     }
     
-    // Succeed callback
-    var s_callback = function(t) {
-        returnobj = t.responseText.evalJSON(true);
-        
-        if (returnobj.rc == 0) {
-            if(plan_id) {
-                constructPlanDetailsCasesZone(
-                    'testcases', plan_id, $('id_form_cases').serialize(true)
-                );
-            } else {
-                window.location.reload();
-            }
-        } else {
-            alert(returnobj.response);
-        }
-    }
-    
     var ctype = 'testcases.testcase';
-    var object_pk = case_id;
+    var object_pk = parameters['case'];
     var field = 'sortkey';
     var value = nsk;
     
-    updateObject(ctype, object_pk, field, value, s_callback);
+    updateObject(ctype, object_pk, field, value, callback);
 }
 
 function changeCaseStatus(object_pk, value, callback)
@@ -616,7 +586,7 @@ function renderComponentForm(container, parameters, form_observe)
     var url = getURLParam().url_cases_component;
     
     new Ajax.Updater(d, url, {
-        method: 'post',
+        method: 'get',
         parameters: parameters,
         onComplete: callback,
         onFailure: html_failure,
@@ -631,4 +601,57 @@ function updateCaseComponent(url, parameters, callback)
          onSuccess: callback,
          onFailure: json_failure
      })
+}
+
+function constructCaseAutomatedForm(container, parameters, callback)
+{
+    if (!parameters['case']) {
+        alert(default_messages.alert.no_case_selected);
+        return false;
+    };
+    container.update(getAjaxLoading());
+    container.show();
+    var d = new Element('div', { 'class': 'automated_form' });
+    var c = function(t) {
+        var returntext = t.responseText;
+        var action = '/cases/automated/';
+        var form_observe = function(e) {
+            e.stop();
+            var params = this.serialize(true);
+            params['case'] = parameters['case'];
+            new Ajax.Request(getURLParam().url_cases_automated, {
+                method: 'post',
+                parameters: params,
+                onSuccess: callback,
+            });
+        }
+        var f = constructForm(returntext, action, form_observe);
+        console.log(f);
+        container.update(f);
+    }
+    
+    getForm(d, 'testcases.CaseAutomatedForm', parameters, c);
+}
+
+function serializeCaseFromInputList(table)
+{
+    var elements = $(table).adjacent('input[name="case"]:checked');
+    var case_ids = new Array();
+    
+    for (i in elements) {
+        if (typeof(elements[i].value) == 'string')
+            case_ids.push(elements[i].value);
+    };
+    
+    return case_ids
+}
+
+function serialzeCaseForm(form, table, serialized)
+{
+    if(typeof(serialized) != 'boolean')
+        var serialized = true;
+    
+    var data = form.serialize(serialized);
+    data['case'] = serializeCaseFromInputList(table);
+    return data
 }

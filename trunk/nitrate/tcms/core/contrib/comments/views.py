@@ -90,7 +90,7 @@ def post(request, template_name='comments/comments.html'):
     comment.ip_address = request.META.get("REMOTE_ADDR", None)
     if request.user.is_authenticated():
         comment.user = request.user
-	
+    
     # Signal that the comment is about to be saved
     responses = signals.comment_will_be_posted.send(
         sender  = comment.__class__,

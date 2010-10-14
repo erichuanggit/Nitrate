@@ -2,6 +2,7 @@
 var Nitrate = {};
 Nitrate.Utils = {};
 var short_string_length = 100;
+var nil;
 
 /*
     Utility function.
@@ -13,13 +14,13 @@ Nitrate.Utils.after_page_load = function(callback) {
 
 
 Nitrate.Utils.convert = function(argument, data) {
-	switch(argument) {
-		case 'obj_to_list':
-			if (data.length != 0 && !data.length)
-				var data = Object.clone({0: data, length: 1});
-			return data;
-			break;
-	};
+    switch(argument) {
+        case 'obj_to_list':
+            if (data.length != 0 && !data.length)
+                var data = Object.clone({0: data, length: 1});
+            return data;
+            break;
+    };
 }
 
 Event.observe(window, 'load', function(e) {
@@ -53,7 +54,8 @@ var default_messages = {
     'alert': {
         'no_case_selected': 'No cases selected! Please select at least one case.',
         'ajax_failure': 'Commnucation with server got some unknown errors.',
-        'tree_reloaded': 'The tree has been reloaded.'
+        'tree_reloaded': 'The tree has been reloaded.',
+        'last_case_run': 'It is the last case run',
     },
     'confirm': {
         'change_case_status': 'Are you sure you want to change the status?',
@@ -101,10 +103,14 @@ function getURLParam()
     param.url_create_case = '/case/create/';
     param.url_cases_automated = '/cases/automated/';
     param.url_cases_component = '/cases/component/';
+    param.url_case_details = '/case/' + id + '/';
     param.url_case_plan = '/case/' + id + '/plan/';
     param.url_modify_case = '/case/' + id + '/modify/';
     param.url_case_change_status = '/cases/changestatus/';
     param.url_change_case_order = '/case/' + id + '/changecaseorder/';
+    
+    param.url_case_run_bug = '/caserun/' + id + '/bug/';
+    param.url_case_run_set_current = '/caserun/' + id + '/current/';
     
     param.url_runs_env_value = '/runs/env_value/'
 
@@ -796,9 +802,9 @@ function removeTag(container, tag)
 }
 function editTag(container, tag)
 {
-	newtag = prompt('Please type your new tag', tag);
-	parameters = $('id_tag_form').serialize(true);
-	parameters.tags = newtag;
+    newtag = prompt('Please type your new tag', tag);
+    parameters = $('id_tag_form').serialize(true);
+    parameters.tags = newtag;
     var complete = function(t) {
         removeTag(container,tag)
     }
@@ -814,18 +820,18 @@ function editTag(container, tag)
 
 function addBatchTag(parameters, callback, format)
 {
-    parameters.handle = 'add';
-    parameters.type = 'json';
-    parameters.format = format;
+    parameters.a = 'add';
+    parameters.t = 'json';
+    parameters.f = format;
     batchProcessTag(parameters, callback, format);
     
 }
 
 function removeBatchTag(parameters, callback, format)
 {
-    parameters.handle = 'remove';
-    parameters.type = 'json';
-    parameters.format = format;
+    parameters.a = 'remove';
+    parameters.t = 'json';
+    parameters.f = format;
     batchProcessTag(parameters, callback, format);
 }
 
@@ -850,7 +856,7 @@ function batchProcessTag(parameters, callback, format)
     
     var url = new String('/management/tags/')
     new Ajax.Request(url, {
-        method: 'post',
+        method: 'get',
         parameters: parameters,
         onSuccess: success,
     })
@@ -896,10 +902,12 @@ function constructCommentZone(container, parameters)
     })
 }
 
-function submitComment(container, parameters)
+function submitComment(container, parameters, callback)
 {
     var complete = function(t) {
         bindCommentDeleteLink(container, parameters);
+        if(callback)
+            callback();
     }
     
     $(container).update('<div class="ajax_loading"></div>');
@@ -1017,10 +1025,15 @@ function getForm(container, app_form, parameters, callback, format)
 function updateObject(content_type, object_pk, field, value, callback)
 {
     var url = new String('/ajax/update/');
-    
     var success = function(t) {
-        if(callback)
-            callback(t);
+        var returnobj = t.responseText.evalJSON();
+        
+        if (returnobj == 0) {
+            return callback(t, returnobj);
+        } else {
+            alert(returnobj.response);
+            return false;
+        }
     }
     
     var parameters = {
@@ -1031,9 +1044,9 @@ function updateObject(content_type, object_pk, field, value, callback)
     }
     
     new Ajax.Request(url, {
-        method: 'post',
+        method: 'get',
         parameters: parameters,
-        onSuccess: success,
+        onSuccess: callback,
         onFailure: json_failure
     })
 }
@@ -1063,8 +1076,13 @@ function getInfoAndUpdateObject(parameters, content_type, object_pks, field, cal
         var returnobj = t.responseText.evalJSON(true);
         
         // FIXME: Display multiple items and let user to select one
-        if (returnobj.length != 1) {
-            alert('The item is not exist in database or mutiple instances reached.');
+        if (returnobj.length == 0) {
+            alert('Nothing found in database');
+            return false;
+        }
+        
+        if (returnobj.length > 1) {
+            alert('Mutiple instances reached, please define the condition more clear.');
             return false;
         }
         
@@ -1193,4 +1211,9 @@ function constructForm(content, action, form_observe, info, s, c)
     f.appendChild(c);
     
     return f
+}
+
+function reloadWindow()
+{
+    window.location.reload(true);
 }

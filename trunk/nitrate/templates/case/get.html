@@ -34,7 +34,7 @@ Nitrate.TestCases.Instance = {
 	{% else %}
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
-        >><a href="{% url tcms.testcases.views.all %}">Search Case</a>
+		>><a href="{% url tcms.testcases.views.all %}">Search Case</a>
 		>>Case: {{ test_case.case_id }}: {{ test_case.summary }}
 	</div>
 	<div id="tcms_values" class="hidden">
@@ -73,7 +73,7 @@ Nitrate.TestCases.Instance = {
 				<div class="cell">
 					<div class="sd">Default Tester:</div>
 					<div >
-						{% if test_case.default_tester  %}
+						{% if test_case.default_tester	%}
 						<span id="display_default_tester"><a href="mailto:{{ test_case.default_tester.email }}">{{ test_case.default_tester.email }}</a></span>
 						{% else %}
 						<span >No default tester</span>
@@ -138,25 +138,25 @@ Nitrate.TestCases.Instance = {
 						<span id="display_script" class="name {% if not test_case.script %}grey{% endif %}">{{ test_case.script|default:'None' }}</span>
 					</div>
 				</div>
-                <div class="cell">
+				<div class="cell">
 					<div class="sd"><span>Alias:</span></div>
 					<div>
 						<span id="display_script" class="name {% if not test_case.alias %}grey{% endif %}">{{ test_case.alias|default:'None' }}</span>
 					</div>
 				</div>
-                <div class="cell">
-                	<div class="sd"><span>Arguments</span></div>
-                    <div>
+				<div class="cell">
+					<div class="sd"><span>Arguments</span></div>
+					<div>
 						<span id="display_script" class="name {% if not test_case.arguments %}grey{% endif %}">{{ test_case.arguments|default:'None' }}</span>
 					</div>
-                </div>
+				</div>
 			</div>
 		</fieldset>
 	</div>
 	<div class="Detailform border-1">
 		<ul id="contentTab" class="content_tab" >
 			<li id="tab_document" class="tab tab_focus">
-				<a href="#document"  title="document">Document</a>
+				<a href="#document" title="document">Document</a>
 			</li>
 			<li id="tab_attachment" class="tab">
 				<a href="#attachment" title="attachment">Attachments ({{ test_case.attachment.count }})</a>
@@ -178,46 +178,42 @@ Nitrate.TestCases.Instance = {
 			<li id="tab_case_bug" class="tab">
 				<a href="#bug" title="bug">Bugs ({{ test_case.case_bug.count }})</a>
 			</li>
-            <li id="tab_case_run" class="tab">
+			<li id="tab_case_run" class="tab">
 				<a href="#case_run" title="case_run">Case Runs ({{ test_case_runs.count }})</a>
 			</li>
 			<li id="tab_case_log" class="tab">
 				<a href="#log" title="log">Change Logs</a>
 			</li>
 		</ul>
-		<div  id="document"  class="Detailform-variety_2 tab_list" style="clear:left;">
-			{% include "case/gets_text.html" %}
+		<div  id="document" class="Detailform-variety_2 tab_list" style="clear:left;">
+			{% include "case/get_text.html" %}
 		</div>
 		<div id="attachment" class="tab_list"  style="display:none">
 			{% include "case/get_attachment.html" %}
 		</div>
-        <div id="plan" style="display:none" class="tab_list">
+		<div id="plan" style="display:none" class="tab_list">
 			<div class="ajax_loading"></div>
 		</div>
 		<div id="component" style="display:none" class="tab_list">
 			{% include "case/get_component.html" %}
 		</div>
-        {% comment %}
+		{% comment %}
 		<div id="depend" class="tab_list" style="display:none">
 			{% include "case/get_depend.html" %}
 		</div>
 		{% endcomment %}
-        <div id="tag" class="tab_list" style="display:none">
+		<div id="tag" class="tab_list" style="display:none">
 			<div class="ajax_loading"></div>
 		</div>
 		<div id="bug" class="tab_list" style="display:none">
 			{% include "case/get_bug.html" %}
 		</div>
-         <div id="case_run" class="tab_list" style="display:none">
-        	{% include "case/get_case_run.html" %}
-        </div>
-		<div id="log" class="tab_list"  style="display:none">
+		 <div id="case_run" class="tab_list" style="display:none">
+			{% include "case/get_case_run.html" %}
+		</div>
+		<div id="log" class="tab_list"	style="display:none">
 			{% include "case/get_log.html" %}
 		</div>
-		
-		
-       
-		
 	</div>
 </div>
 {% endblock %}
