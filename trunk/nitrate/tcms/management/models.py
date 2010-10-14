@@ -397,6 +397,7 @@ class TCMSEnvGroup(TCMSActionModel):
     
     class Meta:
         db_table = u'tcms_env_groups'
+        ordering = ['name']
     
     def __unicode__(self):
         return unicode(self.name)
@@ -418,6 +419,7 @@ class TCMSEnvProperty(TCMSActionModel):
     
     class Meta:
         db_table = u'tcms_env_properties'
+        ordering = ['name']
     
     def __unicode__(self):
         return unicode(self.name)
@@ -439,6 +441,7 @@ class TCMSEnvValue(TCMSActionModel):
     is_active = models.BooleanField(default=True)
     class Meta:
         db_table = u'tcms_env_values'
+        ordering = ['value']
         unique_together = ('property', 'value')
     
     def __unicode__(self):

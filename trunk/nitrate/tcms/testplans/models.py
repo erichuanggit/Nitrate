@@ -37,6 +37,7 @@ class TestPlanType(TCMSActionModel):
         
     class Meta:
         db_table = u'test_plan_types'
+        ordering = ['name']
 
 class TestPlan(TCMSActionModel):
     """
