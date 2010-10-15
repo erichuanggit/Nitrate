@@ -96,7 +96,7 @@ def add_comment(request, case_run_ids, comment):
 
 @log_call
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasebug'))
-def attach_bug(request, case_run_ids, bug_ids):
+def attach_bug(request, values):
     """
     Description: Add one or more bugs to the selected test cases.
 
