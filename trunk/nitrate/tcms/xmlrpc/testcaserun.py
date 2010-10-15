@@ -533,6 +533,7 @@ def update(request, case_run_ids, values):
     # Update alias to 'tcms' for case 12345 and 23456
     >>> TestCaseRun.update([12345, 23456], {'assignee': 2206})
     """
+    from datetime import datetime
     from tcms.core import forms
     from tcms.testruns.forms import XMLRPCUpdateCaseRunForm
     
@@ -550,7 +551,9 @@ def update(request, case_run_ids, values):
             
         if form.cleaned_data['case_run_status']:
             tcrs.update(case_run_status = form.cleaned_data['case_run_status'])
-            
+            tcrs.update(tested_by = request.user)
+            tcrs.update(close_date = datetime.now())
+        
         if form.cleaned_data['notes']:
             tcrs.update(notes = form.cleaned_data['notes'])
             
