@@ -41,7 +41,10 @@ class SimpleForm(CommentDetailsForm):
         max_length=COMMENT_MAX_LENGTH,
     )
     
-    def clean_timestampe(self):
+    def clean_timestamp(self):
+
+        #return self.cleaned_data["timestamp"]
+
         import time
         return str(time.time()).split('.')[0]
     
