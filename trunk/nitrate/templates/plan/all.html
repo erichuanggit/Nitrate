@@ -2,6 +2,7 @@
 
 {% load extra_filters %}
 {% load pagination_tags %}
+{% load adminmedia %}
 
 {% block subtitle %}Test plans{% endblock %}
 
@@ -20,6 +21,7 @@
 
 <script type="text/javascript">
 Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
+window.__admin_media_prefix__ = "{% filter escapejs %}{% admin_media_prefix %}{% endfilter %}";
 </script>
 {% endblock %}
 
