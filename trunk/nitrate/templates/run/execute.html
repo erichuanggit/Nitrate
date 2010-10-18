@@ -44,8 +44,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Execute.on_load);
 		</div>
 		<div class="listinfo">
 			<span class="title">Product:</span> 
-			{{ test_run.plan.product.name }}
-			({{ test_run.plan.default_product_version }})
+			{{ test_run.build.product }}
 		</div>
 		<div class="listinfo">
 			<div class="title">Environment:</div>
