@@ -218,7 +218,7 @@ function getTestCaseNextParam(id)
 }
 
 
-function toggleTestCaseContents(type, container, content_container, case_id, case_text_version, case_run_id, callback)
+function toggleTestCaseContents(template_type, container, content_container, case_id, case_text_version, case_run_id, callback)
 {
     if (typeof(container) != 'object')
         var container = $(container)
@@ -231,7 +231,7 @@ function toggleTestCaseContents(type, container, content_container, case_id, cas
     if ($('id_loading_' + case_id)) {
         var url = getURLParam(case_id).url_case_details;
         var parameters = {
-            type: type,
+            template_type: template_type,
             case_text_version: case_text_version,
             case_run_id: case_run_id,
         };
@@ -363,24 +363,25 @@ function changeCaseOrder(parameters, callback)
     var object_pk = parameters['case'];
     var field = 'sortkey';
     var value = nsk;
+    var vtype = 'int';
     
-    updateObject(ctype, object_pk, field, value, callback);
+    updateObject(ctype, object_pk, field, value, vtype, callback);
 }
 
 function changeCaseStatus(object_pk, value, callback)
 {
     var ctype = 'testcases.testcase';
     var field = 'case_status';
-    
-    updateObject(ctype, object_pk, field, value, callback);
+    var vtype = 'int';
+    updateObject(ctype, object_pk, field, value, vtype, callback);
 }
 
 function changeCasePriority(object_pk, value, callback)
 {
     var ctype = 'testcases.testcase';
     var field = 'priority';
-    
-    updateObject(ctype, object_pk, field, value, callback);
+    var vtype = 'int';
+    updateObject(ctype, object_pk, field, value, vtype, callback);
 }
 
 function bind_plan_selector_to_product_version(allow_blank)

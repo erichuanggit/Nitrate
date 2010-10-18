@@ -299,6 +299,7 @@ def update(request):
     # Initial the data
     data = request.REQUEST.copy()
     ctype = data.get("content_type")
+    vtype = data.get('value_type', 'str')
     object_pk = data.getlist("object_pk")
     field = data.get('field')
     value = data.get('value')
@@ -308,16 +309,24 @@ def update(request):
         ajax_response['response'] = 'Following fields are required - content_type, object_pk, field and value.'
         return HttpResponse(simplejson.dumps(ajax_response))
     
-    # Convert the data type
+    # Convert the value type
+    # FIXME: Django bug here: update() keywords must be strings
     field = str(field)
+    value_types = {
+        # Temporary solution is convert all of data to str
+        # 'bool': lambda x: x == 'True',
+        'bool': lambda x: x == 'True' and 1 or 0,
+        'datetime': lambda x: x == 'NOW' and str(datetime.datetime.now()) or str(datetime.datetime(x)), # FIXME
+        'int': lambda x: str(int(x)),
+        'str': lambda x: str(x),
+        'None': lambda x: None,
+    }
     try:
-        value = int(value)
-        if value == 0:
-            value = None
-    except TypeError:
-        value = str(value)
-    except:
-        pass
+        value = value_types.get(vtype)(value)
+    except TypeError, error:
+        ajax_response['rc'] = 1
+        ajax_response['response'] = 'Value type caused to error - '  + error
+        return HttpResponse(simplejson.dumps(ajax_response))
     
     # Check permission
     no_perms = check_permission(
@@ -338,7 +347,7 @@ def update(request):
     
     if not targets:
         ajax_response['rc'] = 1
-        ajax_response['response'] = 'You specific context_type is not exist in database.'
+        ajax_response['response'] = 'You specific content(s) is not exist in database.'
         return HttpResponse(simplejson.dumps(ajax_response))
     
     if not hasattr(targets[0], field):
@@ -347,9 +356,6 @@ def update(request):
             field, ctype
         )
         return HttpResponse(simplejson.dumps(ajax_response))
-    
-    if field.find('date') and value == 'NOW':
-        value = datetime.datetime.now()
     
     if hasattr(targets[0], 'log_action'):
         try:
@@ -362,7 +368,8 @@ def update(request):
                 )
         except:
             raise
-    
+    from pprint import pprint
+    pprint({field: value})
     targets.update(**{field: value})
     
     if hasattr(targets[0], 'mail_scene'):

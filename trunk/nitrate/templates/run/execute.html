@@ -79,7 +79,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Execute.on_load);
 	<div id="executeList" class="Detailform border-top"> 
 		{% for test_case_run in test_case_runs %}
 		<div class="case_run">
-			<div class="  execute_case_run run_evenRow {% if test_case_run.is_current %} run_current {% endif %} {% ifequal test_case_run.assignee user%} mine {%endifequal%}">
+			<div id="id_case_run_{{ test_case_run.pk }}" class="case_title execute_case_run run_evenRow {% if test_case_run.is_current %}is_current run_current{% endif %} {% ifequal test_case_run.assignee user%} mine {%endifequal%}">
 				<div>
 					<input type="hidden" name="case_run_id" value="{{ test_case_run.pk }}" />
 					<input type="hidden" name="case_id" value="{{ test_case_run.case_id }}" />
@@ -88,11 +88,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Execute.on_load);
 				</div>
 				<span class="lab-20">{{ forloop.counter }}</span>
 				<div class="collapse-control">
-					{% if test_case_run.is_current %}
-					<a><img class="expand blind_icon" src="{{ MEDIA_URL }}/images/t2.gif" /></a>
-					{% else %}
 					<a><img class="collapse blind_icon" src="{{ MEDIA_URL }}/images/t1.gif" /></a>
-					{% endif %}
 				</div>
 				<span class="lab-50">{{ test_case_run.case.priority.value }}</span>
 				<span class="lab-100" title="Case_Run ID">{{ test_case_run.case_run_id }}</span>
@@ -100,24 +96,14 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Execute.on_load);
 					<a href="{% url tcms.testcases.views.get test_case_run.case_id %}?from_plan={{ testrun.plan_id }}" title="Case ID">{{ test_case_run.case_id }}</a>
 				</span>
 				<div class="req">
-					{% if test_case_run.is_current %}
 					<a class="icon_status btn_{{ test_case_run.case_run_status.name.lower }}" href="#caserun_{{ test_case_run.case_run_id }}">
 						{{ test_case_run.case.summary }}
 					</a>
-					{% else %}
-					<a class="icon_status btn_{{ test_case_run.case_run_status.name.lower }}" href="#caserun_{{ test_case_run.case_run_id }}">
-						{{ test_case_run.case.summary }}
-					</a>
-					{% endif %}
 				</div>
 				<span class="lab-50_right"><span class="mark">{{ test_case_run.sortkey }}</span></span>
 			</div>
-			<div class="hiddenRow {% if not test_case_run.is_current %}border-top{% endif %}" {% if not test_case_run.is_current %}style="display: none"{% endif %}>
-				{% if not test_case_run.is_current %}
+			<div class="case_content hiddenRow border-top" style="display: none">
 				<div id="id_loading_{{ test_case_run.case.pk }}" class="ajax_loading"></div>
-				{% else %}
-				{% include "run/execute_case_run.html" %}
-				{% endif %}
 			</div>
 		</div>
 		{% endfor %}

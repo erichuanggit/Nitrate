@@ -362,15 +362,17 @@ def get(request, case_id, template_name = 'case/get.html'):
     tc_text = tc.get_text_with_version(request.REQUEST.get('case_text_versions'))
     
     # Switch the templates for different module
-    templates = {
+    template_types = {
         'case': 'case/get_details.html',
         'review_case': 'case/get_details_review.html',
         'case_run': 'case/get_details_case_run.html',
         'execute_case_run': 'run/execute_case_run.html',
     }
     
-    if request.REQUEST.get('type'):
-        template_name = templates.get(request.REQUEST['type'], 'case')
+    if request.REQUEST.get('template_type'):
+        template_name = template_types.get(
+            request.REQUEST['template_type'], 'case'
+        )
     
     # Render the page
     return direct_to_template(request, template_name, {
