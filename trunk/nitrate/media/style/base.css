@@ -760,7 +760,7 @@ a:link.edit,a:visited.edit{ color:#333;}
 /*End Report*/
 
 #id_pk__in{ max-height:80px; min-width:250px; width:-moz-fit-content;}
-#id_notes{ max-height:40px;}
+#id_notes{height:-moz-fit-content;width:500px; height:100px;}
 
 /*Treeview*/
 .treeview_toolbar{ background:url(../images/note_bg.png) repeat-x left bottom; padding:3px 0; margin-top:35px; position:relative}
