@@ -384,13 +384,13 @@ Nitrate.TestPlans.Details.on_load = function()
     
     if($('btn_disable')) {
         $('btn_disable').observe('click', function(e){
-            updateObject('testplans.testplan', plan_id, 'is_active', 0, reloadWindow);
+            updateObject('testplans.testplan', plan_id, 'is_active', 'False', 'bool', reloadWindow);
         })
     }
     
     if($('btn_enable')) {
         $('btn_enable').observe('click', function(e) {
-            updateObject('testplans.testplan', plan_id, 'is_active', 1, reloadWindow);
+            updateObject('testplans.testplan', plan_id, 'is_active', 'True', 'bool', reloadWindow);
         })
     }
     
@@ -1164,7 +1164,7 @@ function changePlanParent(container, plan_id)
     var callback = function(e) {
         e.stop();
         var tree = Nitrate.TestPlans.TreeView;
-        updateObject('testplans.testplan', plan_id, 'parent', this.serialize(true)['plan_id'], function(t) {
+        var c = function(t) {
             var plan;
             var param = { plan_id: p, t: 'ajax' };
             var c = function(t) {
@@ -1184,7 +1184,8 @@ function changePlanParent(container, plan_id)
             };
             
             tree.filter(param, c)
-        });
+        };
+        updateObject('testplans.testplan', plan_id, 'parent', this.serialize(true)['plan_id'], 'int', c);
     };
     
     constructPlanParentPreviewDialog(p, parameters, callback);
@@ -1211,12 +1212,14 @@ function addPlanChildren(container, plan_id)
     var callback = function(e) {
         e.stop();
         var tree = Nitrate.TestPlans.TreeView;
-        updateObject('testplans.testplan', this.serialize(true)['plan_id'], 'parent', plan_id, function(t) {
+        var c = function(t) {
             tree.init(plan_id);
             tree.render_page();
             clearDialog();
             alert(default_messages.alert.tree_reloaded);
-        });
+        };
+        
+        updateObject('testplans.testplan', this.serialize(true)['plan_id'], 'parent', plan_id, 'int', c);
     };
     
     constructPlanParentPreviewDialog(p, parameters, callback);
@@ -1238,12 +1241,13 @@ function removePlanChildren(container, plan_id)
     var callback = function(e) {
         e.stop();
         var tree = Nitrate.TestPlans.TreeView;
-        updateObject('testplans.testplan', this.serialize(true)['plan_id'], 'parent', 0, function(t) {
+        var c = function(t) {
             tree.init(plan_id);
             tree.render_page();
             clearDialog();
             alert(default_messages.alert.tree_reloaded);
-        });
+        };
+        updateObject('testplans.testplan', this.serialize(true)['plan_id'], 'parent', 0, 'None', c);
     };
     
     constructPlanParentPreviewDialog(p, parameters, callback);

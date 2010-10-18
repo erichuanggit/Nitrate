@@ -90,25 +90,33 @@ Nitrate.TestRuns.Edit.on_load = function()
 
 Nitrate.TestRuns.Execute.on_load = function()
 {
-    $$('.execute_case_run').invoke('observe', 'click', function(e) {
+    $$('.case_title').invoke('observe', 'click', function(e) {
         var type = 'execute_case_run';
         var container = this.up();
         var content_container = this.next();
-        var case_id = this.getElementsBySelector('input[name="case_id"]')[0].value;
-        var case_text_version = this.getElementsBySelector('input[name="case_text_version"]')[0].value;
-        var case_run_id = this.getElementsBySelector('input[name="case_run_id"]')[0].value;
+        var case_id = this.adjacent('input[name="case_id"]')[0].value;
+        var case_text_version = this.adjacent('input[name="case_text_version"]')[0].value;
+        var case_run_id = this.adjacent('input[name="case_run_id"]')[0].value;
         var callback = function(t) {
-            content_container.getElementsBySelector('.update_form')[0].observe('submit', updateCaseRunStatus);
+            content_container.getElementsBySelector('.update_form')[0].observe(
+                'submit', updateCaseRunStatus
+            );
         }
         
         toggleTestCaseContents(type, container, content_container, case_id, case_text_version, case_run_id, callback)
     });
     
-    if(window.location.hash) {
-        blindupAllCases();
-        
+    // Auto show the case contents.
+    if(window.location.hash != '') {
         fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
+    } else {
+        if($$('.is_current') != []) {
+            $$('.is_current').each(function(e) {
+                fireEvent(e, 'click');
+            })
+        }
     }
+    
     $('id_check_box_blinddownallcase').observe('click',function(){
         if($('id_check_box_blinddownallcase').checked){
             blinddownAllCases();
@@ -153,16 +161,18 @@ Nitrate.TestRuns.AssignCase.on_load= function()
 var updateCaseRunStatus = function(e)
 {
     e.stop();
+    
     var container = this.up(2);
     var parent = container.up();
     var title = container.previous();
     var parameters = this.serialize(true);
-    var content_type = parameters['content_type'];
+    var ctype = parameters['content_type'];
     var object_pk = parameters['object_pk'];
     var field = parameters['field'];
     var value = parameters['value'];
-
-	// Callback when 
+    var vtype = 'int';
+    
+    // Callback when 
     var callback = function(t, rtobj) {
         // Reset the content to loading
         var ajax_loading = getAjaxLoading();
@@ -213,13 +223,13 @@ var updateCaseRunStatus = function(e)
     
     // Update the object when changing the status
     if(parameters['value'] != '') {
-        updateObject(content_type, object_pk, 'close_date', 'NOW');
-        updateObject(content_type, object_pk, field, value, callback);
+        updateObject(ctype, object_pk, 'close_date', 'NOW', 'datetime');
+        updateObject(ctype, object_pk, field, value, vtype, callback);
         
         if(parameters['assignee'] != Nitrate.User.pk)
-            updateObject(content_type, object_pk, 'assignee', Nitrate.User.pk);
+            updateObject(ctype, object_pk, 'assignee', Nitrate.User.pk);
         if(parameters['tested_by'] != Nitrate.User.pk)
-            updateObject(content_type, object_pk, 'tested_by', Nitrate.User.pk);
+            updateObject(ctype, object_pk, 'tested_by', Nitrate.User.pk);
         
         // Set the case run to be current
         new Ajax.Request(getURLParam(object_pk).url_case_run_set_current);
@@ -263,8 +273,9 @@ function changeCaseRunOrder(run_id, case_run_id, sort_key)
     var object_pk = case_run_id;
     var field = 'sortkey';
     var value = nsk;
+    var vtype = 'int';
     
-    updateObject(ctype, object_pk, field, value, s_callback);
+    updateObject(ctype, object_pk, field, value, vtype, s_callback);
 }
 
 function taggleSortCaseRun()

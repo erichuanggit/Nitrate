@@ -1022,8 +1022,11 @@ function getForm(container, app_form, parameters, callback, format)
     });
 }
 
-function updateObject(content_type, object_pk, field, value, callback)
+function updateObject(content_type, object_pk, field, value, value_type, callback)
 {
+    if (!value_type)
+        var value_type = 'str';
+    
     var url = new String('/ajax/update/');
     var success = function(t) {
         var returnobj = t.responseText.evalJSON();
@@ -1041,6 +1044,7 @@ function updateObject(content_type, object_pk, field, value, callback)
         object_pk: object_pk,
         field: field,
         value: value,
+        value_type: value_type,
     }
     
     new Ajax.Request(url, {
@@ -1090,7 +1094,7 @@ function getInfoAndUpdateObject(parameters, content_type, object_pks, field, cal
         
         if (!callback)
             callback = refresh_window
-        updateObject(content_type, object_pks, field, value, callback);
+        updateObject(content_type, object_pks, field, value, 'str', callback);
     }
     
     getInfo(parameters, get_info_callback);
