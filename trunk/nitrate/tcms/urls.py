@@ -122,9 +122,9 @@ urlpatterns = patterns('',
     (r'^caserun/(?P<case_run_id>\d+)/bug/$', 'tcms.testruns.views.bug'),
     
     # Review zone
-    (r'^plan/(?P<plan_id>\d+)/newreview/$', 'tcms.testreviews.views.new'),
-    (r'^review/(?P<review_id>\d+)/$', 'tcms.testreviews.views.get'),
-    (r'^review/(?P<review_id>\d+)/changestatus/$', 'tcms.testreviews.views.change_case_status'),
+    #(r'^plan/(?P<plan_id>\d+)/newreview/$', 'tcms.testreviews.views.new'),
+    #(r'^review/(?P<review_id>\d+)/$', 'tcms.testreviews.views.get'),
+    #(r'^review/(?P<review_id>\d+)/changestatus/$', 'tcms.testreviews.views.change_case_status'),
     
     # Management zone
     #(r'^management/$', 'tcms.management.views.index'),
