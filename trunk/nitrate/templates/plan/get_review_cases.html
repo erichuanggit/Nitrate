@@ -1,10 +1,11 @@
 {% load ifin %}
+{% load comments %}
 <form action="{% url tcms.testcases.views.all %}" method="get">
-	<input type="hidden" name="type" value="review_case" />
+	<input type="hidden" name="template_type" value="review_case" />
 	<input type="hidden" name="case_sort_by" value="{{ REQUEST_CONTENTS.case_sort_by }}" />
 	<input type="hidden" name="plan" value="{{ REQUEST_CONTENTS.from_plan }}" />
 	<input type="hidden" name="from_plan" value="{{ REQUEST_CONTENTS.from_plan }}" />
-	<input type="hidden" name="c" value="{{ REQUEST_CONTENTS.c }}" />
+	<input type="hidden" name="template_type" value="{{ REQUEST_CONTENTS.template_type }}" />
 	<div class="tab_navigation">
 		<div class="actions whitelink">
 			{% if perms.testcases.add_testcase %}
@@ -18,14 +19,14 @@
 			<label>New Case :</label>
 			<input class="add_new" type="button" disabled="true" value="Write new case"/>
 			|
-			<input type="button" class="import"	 disabled="true" value="Import cases from XML"	/>
+			<input type="button" class="import" disabled="true" value="Import cases from XML"	/>
 			|
-			<input type="button" class="search"	 disabled="true" value="Add cases from other plans"	 />
+			<input type="button" class="search" disabled="true" value="Add cases from other plans"	 />
 			{% endif %}
 			<span class="reorder_case">
-				<a class="filtercase" title="Click to show filter options">Show filter options</a>
+				<a class="btn_filter filtercase" title="Click to show filter options">Show filter options</a>
 				{% if perms.testcases.change_testcase %}
-				<a class="sortlink" title="Click me,then Drag and drop the rows to adjust the order,and click 'Done Sorting' link to submit your changes">Re-order cases</a>
+				<a class="btn_sort sortlink" title="Click me,then Drag and drop the rows to adjust the order,and click 'Done Sorting' link to submit your changes">Re-order cases</a>
 				{% endif %}
 			</span>
 		</div>
@@ -80,14 +81,13 @@
 			
 			{% if perms.testcases.change_testcase %}
 			
-			<input type="button" value="Automated" title="change automated" class="automated sprites" />
-			<input type="button" class="assignee sprites" value="Default tester" title="change default tester" onclick="changePlanCaseDefaultTester(this.up(2), this.up(3), {{ test_plan.plan_id }})" />
-			<input type="button" value="Component" class="sprites component" />
+			<input type="button" value="Automated" title="change automated" class="btn_automated automated sprites" />
+			<input type="button" value="Default tester" title="change default tester" class="btn_default_tester assignee sprites" />
+			<input type="button" value="Component" class="btn_component sprites component" />
 			{% else %}
-			
-			<input type="button" value="Automated" title="change automated" class="automated_disabled sprites" id="batch_automated" disabled="disabled" />
-			<input type="button" value="Default tester" title="change default tester" class="assigneedisable sprites" disabled />
-			<input id="id_batch_component" type="button" value="Component" class="sprites component_disabled" disabled="disabled"/>
+			<input type="button" value="Automated" title="change automated" class="btn_automated automated_disabled sprites" disabled="Trues" />
+			<input type="button" value="Default tester" title="change default tester" class="btn_default_tester assigneedisable sprites" disabled />
+			<input id="id_batch_component" type="button" value="Component" class="btn_component sprites component_disabled" disabled="disabled"/>
 			{% endif %}
 			
 			{% if perms.testcases.change_testcase %}
@@ -143,48 +143,48 @@
 				<input type="checkbox" value="all" checked />
 			</th>
 			<th align="left" width="50px">
-				<a title="Sort by case ID" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'case_id')">
+				<a title="Sort by case ID" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'case_id')">
 					#
 				</a>
 			</th>
 			<th align="left">
-				<a title="Sort by Summary" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'summary')">
+				<a title="Sort by Summary" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'summary')">
 					Test Case Summary
 				</a>
 			</th>
 			<th align="left" width="90px">
-				<a title="Sort by Author" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'author')">
+				<a title="Sort by Author" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'author')">
 					Author
 				</a>
 			</th>
 			<th align="left" width="110px">
-				<a title="Sort by Default Tester" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'default_tester')">
+				<a title="Sort by Default Tester" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'default_tester')">
 					Default Tester
 				</a>
 			</th>
 			<th align="left" width="140px">
-				<a title="Sort by automated" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'is_automated')">
+				<a title="Sort by automated" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'is_automated')">
 					Automated
 				</a>
 			</th>
 			<th align="left" width="120px">
-				<a title="Sort by status" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'case_status')">
+				<a title="Sort by status" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'case_status')">
 					Status
 				</a>
 			</th>
 			<th align="left" width="100px">
-				<a title="Sort by categoty" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'category__name')">
+				<a title="Sort by categoty" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'category__name')">
 					Category
 				</a>
 			</th>
 			<th align="left" width="60px">
-				<a title="Sort by prority" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'priority')">
+				<a title="Sort by prority" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'priority')">
 					Priority
 				</a>
 			</th>
 			<th align="left" width="80px" style="display:none">Text version</th>
 			<th align="left" width="40px">
-				<a title="Sort by sortkey" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'sortkey')">
+				<a title="Sort by sortkey" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'sortkey')">
 					Sort
 				</a>
 			</th>
@@ -193,9 +193,9 @@
 	</thead>
 	<tbody>
 		{% for test_case in test_cases %}
-		<tr class=" title collapses {% cycle 'odd' 'even' %}" >
+		<tr class="case_title {% cycle 'odd' 'even' %}" >
 			<td class="expandable">
-				<img class="collapse" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
+				<img class="collapse blind_icon" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
 			</td>
 			<td>
 				<input type="checkbox" name="case" value="{{ test_case.pk }}" class="checkbox" {% ifin test_case.pk selected_case_ids %}checked{% endifin %} />
@@ -212,10 +212,10 @@
 			<!-- <td >{{ testcase.create_date }}</td>-->
 			<td>
 				{% if perms.testcases.change_testcase %}
-				<a class="show_change_status_link" onclick="javascript:showStatusSelect()" style="display: none;">
+				<a class="show_change_status_link" href="javascript:void(0);" onclick="this.hide(); this.next().show()" style="display: none;">
 					{{ test_case.case_status }}
 				</a>
-				<select class="change_status_selector" onchange="changeTestCaseStatus()">
+				<select class="change_status_selector">
 					{% for case_stat in case_status %}
 					<option {% ifequal case_stat.pk test_case.case_status_id %} selected="1" {% endifequal %} value="{{ case_stat.id }}">{{ case_stat.name }}</option>
 					{% endfor %}
@@ -228,21 +228,19 @@
 			<td class="col_priority_content expandable" align="center">{{ test_case.priority }}</td>
 			<td valign="top" width="8%" class="col_category_content expandable" style="display:none">{{ test_case.category }}</td>
 			<td class="col_sortkey_content" align="center">
-				<div class="mark">
-					<a href="#" onclick="changeCaseOrder('{{ test_case.pk }}', '{{ test_case.sortkey }}', '{{ test_plan.pk }}')">{{ testcase.sortkey }}</a>
-				</div>
+				<a href="javascript:void(0);" class="mark case_sortkey">{{ test_case.sortkey }}</a>
 			</td>
 			<td align="center" >
 				{% if perms.testcases.change_testcase %}
-				<a class="editlink" href="{% url tcms.testcases.views.edit test_case.case_id %}?from_plan={{ test_splan.plan_id }}">Edit</a>
+				<a class="editlink" href="{% url tcms.testcases.views.edit test_case.case_id %}?from_plan={{ test_plan.plan_id }}">Edit</a>
 				{% else %}
 				<span class="editlink grey">Edit</span>
 				{% endif %}
 			</td>
 		</tr>
-		<tr class="hide" style="display: none;">
-			<td id="id_loading_{{ test_case.pk }}" colspan="12">
-				<div class="ajax_loading"></div>
+		<tr class="case_content hide" style="display: none;">
+			<td colspan="12">
+				<div id="id_loading_{{ test_case.pk }}" class="ajax_loading"></div>
 			</td>
 		</tr>
 		{% empty %}

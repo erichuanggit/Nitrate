@@ -4,7 +4,7 @@
 	<input type="hidden" name="case_sort_by" value="{{ REQUEST_CONTENTS.case_sort_by }}" />
 	<input type="hidden" name="plan" value="{{ REQUEST_CONTENTS.from_plan }}" />
 	<input type="hidden" name="from_plan" value="{{ REQUEST_CONTENTS.from_plan }}" />
-	<input type="hidden" name="c" value="{{ REQUEST_CONTENTS.c }}" />
+	<input type="hidden" name="template_type" value="{{ REQUEST_CONTENTS.template_type }}" />
 	<div class="tab_navigation">
 		<div class="actions whitelink">
 			{% if perms.testcases.add_testcase %}
@@ -142,48 +142,48 @@
 				<input type="checkbox" value="all" checked />
 			</th>
 			<th align="left" width="50px">
-				<a title="Sort by case ID" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'case_id')">
+				<a title="Sort by case ID" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'case_id')">
 					#
 				</a>
 			</th>
 			<th align="left">
-				<a title="Sort by Summary" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'summary')">
+				<a title="Sort by Summary" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'summary')">
 					Test Case Summary
 				</a>
 			</th>
 			<th align="left" width="90px">
-				<a title="Sort by Author" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'author')">
+				<a title="Sort by Author" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'author')">
 					Author
 				</a>
 			</th>
 			<th align="left" width="110px">
-				<a title="Sort by Default Tester" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'default_tester')">
+				<a title="Sort by Default Tester" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'default_tester')">
 					Default Tester
 				</a>
 			</th>
 			<th align="left" width="140px">
-				<a title="Sort by automated" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'is_automated')">
+				<a title="Sort by automated" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'is_automated')">
 					Automated
 				</a>
 			</th>
 			<th align="left" width="120px">
-				<a title="Sort by status" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'case_status')">
+				<a title="Sort by status" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'case_status')">
 					Status
 				</a>
 			</th>
 			<th align="left" width="100px">
-				<a title="Sort by categoty" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'category__name')">
+				<a title="Sort by categoty" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'category__name')">
 					Category
 				</a>
 			</th>
 			<th align="left" width="60px">
-				<a title="Sort by prority" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'priority')">
+				<a title="Sort by prority" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'priority')">
 					Priority
 				</a>
 			</th>
 			<th align="left" width="80px" style="display:none">Text version</th>
 			<th align="left" width="40px">
-				<a title="Sort by sortkey" href="#testcases" onclick="sortCase(this.up(6), '{{ test_plan.plan_id }}', 'sortkey')">
+				<a title="Sort by sortkey" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'sortkey')">
 					Sort
 				</a>
 			</th>
@@ -211,10 +211,10 @@
 			<!-- <td >{{ testcase.create_date }}</td>-->
 			<td>
 				{% if perms.testcases.change_testcase %}
-				<a class="show_change_status_link" onclick="javascript:showStatusSelect()" style="display: none;">
+				<a class="show_change_status_link" href="javascript:void(0);" onclick="this.hide(); this.next().show()" style="display: none;">
 					{{ test_case.case_status }}
 				</a>
-				<select class="change_status_selector" onchange="changeTestCaseStatus()">
+				<select class="change_status_selector">
 					{% for case_stat in case_status %}
 					<option {% ifequal case_stat.pk test_case.case_status_id %} selected="1" {% endifequal %} value="{{ case_stat.id }}">{{ case_stat.name }}</option>
 					{% endfor %}
@@ -238,8 +238,8 @@
 			</td>
 		</tr>
 		<tr class="case_content hide" style="display: none;">
-			<td id="id_loading_{{ test_case.pk }}" colspan="12">
-				<div class="ajax_loading"></div>
+			<td colspan="12">
+				<div id="id_loading_{{ test_case.pk }}" class="ajax_loading"></div>
 			</td>
 		</tr>
 		{% empty %}

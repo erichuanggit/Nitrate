@@ -134,7 +134,7 @@ Nitrate.TestPlans.Instance = {
 					<a href="#testcases" title="testcases">Cases ({{ test_plan.run_case.count }}/{{ test_plan.case.count }})</a>
 				</li>
 				<li id="tab_testcases" class="tab">
-					<a href="#reviewcases" title="reviewcases">Review Cases ({{ test_plan.review_case.count }})</a>
+					<a href="#reviewcases" title="reviewcases">Reviewing Cases ({{ test_plan.review_case.count }})</a>
 				</li>
 				<li id="tab_testruns"  class="tab">
 					<a href="#testruns" title="testruns">Runs ({{ test_plan.run.count }})</a>
@@ -169,9 +169,11 @@ Nitrate.TestPlans.Instance = {
 			<div id="testruns" class="tab_list" style="display:none;">
 				{% include "plan/get_runs.html" %}
 			</div>
+			{% comment %}
 			<div id="testreviews" class="tab_list" style="display:none;">
 				{% include "plan/get_reviews.html" %}
 			</div>
+			{% endcomment %}
 			<div id="components" class="tab_list" style="display:none;">
 				<div class="ajax_loading"></div>
 			</div>
@@ -184,7 +186,7 @@ Nitrate.TestPlans.Instance = {
 			<div id="reviewcases" class="tab_list" style="display:none">
 				<div class="ajax_loading"></div>
 			</div>
-			<div id="testcases"	 class="tab_list">
+			<div id="testcases" class="tab_list">
 				<div class="ajax_loading"></div>
 			</div>
 			<div id="tag" class="tab_list" style="display:none">

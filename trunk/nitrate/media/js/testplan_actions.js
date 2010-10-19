@@ -335,7 +335,7 @@ Nitrate.TestPlans.Details.on_load = function()
     
     var run_case_params = {
         'a': 'initial',
-        'c': 'run_case',
+        'template_type': 'case',
         'from_plan': plan_id
     }
     
@@ -343,7 +343,7 @@ Nitrate.TestPlans.Details.on_load = function()
     
     var review_case_params = {
         'a': 'initial',
-        'c': 'review_case',
+        'template_type': 'review_case',
         'from_plan': plan_id
     }
     constructPlanDetailsCasesZone('reviewcases', plan_id, review_case_params);
@@ -353,7 +353,7 @@ Nitrate.TestPlans.Details.on_load = function()
     
     new Draggable('id_import_case_zone');
     TableKit.Sortable.init('testruns_table');
-    TableKit.Sortable.init('testreview_table');
+    // TableKit.Sortable.init('testreview_table');
     
     $$('li.tab a').invoke('observe', 'click', function(i) {
         $$('div.tab_list').each(function(t) {
@@ -744,7 +744,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     }
                 }
                 
-                changeCaseStatus(params['case'], this.value, callback);
+                changeCasesStatus(params['case'], this.value, callback);
             })
         }
         
@@ -950,14 +950,6 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             })
         }
         
-        // Observe the expand the case contents action
-        table.adjacent('.expandable').invoke('observe', 'click', function(e) {
-            var c = this.up(); // Container
-            var c_container = this.up().next(); // Content Containers
-            var case_id = c.adjacent('input[name="case"]')[0].value;
-            var type = form.adjacent('input[name="type"]')[0].value;
-            toggleTestCaseContents(type, c, c_container, case_id);
-        })
         
         // Observe the change sortkey
         table.adjacent('.case_sortkey').invoke('observe', 'click', function(e) {
@@ -971,6 +963,48 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             };
             
             changeCaseOrder(params, callback)
+        })
+        
+        table.adjacent('.change_status_selector').invoke('observe', 'change', function(e) {
+            var title = this.up(1); // Container
+            var case_id = title.getElementsBySelector('input[name="case"]')[0].value;
+            changeTestCaseStatus(this, case_id);
+        })
+        
+        // Display/Hide the case content
+        table.adjacent('.expandable').invoke('observe', 'click', function(e) {
+            var btn = this;
+            var title = this.up(); // Container
+            var content = this.up().next(); // Content Containers
+            var case_id = title.getElementsBySelector('input[name="case"]')[0].value;
+            var template_type = form.adjacent('input[name="template_type"]')[0].value;
+            // Review case content call back;
+            var review_case_content_callback = function(e) {
+                var comment_container_t = new Element('div');
+                
+                content.adjacent('.update_form').invoke('observe', 'submit', function(e) {
+                    e.stop();
+                    var params = this.serialize(true);
+                    submitComment(comment_container_t, params, function(t) {
+                        var td = new Element('td', {colspan: 12});
+                        var id = 'id_loading_' + params['object_pk'];
+                        td.appendChild(getAjaxLoading(id));
+                        content.update(td);
+                        fireEvent(btn, 'click');
+                        fireEvent(btn, 'click');
+                    })
+                });
+            };
+            
+            switch(template_type) {
+                case 'review_case':
+                    var case_content_callback = review_case_content_callback;
+                    break;
+                default:
+                    var case_content_callback = function(e) {};
+            }
+            
+            toggleTestCaseContents(template_type, title, content, case_id, nil, nil, case_content_callback);
         })
     }
     
@@ -1087,15 +1121,15 @@ function constructBatchTagProcessDialog(plan_id){
     );
 }
 
-function sortCase(container, plan_id, order) {   
-    var parameters = $('id_form_cases').serialize(true);
+function sortCase(container, plan_id, order) {
+    var form = container.childElements()[0];
+    var parameters = form.serialize(true);
     parameters.a = 'sort';
-
-    if($F('case_sort_by') == order)
+    
+    if(parameters.case_sort_by == order)
         parameters.case_sort_by = '-' + order;
     else
         parameters.case_sort_by = order;
-    
     constructPlanDetailsCasesZone(container, plan_id, parameters)
 }
 

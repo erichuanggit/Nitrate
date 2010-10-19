@@ -217,8 +217,7 @@ function getTestCaseNextParam(id)
     return param;
 }
 
-
-function toggleTestCaseContents(template_type, container, content_container, case_id, case_text_version, case_run_id, callback)
+function toggleTestCaseContents(template_type, container, content_container, object_pk, case_text_version, case_run_id, callback)
 {
     if (typeof(container) != 'object')
         var container = $(container)
@@ -228,8 +227,8 @@ function toggleTestCaseContents(template_type, container, content_container, cas
     
     content_container.toggle();
     
-    if ($('id_loading_' + case_id)) {
-        var url = getURLParam(case_id).url_case_details;
+    if ($('id_loading_' + object_pk)) {
+        var url = getURLParam(object_pk).url_case_details;
         var parameters = {
             template_type: template_type,
             case_text_version: case_text_version,
@@ -256,26 +255,26 @@ function toggleTestCaseContents(template_type, container, content_container, cas
     }
 }
 
-function changeTestCaseStatus(id, case_id)
+function changeTestCaseStatus(selector, case_id)
 {
-    var p = getTestCaseParam(id);
-    var value = $(p.case_status_select).value;
+    var value = selector.value;
+    var label = selector.previous();
     
     var success = function(t) {
-        returnobj = t.responseText.evalJSON(true); 
-        case_status_id = returnobj.case_status_id; 
+        var returnobj = t.responseText.evalJSON(true); 
+        var case_status_id = returnobj.case_status_id; 
         
-        for (var i = 0; (node = $(p.case_status_select).options[i]); i++) {
+        for (var i = 0; (node = selector.options[i]); i++) {
            if(node.selected)
                var case_status = node.innerHTML;
         }
         
-        $(p.case_status).innerHTML = case_status;
-        $(p.case_status).show(); 
-        $(p.case_status_select).hide();
+        label.innerHTML = case_status;
+        label.show(); 
+        selector.hide();
     }
     
-    changeCaseStatus(case_id, value, success);
+    changeCasesStatus(case_id, value, success);
 }
 
 function blinddownNextTestCaseContents(index_id) {
@@ -290,14 +289,6 @@ function blinddownNextTestCaseContents(index_id) {
         alert('It is the last case run');
         return false;
     }
-}
-
-function showStatusSelect(id)
-{
-    var p = getTestCaseParam(id);
-    
-    $(p.case_status).hide();
-    $(p.case_status_select).show();
 }
 
 function toggleAllCheckBoxes(element, container, name)
@@ -368,7 +359,7 @@ function changeCaseOrder(parameters, callback)
     updateObject(ctype, object_pk, field, value, vtype, callback);
 }
 
-function changeCaseStatus(object_pk, value, callback)
+function changeCasesStatus(object_pk, value, callback)
 {
     var ctype = 'testcases.testcase';
     var field = 'case_status';

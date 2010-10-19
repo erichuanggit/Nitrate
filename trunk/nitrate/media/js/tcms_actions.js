@@ -1130,11 +1130,14 @@ var clearDialog = function(element)
     dialog.hide();
 }
 
-function getAjaxLoading()
+function getAjaxLoading(id)
 {
-    return Element('div', {className: 'ajax_loading'})
+    var e = Element('div', {className: 'ajax_loading'});
+    if (id)
+        e.id = id
+        
+    return e;
 }
-
 
 // FIXME: Buggy here - Fuck you.
 // Using in bindRefreshComponentCategoryByProduct() in testcase_actions

@@ -234,9 +234,9 @@ def all(request, template_name="case/all.html"):
         tp = TestPlan.objects.get(pk = request.REQUEST['from_plan'])
         SearchForm = CaseFilterForm
         # Hacking for case plan
-        if request.REQUEST.get('c') == 'run_case': # 'c' is meaning component
+        if request.REQUEST.get('template_type') == 'case':
             template_name = 'plan/get_cases.html'
-        elif request.REQUEST.get('c') == 'review_case':
+        elif request.REQUEST.get('template_type') == 'review_case':
             template_name = 'plan/get_review_cases.html'
     else:
         tp = TestPlan.objects.none()
@@ -248,9 +248,9 @@ def all(request, template_name="case/all.html"):
     else:
         # Hacking for case plan
         confirmed_status_name = 'CONFIRMED'
-        if request.REQUEST.get('c') == 'run_case': # 'c' is meaning component
+        if request.REQUEST.get('template_type') == 'case': # 'c' is meaning component
             d_status = TestCaseStatus.objects.filter(name = confirmed_status_name)
-        elif request.REQUEST.get('c') == 'review_case':
+        elif request.REQUEST.get('template_type') == 'review_case':
             d_status = TestCaseStatus.objects.exclude(name = confirmed_status_name)
         
         d_status_ids = d_status.values_list('pk', flat=True)
@@ -382,6 +382,7 @@ def get(request, case_id, template_name = 'case/get.html'):
         'test_case_runs': tcrs,
         'test_case_run': tcr,
         'test_case_text': tc_text,
+        'test_case_status': TestCaseStatus.objects.all(),
         'test_case_run_status': TestCaseRunStatus.objects.all(),
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
     })
