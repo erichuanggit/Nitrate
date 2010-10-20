@@ -104,6 +104,7 @@ def create(request, values):
       | name                    | String         | Required  |                                    |
       | type                    | Integer        | Required  | ID of plan type                    |
       | default_product_version | Integer        | Required  |                                    |
+      | text                    | String         | Required  | Plan documents, HTML acceptable.   |
       | parent                  | Integer        | Optional  | Parent plan ID                     | 
       | is_active               | Boolean        | Optional  | 0: Archived 1: Active (Default 1)  |
       +-------------------------+----------------+-----------+------------------------------------+
@@ -118,20 +119,21 @@ def create(request, values):
         'type': 1,
         'parent_id': 150,
         'default_product_version': 93,
+        'text':'Testing TCMS',
     }
     >>> TestPlan.create(values)
     """
     from tcms.core import forms
-    from tcms.testplans.forms import EditPlanForm
+    from tcms.testplans.forms import XMLRPCNewPlanForm
     
     if not values.get('product'):
         raise ValueError('Value of product is required')
     
-    form = EditPlanForm(values)
+    form = XMLRPCNewPlanForm(values)
     form.populate(product_id = values['product'])
     
     if form.is_valid():
-        return TestPlan.objects.create(
+        tp = TestPlan.objects.create(
             product = form.cleaned_data['product'],
             name = form.cleaned_data['name'],
             type = form.cleaned_data['type'],
@@ -139,7 +141,14 @@ def create(request, values):
             default_product_version = form.cleaned_data['default_product_version'],
             parent = form.cleaned_data['parent'],
             is_active = form.cleaned_data['is_active']
-        ).serialize()
+        )
+        
+        tp.add_text(
+            author = request.user,
+            plan_text = values['text'],
+        )
+        
+        return tp.serialize()
     else:
         return forms.errors_to_list(form)
 
@@ -381,12 +390,12 @@ def remove_tag(request, plan_ids, tags):
 
 @log_call
 @user_passes_test(lambda u: u.has_perm('testplans.add_testplantext'))
-def store_text(request, plan_id, plan_text, author = None):
+def store_text(request, plan_id, text, author = None):
     """
     Description: Update the document field of a plan.
 
     Params:      $plan_id - Integer: An integer representing the ID of this plan in the database.
-                 $plan_text - String: Text for the document. Can contain HTML.
+                 $text - String: Text for the document. Can contain HTML.
                  [$author] = Integer: (OPTIONAL) The numeric ID or the login of the author. 
                       Defaults to logged in user.
 
@@ -406,7 +415,7 @@ def store_text(request, plan_id, plan_text, author = None):
         
     return tp.add_text(
         author = author,
-        plan_text = plan_text,
+        plan_text = text,
     ).serialize()
 
 @log_call

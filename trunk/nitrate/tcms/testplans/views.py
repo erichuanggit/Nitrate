@@ -53,7 +53,7 @@ def new(request, template_name = 'plan/new.html'):
         if form.is_valid():
             if form.cleaned_data.get('upload_plan_text'):
                 # Set the summary form field to the uploaded text
-                form.data['summary'] = form.cleaned_data['summary']
+                form.data['text'] = form.cleaned_data['text']
                 
                 # Generate the form
                 return direct_to_template(request, template_name, {
@@ -81,7 +81,7 @@ def new(request, template_name = 'plan/new.html'):
             if request.user.has_perm('testplans.add_testplantext'):
                 tp.add_text(
                     author = request.user,
-                    plan_text = form.cleaned_data['summary']
+                    plan_text = form.cleaned_data['text']
                 )
             
             # Add tag to plan
@@ -301,7 +301,7 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
         if form.is_valid():
             if form.cleaned_data.get('upload_plan_text'):
                 # Set the summary form field to the uploaded text
-                form.data['summary'] = form.cleaned_data['summary']
+                form.data['text'] = form.cleaned_data['text']
                 
                 # Generate the form
                 return direct_to_template(request, template_name, {
@@ -322,10 +322,10 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
                 tp.save()
             
             if request.user.has_perm('testplans.add_testplantext'):
-                if not tp.latest_text() or request.REQUEST.get('summary') != tp.latest_text().plan_text:
+                if not tp.latest_text() or request.REQUEST.get('text') != tp.latest_text().plan_text:
                     tp.add_text(
                         author = request.user,
-                        plan_text = request.REQUEST.get('summary')
+                        plan_text = request.REQUEST.get('text')
                     )
             
             if request.user.has_perm('management.change_tcmsenvplanmap'):
@@ -359,7 +359,7 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
             'product': tp.product_id,
             'product_version': tp.get_version_id(),
             'type': tp.type_id,
-            'summary': tp.latest_text() and tp.latest_text().plan_text or '',
+            'text': tp.latest_text() and tp.latest_text().plan_text or '',
             'parent': tp.parent_id,
             'env_group': env_group_id,
             'is_active': tp.is_active,

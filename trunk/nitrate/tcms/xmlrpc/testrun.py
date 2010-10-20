@@ -141,7 +141,6 @@ def create(request, values):
 
     Example:
     >>> values = {'build': 384,
-        'default_product_version': 93,
         'manager': 137,
         'plan': 137,
         'product': 61,

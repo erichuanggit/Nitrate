@@ -105,9 +105,9 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Edit.on_load);
 					<td><label class="lab strong">Plan Document</label></td>
 					<td>
 						<div id="display_summary"  class="mec">
-							{{ form.summary }}
+							{{ form.text }}
 						</div>
-                        <div >{{ form.summary.errors }}</div>
+                        <div >{{ form.text.errors }}</div>
                         <span>Or upload a plan document</span>
                         {{ form.upload_plan_text }}
                         <input type="submit" value="Upload" />
@@ -119,7 +119,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Edit.on_load);
 							<font size="-3"><em>Html or plain text.</em></font>
 						</span>
 						{% endcomment %}
-						<div class="errors">{{ form.summary.errors }}</div>
+						<div class="errors">{{ form.text.errors }}</div>
 					</td>
 				</tr>
 				<tr>

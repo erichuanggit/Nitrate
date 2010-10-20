@@ -76,8 +76,8 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Create.on_load);
 				<tr>
 					<td valign="top"><label class="lab" for="id_summary">Plan Document: </label></td>
 					<td>
-						<div class="mec">{{ form.summary }}</div>
-						<div >{{ form.summary.errors }}</div>
+						<div class="mec">{{ form.text }}</div>
+						<div >{{ form.text.errors }}</div>
 						<span>Or upload a plan document</span>
 						{{ form.upload_plan_text }}
 						<input type="submit" value="Upload" />

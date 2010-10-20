@@ -274,7 +274,7 @@ class BasePlanForm(forms.Form):
         queryset = TestPlanType.objects.all(),
         empty_label = None,
     )
-    summary = forms.CharField(
+    text = forms.CharField(
         label = "Plan Document",
         widget = TinyMCEWidget, 
         required = False
@@ -340,7 +340,7 @@ class NewPlanForm(BasePlanForm):
     def clean(self):
         cleaned_data = self.cleaned_data
         if cleaned_data.get('upload_plan_text'):
-            cleaned_data['summary'] = cleaned_data['upload_plan_text']
+            cleaned_data['text'] = cleaned_data['upload_plan_text']
         return cleaned_data
 
 class EditPlanForm(NewPlanForm):
@@ -463,7 +463,7 @@ class ClonePlanForm(BasePlanForm):
 # =========== Forms for XML-RPC functions ==============
 
 class XMLRPCNewPlanForm(EditPlanForm):
-    pass
+    text = forms.CharField()
     
 class XMLRPCEditPlanForm(EditPlanForm):
     name = forms.CharField(
