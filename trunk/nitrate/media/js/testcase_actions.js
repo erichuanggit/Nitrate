@@ -24,6 +24,7 @@ Nitrate.TestCases.List.on_load = function()
             nosortClass : 'nosort'
         });
     }
+	
 }
 
 Nitrate.TestCases.Details.on_load = function()
@@ -117,6 +118,14 @@ Nitrate.TestCases.Details.on_load = function()
     
     if(window.location.hash) {
         fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
+    }
+	if($('id_table_cases')) {
+        TableKit.Sortable.init('id_table_cases',
+        {
+            rowEvenClass : 'roweven',
+            rowOddClass : 'rowodd',
+            nosortClass : 'nosort'
+        });
     }
 }
 
