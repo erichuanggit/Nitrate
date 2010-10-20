@@ -92,11 +92,9 @@ class Product(TCMSActionModel):
     
     def save(self):
         super(Product, self).save()
-        self.category.create(name='--default--')
-        # Component is breaking with the initial owner field
-        # self.component.create(name='unspecified', description='Auto creation')
-        self.version.create(value='unspecified')
-        self.build.create(name='unspecified')
+        self.category.get_or_create(name='--default--')
+        self.version.get_or_create(value='unspecified')
+        self.build.get_or_create(name='unspecified')
     
     def get_version_choices(self, allow_blank):
         # Generate a list of (id, string) pairs suitable
