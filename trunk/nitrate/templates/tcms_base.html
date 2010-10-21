@@ -31,53 +31,9 @@
 	</script>
 </head>
 <body id="body">
-	{% comment %}
-	Debug snippet adapted from http://www.djangosnippets.org/snippets/93/
-
-	You must do the following:
-	1.	Have 'django.core.context_processors.debug' in your TEMPLATE_CONTEXT_PROCESSORS setting (it was there in the default settings, last time I checked).
-	2. Have your current IP in your INTERNAL_IPS setting.
-	3. Use RequestContext when rendering the current template (if you're using a generic view, you're already using RequestContext).
-
-	Legal information from that site:
-
-	I hate legal-speak as much as anybody, but on a site which is geared toward sharing code there has to be at least a little bit of it, so here goes:
-
-	By creating an account here you agree to three things:
-
-	1. That you will only post code which you wrote yourself and that you have the legal right to release under these terms.
-	2. That you grant any third party who sees the code you post a royalty-free, non-exclusive license to copy and distribute that code and to make and distribute derivative works based on that code. You may include license terms in snippets you post, if you wish to use a particular license (such as the BSD license or GNU GPL), but that license must permit royalty-free copying, distribution and modification of the code to which it is applied.
-	3. That if you post code of which you are not the author or for which you do not have the legal right to distribute according to these terms, you will indemnify and hold harmless the operators of this site and any third parties who are exposed to liability as a result of your actions.
-
-	If you can't legally agree to these terms, or don't want to, you cannot create an account here.
-
-	{% endcomment %}
-	{% if debug %}
-	<div id="debug">
-		<p>
-			{{ sql_queries|length }} Quer{{ sql_queries|pluralize:"y,ies" }}
-			{% ifnotequal sql_queries|length 0 %}
-			(<span style="cursor: pointer;" onclick="var s=document.getElementById('debugQueryTable').style;s.display=s.display=='none'?'':'none';this.innerHTML=this.innerHTML=='Show'?'Hide':'Show';">Show</span>)
-			{% endifnotequal %}
-		</p>
-		<table id="debugQueryTable" style="display: none;">
-			<tr class="odd">
-				<td>#</td>
-				<td>SQL</td>
-				<td>Time</td>
-			</tr>
-			{% for query in sql_queries %}
-			<tr class="{% cycle odd,even %}">
-				<td>{{ forloop.counter }}</td>
-				<td>{{ query.sql|escape }}</td>
-				<td>{{ query.time }}</td>
-			</tr>{% endfor %}
-		</table>
-	</div>
-	{% endif %}
 	<div id="header">
 			<div class="logo">
-				<a href="{% url tcms.core.views.index %}"><img  src="{{ MEDIA_URL }}/images/logo_shipshape_1.png" alt="logo" /></a>
+				<a href="{% url tcms.core.views.index %}"><img src="{{ MEDIA_URL }}/images/logo_shipshape_1.png" alt="logo" /></a>
 			</div>
 			<div class="absoluteright">
 				<label>
@@ -98,20 +54,18 @@
 				</label>
 			</div>
 			{% include 'menu.html' %}
-		
 	</div>
 	{% block contents %}{% endblock %}
-    <div id="dialog" style="display:none"><div class="ajax_loading"></div></div>
+	<div id="dialog" style="display:none"><div class="ajax_loading"></div></div>
 	<div id="footer">
 		{% if SETTINGS.FOOTER_LINKS %}
-    	<div class="footercontent">
+		<div class="footercontent">
 			{% for link in SETTINGS.FOOTER_LINKS %}
 			<a href="{{ link.0 }}">{{ link.1 }}</a>{% if not forloop.last %}|{% endif %}
 			{% endfor %}
-        </div>
+		</div>
 		{% endif %}
-		<div class="center"><span>Nitrate NITRATE_VERSION  © 2010 Red Hat, Inc. All rights reserved.</span></div>
+		<div class="center"><span>Nitrate NITRATE_VERSION © 2010 Red Hat, Inc. All rights reserved.</span></div>
 	</div>
-    
 </body>
 </html>
