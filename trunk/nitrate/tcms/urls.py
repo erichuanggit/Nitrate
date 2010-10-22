@@ -65,10 +65,7 @@ urlpatterns = patterns('',
     (r'^accounts/passwordreset/$', 'django.contrib.auth.views.password_reset'),
     (r'^accounts/passwordreset/done/$', 'django.contrib.auth.views.password_reset_done'),
     (r'^accounts/passwordreset/confirm/$', 'django.contrib.auth.views.password_reset_confirm'),
-    (r'^accounts/profile/$', 'tcms.profiles.views.profile'),
-    (r'^users/(?P<name>[A-Za-z0-9\-]+)/$','django.views.generic.simple.redirect_to', {
-        'url': '/plans/?author=%(name)s', 'permanent': True
-    }),
+    (r'^accounts/profile/(?P<username>[A-Za-z0-9\-]+)/$', 'tcms.profiles.views.profile'),
     
     # Testplans zone
     (r'^plan/new/$', 'tcms.testplans.views.new'),
