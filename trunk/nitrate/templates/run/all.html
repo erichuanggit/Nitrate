@@ -27,11 +27,21 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 		>> Test Runs
 		{% endif %}
 	</div>
+    <form action="{% url tcms.testruns.views.all %}" method="get">
+
 	<div id="itemSearch" class="itemSearch">
-		<form action="{% url tcms.testruns.views.all %}" method="get">
 			<input type="hidden" name="action" value="search" />
-			<h2>Search Test Run</h2>
-			{% include 'run/form/search.html' %}
+            <div>
+                <h2>Search Test Run</h2>
+                {% include 'run/form/search.html' %}
+                </div>
+            <div>
+                <div class="relativeSearchTitle">Case Information Option<div class="expand" id="relativeSearchOption_case"></div></div>
+                <div class="relativeSearchBox" style="display:none" id="relativeSearch_case">
+                    {% include 'run/form/search_case.html' %}
+                    <div class="clear"></div>
+                </div>
+            </div>
 			<div class="bottom">
 				<input type="submit" size="7" value="Search" />
 				<input type="reset" size="7"  value="Reset" />
@@ -40,11 +50,11 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 				</span>
 			</div>
             <div class="clear"></div>
-		</form>
 	</div>
+    </form>
+
 	<div id="contentTab" class="mixbar">
 		<span class="tit">{{ test_runs.count }} Test Runs</span>
-        
         <span class="tit"><a href="{% url tcms.testruns.views.all %}?case_run__assignee__email__startswith={{ user.email }}">View My Assigned Runs</a></span>
         
 		<span class="right-action">

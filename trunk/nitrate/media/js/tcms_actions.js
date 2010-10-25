@@ -67,8 +67,8 @@ var default_messages = {
         'show_filter': 'Show filter options',
     },
 	 'search': {
-        'hide_filter': 'Hide filter options',
-        'show_filter': 'Show filter options',
+        'hide_filter': 'Hide Case Information Option',
+        'show_filter': 'Show Case Information Option',
     },
     'report': {
         'hide_search':'Hide the coverage search',
