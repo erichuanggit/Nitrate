@@ -16,14 +16,58 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
+from django.views.decorators.csrf import csrf_protect
+from django.contrib.auth.decorators import user_passes_test, login_required
+from django.views.generic.simple import direct_to_template
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.core.exceptions import ObjectDoesNotExist
 
-def profile(request, user_id = None):
+from django.contrib.auth.models import User, Group
+from django.contrib.auth.forms import PasswordChangeForm
+
+from models import UserProfile
+
+@login_required
+@csrf_protect
+def profile(request, username = None, template_name = 'profile/info.html'):
     """
     Edit the profiles of the user
-    # Redirect to index page temporary
     """
-    #FIXME: Complete the profiles page here
+    from forms import UserProfileForm
     
-    return HttpResponseRedirect(request.REQUEST.get('next', reverse('tcms.core.views.index')))
+    try:
+        u = User.objects.get(username = username)
+    except ObjectDoesNotExist, error:
+        raise Http404(error)
+    
+    try:
+        up = u.get_profile()
+    except ObjectDoesNotExist, error:
+        up = UserProfile(
+            user = u,
+            phone_number = '',
+            url = '',
+            im = '',
+            im_type_id = None,
+            address = None,
+        )
+    
+    form = UserProfileForm(instance=up)
+    
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=up)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(
+                reverse(
+                    'tcms.profiles.views.profile',
+                    args=[form.cleaned_data['username']]
+                )
+            )
+    
+    return direct_to_template(request, template_name, {
+        'user_profile': up,
+        'form': form
+    })

@@ -18,6 +18,8 @@
 
 from django.db import models
 
+from tcms.core.models.base import TCMSBaseSharedModel
+
 class Profiles(models.Model):
     userid = models.AutoField(primary_key=True)
     login_name = models.CharField(max_length=255, unique=True)
@@ -74,20 +76,45 @@ class UserGroupMap(models.Model):
         db_table = u'user_group_map'
 
 #
+# Extra information for users
+#
+
+class UserProfile(models.Model):
+    user = models.ForeignKey('auth.User', unique=True)
+    phone_number = models.CharField(max_length=128, blank=True)
+    url = models.URLField(blank=True)
+    im = models.CharField(max_length=128, blank=True)
+    im_type_id = models.IntegerField(max_length=4, blank=True, null=True)
+    address = models.TextField(blank=True)
+    class Meta:
+        db_table = u'tcms_user_profiles'
+    
+    def get_im(self):
+        from forms import IM_CHOICES
+        
+        if not self.im:
+            return None
+        
+        for c in IM_CHOICES:
+            if self.im_type_id == c[0]:
+                return '[%s] %s' % (c[1], self.im)
+
+#
 # TCMS Bookmarks in profile models
 #
 
 class BookmarkCategory(models.Model):
-    create_by = models.ForeignKey('auth.User')
+    user = models.ForeignKey('auth.User')
     name = models.CharField(max_length=1024)
     description = models.TextField(blank=True,null=True)
     class Meta:
         db_table = u'tcms_bookmark_categories'
 
-class Bookmark(models.Model):
-    category = models.ForeignKey(BookmarkCategory)
+class Bookmark(TCMSBaseSharedModel):
+    user = models.ForeignKey('auth.User')
+    category = models.ForeignKey(BookmarkCategory, blank=True, null=True, related_name='bookmark')
     name = models.CharField(max_length=1024)
-    description = models.TextField(blank=True,null=True)
+    description = models.TextField(blank=True, null=True)
     url = models.CharField(max_length=8192)
     class Meta:
         db_table = u'tcms_bookmarks'

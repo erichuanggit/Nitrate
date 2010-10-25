@@ -215,6 +215,9 @@ INTERNAL_IPS = ('127.0.0.1', )
 
 COMMENTS_APP = 'tcms.core.contrib.comments'
 
+# Define the custom profile models
+AUTH_PROFILE_MODULE = 'profiles.UserProfile'
+
 # Mail settings
 
 # Set the default send mail address

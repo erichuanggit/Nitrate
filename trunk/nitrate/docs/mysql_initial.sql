@@ -46,3 +46,7 @@ ALTER TABLE test_cases ADD notes mediumtext;
 
 -- Upgrade to 3.1.1
 ALTER TABLE test_plans ADD COLUMN parent_id int unsigned;
+
+-- Upgrade to 3.2
+DROP TABLE IF EXISTS tcms_bookmark_categories;
+DROP TABLE IF EXISTS tcms_bookmarks;
