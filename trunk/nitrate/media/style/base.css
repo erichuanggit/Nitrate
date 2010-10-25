@@ -94,8 +94,9 @@ a:link.execute,a:visited.execute{ background:url(../images/sprites.png) no-repea
 /* End Home */
 
 /* Error */
-.error_404_500{ width:500px; height:500px; position:absolute; left:50%; top:50%; margin-left:-250px; margin-top:-250px;}
-.error_content ul li{ margin:10px 0 10px 20px; list-style-type:none}
+.error_404_500{ width:100%; text-align:center;  }
+.error_content{ width:500px; height:150px; margin:10px auto;padding-top:10px;}
+.error_content ul li{ margin:10px 0 10px 20px; list-style-type:none; text-align:left;}
 /* End Error */
 
 .pagination{ margin:10px 5px; float:right;}
