@@ -513,14 +513,19 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
  .list_filter .priority_filter ul li{ float:left; padding:0px; margin:0px;}
 .list_filter td  input[ type="text" ]{ width:100%;}
 /**********************item Search*******************/
-.itemSearch { width : 100%; border-top:1px solid #ccc; float :right; background:#f5f5f5;}
+.itemSearch {width:100%;background:#f5f5f5; margin:0px; position:relative}
+.itemSearch h2{ margin:0px; padding:10px}
+.itemSearch .relativeSearchOption{ position:absolute; top:5px; right:10px;}
+.itemSearch .relativeSearchBox{width:100%;}
+.itemSearch .relativeSearchTitle{ border-top:solid 1px #ccc; margin:20px 10px 10px; font-size:14px; font-weight:bold; height:30px; line-height:30px; position:relative;}
+.itemSearch .relativeSearchTitle span{ font-weight:normal; font-size:12px}
 .itemSearch .field{ float:left; width:50%; margin-bottom:2px;}
-.itemSearch .field .title { width :150px; margin-right : 2px; margin-left:10px; float : left;}
+.itemSearch .field .title { width :150px; margin-right:2px; margin-left:10px; float:left;}
 .itemSearch .name { float:left;}
 .itemSearch  .name_short input[type="text"]{ width:120px;}
 .itemSearch  .name input[type="text"]{ width:250px;}
 .itemSearch  .name select{ width:255px;}
-.itemSearch .bottom{ width:100%; margin-top:10px; text-align:center; border-bottom:1px solid #ccc; padding-bottom:5px; float:left;}
+.itemSearch .bottom{ width:100%;text-align:center;border-bottom:1px solid #ccc;background:#f5f5f5; height:30px; line-height:30px; }
 /**********************tab******************/
 .content_tab{ border-bottom:4px solid #235d9f; float:left; width:100%; list-style-type:none; padding:0px; margin:0px}
 .content_tab li{ line-height:30px; margin:0px; padding:0px;}

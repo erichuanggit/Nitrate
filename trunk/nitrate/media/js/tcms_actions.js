@@ -66,6 +66,10 @@ var default_messages = {
         'hide_filter': 'Hide filter options',
         'show_filter': 'Show filter options',
     },
+	 'search': {
+        'hide_filter': 'Hide filter options',
+        'show_filter': 'Show filter options',
+    },
     'report': {
         'hide_search':'Hide the coverage search',
         'show_search':'Show the coverage search'

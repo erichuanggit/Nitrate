@@ -39,7 +39,20 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
 		<form id="id_search_plan_form" action="{% url tcms.testplans.views.all %}" method="get">
 			<input type="hidden" name="action" value="search" />
 			<h2>Search Plan</h2>
+            <div class="relativeSearchOption">
+            	<select>
+                	<option>Search Plans</option>
+                	<option id="relativeSearchOption_case">Search Plans By Case Information</option>
+                    <option id='relativeSearchOption_run'>Search Plans By Run Information</option>
+                </select>
+            </div>
 			{% include 'plan/form/search.html' %}
+            <div class="relativeSearchBox" style="display:none" id="relativeSearch_case">
+            	<div class="relativeSearchTitle">Case Information Option<span class="absoluteright" id="relativeSearch_case_info">Hide Case Information Option</span></div>
+                
+                {% include 'plan/form/search_case.html' %}
+                <div class="clear"></div>
+            </div>
 			<div class="bottom" >
 				<input type="submit" size="7" value="Search" />
 				<input type="reset" size="7" value="Reset" title="Reset the form"/>
@@ -48,8 +61,10 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
 					
 				</span>
 			</div>
-		</div>
-	</form>
+            <div class="clear"></div>
+        </form>
+	</div>
+	
 	
 	{% if REQUEST_CONTENTS.items %}
 	<form id="plans_form">

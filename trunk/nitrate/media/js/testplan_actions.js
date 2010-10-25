@@ -283,6 +283,15 @@ Nitrate.TestPlans.Edit.on_load = function()
 
 Nitrate.TestPlans.List.on_load = function()
 {
+	$('relativeSearchOption_case').observe('click', function(e){
+		$('relativeSearch_case').toggle();
+		})
+	
+	$('relativeSearch_case_info').observe('click', function(e){
+		$('relativeSearch_case').hide();
+	})
+	
+	
     if($('id_product')) {
         bind_version_selector_to_product(true);
     };
@@ -393,6 +402,7 @@ Nitrate.TestPlans.Details.on_load = function()
             updateObject('testplans.testplan', plan_id, 'is_active', 'True', 'bool', reloadWindow);
         })
     }
+	
     
     Nitrate.TestPlans.TreeView.init(plan_id);
     Nitrate.TestPlans.TreeView.render_page();
