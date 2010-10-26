@@ -45,14 +45,7 @@ def profile(request, username = None, template_name = 'profile/info.html'):
     try:
         up = u.get_profile()
     except ObjectDoesNotExist, error:
-        up = UserProfile(
-            user = u,
-            phone_number = '',
-            url = '',
-            im = '',
-            im_type_id = None,
-            address = None,
-        )
+        up = u.profile.create()
     
     form = UserProfileForm(instance=up)
     

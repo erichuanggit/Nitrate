@@ -83,8 +83,8 @@ class UserProfileForm(forms.ModelForm):
     def save(self, commit = True):
         from django.contrib.auth import get_backends
         
-        user = super(UserProfileForm, self).save(commit=False)
-        user = self.instance.user
+        instance = super(UserProfileForm, self).save(commit=commit)
+        user = instance.user
         can_register = False
         
         for b in get_backends():
@@ -98,4 +98,4 @@ class UserProfileForm(forms.ModelForm):
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         user.save()
-        return self
+        return instance

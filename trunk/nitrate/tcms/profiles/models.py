@@ -80,12 +80,12 @@ class UserGroupMap(models.Model):
 #
 
 class UserProfile(models.Model):
-    user = models.ForeignKey('auth.User', unique=True)
-    phone_number = models.CharField(max_length=128, blank=True)
-    url = models.URLField(blank=True)
-    im = models.CharField(max_length=128, blank=True)
-    im_type_id = models.IntegerField(max_length=4, blank=True, null=True)
-    address = models.TextField(blank=True)
+    user = models.ForeignKey('auth.User', unique=True, related_name='profile')
+    phone_number = models.CharField(blank=True, default='', max_length=128)
+    url = models.URLField(blank=True, default='')
+    im = models.CharField(blank=True, default='', max_length=128)
+    im_type_id = models.IntegerField(blank=True, default=1, max_length=4, null=True)
+    address = models.TextField(blank=True, default='')
     class Meta:
         db_table = u'tcms_user_profiles'
     
