@@ -22,5 +22,13 @@
          "name":"DISABLED",
          "description":null
       }
+   },
+   {
+      "pk":4,
+      "model":"testcases.testcasestatus",
+      "fields":{
+         "name":"NEED_UPDATE",
+         "description":null
+      }
    }
 ]
