@@ -15,10 +15,10 @@ Nitrate.TestRuns.List.on_load = function()
 	$('relativeSearchOption_case').observe('click', function(e){
 		if($('relativeSearch_case').getStyle('display') == 'none'){
 			Effect.BlindDown('relativeSearch_case',{ duration: 0.5 });
-			this.className = 'collapse'
+			this.className = 'up'
 		} else {
 			Effect.BlindUp('relativeSearch_case',{ duration: 0.5 });
-			this.className = 'expand'
+			this.className = 'down'
 		}
 	})
 	
