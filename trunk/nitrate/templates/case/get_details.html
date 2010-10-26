@@ -66,5 +66,23 @@
 				<div class="content">{{ test_case_text.effect|safe }}</div>
 			</td>
 		</tr>
+	    <tr>
+			<td colspan='3'>
+				<h4>Notes:</h4>
+				<div class="content">{{ test_case.notes }}</div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3" class="row">
+				<h4>Change Log</h4>
+				<ul>
+					{% for log in test_case.log %}
+					<li>[{{ log.date }}] - [{{ log.who }}] - {{ log.action }}</li>
+					{% empty %}
+					<li class="grey">No log recorded.</li>
+					{% endfor %}
+				</ul>
+			</td>
+		</tr>
 	</table>
 </td>
