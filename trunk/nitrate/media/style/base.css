@@ -425,7 +425,7 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 #down{ width:20px;  height:20px; float:left; }
 #down:hover{background:url(../images/down_hover.png) no-repeat;}
 .req { height: 28px; }
-.icon_status { padding-left: 28px; }
+.icon_status {display:inline-block;padding-left:26px; height:25px; line-height:25px;  }
 
 .btn {height:25px; width:25px; border:0;}
 .btn_passed{ background:url(../images/pass.png) no-repeat; }
