@@ -450,3 +450,6 @@ a:link.edit,a:visited.edit{ color:#333;}
 .add_env_box select{ width:98%; }
 .add_env_button{ float:left; margin:20px 10px 10px 20px; }
 .add_env_button input{ margin-right:5px; }
+.comment{ width:98%;}
+.comment li{margin:5px 0px;border:1px outset #fff; position:relative}
+.notes_title{ margin:0px; color:#235d9f; font-size:1.0em; font-weight:bold; }
