@@ -42,7 +42,7 @@ Nitrate.TestPlans.Instance = {
 	<input type="hidden" name="content_type" value="testplans.testplan" />
 	<input type="hidden" name="object_pk" value="{{ test_plan.pk }}" />
 	<input type="hidden" name="name" value="{{ test_plan.name }}" />
-	<input type="hidden" name="description" value="{{ test_plan.latest_text.plan_text }}" />
+	{# <input type="hidden" name="description" value="{{ test_plan.latest_text.plan_text }}" /> #}
 {% endblock %}
 
 {% block contents %}
