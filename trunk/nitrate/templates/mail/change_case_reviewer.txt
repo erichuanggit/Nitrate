@@ -1,3 +1,7 @@
-{% for tc in test_cases %}
-{{ tc }}
+You have been specific as the reviewer of following cases by {{ user }}.
+
+
+### Test cases information ###
+{% for test_case in test_cases %}
+[{{ test_case.pk }}] {{ test_case }} - {{ test_case.get_url }}
 {% endfor %}

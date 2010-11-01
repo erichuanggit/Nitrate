@@ -344,21 +344,6 @@ Nitrate.TestPlans.Details.on_load = function()
     var plan_id = Nitrate.TestPlans.Instance.pk;
     // regUrl('display_summary');
     
-    var run_case_params = {
-        'a': 'initial',
-        'template_type': 'case',
-        'from_plan': plan_id
-    }
-    
-    constructPlanDetailsCasesZone('testcases', plan_id, run_case_params);
-    
-    var review_case_params = {
-        'a': 'initial',
-        'template_type': 'review_case',
-        'from_plan': plan_id
-    }
-    constructPlanDetailsCasesZone('reviewcases', plan_id, review_case_params);
-    
     constructTagZone('tag', { plan: plan_id });
     constructPlanComponentsZone('components');
     
@@ -387,9 +372,30 @@ Nitrate.TestPlans.Details.on_load = function()
         fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
     }
     
+    var run_case_params = {
+        'a': 'initial',
+        'template_type': 'case',
+        'from_plan': plan_id
+    }
+    
+    constructPlanDetailsCasesZone('testcases', plan_id, run_case_params);
+    
     $('tab_testcases').observe('mousedown', function(e) {
         if (this.classNames().toArray().indexOf('tab_focus') == -1) {
             constructPlanDetailsCasesZone('testcases', plan_id, run_case_params);
+        }
+    })
+    
+    var review_case_params = {
+        'a': 'initial',
+        'template_type': 'review_case',
+        'from_plan': plan_id
+    }
+    constructPlanDetailsCasesZone('reviewcases', plan_id, review_case_params);
+    
+    $('tab_reviewcases').observe('mousedown', function(e) {
+        if (this.classNames().toArray().indexOf('tab_focus') == -1) {
+            constructPlanDetailsCasesZone('reviewcases', plan_id, review_case_params);
         }
     })
     
