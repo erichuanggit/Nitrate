@@ -227,15 +227,16 @@ def tag(request, template_name="management/get_tag.html"):
             return True
         
         def remove(self):
-            tp_case_ids = request.REQUEST.getlist('case')
-            tp_run_ids = request.REQUEST.getlist('run')
-            if tp_case_ids:
-                tag_ids = TestCaseTag.objects.filter(case__in = tp_case_ids).distinct().values_list('tag')
-            elif tp_run_ids:
-                tag_ids = TestRunTag.objects.filter(run__in = tp_run_ids).distinct().values_list('tag')
-
-            tags_set = TestTag.objects.filter(id__in = tag_ids)
-
+            tp_pks = request.REQUEST.getlist('plan')
+            tc_pks = request.REQUEST.getlist('case')
+            tr_pks = request.REQUEST.getlist('run')
+            if tp_pks:
+                tags_set = TestTag.objects.filter(testplan__pk__in = tp_pks)
+            if tc_pks:
+                tags_set = TestTag.objects.filter(testcase__pk__in = tc_pks)
+            elif tr_pks:
+                tags_set = TestTag.objects.filter(testrun__pk__in = tr_pks)
+            
             for tag_str in self.tag:
                 try:
                     tag = tags_set.filter(name = tag_str)[0]
@@ -368,8 +369,6 @@ def update(request):
                 )
         except:
             raise
-    from pprint import pprint
-    pprint({field: value})
     targets.update(**{field: value})
     
     if hasattr(model, 'mail_scene'):

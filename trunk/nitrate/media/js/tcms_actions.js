@@ -101,25 +101,29 @@ var default_messages = {
         'ajax_failure': 'Commnucation with server got some unknown errors.',
         'tree_reloaded': 'The tree has been reloaded.',
         'last_case_run': 'It is the last case run',
-        'bookmark_added': 'Bookmark added.'
+        'bookmark_added': 'Bookmark added.',
     },
     'confirm': {
         'change_case_status': 'Are you sure you want to change the status?',
         'change_case_priority': 'Are you sure you want to change the priority?',
         'remove_case_component': 'Are you sure you want to delete these component(s)?\nThe action will unable to undo.',
-        'remove_bookmark': 'Are you sure you wish to delete these bookmarks ?'
+        'remove_bookmark': 'Are you sure you wish to delete these bookmarks?',
+        'remove_tag': 'Are you sure you wish to delete the tag(s)'
     },
     'link': {
         'hide_filter': 'Hide filter options',
         'show_filter': 'Show filter options',
     },
+    'prompt': {
+        'edit_tag': 'Please type your new tag'
+    },
+    'report': {
+        'hide_search': 'Hide the coverage search',
+        'show_search': 'Show the coverage search'
+    },
      'search': {
         'hide_filter': 'Hide Case Information Option',
         'show_filter': 'Show Case Information Option',
-    },
-    'report': {
-        'hide_search':'Hide the coverage search',
-        'show_search':'Show the coverage search'
     }
 }
 
@@ -856,7 +860,7 @@ function addTag(container)
 
 function removeTag(container, tag)
 {
-    $('id_tag_form').adjacent('input[name="handle"]')[0].value = 'remove';
+    $('id_tag_form').adjacent('input[name="a"]')[0].value = 'remove';
     
     parameters = $('id_tag_form').serialize(true);
     parameters.tags = tag;
@@ -865,11 +869,14 @@ function removeTag(container, tag)
 }
 function editTag(container, tag)
 {
-    newtag = prompt('Please type your new tag', tag);
+    var nt = prompt(default_messages.prompt.edit_tag, tag);
+    if(!nt)
+        return false;
+    
     parameters = $('id_tag_form').serialize(true);
-    parameters.tags = newtag;
+    parameters.tags = nt;
     var complete = function(t) {
-        removeTag(container,tag)
+        removeTag(container, tag)
     }
    var url = new String('/management/tags/');
     new Ajax.Updater(container, url, {

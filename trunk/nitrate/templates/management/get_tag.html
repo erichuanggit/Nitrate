@@ -40,7 +40,7 @@
 				{% if perms.management.add_testtag %}
 				<div class="addtag">
 						<span class="tit">Add Tag</span>
-						<input type="hidden" name="handle" value="add">
+						<input type="hidden" name="a" value="add">
 						{% if object.plan_id %}<input type="hidden" name="plan" value="{{ object.plan_id }}" />{% endif %}
 						{% if object.case_id %}<input type="hidden" name="case" value="{{ object.case_id }}" />{% endif %}
 						{% if object.run_id %}<input type="hidden" name="run" value="{{ object.run_id }}" />{% endif %}
