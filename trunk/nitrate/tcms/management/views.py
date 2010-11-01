@@ -147,7 +147,19 @@ def environment_group_edit(request, template_name = 'environment/group_edit.html
         environment = TCMSEnvGroup.objects.get(id = request.REQUEST.get('id', None))
     except TCMSEnvGroup.DoesNotExist, error:
         raise Http404
-        
+    
+    try:
+        de = TCMSEnvGroup.objects.get(name = request.REQUEST.get('name'))
+        response = 'Duplicated name already exists, please change to another name.'
+        return direct_to_template(request, template_name, {
+            'environment': environment,
+            'properties': TCMSEnvProperty.get_active(),
+            'selected_properties': environment.property.all(),
+            'message': response,
+        })
+    except TCMSEnvGroup.DoesNotExist, error:
+        pass
+    
     if request.REQUEST.get('action') == 'modify':   # Actions of modify
         if environment.name != request.REQUEST['name']:
             environment.name = request.REQUEST['name']
