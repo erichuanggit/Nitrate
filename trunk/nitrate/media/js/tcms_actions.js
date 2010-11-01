@@ -24,6 +24,7 @@ Nitrate.Utils.convert = function(argument, data) {
 }
 
 Event.observe(window, 'load', function(e) {
+	// Initial the drop menu
     var dropDownMenu = Class.create();
     
     dropDownMenu.prototype = {
@@ -47,7 +48,51 @@ Event.observe(window, 'load', function(e) {
         }
     };
     
-    var newnewMenu = new dropDownMenu(".nav_li");  
+    var newnewMenu = new dropDownMenu(".nav_li");
+
+    // Observe the bookmark form
+    $('id_bookmark_iform').observe('submit', function(e) {
+        e.stop();
+        console.log(this);
+        var url = this.action;
+        var dialog = showDialog();
+        var username = Nitrate.User.username;
+        var parameters = this.serialize(true);
+        parameters.url = window.location.href;
+        
+        if(!parameters.name)
+            parameters.name = document.title;
+        
+        var complete = function(t) {
+            var c = function(t) {
+                var returnobj = t.responseText.evalJSON();
+                
+                if (returnobj.rc != 0) {
+                    alert(returnobj.response);
+                    return returnobj
+                }
+                
+                clearDialog();
+                alert(default_messages.alert.bookmark_added);
+                return returnobj;
+            }
+            
+            var form_observe = function(e) {
+                e.stop();
+                addBookmark(this.action, this.method, this.serialize(true), c)
+            }
+            
+            var form = constructForm(t.responseText, url, form_observe);
+            dialog.update(form);
+        };
+        
+        new Ajax.Updater(dialog, url, {
+            method: this.method,
+            parameters: parameters,
+            onComplete: complete,
+            onFailure: html_failure,
+        });
+    });
 });
 
 var default_messages = {
@@ -56,17 +101,19 @@ var default_messages = {
         'ajax_failure': 'Commnucation with server got some unknown errors.',
         'tree_reloaded': 'The tree has been reloaded.',
         'last_case_run': 'It is the last case run',
+        'bookmark_added': 'Bookmark added.'
     },
     'confirm': {
         'change_case_status': 'Are you sure you want to change the status?',
         'change_case_priority': 'Are you sure you want to change the priority?',
-        'remove_case_component': 'Are you sure you want to delete these component(s)?\nThe action will unable to undo.'
+        'remove_case_component': 'Are you sure you want to delete these component(s)?\nThe action will unable to undo.',
+        'remove_bookmark': 'Are you sure you wish to delete these bookmarks ?'
     },
     'link': {
         'hide_filter': 'Hide filter options',
         'show_filter': 'Show filter options',
     },
-	 'search': {
+     'search': {
         'hide_filter': 'Hide Case Information Option',
         'show_filter': 'Show Case Information Option',
     },
@@ -153,6 +200,18 @@ var json_success_refresh_page = function(t)
         alert(returnobj.response);
         return false;
     }
+}
+
+function addBookmark(url, method, parameters, callback)
+{
+    parameters['a'] = 'add';
+    
+    new Ajax.Request(url, {
+        method: method,
+        parameters: parameters,
+        onSuccess: callback,
+        onFailure: json_failure,
+    });
 }
 
 function setCookie(name, value, expires, path, domain, secure) { 
@@ -1121,17 +1180,22 @@ function getDialog(element)
 {
     if(!element)
         var element = $('dialog');
-        
+    
     return element
 }
 
+var showDialog = function(element)
+{
+    var dialog = getDialog(element);
+    return dialog.show();
+}
 
 var clearDialog = function(element)
 {
     var dialog = getDialog(element);
     
     dialog.update(getAjaxLoading());
-    dialog.hide();
+    return dialog.hide();
 }
 
 function getAjaxLoading(id)

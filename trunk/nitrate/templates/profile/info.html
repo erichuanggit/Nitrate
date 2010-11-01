@@ -9,10 +9,12 @@
 {% block custom_javascript %}
 <script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/fastinit.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/tablekit.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/report.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/profiles.js"></script>
+{# comment #}
 <script type="text/javascript">
-Nitrate.Utils.after_page_load(Nitrate.Report.CustomSearch.on_load);
+Nitrate.Utils.after_page_load(Nitrate.Profiles.Infos.on_load);
 </script>
+{# endcomment #}
 {% endblock %}
 
 {% block contents %}
@@ -25,9 +27,9 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomSearch.on_load);
 	<div class="profile">
 		<div class="profile_tab">
 			<ul>
-				<li class="profile_tab_active"><a href="#">Basic Infomation</a></li>
+				<li class="profile_tab_active"><a href="{% url tcms.profiles.views.profile user.username %}">Basic Infomation</a></li>
 				{% ifequal user_profile.user user %}
-				<li><a href="watchlist.html">Watch List</a></li>
+				<li><a href="{% url tcms.profiles.views.bookmark user.username %}">Bookmarks</a></li>
 				{% endifequal %}
 			</ul>
 		</div>

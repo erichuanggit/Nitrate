@@ -24,6 +24,13 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Edit.on_load);
 </script>
 {% endblock %}
 
+{% block content_type %}
+	<input type="hidden" name="content_type" value="testplans.testplan" />
+	<input type="hidden" name="object_pk" value="{{ test_plan.pk }}" />
+	<input type="hidden" name="name" value="{{ test_plan.name }}" />
+	<input type="hidden" name="description" value="{{ test_plan.latext_text.plan_text }}" />
+{% endblock %}
+
 {% block contents %}
 
 <div id="content">

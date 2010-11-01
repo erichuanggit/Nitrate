@@ -27,15 +27,14 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.forms import PasswordChangeForm
 
-from models import UserProfile
-
 @login_required
 @csrf_protect
-def profile(request, username = None, template_name = 'profile/info.html'):
+def profile(request, username, template_name = 'profile/info.html'):
     """
     Edit the profiles of the user
     """
     from forms import UserProfileForm
+    from models import UserProfile
     
     try:
         u = User.objects.get(username = username)
@@ -64,3 +63,77 @@ def profile(request, username = None, template_name = 'profile/info.html'):
         'user_profile': up,
         'form': form
     })
+
+def bookmark(request, username, template_name = 'profile/bookmarks.html'):
+    """
+    Bookmarks for the user
+    """
+    from django.conf import settings
+    from django.utils import simplejson
+	
+    from forms import BookmarkForm
+    from models import BookmarkCategory, Bookmark
+    
+    if username != request.user.username:
+        return HttpResponse(
+            'Permission denied - no permission to see the bookmarks of %s' % username
+        )
+    else:
+        up = {'user': request.user}
+    
+    class BookmarkActions(object):
+        def __init__(self):
+            self.ajax_response = {
+                'rc': 0,
+                'response': 'ok',
+            }
+        
+        def add(self):
+            form = BookmarkForm(request.REQUEST)
+            if not form.is_valid():
+                ajax_response = {
+                    'rc': 1,
+                    'response': form.errors,
+                }
+                return HttpResponse(simplejson.dumps(ajax_response))
+            
+            form.save()
+            return HttpResponse(simplejson.dumps(self.ajax_response))
+        
+        def add_category(self):
+            pass
+        
+        def remove(self):
+            pks = request.REQUEST.getlist('pk')
+            bks = Bookmark.objects.filter(
+                pk__in = pks,
+                user = request.user,
+            )
+            bks.delete()
+            
+            return HttpResponse(simplejson.dumps(self.ajax_response))
+        
+        def render(self):
+            if request.REQUEST.get('category'):
+                bks = Bookmark.objects.filter(
+                    user = request.user,
+                    category_id = request.REQUEST['category']
+                )
+            else:
+                bks = Bookmark.objects.filter(user = request.user)
+            
+            return direct_to_template(request, template_name, {
+                'user_profile': up,
+                'bookmarks': bks,
+            })
+        
+        def render_form(self):
+            query = request.GET.copy()
+            query['a'] = 'add'
+            form = BookmarkForm(initial=query)
+            form.populate(user = request.user)
+            return HttpResponse(form.as_p())
+    
+    action = BookmarkActions()
+    func = getattr(action, request.REQUEST.get('a', 'render'))
+    return func()

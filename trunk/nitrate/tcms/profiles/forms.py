@@ -22,7 +22,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django import forms
 from django.contrib.auth.models import User
 
-from models import UserProfile
+from models import UserProfile, Bookmark, BookmarkCategory
 
 IM_CHOICES = (
     (1, 'IRC'),
@@ -31,6 +31,8 @@ IM_CHOICES = (
     (4, 'Yahoo messenger'),
     (5, 'ICQ')
 )
+
+BOOKMARK_EMPTY_LABEL = '---all---'
 
 class UserProfileForm(forms.ModelForm):
     user = forms.CharField(widget=forms.HiddenInput)
@@ -99,3 +101,52 @@ class UserProfileForm(forms.ModelForm):
         user.last_name = self.cleaned_data['last_name']
         user.save()
         return instance
+
+class BookmarkForm(forms.Form):
+    a = forms.CharField(widget=forms.HiddenInput)
+    content_type = forms.IntegerField(
+        required = False, widget=forms.HiddenInput
+    )
+    object_pk = forms.CharField(
+        required = False, widget=forms.HiddenInput
+    )
+    user = forms.IntegerField(widget=forms.HiddenInput)
+    #category = forms.ModelChoiceField(
+    #    queryset = BookmarkCategory.objects.none(),
+    #    empty_label = BOOKMARK_EMPTY_LABEL,
+    #)
+    url = forms.URLField()
+    name = forms.CharField(max_length = 1024, required = False)
+    description = forms.CharField(required = False, widget=forms.Textarea)
+    
+    def clean(self):
+        from django.conf import settings
+        from django.db import models
+        from django.core.exceptions import ObjectDoesNotExist, ValidationError
+        from django.contrib.sites.models import Site
+        from django.contrib.auth.models import User
+        
+        cleaned_data = self.cleaned_data.copy()
+        if cleaned_data.get('content_type'):
+            try:
+                model = models.get_model(*cleaned_data['content_type'].split(".", 1))
+                target = model._default_manager.get(pk=object_pk)
+                cleaned_data['content_type'] = model
+                cleaned_data['object_pk'] = target.pk
+            except ObjectDoesNotExist, error:
+                raise ValidationError(error)
+        
+        cleaned_data['user'] = User.objects.get(pk = cleaned_data['user'])
+        cleaned_data['site'] = Site.objects.get(pk = settings.SITE_ID)
+        return cleaned_data
+    
+    def populate(self, user):
+        #self.fields['category'].queryset = BookmarkCategory.objects.filter(user = user)
+        pass
+    
+    def save(self):
+        from models import Bookmark
+        from pprint import pprint
+        cleaned_data = self.cleaned_data.copy()
+        del cleaned_data['a']
+        return Bookmark.objects.create(**cleaned_data)

@@ -19,6 +19,12 @@ Nitrate.Utils.after_page_load(Nitrate.Management.Environment.Edit.on_load);
 </script>
 {% endblock %}
 
+{% block content_type %}
+	<input type="hidden" name="content_type" value="management.tcmsenvgroup" />
+	<input type="hidden" name="object_pk" value="{{ environment.pk }}" />
+	<input type="hidden" name="name" value="{{ environment.name }}" />
+{% endblock %}
+
 {% block contents %}
 <div id="content">
 	<div class="sprites crumble">

@@ -19,6 +19,13 @@ Nitrate.TestCases.Instance = {
 </script>
 {% endblock %}
 
+{% block content_type %}
+	<input type="hidden" name="content_type" value="testcases.testcase" />
+	<input type="hidden" name="object_pk" value="{{ test_case.pk }}" />
+	<input type="hidden" name="name" value="{{ test_case.summary }}" />
+	<input type="hidden" name="description" value="{{ test_case.notes }}" />
+{% endblock %}
+
 {% block contents %}
 <div id="content">
 	{% if test_plan %}

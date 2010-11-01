@@ -106,9 +106,11 @@ class UserProfile(models.Model):
 class BookmarkCategory(models.Model):
     user = models.ForeignKey('auth.User')
     name = models.CharField(max_length=1024)
-    description = models.TextField(blank=True,null=True)
     class Meta:
         db_table = u'tcms_bookmark_categories'
+    
+    def __unicode__(self):
+        return self.name
 
 class Bookmark(TCMSBaseSharedModel):
     user = models.ForeignKey('auth.User')
@@ -118,3 +120,6 @@ class Bookmark(TCMSBaseSharedModel):
     url = models.CharField(max_length=8192)
     class Meta:
         db_table = u'tcms_bookmarks'
+    
+    def __unicode__(self):
+        return self.name

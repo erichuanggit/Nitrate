@@ -66,6 +66,7 @@ urlpatterns = patterns('',
     (r'^accounts/passwordreset/done/$', 'django.contrib.auth.views.password_reset_done'),
     (r'^accounts/passwordreset/confirm/$', 'django.contrib.auth.views.password_reset_confirm'),
     (r'^accounts/profile/(?P<username>[A-Za-z0-9\-]+)/$', 'tcms.profiles.views.profile'),
+    (r'^accounts/profile/(?P<username>[A-Za-z0-9\-]+)/bookmarks/$', 'tcms.profiles.views.bookmark'),
     
     # Testplans zone
     (r'^plan/new/$', 'tcms.testplans.views.new'),

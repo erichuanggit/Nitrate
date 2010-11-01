@@ -9,6 +9,12 @@
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testplan_actions.js'></script>
 {% endblock %}
 
+{% block content_type %}
+	<input type="hidden" name="content_type" value="testplans.testplan" />
+	<input type="hidden" name="object_pk" value="{{ test_plan.pk }}" />
+	<input type="hidden" name="name" value="{{ test_plan.name }}" />
+{% endblock %}
+
 {% block contents %}
 <div id="content">
 	<div class="sprites crumble">
