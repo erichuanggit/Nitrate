@@ -381,10 +381,10 @@ function addCaseBug(form, callback)
     })
 }
 
-function removeCaseBug(id, callback)
+function removeCaseBug(id, case_id, callback)
 {
     if(!confirm('Are you sure to remove the bug?'))
-    return false;
+        return false;
     
     var parameteres = {
         'handle': 'remove',

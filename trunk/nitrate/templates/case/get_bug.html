@@ -15,8 +15,13 @@
 		<td>{{ bug.case_run_id }}</td>
 		<td>{% if bug.case_run_id %}<a href="{% url tcms.testruns.views.get bug.case_run.run_id %}">{{ bug.case_run.run_id }}</a>{% else %}None{% endif %}</td>
 		<td><a href="{{ bug.get_absolute_url }}">{{ bug.get_absolute_url }}</a></td>
-        <td><a class="remove" onclick="removeCaseBug('{{ bug.id }}')">Remove</a></td>
-        
+        <td>
+			{% if perms.testcases.delete_testcasebug %}
+			<a class="remove" onclick="removeCaseBug('{{ bug.pk }}', '{{ test_case.pk }}')">Remove</a>
+			{% else %}
+			<label class="grey">None</label>
+			{% endif %}
+		</td>
 	</tr>
 	{% empty %}
 	<tr>
