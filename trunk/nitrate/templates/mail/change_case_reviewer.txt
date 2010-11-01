@@ -1,0 +1,3 @@
+{% for tc in test_cases %}
+{{ tc }}
+{% endfor %}

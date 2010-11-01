@@ -126,7 +126,9 @@ class TestCase(TCMSActionModel):
     default_tester = models.ForeignKey(
         'auth.User', related_name='cases_as_default_tester', null=True
     )
-    
+    reviewer = models.ForeignKey(
+        'auth.User', related_name='cases_as_reviewer', null=True
+    )
     attachment = models.ManyToManyField(
         'management.TestAttachment',
         through='testcases.TestCaseAttachment',
@@ -278,6 +280,20 @@ class TestCase(TCMSActionModel):
         }
         
         return cls.list(query)
+    
+    @classmethod
+    def mail_scene(cls, objects, field = None, value = None, ctype = None, object_pk = None):
+        tcs = objects.select_related()
+        scence_templates = {
+            'reviewer': {
+                'template_name': 'mail/change_case_reviewer.txt',
+                'subject': 'You have been speicific to be the reviewer of cases',
+                'to_mail': list(set(tcs.values_list('reviewer__email', flat=True))),
+                'context': {'test_cases': tcs},
+            }
+        }
+        
+        return scence_templates.get(field)
     
     def add_bug(self, bug_id, bug_system, summary = None, description = None, case_run = None):
         try:

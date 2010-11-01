@@ -406,6 +406,23 @@ class TestCaseRun(TCMSActionModel):
     def __unicode__(self):
         return '%s: %s' % (self.pk, self.case_id)
     
+    @classmethod
+    def mail_scene(cls, objects, field = None, value = None, ctype = None, object_pk = None):
+        tr = objects[0].run
+        # scence_templates format:
+        # template, subject, context
+        tcrs = objects.select_related()
+        scence_templates = {
+            'assignee': {
+                'template_name': 'mail/change_case_run_assignee.txt',
+                'subject': 'Assignee of run %s has been changed' % tr.run_id,
+                'to_mail': list(set(tcrs.values_list('default_tester__email', flat=True))),
+                'context': {'test_run': tr, 'test_case_runs': tcrs},
+            }
+        }
+        
+        return scence_templates.get(field)
+    
     def add_bug(self, bug_id, bug_system, summary = None, description = None):
         try:
             return self.case.add_bug(
@@ -471,24 +488,6 @@ class TestCaseRun(TCMSActionModel):
             ).order_by('-case_text_version')[0]
         except IndexError:
             return NoneText
-    
-    def mail_scene(self, objects, field = None, value = None, ctype = None, object_pk = None, request = None):
-        tr = self.run
-        # scence_templates format:
-        # template, subject, context
-        objects = objects.select_related()
-        scence_templates = {
-            'assignee_id': {
-                'template': 'mail/change_case_run_assignee.txt',
-                'subject': 'Assignee of run %s has been changed' % tr.run_id,
-                'context': {'test_run': tr, 'test_case_runs': objects},
-                'request': request
-            }
-        }
-        
-        scence = scence_templates.get(field)
-        if scence:
-            tr.mail(**scence)
     
     def set_current(self):
         for case_run in self.run.case_run.all():

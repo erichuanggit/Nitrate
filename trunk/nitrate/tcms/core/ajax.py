@@ -372,12 +372,13 @@ def update(request):
     pprint({field: value})
     targets.update(**{field: value})
     
-    if hasattr(targets[0], 'mail_scene'):
-        t = targets[0]
-        t.mail_scene(
-            objects = targets, field = field, value = value, ctype = ctype,
-            object_pk = object_pk, request = request
+    if hasattr(model, 'mail_scene'):
+        from tcms.core.utils.mailto import mailto
+        mail_context = model.mail_scene(
+            objects = targets, field = field, value = value, ctype = ctype, object_pk = object_pk,
         )
+        mail_context['request'] = request
+        mailto(**mail_context)
     
     del ctype, object_pk, field, value, targets
     return HttpResponse(simplejson.dumps(ajax_response))

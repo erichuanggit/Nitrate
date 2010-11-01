@@ -82,11 +82,11 @@
 			{% if perms.testcases.change_testcase %}
 			
 			<input type="button" value="Automated" title="change automated" class="btn_automated automated sprites" />
-			<input type="button" value="Default tester" title="change default tester" class="btn_default_tester assignee sprites" />
+			<input type="button" value="Reviewer" title="change reviewer" class="btn_reviewer assignee sprites" />
 			<input type="button" value="Component" class="btn_component sprites component" />
 			{% else %}
 			<input type="button" value="Automated" title="change automated" class="btn_automated automated_disabled sprites" disabled="Trues" />
-			<input type="button" value="Default tester" title="change default tester" class="btn_default_tester assigneedisable sprites" disabled />
+			<input type="button" value="Reviewer" title="change reviewer" class="btn_reviewer assigneedisable sprites" disabled />
 			<input id="id_batch_component" type="button" value="Component" class="btn_component sprites component_disabled" disabled="disabled"/>
 			{% endif %}
 			
@@ -158,8 +158,8 @@
 				</a>
 			</th>
 			<th align="left" width="110px">
-				<a title="Sort by Default Tester" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'default_tester')">
-					Default Tester
+				<a title="Sort by Reviewer" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'reviewer')">
+					Reviewer
 				</a>
 			</th>
 			<th align="left" width="140px">
@@ -207,7 +207,7 @@
 				<a class="blind_down_link">{{ test_case.summary }}</a>
 			</td>
 			<td class="col_author_content"><a title="Send email to {{ test_case.author.email }}" href="mailto:{{ test_case.author.email }}">{{ test_case.author }}</a></td>
-			<td class="col_author_content"><a title="Send email to {{ test_case.defaulte_tester.email }}" href="mailto:{{ test_case.author.email }}">{{ test_case.default_tester }}</a></td>
+			<td class="col_author_content"><a title="Send email to {{ test_case.defaulte_tester.email }}" href="mailto:{{ test_case.author.email }}">{{ test_case.reviewer }}</a></td>
 			<td class="col_tester_content expandable">{{ test_case.get_is_automated_status }}</td>
 			<!-- <td >{{ testcase.create_date }}</td>-->
 			<td>

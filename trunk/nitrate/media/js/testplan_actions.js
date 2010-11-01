@@ -283,17 +283,17 @@ Nitrate.TestPlans.Edit.on_load = function()
 
 Nitrate.TestPlans.List.on_load = function()
 {
-	
-	$('relativeSearchOption_case').observe('click', function(e){
-		if($('relativeSearch_case').getStyle('display') == 'none'){
-			Effect.BlindDown('relativeSearch_case',{ duration: 0.5 });
-			this.className = 'up'
-		} else {
-			Effect.BlindUp('relativeSearch_case',{ duration: 0.5 });
-			this.className = 'down'
-		}
-	})
-	
+    
+    $('relativeSearchOption_case').observe('click', function(e){
+        if($('relativeSearch_case').getStyle('display') == 'none'){
+            Effect.BlindDown('relativeSearch_case',{ duration: 0.5 });
+            this.className = 'up'
+        } else {
+            Effect.BlindUp('relativeSearch_case',{ duration: 0.5 });
+            this.className = 'down'
+        }
+    })
+    
     if($('id_product')) {
         bind_version_selector_to_product(true);
     };
@@ -404,7 +404,7 @@ Nitrate.TestPlans.Details.on_load = function()
             updateObject('testplans.testplan', plan_id, 'is_active', 'True', 'bool', reloadWindow);
         })
     }
-	
+    
     
     Nitrate.TestPlans.TreeView.init(plan_id);
     Nitrate.TestPlans.TreeView.render_page();
@@ -676,7 +676,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         })
         
         // Observe the check all selectbox
-        if(form.adjacent('input[value="all"]')) {
+        if(form.adjacent('input[value="all"]').length > 0) {
             var element = form.adjacent('input[value="all"]')[0];
             
             element.observe('click', function(e) {
@@ -684,7 +684,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             })
         }
         
-        if(form.adjacent('.btn_filter')) {
+        if(form.adjacent('.btn_filter').length > 0) {
             var element = form.adjacent('.btn_filter')[0];
             element.observe('click', function(t) {
                 if(filter.getStyle('display') == 'none'){
@@ -698,7 +698,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         }
         
         // Bind click the tags in tags list to tags field in filter
-        if(form.adjacent('.taglist a[href="#testcases"]')) {
+        if(form.adjacent('.taglist a[href="#testcases"]').length > 0) {
             var elements = form.adjacent('.taglist a');
             elements.invoke('observe', 'click', function(e) {
                 if(filter.style.display == 'none')
@@ -709,7 +709,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         }
         
         // Bind the sort link
-        if(form.adjacent('.btn_sort')) {
+        if(form.adjacent('.btn_sort').length > 0) {
             var element = form.adjacent('.btn_sort')[0];
             element.observe('click', function(e) {
                 var params = serialzeCaseForm(form, table);
@@ -727,7 +727,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         }
         
         // Bind batch change case status selector
-        if(form.adjacent('select[name="new_case_status_id"]')) {
+        if(form.adjacent('select[name="new_case_status_id"]').length > 0) {
             var element = form.adjacent('select[name="new_case_status_id"]')[0];
             
             element.observe('change',function(t) {
@@ -760,7 +760,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             })
         }
         
-        if(form.adjacent('select[name="new_priority_id"]')) {
+        if(form.adjacent('select[name="new_priority_id"]').length > 0) {
             var element = form.adjacent('select[name="new_priority_id"]')[0];
             
             element.observe('change', function(t) {
@@ -793,7 +793,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         }
         
         // Observe the batch case automated status button
-        if (form.adjacent('input.btn_automated')) {
+        if (form.adjacent('input.btn_automated').length > 0) {
             var element = form.adjacent('input.btn_automated')[0];
             element.observe('click', function(e) {
                 var params = serialzeCaseForm(form, table);
@@ -816,7 +816,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             })
         }
         
-        if(form.adjacent('input.btn_component')) {
+        if(form.adjacent('input.btn_component').length > 0) {
             var element = form.adjacent('input.btn_component')[0];
             element.observe('click', function(e) {
                 if(this.diabled)
@@ -856,7 +856,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             })
         };
         
-        if(form.adjacent('input.btn_default_tester')) {
+        if(form.adjacent('input.btn_default_tester').length != 0) {
             var element = form.adjacent('input.btn_default_tester')[0];
             element.observe('click', function(e) {
                 var case_pks = serializeCaseFromInputList(table);
@@ -877,7 +877,34 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     constructPlanDetailsCasesZone(container, plan_id, parameters);
                 }
                 
-                changePlanCaseDefaultTester(table, case_pks, callback);
+                var field = 'default_tester';
+                changeCaseMember(table, field, case_pks, callback);
+            })
+        }
+        
+        if(form.adjacent('input.btn_reviewer').length > 0) {
+            var element = form.adjacent('input.btn_reviewer')[0];
+            element.observe('click', function(e) {
+                var case_pks = serializeCaseFromInputList(table);
+                
+                if(case_pks.length == 0){
+                    alert(default_messages.alert.no_case_selected);
+                    return false;
+                }
+                
+                var callback = function(t) {
+                    var returnobj = t.responseText.evalJSON();
+                    
+                    if (returnobj.rc != 0) {
+                        alert(returnobj.response);
+                        return false
+                    };
+                    
+                    constructPlanDetailsCasesZone(container, plan_id, parameters);
+                }
+                
+                var field = 'reviewer';
+                changeCaseMember(table, field, case_pks, callback);
             })
         }
         
@@ -912,7 +939,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         };
         
         // Observe the batch add case button
-        if(form.adjacent('input.tag_add')) {
+        if(form.adjacent('input.tag_add').length > 0) {
             var element = form.adjacent('input.tag_add')[0];
             element.observe('click',function(e) {
                 if(serializeCaseFromInputList(table).length == 0){
@@ -937,7 +964,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         }
         
         // Observe the batch remove tag function
-        if(form.adjacent('input.tag_delete')) {
+        if(form.adjacent('input.tag_delete').length > 0) {
             var element = form.adjacent('input.tag_delete')[0];
             element.observe('click',function(e) {
                 if(serializeCaseFromInputList(table).length == 0){
@@ -1150,9 +1177,9 @@ function toggleMultiSelect(){
     $('filter_priority_selector_multiple').toggle();
 }
 
-function changePlanCaseDefaultTester(container, case_ids, callback)
+function changeCaseMember(container, field, case_ids, callback)
 {
-    var p = prompt('Please type new email or username for default tester');
+    var p = prompt('Please type new email or username');
     if(!p)
         return false;
     
@@ -1165,7 +1192,7 @@ function changePlanCaseDefaultTester(container, case_ids, callback)
         parameters,
         'testcases.testcase',
         case_ids,
-        'default_tester',
+        field,
         callback
     )
 }
