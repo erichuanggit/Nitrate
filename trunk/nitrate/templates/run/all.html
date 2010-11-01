@@ -28,13 +28,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 		{% endif %}
 	</div>
 	<form action="{% url tcms.testruns.views.all %}" method="get">
-
-	<div id="itemSearch" class="itemSearch">
+		<div id="itemSearch" class="itemSearch">
 			<input type="hidden" name="action" value="search" />
 			<div>
 				<h2>Search Test Run</h2>
 				{% include 'run/form/search.html' %}
-				</div>
+			</div>
 			<div>
 				<div class="relativeSearchTitle">Case Information Option<div class="down" id="relativeSearchOption_case"></div></div>
 				<div class="relativeSearchBox" style="display:none" id="relativeSearch_case">
@@ -50,7 +49,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 				</span>
 			</div>
 			<div class="clear"></div>
-	</div>
+		</div>
 	</form>
 	<form id='runs_form'>
 	<div id="contentTab" class="mixbar">
