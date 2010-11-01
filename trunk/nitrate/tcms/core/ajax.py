@@ -377,8 +377,9 @@ def update(request):
         mail_context = model.mail_scene(
             objects = targets, field = field, value = value, ctype = ctype, object_pk = object_pk,
         )
-        mail_context['request'] = request
-        mailto(**mail_context)
+        if mail_context:
+            mail_context['request'] = request
+            mailto(**mail_context)
     
     del ctype, object_pk, field, value, targets
     return HttpResponse(simplejson.dumps(ajax_response))
