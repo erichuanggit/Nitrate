@@ -203,7 +203,7 @@ class TestCase(TCMSActionModel):
         q = cls.objects
         if query.get('search'):
             q = q.filter(
-                Q(case_id__icontains = query['search'])
+                Q(pk__icontains = query['search'])
                 | Q(summary__icontains = query['search'])
                 | Q(author__email__startswith = query['search'])
             )

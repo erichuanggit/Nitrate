@@ -252,6 +252,8 @@ def all(request, template_name="case/all.html"):
             d_status = TestCaseStatus.objects.filter(name = confirmed_status_name)
         elif request.REQUEST.get('template_type') == 'review_case':
             d_status = TestCaseStatus.objects.exclude(name = confirmed_status_name)
+        else:
+            d_status = TestCaseStatus.objects.all()
         
         d_status_ids = d_status.values_list('pk', flat=True)
         

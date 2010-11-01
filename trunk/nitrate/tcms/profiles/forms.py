@@ -104,7 +104,7 @@ class UserProfileForm(forms.ModelForm):
 
 class BookmarkForm(forms.Form):
     a = forms.CharField(widget=forms.HiddenInput)
-    content_type = forms.IntegerField(
+    content_type = forms.CharField(
         required = False, widget=forms.HiddenInput
     )
     object_pk = forms.CharField(
@@ -125,13 +125,18 @@ class BookmarkForm(forms.Form):
         from django.core.exceptions import ObjectDoesNotExist, ValidationError
         from django.contrib.sites.models import Site
         from django.contrib.auth.models import User
+        from django.contrib.contenttypes.models import ContentType
         
         cleaned_data = self.cleaned_data.copy()
         if cleaned_data.get('content_type'):
             try:
-                model = models.get_model(*cleaned_data['content_type'].split(".", 1))
-                target = model._default_manager.get(pk=object_pk)
-                cleaned_data['content_type'] = model
+                m = models.get_model(*cleaned_data['content_type'].split(".", 1))
+                target = m._default_manager.get(pk=cleaned_data['object_pk'])
+                app_label, model = cleaned_data['content_type'].split(".", 1)
+                ct = ContentType.objects.get(
+                    app_label = app_label, model = model
+                )
+                cleaned_data['content_type'] = ct
                 cleaned_data['object_pk'] = target.pk
             except ObjectDoesNotExist, error:
                 raise ValidationError(error)
