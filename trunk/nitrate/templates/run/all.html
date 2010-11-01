@@ -27,21 +27,21 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 		>> Test Runs
 		{% endif %}
 	</div>
-    <form action="{% url tcms.testruns.views.all %}" method="get">
+	<form action="{% url tcms.testruns.views.all %}" method="get">
 
 	<div id="itemSearch" class="itemSearch">
 			<input type="hidden" name="action" value="search" />
-            <div>
-                <h2>Search Test Run</h2>
-                {% include 'run/form/search.html' %}
-                </div>
-            <div>
-                <div class="relativeSearchTitle">Case Information Option<div class="down" id="relativeSearchOption_case"></div></div>
-                <div class="relativeSearchBox" style="display:none" id="relativeSearch_case">
-                    {% include 'run/form/search_case.html' %}
-                    <div class="clear"></div>
-                </div>
-            </div>
+			<div>
+				<h2>Search Test Run</h2>
+				{% include 'run/form/search.html' %}
+				</div>
+			<div>
+				<div class="relativeSearchTitle">Case Information Option<div class="down" id="relativeSearchOption_case"></div></div>
+				<div class="relativeSearchBox" style="display:none" id="relativeSearch_case">
+					{% include 'run/form/search_case.html' %}
+					<div class="clear"></div>
+				</div>
+			</div>
 			<div class="bottom">
 				<input type="submit" size="7" value="Search" />
 				<input type="reset" size="7"  value="Reset" />
@@ -49,14 +49,14 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 					<a href="?summary=&plan=&product_id=&env_group_id=&manager=&status=" class="viewall">View All Runs</a>
 				</span>
 			</div>
-            <div class="clear"></div>
+			<div class="clear"></div>
 	</div>
-    </form>
-
+	</form>
+	<form id='runs_form'>
 	<div id="contentTab" class="mixbar">
 		<span class="tit">{{ test_runs.count }} Test Runs</span>
-        <span class="tit"><a href="{% url tcms.testruns.views.all %}?case_run__assignee__email__startswith={{ user.email }}">View My Assigned Runs</a></span>
-        
+		<span class="tit"><a href="{% url tcms.testruns.views.all %}?case_run__assignee__email__startswith={{ user.email }}">View My Assigned Runs</a></span>
+		<input type="button" value="Clone" title="clone selected test runs" onclick="postToURL('{% url tcms.testruns.views.clone %}', this.form.serialize(true), 'get')" />
 		<span class="right-action">
 			<label for="run_column_add">Add Column</label>
 			<select id="run_column_add">
@@ -69,6 +69,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 	<table id="testruns_table" class="list border-bottom" cellpadding="0" cellspacing="0" border="0">
 		<thead>
 			<tr >
+				<th class="nosort" width="30"><input id='id_check_all_runs' type="checkbox" title="Select all/Select none" /></th>
 				<th class="number sortasc" width="40">#</th>
 				<th class="text">Summary</th>
 				<th class="text" width="80">Manager</th>
@@ -87,6 +88,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 		<tbody>
 			{% for test_run in test_runs %}
 			<tr class="{% cycle 'rowodd' 'roweven' %}">
+				<td><input type='checkbox' name="run" value="{{ test_run.pk }}" /></td>
 				<td><a href="{% url tcms.testruns.views.get test_run.run_id %}"/ >{{ test_run.run_id }}</a></td>
 				<td><a href="{% url tcms.testruns.views.get test_run.run_id %}"/>{{ test_run.summary|striptags }}</a></td>
 				<td><a href="mailto:{{ test_run.manager.email }}" title="Send email to {{ test_run.manager.email }}">{{ test_run.manager}}</a></td>
@@ -126,11 +128,13 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 			{% endfor %}
 		</tbody>
 	</table>
-    {% paginate %}
+	{% paginate %}
+	
 	{% else %}
 	{% if query_result %}
 	<span class="prompt-message"><center>No test runs found</center></span>
 	{% endif %}
+	</form>
 	{% endif %}
 </div>
 {% endblock %}
