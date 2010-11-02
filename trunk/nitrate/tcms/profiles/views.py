@@ -19,7 +19,6 @@
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.views.generic.simple import direct_to_template
-from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.exceptions import ObjectDoesNotExist
@@ -27,57 +26,22 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.forms import PasswordChangeForm
 
-@login_required
-@csrf_protect
-def profile(request, username, template_name = 'profile/info.html'):
-    """
-    Edit the profiles of the user
-    """
-    from forms import UserProfileForm
-    from models import UserProfile
-    
-    try:
-        u = User.objects.get(username = username)
-    except ObjectDoesNotExist, error:
-        raise Http404(error)
-    
-    try:
-        up = u.get_profile()
-    except ObjectDoesNotExist, error:
-        up = u.profile.create()
-    
-    form = UserProfileForm(instance=up)
-    
-    if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=up)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(
-                reverse(
-                    'tcms.profiles.views.profile',
-                    args=[form.cleaned_data['username']]
-                )
-            )
-    
-    return direct_to_template(request, template_name, {
-        'user_profile': up,
-        'form': form
-    })
+MODULE_NAME = 'profile'
 
+#@user_passes_test(lambda u: u.username == username)
+@login_required
 def bookmark(request, username, template_name = 'profile/bookmarks.html'):
     """
     Bookmarks for the user
     """
     from django.conf import settings
     from django.utils import simplejson
-	
+    
     from forms import BookmarkForm
     from models import BookmarkCategory, Bookmark
     
     if username != request.user.username:
-        return HttpResponse(
-            'Permission denied - no permission to see the bookmarks of %s' % username
-        )
+        return HttpResponseRedirect(reverse('django.contrib.auth.views.login'))
     else:
         up = {'user': request.user}
     
@@ -137,3 +101,89 @@ def bookmark(request, username, template_name = 'profile/bookmarks.html'):
     action = BookmarkActions()
     func = getattr(action, request.REQUEST.get('a', 'render'))
     return func()
+
+@login_required
+@csrf_protect
+def profile(request, username, template_name = 'profile/info.html'):
+    """
+    Edit the profiles of the user
+    """
+    from forms import UserProfileForm
+    from models import UserProfile
+    
+    try:
+        u = User.objects.get(username = username)
+    except ObjectDoesNotExist, error:
+        raise Http404(error)
+    
+    try:
+        up = u.get_profile()
+    except ObjectDoesNotExist, error:
+        up = u.profile.create()
+    
+    form = UserProfileForm(instance=up)
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=up)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(
+                reverse(
+                    'tcms.profiles.views.profile',
+                    args=[form.cleaned_data['username']]
+                )
+            )
+    
+    return direct_to_template(request, template_name, {
+        'user_profile': up,
+        'form': form
+    })
+
+@login_required
+def recent(request, username, template_name='profile/recent.html'):
+    """
+    List the recent plan/run.
+    """
+    from tcms.testplans.models import TestPlan
+    from tcms.testruns.models import TestRun
+    from tcms.testcases.models import TestCase
+    from tcms.core.utils.raw_sql import RawSQL
+    
+    if username != request.user.username:
+        return HttpResponseRedirect(reverse('django.contrib.auth.views.login'))
+    else:
+        up = {'user': request.user}
+    
+    plans_query = {
+        'author': request.user,
+    }
+    
+    runs_query = {
+        'people': request.user,
+        'is_active': True,
+        'status': 'running',
+    }
+    
+    tps = TestPlan.list(plans_query)
+    tps = tps.order_by('-plan_id')
+    tps = tps.select_related('product', 'type')
+    tps = tps.extra(select={
+        'num_runs': RawSQL.num_runs,
+    })
+    
+    trs = TestRun.list(runs_query)
+    
+    trs = trs.extra(
+        select={
+            'completed_case_run_percent': RawSQL.completed_case_run_percent,
+            'failed_case_run_percent':RawSQL.failed_case_run_percent,
+        },
+    )
+    
+    return direct_to_template(request, template_name, {
+        'module': MODULE_NAME,
+        'user_profile': up,
+        'test_plans_count': tps.count(),
+        'test_runs_count': trs.count(),
+        'last_15_test_plans': tps[:15],
+        'last_15_test_runs': trs[:15],
+    })

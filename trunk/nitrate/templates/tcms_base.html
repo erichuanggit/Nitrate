@@ -39,12 +39,14 @@
 				<label>
 					{% if user.is_authenticated %}
 					<a href={% url tcms.profiles.views.profile user.username %}>Welcome, {{ user }}</a>
-					[
 					{% if AUTH_BACKEND.can_logout %}
+					[
 					<a href="{% url tcms.core.contrib.auth.views.logout %}?next={{ request.path }}">Logout</a>
+					]
 					{% endif %}
 					{% else %}
 					Welcome, Guest.
+					[
 					{% if AUTH_BACKEND.can_login %}
 					<a href="{% url django.contrib.auth.views.login %}?next={{ request.path }}" class="banner_login">Login</a>
 					{% endif %}
