@@ -74,7 +74,7 @@
 			<div><span class="detail_title">Close Date:</span>{{ test_case_run.close_date }}</div>
 			<div><span class="detail_title">Build:</span>{{ test_case_run.build }}</div>
 			<div><span class="detail_title">Text Version:</span>{{ test_case_run.case_text_version }}</div>
-			<div><span class="detail_title">Notes:</span>{{ test_case_run.notes }}</div>
+			<div><span class="detail_title">Notes:</span>{{ test_case_run.notes|urlize|linebreaksbr }}</div>
 		</td>
 		</tr>
 		<tr>
