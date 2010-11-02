@@ -5,90 +5,91 @@
 	<input type="hidden" name="plan" value="{{ REQUEST_CONTENTS.from_plan }}" />
 	<input type="hidden" name="from_plan" value="{{ REQUEST_CONTENTS.from_plan }}" />
 	<input type="hidden" name="template_type" value="{{ REQUEST_CONTENTS.template_type }}" />
-	<div class="tab_navigation">
-		<div class="actions whitelink">
-			{% if perms.testcases.add_testcase %}
-			<label>New Case :</label>
-			<input class="add_new" type="button" value="Write new case" onclick="window.location.href='{% url tcms.testcases.views.new %}?from_plan={{ test_plan.plan_id }}';"/>
-			|
-			<input type="button" class="import" value="Import cases from XML" onclick="$('id_import_case_zone').toggle();" />
-			|
-			<input type="button" class="search" value="Add cases from other plans" onclick="window.location.href='{% url tcms.testplans.views.cases test_plan.plan_id %}?a=link_cases'" />
-			{% else %}
-			<label>New Case :</label>
-			<input class="add_new" type="button" disabled="true" value="Write new case"/>
-			|
-			<input type="button" class="import"	 disabled="true" value="Import cases from XML"	/>
-			|
-			<input type="button" class="search"	 disabled="true" value="Add cases from other plans"	 />
-			{% endif %}
+	<div class="tab_navigation actions">
+		<div class='toolbar'>
+			<ul>
+				<li><span class='sprites toolbar_case'>Case</span>
+					<ul>
+						{% if perms.testcases.add_testcase %}
+						<li><input class="add_new" type="button" value="Write new case" onclick="window.location.href='{% url tcms.testcases.views.new %}?from_plan={{ test_plan.plan_id }}';"/></li>							<li><input type="button" class="import" value="Import cases from XML" onclick="$('id_import_case_zone').toggle();" /></li>
+						<li><input type="button" class="search" value="Add cases from other plans" onclick="window.location.href='{% url tcms.testplans.views.cases test_plan.plan_id %}?a=link_cases'" /></li>
+						{% else %}
+						<li><input class="add_new" type="button" disabled="true" value="Write new case"/></li>
+						<li><input type="button" class="import"	 disabled="true" value="Import cases from XML"	/></li>
+						<li><input type="button" class="search"	 disabled="true" value="Add cases from other plans"	 /></li>
+						{% endif %}
+						<li><input type="button" class="export" title="Export selected cases into XML file" value="Export" onclick="postToURL('{% url tcms.testcases.views.export %}', serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
+						<li><input type="button" class="print_view" value="Print"  title="print view of selected cases" onclick="postToURL('{% url tcms.testcases.views.printable %}', serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
+						{% if perms.testcases.add_testcase %}
+						<li><input type="button" class="clone" value="Clone" title="Clone selected cases to another test plan" onclick="postToURL('{% url tcms.testcases.views.clone %}', serialzeCaseForm(this.up(6), this.up(6).next()), 'get');" /></li>
+						{% else %}
+						<li><input type="button" class="clone" value="Clone" title="Clone selected cases to another test plan" disabled="true"/></li>
+						{% endif %}
+						{% if perms.testcases.delete_testcaseplan %}
+						<li><input type="button" class="delete" value="Remove" title="Remove selected cases from this plan" onclick="unlinkCasePlan(this.up(7), serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
+						{% else %}
+						<li><input type="button" class="delete" value="Remove" title="Remove selected cases from this plan" disabled="true"/></li>
+						{% endif %}
+					</ul>
+				</li>
+				<li><span class='sprites toolbar_run'>Run</span>
+					<ul>
+						{% if perms.testruns.add_testrun %}
+						<li><input type="button" class="new_run" title="Make new test run from selected cases" value="New Run" onclick="var p = serialzeCaseForm(this.up(6), this.up(6).next()); postToURL('{% url tcms.testruns.views.new %}', p, 'get');" /></li>
+						{% else %}
+						<li><input type="button" class="new_run" title="Make new test run from selected cases" value="New Run" disabled="true" /></li>
+						{% endif %}
+					</ul>
+				</li>
+				<li><span class='sprites toolbar_tag'>Tag</span>
+					<ul>
+					{% if perms.testcases.add_testcasetag %}
+					<li><input type="button" value="Add" class="tag_add sprites" /></li>
+					{% else %} 
+					<li><input type="button" value="Add" class="tag_add_disabled sprites" disabled="disabled" /></li>
+					{% endif %}
+					{% if perms.testcases.delete_testcasetag %}
+					<li><input type="button" value="Remove" class="tag_delete sprites" /> </li>
+					{% else %}
+					<li><input type="button" value="Remove" class="tag_delete_disabled sprites" disabled="disabled" /></li>
+					{% endif %}
+					</ul>
+				</li>
+				{% if perms.testcases.change_testcase %}
+				<li><input type="button" value="Automated" title="change automated" class="btn_automated automated sprites" /></li>
+				<li><input type="button" value="Default tester" title="change default tester" class="btn_default_tester assignee sprites" /></li>
+				<li><input type="button" value="Component" class="btn_component sprites component" /></li>
+				{% else %}
+				<li><input type="button" value="Automated" title="change automated" class="btn_automated automated_disabled sprites" disabled="Trues" /></li>
+				<li><input type="button" value="Default tester" title="change default tester" class="btn_default_tester assigneedisable sprites" disabled /></li>
+				<li><input id="id_batch_component" type="button" value="Component" class="btn_component sprites component_disabled" disabled="disabled"/></li>
+				{% endif %}
+				<li><span class='sprites toolbar_status'>Status</span>
+					<ul>
+						<li><input type='button' value='Set PROPOSED' class='proposed'></li>
+						<li><input type='button' value='Set NEED_UPDATE' class='need_update'></li>
+						<li><input type='button' value='Set CONFIRMED' class='confirmed'></li>
+						<li><input type='button' value='Set DISABLED' class='disabled'></li>
+					</ul>
+				</li>
+				<li><span class='sprites toolbar_priority'>Priority</span>
+					<ul>
+						<li><input type='button' value='Set P1' class='p1'></li>
+						<li><input type='button' value='Set P2' class='p2'></li>
+						<li><input type='button' value='Set P3' class='p3'></li>
+						<li><input type='button' value='Set P4' class='p4'></li>
+						<li><input type='button' value='Set P5' class='p5'></li>
+					</ul>
+				</li>
+			</ul>
 			<span class="reorder_case">
 				<a class="btn_filter filtercase" title="Click to show filter options">Show filter options</a>
 				{% if perms.testcases.change_testcase %}
 				<a class="btn_sort sortlink" title="Click me,then Drag and drop the rows to adjust the order,and click 'Done Sorting' link to submit your changes">Re-order cases</a>
 				{% endif %}
 			</span>
-		</div>
-	</div>
-	<div class="mixbar">
-		<div class="actions">
-			| New: 
+			
 			{% comment %}
-			{% if perms.testreviews.add_testreview %}
-			<input type="button"  title="Make new review from selected cases" class="new_review" value="Review" onclick="var p = serialzeCaseForm(this.up(2), this.up(2).next()); postToURL('{% url tcms.testreviews.views.new test_plan.plan_id %}', p, 'get');" />
-			{% else %}
-			<input type="button" title="Make new review from selected cases" class="new_review" value="Review" disabled="true" />
-			{% endif %}
-			{% endcomment %}
-			
-			{% if perms.testruns.add_testrun %}
-			<input type="button" class="new_run" title="Make new test run from selected cases" value="Run" onclick="var p = serialzeCaseForm(this.up(2), this.up(2).next()); postToURL('{% url tcms.testruns.views.new %}', p, 'get');" />
-			{% else %}
-			<input type="button" class="new_run" title="Make new test run from selected cases" value="Run" disabled="true" />
-			{% endif %}
-			|
-			Case(s):
-			<input type="button" class="export" title="Export selected cases into XML file" value="Export" onclick="postToURL('{% url tcms.testcases.views.export %}', serialzeCaseForm(this.up(2), this.up(2).next()));" />
-			<input type="button" class="print_view" value="Print"  title="print view of selected cases" onclick="postToURL('{% url tcms.testcases.views.printable %}', serialzeCaseForm(this.up(2), this.up(2).next()));" />
-			
-			{% if perms.testcases.add_testcase %}
-			<input type="button" class="clone" value="Clone" title="Clone selected cases to another test plan" onclick="postToURL('{% url tcms.testcases.views.clone %}', serialzeCaseForm(this.up(2), this.up(2).next()), 'get');" />
-			{% else %}
-			<input type="button" class="clone" value="Clone" title="Clone selected cases to another test plan" disabled="true"/>
-			{% endif %}
-			
-			{% if perms.testcases.delete_testcaseplan %}
-			<input type="button" class="delete" value="Remove" title="Remove selected cases from this plan" onclick="unlinkCasePlan(this.up(3), serialzeCaseForm(this.up(2), this.up(2).next()));" />
-			{% else %}
-			<input type="button" class="delete" value="Remove" title="Remove selected cases from this plan" disabled="true"/>
-			{% endif %}
-			|
-			
-			Tag:
-			
-			{% if perms.testcases.add_testcasetag %}
-			<input type="button" value="Add" class="tag_add sprites" />
-			{% else %} 
-			<input type="button" value="Add" class="tag_add_disabled sprites" disabled="disabled" />
-			{% endif %}
-			
-			{% if perms.testcases.delete_testcasetag %}
-			<input type="button" value="Remove" class="tag_delete sprites" /> |
-			{% else %}
-			<input type="button" value="Remove" class="tag_delete_disabled sprites" disabled="disabled" /> |
-			{% endif %}
-			
-			{% if perms.testcases.change_testcase %}
-			
-			<input type="button" value="Automated" title="change automated" class="btn_automated automated sprites" />
-			<input type="button" value="Default tester" title="change default tester" class="btn_default_tester assignee sprites" />
-			<input type="button" value="Component" class="btn_component sprites component" />
-			{% else %}
-			<input type="button" value="Automated" title="change automated" class="btn_automated automated_disabled sprites" disabled="Trues" />
-			<input type="button" value="Default tester" title="change default tester" class="btn_default_tester assigneedisable sprites" disabled />
-			<input id="id_batch_component" type="button" value="Component" class="btn_component sprites component_disabled" disabled="disabled"/>
-			{% endif %}
-			
 			{% if perms.testcases.change_testcase %}
 			<select name="new_case_status_id" id="new_case_set_status">
 				<option title="please choose a status" value="">Set status</option>
@@ -110,8 +111,9 @@
 				<option title="please choose a priority" value="">Set priority</option>
 			</select>
 			{% endif %}
+			{% endcomment %}
 		</div>
-		<div class="mixbar_tag">
+		<div class="mixbar">
 			<div class="tagname">Tags:</div>
 			<div class="taglist">
 				{% for tag in case_own_tags %}
