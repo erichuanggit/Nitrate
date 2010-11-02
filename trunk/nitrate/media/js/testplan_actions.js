@@ -1360,7 +1360,6 @@ function resortCasesDragAndDrop(container, button, form, table, parameters, call
         });
         */
         
-        console.log(button)
         // init the tableDnD object
         new TableDnD().init(table);
         button.innerHTML = 'Done Sorting';

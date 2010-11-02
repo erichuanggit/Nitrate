@@ -5,7 +5,7 @@ Summary: {{ test_case.summary }}
 Default tester: {{ test_case.default_tester }}
 Product: {{ test_case.category.product }}
 Category: {{ test_case.category }}
-Esitmated time: {{ test_case.estimated_time }}
+Estimated time: {{ test_case.estimated_time }}
 Priority: {{ test_case.priority }}
 Status: {{ test_case.case_status }}
 

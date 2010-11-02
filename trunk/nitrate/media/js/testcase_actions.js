@@ -562,7 +562,6 @@ function constructCaseAutomatedForm(container, parameters, callback)
             });
         }
         var f = constructForm(returntext, action, form_observe);
-        console.log(f);
         container.update(f);
     }
     
