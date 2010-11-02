@@ -508,9 +508,9 @@ def edit(request, case_id, template_name = 'case/edit.html'):
             )
             
             # Clear and Add components into the case
-            tc.clear_components()
-            for component in form.cleaned_data['component']:
-                tc.add_component(component = component)
+            #tc.clear_components()
+            #for component in form.cleaned_data['component']:
+            #    tc.add_component(component = component)
             
             # Notification
             n_form = CaseNotifyForm(request.REQUEST)    # Notification form
