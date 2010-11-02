@@ -216,7 +216,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 			</div>
 		   
 			<div class="listinfo">
-				<div class="title">Note:</div>{{ test_run.notes|linebreaksbr }}
+				<div class="title">Note:</div>{{ test_run.notes|urlize|linebreaksbr }}
 			</div>
 		
 		</div>
