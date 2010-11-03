@@ -47,8 +47,8 @@ Nitrate.Utils.after_page_load(Nitrate.Profiles.Bookmarks.on_load);
 				<tr class="{% cycle 'odd' 'even' %}" title="{{ bookmark.description}}">
 					<td><input type="checkbox" name="pk" value="{{ bookmark.pk }}" /></td>
 					<td>{{ forloop.counter }}</td>
-					<td>{{ bookmark }}</td>
-					<td>{{ bookmark.url }}</td>
+					<td><a href='{{ bookmark.url }}'>{{ bookmark }}</a></td>
+					<td><a href='{{ bookmark.url }}'>{{ bookmark.url }}</a></td>
 					{# <td><a href="#" class="sprites node_edit">Edit</a></td> #}
 				</tr>
 				{% empty %}
