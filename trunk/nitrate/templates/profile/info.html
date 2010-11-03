@@ -19,21 +19,17 @@ Nitrate.Utils.after_page_load(Nitrate.Profiles.Infos.on_load);
 
 {% block contents %}
 <div id="content">
-	<div class="sprites crumble">
-		<a href="{% url tcms.core.views.index %}">Home</a>
-		>> User Profiles
-		>> {{ user_profile.user.username }}
+	<div class="sprites crumble profile_tab">
+		<ul>
+			<li class="profile_tab_active"><a href="{% url tcms.profiles.views.profile user.username %}">Basic Information</a></li>
+			{% ifequal user_profile.user user %}
+			<li><a href="{% url tcms.profiles.views.bookmark user.username %}">Bookmarks</a></li>
+			<li><a href="{% url tcms.profiles.views.recent user.username %}">Recent</a></li>
+			{% endifequal %}
+		</ul>
 	</div>
-	<div class="profile">
-		<div class="profile_tab">
-			<ul>
-				<li class="profile_tab_active"><a href="{% url tcms.profiles.views.profile user.username %}">Basic Infomation</a></li>
-				{% ifequal user_profile.user user %}
-				<li><a href="{% url tcms.profiles.views.bookmark user.username %}">Bookmarks</a></li>
-				<li><a href="{% url tcms.profiles.views.recent user.username %}">Recent</a></li>
-				{% endifequal %}
-			</ul>
-		</div>
+
+		
 		{% ifequal user_profile.user user %}
 		<form action="." method="post">
 			{% csrf_token %}
@@ -85,7 +81,7 @@ Nitrate.Utils.after_page_load(Nitrate.Profiles.Infos.on_load);
 				</tr>
 				<tr>
 					<td>{{ form.errors }}</td>
-					<td><input type="submit" value="Save Change" class="clear button_area" /></td>
+					<td><input type="submit" value="Save Change" class="clear" /></td>
 			</table>
 		</form>
 		{% else %}
@@ -121,5 +117,5 @@ Nitrate.Utils.after_page_load(Nitrate.Profiles.Infos.on_load);
 		</table>
 		{% endifequal %}
 	</div>
-</div>
+
 {% endblock %}
