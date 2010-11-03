@@ -54,7 +54,6 @@ Event.observe(window, 'load', function(e) {
     if($('id_bookmark_iform')) {
         $('id_bookmark_iform').observe('submit', function(e) {
             e.stop();
-            console.log(this);
             var url = this.action;
             var dialog = showDialog();
             var username = Nitrate.User.username;
