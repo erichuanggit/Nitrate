@@ -123,7 +123,7 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .spacer a:hover{color:#DC6F20;}
 .selected_tab{width:150px;color:#fff;font-weight:bold;-moz-border-radius:2px 2px 2px 2px;height:20px;float:left;padding-left:2px;}
 .clickable_area{background-color:#ccc;width:30%;}
-.mixbar{background:url("../images/action_bg.png") repeat-x left top #e6e6e6;width:100%;clear:both;border-bottom:1px solid #ccc; padding:3px 0;float:left;margin-top:4px;}
+.mixbar{background:url("../images/action_bg.png") repeat-x left top #e6e6e6;width:100%;clear:both;border-bottom:1px solid #ccc; padding:3px 0;float:left;margin-top:4px;position:relative;}
 .tagname{ margin-left:10px; height:20px; line-height:20px; float:left}
 .taglist{ margin-left:5px; float:left;line-height:20px; width:90%;}
 .mixbar a:link,.mixbar a:visited{ margin:0 5px; float:left}
@@ -481,8 +481,8 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 /***********************Testcase Start***************************/
 .control { padding:10px; }
 .float-tip{ width:80%; float:left; margin:10px; padding:10px 10px 10px 40px; background:#FFFAD7 url(../images/tip_bg.png) no-repeat 10px; -moz-box-shadow:1px 1px 1px #333; }
-.even,.evenRow, .rowodd{ background:#ffffff; }
-.odd, .oddRow, .roweven{ background:#f6f6f6; }
+.even,.evenRow, .roweven{background:#f1f1f1; }
+.odd, .oddRow, .rowodd{ background:#ffffff; }
 
 .selection_row { background:#f3f8fe; border:0px; }
 .progress-bar{ width:100px; background:#fff url(../images/evenbg.png) repeat-x; height:24px; border:1px solid #ccc; vertical-align:middle; margin:3px 0px 2px 0px; font-size:12px; text-align:right; }

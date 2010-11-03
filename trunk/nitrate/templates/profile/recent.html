@@ -86,7 +86,7 @@
 					<th><div class="sprites tableheader" align="left">Runs<div class="sprites tableheaderright"></div></div></th>
 				</tr>
 				{% for test_plan in last_15_test_plans %}
-				<tr class="{% cycle 'even' 'odd' %}">
+				<tr class="{% cycle 'odd' 'even' %}">
 					<td height="27"><a class="link" href="{% url tcms.testplans.views.get test_plan.plan_id %}">{{ test_plan.name }}</a></td>
 					<td>{{ test_plan.product }}</td>
 					<td>{{ test_plan.type }}</td>
