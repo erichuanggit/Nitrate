@@ -216,7 +216,7 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .actions .sortlink{color:#Fff;background-position: 0 -422px;padding-left:16px;}
 .actions .proposed{ padding-left:16px;}
 .actions .need_update{ padding-left:16px;background-position:0 -1016px;}
-.actions .confirmed{padding-left:16px; background-position:0 -40px;}
+.actions .confirmed{padding-left:16px; background-position:0 -36px;}
 .actions .disabled{padding-left:16px; background-position:0 -160px;}
 .tag_add{ background-position:0 -148px;padding-left:16px;}
 .tag_delete{ background-position:0 -166px;padding-left:16px;}
