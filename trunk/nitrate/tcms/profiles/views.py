@@ -187,3 +187,7 @@ def recent(request, username, template_name='profile/recent.html'):
         'last_15_test_plans': tps[:15],
         'last_15_test_runs': trs[:15],
     })
+
+@login_required
+def redirect_to_profile(request):
+    return HttpResponseRedirect(reverse('tcms.profiles.views.recent', args=[request.user.username]))
