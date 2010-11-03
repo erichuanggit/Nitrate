@@ -341,20 +341,18 @@ Nitrate.TestPlans.List.on_load = function()
 
 Nitrate.TestPlans.Details.on_load = function()
 {
-	$('id_check_all_runs').observe('click',function(e){
-        clickedSelectAll(this, 'testruns_table', 'run')
-    })
-	
     var plan_id = Nitrate.TestPlans.Instance.pk;
     // regUrl('display_summary');
     
+	// Initial the contents
     constructTagZone('tag', { plan: plan_id });
     constructPlanComponentsZone('components');
-    
-    new Draggable('id_import_case_zone');
-    TableKit.Sortable.init('testruns_table');
     // TableKit.Sortable.init('testreview_table');
-    
+    // Initial the tree view
+    Nitrate.TestPlans.TreeView.init(plan_id);
+    Nitrate.TestPlans.TreeView.render_page();
+
+    // Initial the tabs.
     $$('li.tab a').invoke('observe', 'click', function(i) {
         $$('div.tab_list').each(function(t) {
             t.hide();
@@ -372,10 +370,12 @@ Nitrate.TestPlans.Details.on_load = function()
         $(tab).show();
     })
     
+    // Display the current tab.
     if(window.location.hash) {
         fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
     }
     
+    // Initial the case plan
     var run_case_params = {
         'a': 'initial',
         'template_type': 'case',
@@ -390,6 +390,7 @@ Nitrate.TestPlans.Details.on_load = function()
         }
     })
     
+    // Initial the review case
     var review_case_params = {
         'a': 'initial',
         'template_type': 'review_case',
@@ -403,6 +404,8 @@ Nitrate.TestPlans.Details.on_load = function()
         }
     })
     
+
+    // Initial the enable/disble btns
     if($('btn_disable')) {
         $('btn_disable').observe('click', function(e){
             updateObject('testplans.testplan', plan_id, 'is_active', 'False', 'bool', reloadWindow);
@@ -415,9 +418,22 @@ Nitrate.TestPlans.Details.on_load = function()
         })
     }
     
+    // Bind for run form
+    $('id_form_run').observe('submit', function(e) {
+        if(!this.serialize(true)['run']) {
+            e.stop();
+            alert(default_messages.alert.no_run_selected);
+        }
+    })
     
-    Nitrate.TestPlans.TreeView.init(plan_id);
-    Nitrate.TestPlans.TreeView.render_page();
+    $('id_check_all_runs').observe('click', function(e) {
+        clickedSelectAll(this, 'testruns_table', 'run')
+    })
+    
+    TableKit.Sortable.init('testruns_table');
+    
+    // Make the import case dialog draggable.
+    new Draggable('id_import_case_zone');
 };
 
 Nitrate.TestPlans.SearchCase.on_load = function()
