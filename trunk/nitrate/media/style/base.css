@@ -204,7 +204,7 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .actions input.clone{background-position: 0 -140px;padding-left:16px;}
 .actions input.clone[disabled='true']{background-position: 0 -624px;padding-left:16px;color:#ccc;}
 .actions input.add_new{background-position: 0 -403px;padding-left:16px;}
-.actions input.add_new[disabled='true']{background-position: 0 -887px;padding-left:16px;color:#ccc;}
+.actions input.add_new[disabled='true']{filter:grey;}
 .actions input.search{background-position: 0 -16px;padding-left:16px;}
 .actions input.search[disabled='true']{color:#ccc;background-position: 0 -503px;padding-left:16px;color:#ccc;}
 .actions input.delete{background-position: 0 -159px;padding-left:16px; cursor:pointer}

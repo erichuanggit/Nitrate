@@ -341,6 +341,10 @@ Nitrate.TestPlans.List.on_load = function()
 
 Nitrate.TestPlans.Details.on_load = function()
 {
+	$('id_check_all_runs').observe('click',function(e){
+        clickedSelectAll(this, 'testruns_table', 'run')
+    })
+	
     var plan_id = Nitrate.TestPlans.Instance.pk;
     // regUrl('display_summary');
     
