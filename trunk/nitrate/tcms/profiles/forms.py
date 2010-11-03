@@ -151,7 +151,9 @@ class BookmarkForm(forms.Form):
     
     def save(self):
         from models import Bookmark
-        from pprint import pprint
         cleaned_data = self.cleaned_data.copy()
         del cleaned_data['a']
+        if not cleaned_data['content_type']:
+            del cleaned_data['content_type']
+            del cleaned_data['object_pk']
         return Bookmark.objects.create(**cleaned_data)
