@@ -24,7 +24,7 @@ Nitrate.Utils.convert = function(argument, data) {
 }
 
 Event.observe(window, 'load', function(e) {
-	// Initial the drop menu
+    // Initial the drop menu
     var dropDownMenu = Class.create();
     
     dropDownMenu.prototype = {
@@ -51,48 +51,50 @@ Event.observe(window, 'load', function(e) {
     var newnewMenu = new dropDownMenu(".nav_li");
 
     // Observe the bookmark form
-    $('id_bookmark_iform').observe('submit', function(e) {
-        e.stop();
-        console.log(this);
-        var url = this.action;
-        var dialog = showDialog();
-        var username = Nitrate.User.username;
-        var parameters = this.serialize(true);
-        parameters.url = window.location.href;
-        
-        if(!parameters.name)
-            parameters.name = document.title;
-        
-        var complete = function(t) {
-            var c = function(t) {
-                var returnobj = t.responseText.evalJSON();
-                
-                if (returnobj.rc != 0) {
-                    alert(returnobj.response);
-                    return returnobj
+    if($('id_bookmark_iform')) {
+        $('id_bookmark_iform').observe('submit', function(e) {
+            e.stop();
+            console.log(this);
+            var url = this.action;
+            var dialog = showDialog();
+            var username = Nitrate.User.username;
+            var parameters = this.serialize(true);
+            parameters.url = window.location.href;
+            
+            if(!parameters.name)
+                parameters.name = document.title;
+            
+            var complete = function(t) {
+                var c = function(t) {
+                    var returnobj = t.responseText.evalJSON();
+                    
+                    if (returnobj.rc != 0) {
+                        alert(returnobj.response);
+                        return returnobj
+                    }
+                    
+                    clearDialog();
+                    alert(default_messages.alert.bookmark_added);
+                    return returnobj;
                 }
                 
-                clearDialog();
-                alert(default_messages.alert.bookmark_added);
-                return returnobj;
-            }
+                var form_observe = function(e) {
+                    e.stop();
+                    addBookmark(this.action, this.method, this.serialize(true), c)
+                }
+                
+                var form = constructForm(t.responseText, url, form_observe);
+                dialog.update(form);
+            };
             
-            var form_observe = function(e) {
-                e.stop();
-                addBookmark(this.action, this.method, this.serialize(true), c)
-            }
-            
-            var form = constructForm(t.responseText, url, form_observe);
-            dialog.update(form);
-        };
-        
-        new Ajax.Updater(dialog, url, {
-            method: this.method,
-            parameters: parameters,
-            onComplete: complete,
-            onFailure: html_failure,
+            new Ajax.Updater(dialog, url, {
+                method: this.method,
+                parameters: parameters,
+                onComplete: complete,
+                onFailure: html_failure,
+            });
         });
-    });
+    }
 });
 
 var default_messages = {
@@ -102,6 +104,7 @@ var default_messages = {
         'tree_reloaded': 'The tree has been reloaded.',
         'last_case_run': 'It is the last case run',
         'bookmark_added': 'Bookmark added.',
+        'no_run_selected': 'No run selected.',
     },
     'confirm': {
         'change_case_status': 'Are you sure you want to change the status?',
