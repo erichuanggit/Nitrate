@@ -753,8 +753,8 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         }
         
         // Bind batch change case status selector
-        if(form.adjacent('select[name="new_case_status_id"]').length > 0) {
-            var element = form.adjacent('select[name="new_case_status_id"]')[0];
+        if(form.adjacent('input[name="new_case_status_id"]').length > 0) {
+            var element = form.adjacent('input[name="new_case_status_id"]')[0];
             
             element.observe('change',function(t) {
                 var params = serialzeCaseForm(form, table);
@@ -786,8 +786,8 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             })
         }
         
-        if(form.adjacent('select[name="new_priority_id"]').length > 0) {
-            var element = form.adjacent('select[name="new_priority_id"]')[0];
+        if(form.adjacent('input[name="new_priority_id"]').length > 0) {
+            var element = form.adjacent('input[name="new_priority_id"]')[0];
             
             element.observe('change', function(t) {
                 var params = serialzeCaseForm(form, table);

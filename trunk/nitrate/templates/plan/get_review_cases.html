@@ -6,6 +6,8 @@
 	<input type="hidden" name="plan" value="{{ REQUEST_CONTENTS.from_plan }}" />
 	<input type="hidden" name="from_plan" value="{{ REQUEST_CONTENTS.from_plan }}" />
 	<input type="hidden" name="template_type" value="{{ REQUEST_CONTENTS.template_type }}" />
+	<input type="hidden" name="new_case_status_id" />
+	<input type="hidden" name="new_priority_id" />
 	<div class="tab_navigation actions">
 		<div class='toolbar'>
 			<ul>
@@ -52,28 +54,25 @@
 				<li><input type="button" value="Automated" title="change automated" class="btn_automated automated sprites" /></li>
 				<li><input type="button" value="Reviewer" title="change reviewer" class="btn_reviewer assignee sprites" /></li>
 				<li><input type="button" value="Component" class="btn_component sprites component" /></li>
+				<li><span class='sprites toolbar_status'>Status</span>
+					<ul>
+						{% for cs in case_status %}
+						<li><input type='button' value='Set {{ cs }}' class='btn_case_status {{ cs|lower }}' onclick="this.form.new_case_status_id.value={{ cs.pk }}; fireEvent(form.new_case_status_id, 'change')"　/></li>
+						{% endfor %}
+					</ul>
+				</li>
+				<li><span class='sprites toolbar_priority'>Priority</span>
+					<ul>
+						{% for priority in priorities %}
+						<li><input type='button' value='Set {{ priority }}' class='btn_case_priority {{ priority|lower }}' onclick="this.form.new_priority_id.value={{ priority.pk }}; fireEvent(form.new_priority_id, 'change')" /></li>
+						{% endfor %}
+					</ul>
+				</li>
 				{% else %}
 				<li><input type="button" value="Automated" title="change automated" class="btn_automated automated_disabled sprites" disabled="Trues" /></li>
 				<li><input type="button" value="Reviewer" title="change reviewer" class="btn_reviewer assigneedisable sprites" disabled /></li>
 				<li><input id="id_batch_component" type="button" value="Component" class="btn_component sprites component_disabled" disabled="disabled"/></li>
 				{% endif %}
-				<li><span class='sprites toolbar_status'>Status</span>
-					<ul>
-						<li><input type='button' value='Set PROPOSED' class='proposed'></li>
-						<li><input type='button' value='Set NEED_UPDATE' class='need_update'></li>
-						<li><input type='button' value='Set CONFIRMED' class='confirmed'></li>
-						<li><input type='button' value='Set DISABLED' class='disabled'></li>
-					</ul>
-				</li>
-				<li><span class='sprites toolbar_priority'>Priority</span>
-					<ul>
-						<li><input type='button' value='Set P1' class='p1'></li>
-						<li><input type='button' value='Set P2' class='p2'></li>
-						<li><input type='button' value='Set P3' class='p3'></li>
-						<li><input type='button' value='Set P4' class='p4'></li>
-						<li><input type='button' value='Set P5' class='p5'></li>
-					</ul>
-				</li>
 			</ul>
 			
 			<span class="reorder_case">
