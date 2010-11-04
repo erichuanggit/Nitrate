@@ -660,6 +660,9 @@ def clone(request, template_name='case/clone.html'):
             next = 'javascript:window.history.go(-1)'
         ))
     
+    tp = None
+    search_plan_form = SearchPlanForm()
+    
     # Do the clone action
     if request.method == 'POST':
         clone_form = CloneCaseForm(request.POST)
@@ -765,25 +768,22 @@ def clone(request, template_name='case/clone.html'):
                 info = 'Test case successful to clone, click following link to return to plans page.',
                 next = reverse('tcms.testplans.views.all')
             ))
+    else:
+        # Initial the clone case form
+        clone_form = CloneCaseForm(initial={
+            'case': request.REQUEST.getlist('case'),
+            'copy_case': True,
+            'maintain_case_orignal_author': True,
+            'maintain_case_orignal_default_tester': True,
+            'copy_component': True,
+        })
+        clone_form.populate(case_ids = request.REQUEST.getlist('case'))
     
     # Generate search plan form
     if request.REQUEST.get('from_plan'):
         tp = TestPlan.objects.get(plan_id = request.REQUEST['from_plan'])
         search_plan_form = SearchPlanForm(initial={ 'product': tp.product_id, 'is_active': True })
         search_plan_form.populate(product_id = tp.product_id)
-    else:
-        tp = None
-        search_plan_form = SearchPlanForm()
-    
-    # Initial the clone case form
-    clone_form = CloneCaseForm(initial={
-        'case': request.REQUEST.getlist('case'),
-        'copy_case': True,
-        'maintain_case_orignal_author': True,
-        'maintain_case_orignal_default_tester': True,
-        'copy_component': True,
-    })
-    clone_form.populate(case_ids = request.REQUEST.getlist('case'))
     
     return direct_to_template(request, template_name, {
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
