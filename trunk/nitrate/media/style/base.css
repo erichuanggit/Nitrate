@@ -124,18 +124,23 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .selected_tab{width:150px;color:#fff;font-weight:bold;-moz-border-radius:2px 2px 2px 2px;height:20px;float:left;padding-left:2px;}
 .clickable_area{background-color:#ccc;width:30%;}
 .mixbar{background:url("../images/action_bg.png") repeat-x left top #e6e6e6;width:100%;clear:both;border-bottom:1px solid #ccc; padding:3px 0;float:left;margin-top:4px;position:relative;}
+.mixbar_left{float:left; height:22px;line-height:22px;padding-left:5px;}
 .tagname{ margin-left:10px; height:20px; line-height:20px; float:left}
 .taglist{ margin-left:5px; float:left;line-height:20px; width:90%;}
-.mixbar a:link,.mixbar a:visited{ margin:0 5px; float:left}
 .tit{font-weight:bold;margin-left:10px; height:23px; line-height:23px;}
 .mixbar.tit{font-size:1.2em;}
-.disablelink, .enablelink,.spadelink , .addlink, .editlink, .deletelink, .sortlink,.updatelink,.updategrey{background:transparent url(../images/operation.png) no-repeat;text-decoration:none; }
-.addlink{padding:0px 15px;cursor:pointer;background-position: 0 -54px;}
+.disablelink, .enablelink,.spadelink , .addlink, .editlink, .deletelink, .sortlink,.updatelink,.updategrey,.comment_add,.bug_add{background:transparent url(../images/operation.png) no-repeat;text-decoration:none;height:16px;line-height:16px;cursor:pointer; }
+.addlink{padding:0px 16px;cursor:pointer;background-position: 0 -54px;}
 .updatelink{ padding-left:16px; cursor:pointer; background-position:0px -984px;}
-.updategrey{ padding-left:16px; cursor:default; background-position:0px -1000px; color:#999}
+.updategrey{ padding-left:16px; cursor:pointer; background-position:0px -1000px; color:graytext}
 .editlink{padding:0px 18px;background-position: 0 -124px;}
 .editlink{text-decoration:underline;}
-.deletelink{padding-left:16px;background-position: 0 -159px; }
+.deletelink{padding-left:18px;background-position: 0 -159px; }
+.comment_add{padding-left:18px;background-position: 0 -1112px;border:none;}
+.comment_add_disable{padding-left:18px;background-position: 0 -1142px;border:none;color:graytext}
+.bug_add{padding-left:18px;background-position: 0 -1128px;border:none;}
+.bug_add_disable{padding-left:18px;background-position: 0 -1158px;border:none;color:graytext}
+
 .successlink{color: #2F855D;margin:0px 15px;}
 .historylink{float:left;text-shadow:1px 1px 1px #ddd;float:right;}
 .historylink :visited{color:#FFFAB3;}
@@ -190,44 +195,45 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .toolbar_case{background-position: 0 -821px;padding-left:18px}
 .toolbar_run{background-position: 0 -837px;padding-left:18px}
 .toolbar_tag{background-position: 0 -853px;padding-left:18px}
+.toolbar_tag_disabled{background-position: 0 -918px;padding-left:18px;color:graytext;;}
 .toolbar_status{background-position: 0 -805px;padding-left:18px}
 .toolbar_priority{background-position: 0 -902px;padding-left:18px}
 
 .actions .export,.actions .filter_action, .actions .import, .actions .print_view,.actions .add_new, .actions .clone, .actions .add_new , .actions .delete,.actions .new_run ,.actions .proposed ,.actions .confirmed ,.actions .disabled,.actions .new_review,.actions .sortlink, .actions .search,.actions .need_update,.actions .p1,.actions .p2,.actions .p3,.actions .p4,.actions .p5{border:none;background:url("../images/operation.png") no-repeat;height:16px; line-height:16px; cursor:pointer; }
 .actions a{cursor:pointer;}
 .actions input.export{background-position: 0 -384px;padding-left:16px;}
-.actions input.export[disabled='true']{background-position: 0px -868px;padding-left:16px;color:#ccc;}
+.actions input.export[disabled='true']{background-position: 0px -868px;padding-left:16px;color:graytext;}
 .actions input.import{background-position: 0 -262px;padding-left:16px;}
-.actions input.import[disabled='true']{background-position: 0 -746px;padding-left:16px;color:#ccc;}
+.actions input.import[disabled='true']{background-position: 0 -746px;padding-left:16px;color:graytext;}
 .actions input.print_view{background-position: 0 -346px;padding-left:16px;}
-.actions input.print_view[disabled='true']{background-position: 0 -848px;padding-left:16px;color:#ccc;}
+.actions input.print_view[disabled='true']{background-position: 0 -848px;padding-left:16px;color:graytext;}
 .actions input.clone{background-position: 0 -140px;padding-left:16px;}
-.actions input.clone[disabled='true']{background-position: 0 -624px;padding-left:16px;color:#ccc;}
+.actions input.clone[disabled='true']{background-position: 0 -624px;padding-left:16px;color:graytext;}
 .actions input.add_new{background-position: 0 -403px;padding-left:16px;}
-.actions input.add_new[disabled='true']{filter:grey;}
+.actions input.add_new[disabled='true']{background-position: 0 -887px;padding-left:16px;color:graytext;}
 .actions input.search{background-position: 0 -16px;padding-left:16px;}
-.actions input.search[disabled='true']{color:#ccc;background-position: 0 -503px;padding-left:16px;color:#ccc;}
+.actions input.search[disabled='true']{background-position: 0 -503px;padding-left:16px;color:graytext;}
 .actions input.delete{background-position: 0 -159px;padding-left:16px; cursor:pointer}
-.actions input.delete[disabled='true']{background-position: 0 -643px;padding-left:16px;color:#ccc;}
+.actions input.delete[disabled='true']{background-position: 0 -643px;padding-left:16px;color:graytext;}
 .actions input.new_run{background-position: 0 -108px;padding-left:16px;}
-.actions input.new_run[disabled='true']{background-position: 0 -592px;padding-left:16px;color:#ccc;}
+.actions input.new_run[disabled='true']{background-position: 0 -592px;padding-left:16px;color:graytext;}
 .actions input.new_review{background-position: 0 -224px;padding-left:16px;}
-.actions input.new_review[disabled='true']{background-position: 0 -706px;padding-left:16px;color:#ccc;}
+.actions input.new_review[disabled='true']{background-position: 0 -706px;padding-left:16px;color:graytext;}
 .actions .sortlink{color:#Fff;background-position: 0 -422px;padding-left:16px;}
 .actions .proposed{ padding-left:16px;}
 .actions .need_update{ padding-left:16px;background-position:0 -1016px;}
-.actions .confirmed{padding-left:16px; background-position:0 -40px;}
+.actions .confirmed{padding-left:16px; background-position:0 -36px;}
 .actions .disabled{padding-left:16px; background-position:0 -160px;}
 .tag_add{ background-position:0 -148px;padding-left:16px;}
 .tag_delete{ background-position:0 -166px;padding-left:16px;}
-.tag_delete_disabled{ background-position:0 -670px; padding-left:16px;}
-.tag_add_disabled{ background-position:0 -652px; padding-left:16px;}
+.tag_delete_disabled{ background-position:0 -670px; padding-left:16px;color:graytext;}
+.tag_add_disabled{ background-position:0 -652px; padding-left:16px;color:graytext;}
 .automated{ padding-left:16px; background-position:0 -131px;cursor:pointer;}
-.automated_disabled{ background-position:0 -688px; padding-left:16px;}
+.automated_disabled{ background-position:0 -688px; padding-left:16px;color:graytext;}
 .component{ background-position:0 -615px; padding-left:16px;cursor:pointer;}
-.component_disabled{background-position:0 -633px;padding-left:16px;}
+.component_disabled{background-position:0 -633px;padding-left:16px;color:graytext;}
 .assignee{ background-position:0 -30px; padding-left:16px;  border:none;cursor:pointer;}
-.assigneedisable{ background-position:0 -48px; padding-left:16px;border:none; }
+.assigneedisable{ background-position:0 -48px; padding-left:16px;border:none;color:graytext; }
 .actions .p1{background-position:0 -1032px; padding-left:16px;  border:none;cursor:pointer;}
 .actions .p2{background-position:0 -1048px; padding-left:16px;  border:none;cursor:pointer;}
 .actions .p3{background-position:0 -1064px; padding-left:16px;  border:none;cursor:pointer;}
@@ -295,7 +301,7 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .errornote{ background:#FCE595; color:red; background : url("admin_media/img/admin/icon_error.gif") left 3px  no-repeat; padding-left:20px; }
 .errorlist{ width:99%; margin:10px auto;background:#AF2B2B;font-size:12px;-moz-border-radius:5px 5px 5px 5px;-moz-box-shadow:0 1px 4px #666666; border:1px solid #6F1B1B;color:#FFF;display:block;text-shadow:0 1px 0 #000000; padding:10px 0; }
 .errorlist li{ list-style:none; margin-left:10px;}
-.datetime{ margin-left:160px; }
+.datetime{margin-left:160px;}
 
 #changelist-filter { background:#f5f5f5; float:left; width:100%; border-top:1px solid #ccc; border-bottom:1px solid #ccc; }
 #changelist-filter h2{ color:#255A82; padding-left:10px; font-size:1.1em; margin:0px; }	
@@ -554,7 +560,7 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .tab_navigation .hyperlink{ color:#FFF; margin-left:10px; float:left;}
 .tab_navigation .hyperlink a{ color:#f3f8fd;}
 .tab_navigation label{ margin-left:10px; float:left; color:#fff}
-.reorder_case{ position:absolute; right:5px; top:5px;}
+.reorder_case{ position:absolute; right:5px; top:3px;}
 #container { width:98%; margin-left:1%; float:left;}
 #id_upload_files{ float:left; width:95%; text-align:left; margin-left:10px;}
 #id_upload_files a{ margin-left:100px; color:red;}

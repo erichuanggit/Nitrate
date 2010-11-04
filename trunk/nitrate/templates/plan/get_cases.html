@@ -10,7 +10,12 @@
 	<div class="tab_navigation actions">
 		<div class='toolbar'>
 			<ul>
-				<li><span class='sprites toolbar_case'>Case</span>
+				<li>
+					{% if perms.testcases.add_testcase %}
+					<span class='sprites toolbar_case' onclick="window.location.href='{% url tcms.testcases.views.new %}?from_plan={{ test_plan.plan_id }}';">Case</span>
+					{% else %}
+					<span class='sprites toolbar_case'>Case</span>
+					{% endif %}
 					<ul>
 						{% if perms.testcases.add_testcase %}
 						<li><input class="add_new" type="button" value="Write new case" onclick="window.location.href='{% url tcms.testcases.views.new %}?from_plan={{ test_plan.plan_id }}';"/></li>							<li><input type="button" class="import" value="Import cases from XML" onclick="$('id_import_case_zone').toggle();" /></li>
@@ -34,26 +39,28 @@
 						{% endif %}
 					</ul>
 				</li>
-				<li><span class='sprites toolbar_run'>Run</span>
-					<ul>
-						{% if perms.testruns.add_testrun %}
-						<li><input type="button" class="new_run" title="Make new test run from selected cases" value="New Run" onclick="var p = serialzeCaseForm(this.up(6), this.up(6).next()); postToURL('{% url tcms.testruns.views.new %}', p, 'get');" /></li>
-						{% else %}
-						<li><input type="button" class="new_run" title="Make new test run from selected cases" value="New Run" disabled="true" /></li>
-						{% endif %}
-					</ul>
-				</li>
-				<li><span class='sprites toolbar_tag'>Tag</span>
+				{% if perms.testruns.add_testrun %}
+				<li><input type="button" class="new_run" title="Make new test run from selected cases" value="Run" onclick="var p = serialzeCaseForm(this.up(4), this.up(4).next()); postToURL('{% url tcms.testruns.views.new %}', p, 'get');"/></li>
+				{% else %}
+				<li><input type="button" class="new_run" title="Make new test run from selected cases" value="Run" disabled="true" /></li>
+				{% endif %}
+				
+				<li>
+					{% if perms.testcases.add_testcasetag %}
+					<span class='sprites toolbar_tag'>Tag</span>
+					{% else %}
+					<span class='sprites toolbar_tag_disabled'>Tag</span>
+					{% endif %}
 					<ul>
 					{% if perms.testcases.add_testcasetag %}
-					<li><input type="button" value="Add" class="tag_add sprites" /></li>
+					<li><input type="button" value="Add Tag" class="tag_add sprites" /></li>
 					{% else %} 
-					<li><input type="button" value="Add" class="tag_add_disabled sprites" disabled="disabled" /></li>
+					<li><input type="button" value="Add Tag" class="tag_add_disabled sprites" disabled="disabled" /></li>
 					{% endif %}
 					{% if perms.testcases.delete_testcasetag %}
-					<li><input type="button" value="Remove" class="tag_delete sprites" /> </li>
+					<li><input type="button" value="Remove Tag" class="tag_delete sprites" /> </li>
 					{% else %}
-					<li><input type="button" value="Remove" class="tag_delete_disabled sprites" disabled="disabled" /></li>
+					<li><input type="button" value="Remove Tag" class="tag_delete_disabled sprites" disabled="disabled" /></li>
 					{% endif %}
 					</ul>
 				</li>

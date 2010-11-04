@@ -33,8 +33,8 @@
 	</thead>
 	<tbody>
 		{% for test_case_run in test_case_runs %}
-		<tr class="case_title {% cycle 'odd' 'even' %}">
-			<td class="center">
+		<tr class="case_title {% if test_case_run.is_current %}is_current run_current{% endif %} {% ifequal test_case_run.assignee user%} mine {%endifequal%}">
+			<td>
 				<input type="checkbox" name="case_run" value="{{ test_case_run.pk }}" title="Select/Unselect" />
 				<input type="hidden" name="case" value="{{ test_case_run.case_id }}" />
 				<input type="hidden" name="case_text_version" value="{{ test_case_run.case_text_version }}" />

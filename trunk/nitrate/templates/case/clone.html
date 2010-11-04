@@ -45,6 +45,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Clone.on_load);
 						</div>
 					</form>
 				</div>
+				{{ clone_form.plan.errors }}
                 </div>
 			</div>
 			<form id="id_clone_form" action="{% url tcms.testcases.views.clone %}" method="post">
