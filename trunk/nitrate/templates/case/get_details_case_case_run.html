@@ -1,0 +1,25 @@
+{% load comments %}
+{% get_comment_list for test_case_run as case_run_comments %}
+<td colspan="6">
+	Comments:
+	<ul>
+		{% for comment in case_run_comments %}
+		<li>
+			[{{ comment.submit_date }}] - [{{ comment.user }}] - 
+			{{ comment|linebreaksbr }}
+		</li>
+		{% empty %}
+		<li class="grey">No comments found.</li>
+		{% endfor %}
+	<ul>
+</td>
+<td colspan="6">
+	Logs:
+	<ul>
+		{% for log in test_case_run.log %}
+		<li>[{{ log.date }}] - [{{ log.who }}] - {{ log.action }}</li>
+		{% empty %}
+		<li class="grey">No log found.</li>
+		{% endfor %}
+	</ul>
+</td>

@@ -30,12 +30,18 @@ Nitrate.TestCases.Details.on_load = function()
     var case_id = Nitrate.TestCases.Instance.pk;
     constructTagZone('tag', { 'case': case_id });
     constructPlanCaseZone($('plan'), case_id);
+    
     $$('li.tab a').invoke('observe', 'click', function(i) {
         $$('div.tab_list').invoke('hide');
         $$('li.tab').invoke('removeClassName', 'tab_focus');
         this.parentNode.addClassName('tab_focus');
         $(this.title).show();
     });
+    
+    if(window.location.hash) {
+        fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
+    };
+    
     $('id_update_component').observe('click', function(e) {
         if(this.diabled)
         return false;
@@ -109,10 +115,7 @@ Nitrate.TestCases.Details.on_load = function()
     });
     
     bindSelectAllCheckbox($('id_checkbox_all_components'), $('id_form_case_component'), 'component');
-    
-    if(window.location.hash) {
-        fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
-    }
+
     if($('id_table_cases')) {
         TableKit.Sortable.init('id_table_cases',
         {
@@ -120,7 +123,19 @@ Nitrate.TestCases.Details.on_load = function()
             rowOddClass : 'rowodd',
             nosortClass : 'nosort'
         });
+    };
+
+    var toggle_case_run = function(e) {
+        var c = this.up(); // Container
+        var c_container = c.next(); // Content Containers
+        var case_id = c.getElementsBySelector('input[name="case"]')[0].value;
+        var case_run_id = c.getElementsBySelector('input[name="case_run"]')[0].value;
+        var case_text_version = c.getElementsBySelector('input[name="case_text_version"]')[0].value;
+        var type = 'case_case_run';
+        toggleTestCaseContents(type, c, c_container, case_id, case_text_version, case_run_id);
     }
+    
+    $$('.expandable').invoke('observe', 'click', toggle_case_run);
 }
 
 Nitrate.TestCases.Create.on_load = function()

@@ -61,7 +61,7 @@ Nitrate.TestRuns.Details.on_load = function()
         toggleAllCheckBoxes(this, 'id_table_cases', 'case_run');
     })
     
-    $$('.expandable').invoke('observe', 'click', function(e) {
+    var toggle_case_run = function(e) {
         var c = this.up(); // Container
         var c_container = c.next(); // Content Containers
         var case_id = c.getElementsBySelector('input[name="case"]')[0].value;
@@ -69,7 +69,9 @@ Nitrate.TestRuns.Details.on_load = function()
         var case_text_version = c.getElementsBySelector('input[name="case_text_version"]')[0].value;
         var type = 'case_run';
         toggleTestCaseContents(type, c, c_container, case_id, case_text_version, case_run_id);
-    });
+    }
+    
+    $$('.expandable').invoke('observe', 'click', toggle_case_run);
     
     if(window.location.hash) {
         fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');

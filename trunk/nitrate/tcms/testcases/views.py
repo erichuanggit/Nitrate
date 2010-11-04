@@ -368,6 +368,7 @@ def get(request, case_id, template_name = 'case/get.html'):
         'case': 'case/get_details.html',
         'review_case': 'case/get_details_review.html',
         'case_run': 'case/get_details_case_run.html',
+        'case_case_run': 'case/get_details_case_case_run.html',
         'execute_case_run': 'run/execute_case_run.html',
     }
     
