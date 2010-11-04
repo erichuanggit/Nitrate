@@ -124,18 +124,23 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .selected_tab{width:150px;color:#fff;font-weight:bold;-moz-border-radius:2px 2px 2px 2px;height:20px;float:left;padding-left:2px;}
 .clickable_area{background-color:#ccc;width:30%;}
 .mixbar{background:url("../images/action_bg.png") repeat-x left top #e6e6e6;width:100%;clear:both;border-bottom:1px solid #ccc; padding:3px 0;float:left;margin-top:4px;position:relative;}
+.mixbar_left{float:left; height:22px;line-height:22px;padding-left:5px;}
 .tagname{ margin-left:10px; height:20px; line-height:20px; float:left}
 .taglist{ margin-left:5px; float:left;line-height:20px; width:90%;}
-.mixbar a:link,.mixbar a:visited{ margin:0 5px; float:left}
 .tit{font-weight:bold;margin-left:10px; height:23px; line-height:23px;}
 .mixbar.tit{font-size:1.2em;}
-.disablelink, .enablelink,.spadelink , .addlink, .editlink, .deletelink, .sortlink,.updatelink,.updategrey{background:transparent url(../images/operation.png) no-repeat;text-decoration:none; }
-.addlink{padding:0px 15px;cursor:pointer;background-position: 0 -54px;}
+.disablelink, .enablelink,.spadelink , .addlink, .editlink, .deletelink, .sortlink,.updatelink,.updategrey,.comment_add,.bug_add{background:transparent url(../images/operation.png) no-repeat;text-decoration:none;height:16px;line-height:16px;cursor:pointer; }
+.addlink{padding:0px 16px;cursor:pointer;background-position: 0 -54px;}
 .updatelink{ padding-left:16px; cursor:pointer; background-position:0px -984px;}
-.updategrey{ padding-left:16px; cursor:default; background-position:0px -1000px; color:#999}
+.updategrey{ padding-left:16px; cursor:pointer; background-position:0px -1000px; color:graytext}
 .editlink{padding:0px 18px;background-position: 0 -124px;}
 .editlink{text-decoration:underline;}
-.deletelink{padding-left:16px;background-position: 0 -159px; }
+.deletelink{padding-left:18px;background-position: 0 -159px; }
+.comment_add{padding-left:18px;background-position: 0 -1112px;border:none;}
+.comment_add_disable{padding-left:18px;background-position: 0 -1142px;border:none;color:graytext}
+.bug_add{padding-left:18px;background-position: 0 -1128px;border:none;}
+.bug_add_disable{padding-left:18px;background-position: 0 -1158px;border:none;color:graytext}
+
 .successlink{color: #2F855D;margin:0px 15px;}
 .historylink{float:left;text-shadow:1px 1px 1px #ddd;float:right;}
 .historylink :visited{color:#FFFAB3;}
@@ -555,7 +560,7 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .tab_navigation .hyperlink{ color:#FFF; margin-left:10px; float:left;}
 .tab_navigation .hyperlink a{ color:#f3f8fd;}
 .tab_navigation label{ margin-left:10px; float:left; color:#fff}
-.reorder_case{ position:absolute; right:5px; top:5px;}
+.reorder_case{ position:absolute; right:5px; top:3px;}
 #container { width:98%; margin-left:1%; float:left;}
 #id_upload_files{ float:left; width:95%; text-align:left; margin-left:10px;}
 #id_upload_files a{ margin-left:100px; color:red;}

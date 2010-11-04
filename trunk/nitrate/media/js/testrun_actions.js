@@ -74,6 +74,20 @@ Nitrate.TestRuns.Details.on_load = function()
     if(window.location.hash) {
         fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
     }
+    $('id_check_box_blinddownallcase').observe('click',function(){
+        if($('id_check_box_blinddownallcase').checked){
+            blinddownAllCases();
+        } else {
+            blindupAllCases();
+        }
+    })
+    if($('id_check_box_highlight').checked)
+        $$('.mine').invoke('addClassName','highlight');
+
+    $('id_check_box_highlight').observe('click', function(e) {
+        e=$$('.mine');
+        this.checked && e.invoke('addClassName','highlight') || e.invoke('removeClassName','highlight')
+    })
 }
 
 Nitrate.TestRuns.New.on_load = function()

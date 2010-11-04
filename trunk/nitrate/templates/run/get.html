@@ -268,8 +268,26 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 	<div class="Detailform border-1">
 		<form id="id_form_case_runs">
 			<div class="mixbar"> 
-				<span class="tit">Cases: {{ test_case_runs.count }}</span>
-				<div class="reorder_case">
+				{#}<span class="tit">Cases: {{ test_case_runs.count }}</span>{#}
+				<div class='mixbar_left'>
+					<select>
+						<option checked>Set Status</option>
+						<option>Idle</option>
+						<option>Running</option>
+						<option>Passed</option>
+						<option>Failed</option>
+						<option>Error</option>
+						<option>Blocked</option>
+						<option>Paused</option>
+						<option>Waived</option>
+					</select>
+					{% if perms.testruns.add_testcaserun %}
+					<input type='button' class='comment_add' value='Add Comment' title="Add comment to these selected cases">
+					<input type='button' class='bug_add' value='Add Bug' title="Add new bug to these selected cases">
+					{% else%}
+					<input type='button' class='comment_add_disable' value='Add Comment' title="Add comment to these selected cases">
+					<input type='button' class='bug_add_disable' value='Add Bug' title="Add new bug to these selected cases">
+					{% endif %}
 					<a class="assignee sprites" href="#" title="Assignee this case(s) to other people" onclick="changeCaseRunAssignee(this.up(2));">Assignee</a>
 					{% if perms.testruns.add_testcaserun %}
 					<a href="{% url tcms.testruns.views.assign_case test_run.run_id %}" class="add">Add Case</a>
@@ -288,6 +306,14 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 					<span class="sortlink grey" >Re-order Cases</span>
 					<span class="updategrey">Update</span>
 					{% endif %}
+				</div>
+				<div class="reorder_case">
+					<input id="id_check_box_auto_blinddown" type="checkbox" checked=true />
+					<label for="id_check_box_auto_blinddown"> Automatically display next test case</label>
+					<input id="id_check_box_blinddownallcase" type="checkbox" />
+					<label for="id_check_box_blinddownallcase"> Expand all case</label>
+					<input id="id_check_box_highlight" type="checkbox" />
+					<label for="id_check_box_highlight">Highligt My Assigned Runs</label>
 				</div>
 			</div>
 			{% include 'run/get_case_runs.html' %}
