@@ -260,27 +260,31 @@ function toggleAllCheckBoxes(element, container, name)
     }
 }
 
-function blinddownAllCases()
+function blinddownAllCases(element)
 {
     $$('.collapse').each(function(e) {
         fireEvent(e, 'click');
     })
     
-    if($('id_blind_all_link')) {
-        $('id_blind_all_link').href="javascript:blindupAllCases()";
-        $('id_blind_all_img').src="/media/images/t2.gif";
+    if (element) {
+        element.removeClassName('collapse');
+        element.addClassName('expand');
+        element.href="javascript:blindupAllCases()";
+        element.src="/media/images/t2.gif";
     }
 }
 
-function blindupAllCases()
+function blindupAllCases(element)
 {
     $$('.expand').each(function(e) {
         fireEvent(e, 'click');
     })
     
-    if($('id_blind_all_link')) {
-        $('id_blind_all_link').href="javascript:blinddownAllCases()";
-        $('id_blind_all_img').src="/media/images/t1.gif";
+    if(element) {
+        element.removeClassName('expand');
+        element.addClassName('collapse');
+        element.href="javascript:blinddownAllCases()";
+        element.src="/media/images/t1.gif";
     }
 }
 

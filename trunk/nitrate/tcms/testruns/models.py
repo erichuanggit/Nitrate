@@ -218,6 +218,20 @@ class TestRun(TCMSActionModel):
         
         return self.get_url(request)
     
+    def get_notify_addrs(self):
+        """
+        Get the all related mails from the run
+        """
+        to = [self.manager.email]
+        to.extend(self.cc.values_list('email', flat=True))
+        if self.default_tester_id:
+            to.append(self.default_tester.email)
+            
+        for tcr in self.case_run.select_related('assignee').all():
+            if tcr.assignee_id:
+                to.append(tcr.assignee.email)
+        return list(set(to))
+    
     def get_url_path(self):
         return reverse('tcms.testruns.views.get', args=[self.pk, ])
     
@@ -325,16 +339,7 @@ class TestRun(TCMSActionModel):
     
     def mail(self, template, subject, context, to = [], request = None):
         from tcms.core.utils.mailto import mailto
-        
-        to = [self.manager.email]
-        to.extend(self.cc.values_list('email', flat=True))
-        if self.default_tester_id:
-            to.append(self.default_tester.email)
-            
-        for tcr in self.case_run.select_related('assignee').all():
-            if tcr.assignee_id:
-                to.append(tcr.assignee.email)
-        to = list(set(to))
+        to = self.get_notify_addrs()
         mailto(template, subject, to, context, request)
 
 class TestCaseRunStatus(TCMSActionModel):
@@ -416,7 +421,7 @@ class TestCaseRun(TCMSActionModel):
             'assignee': {
                 'template_name': 'mail/change_case_run_assignee.txt',
                 'subject': 'Assignee of run %s has been changed' % tr.run_id,
-                'to_mail': list(set(tcrs.values_list('default_tester__email', flat=True))),
+                'to_mail': tr.get_notify_addrs(),
                 'context': {'test_run': tr, 'test_case_runs': tcrs},
             }
         }

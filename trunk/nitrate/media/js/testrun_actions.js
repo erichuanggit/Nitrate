@@ -54,6 +54,12 @@ Nitrate.TestRuns.List.on_load = function()
 
 Nitrate.TestRuns.Details.on_load = function()
 {
+    // Open the selected case
+    if(window.location.hash) {
+        fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
+    }
+    
+    // Observe the interface buttons
     if($('id_sort'))
         $('id_sort').observe('click', taggleSortCaseRun);
     
@@ -61,6 +67,25 @@ Nitrate.TestRuns.Details.on_load = function()
         toggleAllCheckBoxes(this, 'id_table_cases', 'case_run');
     })
     
+    
+    if($('id_check_box_highlight').checked)
+        $$('.mine').invoke('addClassName','highlight');
+    
+    $('id_check_box_highlight').observe('click', function(e) {
+        e=$$('.mine');
+        this.checked && e.invoke('addClassName','highlight') || e.invoke('removeClassName','highlight')
+    });
+    
+    $('id_blind_all_link').observe('click', function(e) {
+        var element = this.down();
+        if (element.hasClassName('collapse')) {
+            blinddownAllCases(element);
+        } else {
+            blindupAllCases(element);
+        };
+    })
+    
+    // Observe the case run toggle and the comment form
     var toggle_case_run = function(e) {
         var c = this.up(); // Container
         var c_container = c.next(); // Content Containers
@@ -68,28 +93,14 @@ Nitrate.TestRuns.Details.on_load = function()
         var case_run_id = c.getElementsBySelector('input[name="case_run"]')[0].value;
         var case_text_version = c.getElementsBySelector('input[name="case_text_version"]')[0].value;
         var type = 'case_run';
-        toggleTestCaseContents(type, c, c_container, case_id, case_text_version, case_run_id);
+        var callback = function(t) {
+            c_container.getElementsBySelector('.update_form')[0].observe('submit', updateCaseRunStatus);
+        }
+        
+        toggleTestCaseContents(type, c, c_container, case_id, case_text_version, case_run_id, callback);
     }
     
     $$('.expandable').invoke('observe', 'click', toggle_case_run);
-    
-    if(window.location.hash) {
-        fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
-    }
-    $('id_check_box_blinddownallcase').observe('click',function(){
-        if($('id_check_box_blinddownallcase').checked){
-            blinddownAllCases();
-        } else {
-            blindupAllCases();
-        }
-    })
-    if($('id_check_box_highlight').checked)
-        $$('.mine').invoke('addClassName','highlight');
-
-    $('id_check_box_highlight').observe('click', function(e) {
-        e=$$('.mine');
-        this.checked && e.invoke('addClassName','highlight') || e.invoke('removeClassName','highlight')
-    })
 }
 
 Nitrate.TestRuns.New.on_load = function()
@@ -191,9 +202,10 @@ var updateCaseRunStatus = function(e)
 {
     e.stop();
     
-    var container = this.up(2);
+    var container = this.up(4);
     var parent = container.up();
-    var title = container.previous();
+    var title = parent.previous();
+    var link = title.getElementsBySelector('.expandable')[0];
     var parameters = this.serialize(true);
     var ctype = parameters['content_type'];
     var object_pk = parameters['object_pk'];
@@ -210,14 +222,22 @@ var updateCaseRunStatus = function(e)
         
         // Update the contents
         if (parameters['value'] != '') {
+			// Update the case run status icon
             var crs = Nitrate.TestRuns.CaseRunStatus;
-            var icon_status = parent.getElementsBySelector('.icon_status');
+            var icon_status = title.getElementsBySelector('.icon_status');
             icon_status.each(function(item) {
                 for (i in crs) {
                     if (typeof(crs[i]) == 'string' && item.hasClassName('btn_' + crs[i]))
                         item.removeClassName('btn_' + crs[i]);
                 }
                 item.addClassName('btn_' + Nitrate.TestRuns.CaseRunStatus[value-1]);
+            })
+            
+            // Update related people
+            var usr = Nitrate.User;
+            title.getElementsBySelector('.link_tested_by, .link_assignee').each(function(i) {
+                i.href = 'mailto:' + usr.email;
+                i.update(usr.username);
             })
         }
         
@@ -226,18 +246,17 @@ var updateCaseRunStatus = function(e)
             title.addClassName('mine');
         
         // Blind down next case
-        fireEvent(title, 'click');
-        
+        fireEvent(link, 'click');
         if ($('id_check_box_auto_blinddown').checked && parameters['value'] != '') {
-            if(!parent.next()) {
+            var next_title = parent.next();
+            if(!next_title) {
                 alert(default_messages.alert.last_case_run);
                 return false;
             }
-            
-            if(parent.next().down().next().getStyle('display') == 'none')
-                fireEvent(parent.next().down(), 'click');
+            if(next_title.next().getStyle('display') == 'none')
+                fireEvent(next_title.getElementsBySelector('.expandable')[0], 'click');
         } else {
-            fireEvent(title, 'click');
+            fireEvent(link, 'click');
         }
     }
     
@@ -362,15 +381,17 @@ function selectcase(){
 
 function constructCaseRunZone(container, title_container, case_id)
 {
+    var link = title_container.getElementsBySelector('.expandable')[0];
+    console.log(link);
     if(container) {
-        var ajax_loading = getAjaxLoading();
-        ajax_loading.id = 'id_loading_' + case_id;
-        container.update(ajax_loading);
+		var td = new Element('td', {'id': 'id_loading_' + case_id, 'colspan': 12});
+        td.update(getAjaxLoading());
+		container.update(td);
     }
     
     if(title_container) {
-        fireEvent(title_container, 'click');
-        fireEvent(title_container, 'click');
+        fireEvent(link, 'click');
+        fireEvent(link, 'click');
     }
 }
 
@@ -378,12 +399,13 @@ function addCaseRunBug(title_container, container, case_id, case_run_id, callbac
 {
     // FIXME: Popup dialog to select the bug system
     bug_id = prompt('Please input the bug id.');
-    bug_id = Trim(bug_id);
+    bug_id = bug_id.replace(/ /g, '');
     
     if(!bug_id)
         return false
-    
-    if(!isInteger(bug_id)) {
+    debug_output(title_container);
+	debug_output(container);
+    if(parseInt(bug_id) != bug_id) {
         alert('Wrong number.');
         return false;
     }

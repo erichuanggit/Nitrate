@@ -1,11 +1,7 @@
 {% extends "tcms_base.html" %}
 
-{% load comments %}
-
 {% block subtitle %}{{ test_run.summary }}{% endblock %}
 
-{% block custom_stylesheet %}
-{% endblock %}
 {% block custom_javascript %}
 <script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/progressbar/progressbar.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/fastinit.js"></script>
@@ -13,6 +9,11 @@
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testrun_actions.js'></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
 <script type="text/javascript">
+{#　Define the case_run_status array for all of case run status　#}
+Nitrate.TestRuns.CaseRunStatus = new Array();
+{% for crs in test_case_run_status %}
+Nitrate.TestRuns.CaseRunStatus.push('{{ crs.name|lower }}');
+{% endfor %}
 Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 </script>
 {% endblock %}
@@ -53,11 +54,14 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 		{% else %}
 		<input type="button" value="Clone" disabled="true"/>
 		{% endif %}
+		{% comment %}
+		{# The standalone execute page is not longer needed #}
 		{% if perms.testruns.change_testcaserun %}
 		<input type="button" value="Execute" title="Execute cases in this run" onclick="window.location.href='{% url tcms.testruns.views.execute test_run.pk %}'">
 		{% else %}
 		<input type="button" value="Execute" disabled="true">
 		{% endif %}
+		{% endcomment %}
 		{% if perms.testruns.delete_testrun %}
 		{% ifequal test_run.manager user %}
 		<input type="button" value="Delete" title="Delete the run" onclick="window.location.href='{% url tcms.testruns.views.delete test_run.pk %}'">
@@ -266,58 +270,56 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 	</div>
 	</div>
 	<div class="Detailform border-1">
-		<form id="id_form_case_runs">
-			<div class="mixbar"> 
-				{#}<span class="tit">Cases: {{ test_case_runs.count }}</span>{#}
-				<div class='mixbar_left'>
-					<select>
-						<option checked>Set Status</option>
-						<option>Idle</option>
-						<option>Running</option>
-						<option>Passed</option>
-						<option>Failed</option>
-						<option>Error</option>
-						<option>Blocked</option>
-						<option>Paused</option>
-						<option>Waived</option>
-					</select>
-					{% if perms.testruns.add_testcaserun %}
-					<input type='button' class='comment_add' value='Add Comment' title="Add comment to these selected cases">
-					<input type='button' class='bug_add' value='Add Bug' title="Add new bug to these selected cases">
-					{% else%}
-					<input type='button' class='comment_add_disable' value='Add Comment' title="Add comment to these selected cases">
-					<input type='button' class='bug_add_disable' value='Add Bug' title="Add new bug to these selected cases">
-					{% endif %}
-					<a class="assignee sprites" href="#" title="Assignee this case(s) to other people" onclick="changeCaseRunAssignee(this.up(2));">Assignee</a>
-					{% if perms.testruns.add_testcaserun %}
-					<a href="{% url tcms.testruns.views.assign_case test_run.run_id %}" class="add">Add Case</a>
-					{% else %}
-					<span class="adddisable grey sprites" >Add Case</span>
-					{% endif %}
-					{% if test_case_runs and perms.testruns.delete_testcaserun %}
-					<a class="deletelink" href="#" title="Remove selected cases form this test run" onclick="delCaseRun('{{ test_run.run_id }}');">Remove Case</a>
-					{% else %}
-					<span class="actions"><input type="button" disabled="true" class="delete" value="Remove case"/></span>
-					{% endif %}
-					{% if test_case_runs and perms.testruns.change_testcaserun %}
-					<a id="id_sort" class="sortlink" title="Click me,then Drag and drop the rows to adjust the order,and click 'Done Sorting' link to submit your changes">Re-order Cases</a>
-					<a title="Update the IDLE case runs to newest case text" href="update/" class="updatelink">Update</a>
-					{% else %}
-					<span class="sortlink grey" >Re-order Cases</span>
-					<span class="updategrey">Update</span>
-					{% endif %}
-				</div>
-				<div class="reorder_case">
-					<input id="id_check_box_auto_blinddown" type="checkbox" checked=true />
-					<label for="id_check_box_auto_blinddown"> Automatically display next test case</label>
-					<input id="id_check_box_blinddownallcase" type="checkbox" />
-					<label for="id_check_box_blinddownallcase"> Expand all case</label>
-					<input id="id_check_box_highlight" type="checkbox" />
-					<label for="id_check_box_highlight">Highligt My Assigned Runs</label>
-				</div>
+		<div class="mixbar"> 
+			{#}<span class="tit">Cases: {{ test_case_runs.count }}</span>{#}
+			<div class='mixbar_left'>
+				<select name="case_run_status">
+					<option>Set Status</option>
+					{% for tcrs in test_case_run_status %}
+					<option value="{{ tcrs.pk }}">{{ tcrs }}</option>
+					{% endfor %}
+				</select>
+				{% if perms.comments.add_comment %}
+				<input type='button' class='comment_add' value='Add Comment' title="Add comment to these selected cases">
+				{% else%}
+				<input type='button' class='comment_add_disable' value='Add Comment' title="Add comment to these selected cases">
+				{% endif %}
+				{% comment %}
+				{% if perms.testcases.add_testcasebug %}
+				<input type='button' class='bug_add' value='Add Bug' title="Add new bug to these selected cases">
+				{% else %}
+				<input type='button' class='bug_add_disable' value='Add Bug' title="Add new bug to these selected cases">
+				{% endif %}
+				{% endcomment %}
+				{% if perms.testruns.change_testcaserun %}
+				<a class="assignee sprites" href="#" title="Assignee this case(s) to other people" onclick="changeCaseRunAssignee(this.up(2));">Assignee</a>
+				{% endif %}
+				{% if perms.testruns.add_testcaserun %}
+				<a href="{% url tcms.testruns.views.assign_case test_run.run_id %}" class="add">Add Case</a>
+				{% else %}
+				<span class="adddisable grey sprites" >Add Case</span>
+				{% endif %}
+				{% if perms.testruns.delete_testcaserun %}
+				<a class="deletelink" href="#" title="Remove selected cases form this test run" onclick="delCaseRun('{{ test_run.run_id }}');">Remove Case</a>
+				{% else %}
+				<span class="actions"><input type="button" disabled="true" class="delete" value="Remove case"/></span>
+				{% endif %}
+				{% if perms.testruns.change_testcaserun %}
+				<a id="id_sort" class="sortlink" title="Click me,then Drag and drop the rows to adjust the order,and click 'Done Sorting' link to submit your changes">Re-order Cases</a>
+				<a title="Update the IDLE case runs to newest case text" href="update/" class="updatelink">Update</a>
+				{% else %}
+				<span class="sortlink grey" >Re-order Cases</span>
+				<span class="updategrey">Update</span>
+				{% endif %}
 			</div>
-			{% include 'run/get_case_runs.html' %}
-		</form>
+			<div class="reorder_case">
+				<input id="id_check_box_auto_blinddown" type="checkbox" checked="true" />
+				<label for="id_check_box_auto_blinddown">Automatically display next test case</label>
+				<input id="id_check_box_highlight" type="checkbox" />
+				<label for="id_check_box_highlight">Highligt My Assigned Runs</label>
+			</div>
+		</div>
+		{% include 'run/get_case_runs.html' %}
 	</div>
 </div>
 {% endblock %}

@@ -301,7 +301,7 @@ def get(request, run_id, template_name = 'run/get.html'):
         'from_plan': request.GET.get('from_plan', False),
         'test_case_runs': tcrs,
         'test_case_run_bugs': tcr_bugs,
-        'test_case_run_status': TestCaseRunStatus.objects.order_by('pk')
+        'test_case_run_status': TestCaseRunStatus.objects.order_by('pk'),
     })
 
 @user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))

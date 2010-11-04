@@ -1,6 +1,6 @@
 {% load comments %}
 
-<td id="id_case_text_{{ forloop.counter }}" colspan="12">
+<td colspan="12">
 	<table class="case_detail">
 		<tr>
 			<td valign="top">
@@ -14,6 +14,9 @@
 			<td valign="top" rowspan="2" width="200">
 				<h4><span class="title strong">Attachment:</span></h4>
 				<ul class="ul-no-format">
+					{% if perms.management.add_testattachment %}
+					<li><a href="{% url tcms.testcases.views.attachment test_case_run.case_id %}?from_plan={{ testrun.plan_id }}" class="addlink" target="_blank">Add Attachment</a></li>
+					{% endif %}
 					{% for attachment_file in test_case.attachment.all %}
 					<li>
 						<a href="{% url tcms.core.files.check_file attachment_file.attachment_id %}">
@@ -27,7 +30,7 @@
 				<h4><span class="title strong">Component:</span></h4>
 				<ul class="ul-no-format">
 					{% for component in test_case.component.all %}
-					<li id="display_component" >{{ component.name }}</li>
+					<li>{{ component.name }}</li>
 					{% empty %}
 					<li class="grey">No component found</li>
 					{% endfor %}
@@ -42,7 +45,13 @@
 				</ul>
 				<h4><span class="title strong">bug:</span></h4>
 				<ul class="ul-no-format">
-					{% for bug in bugs %}
+					<li>
+						<a href="{% url tcms.testruns.views.bug test_case_run.pk %}?a=file" target="_blank" class="buglink" title="File a bug on bugzilla">File</a>
+						{% if perms.testcases.add_testcasebug %}
+						<a href="javascript:void(0);" class="addlink" title="Add" onclick="addCaseRunBug(this.up(7).previous(), this.up(7), {{ test_case_run.case_id }}, {{ test_case_run.pk }})">Add</a>
+						{% endif %}
+					</li>
+					{% for bug in test_case_run.get_bugs %}
 					<li>
 						<a href="{{ bug.get_absolute_url }}">{{ bug }}</a>
 						{% if bug.case_run_id %}
@@ -79,17 +88,53 @@
 		<tr>
 			<td colspan="3" style="border:none; background:none">
 				{% get_comment_list for test_case_run as case_run_comments %}
-				<h4> Comments:</h4>
+				<h4>Comments:</h4>
 				<ul class="comment ul-no-format">
 					{% for comment in case_run_comments %}
 					<li>
+						<span class="strong">#{{ forloop.counter }}</span>
 						<span class="strong">{{ comment.user.email }}</span>
 						<span class="grey">{{ comment.submit_date }}</span><br/>
 					{{ comment.comment|linebreaksbr }} 
 					</li>
 					{% endfor %}
 				</ul>
-				
+				{% if perms.comments.add_comments %}
+				<form class="update_form" method="POST">
+					<table cellspacing="0" cellspan="0">
+						{% get_comment_form for test_case_run as comment_form %}
+						{{ comment_form.as_table }}
+						<tr>
+							<td>
+							</td>
+							<td align="right">
+								<input type="hidden" name="type" value="html" />
+								<input type="hidden" name="field" value="case_run_status" />
+								<input type="hidden" name="case_id" value="{{ test_case_run.case.pk }}" />
+								<input type="hidden" name="assignee" value="{{ test_case_run.assignee.pk }}" />
+								<input type="hidden" name="tested_by" value="{{ test_case_run.tested_by.pk }}" />
+								<input type="hidden" name="value" value="" />
+								{% if perms.testruns.change_testcaserun %}
+								{% for crs in test_case_run_status %}
+								<input type="submit" class="btn btn_{{ crs.name.lower }}" value="" {% ifequal crs test_case_run.case_run_status %}disabled="True"{% endifequal %} onclick="this.form.value.value={{ crs.pk }}" />
+								{% endfor %}
+								{% endif %}
+								<input type="submit" class="submit-post" value="Submit">
+							</td>
+						</tr>
+					</table>
+				</form>
+				{% endif %}
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3">
+				<h4>Change Log</h4>
+				{% for log in test_case_run.log %}
+				<li>[{{ log.date }}] - [{{ log.who }}] - {{ log.action }}</li>
+				{% empty %}
+				<li class="grey">No log recorded.</li>
+				{% endfor %}
 			</td>
 		</tr>
 	</table>
