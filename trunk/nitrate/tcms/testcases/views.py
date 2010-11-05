@@ -1026,7 +1026,6 @@ def bug(request, case_id, template_name='case/get_bug.html'):
     func = getattr(case_bug_actions, request.REQUEST['handle'])
     return func()
 
-@user_passes_test(lambda u: u.has_perm('testcases.change_testcaseplan'))
 def plan(request, case_id):
     """
     Operating the case plan objects, such as add to remove plan from case
@@ -1061,11 +1060,25 @@ def plan(request, case_id):
         
         # Add case plan action
         if request.REQUEST['a'] == 'add':
+            if not request.user.has_perm('testcases.add_testcaseplan'):
+                return direct_to_template(request, 'case/get_plan.html', {
+                    'test_case': tc,
+                    'test_plans': tps,
+                    'message': 'Permission denied',
+                })
+            
             for tp in tps:
                 tc.add_to_plan(tp)
         
         # Remove case plan action
         if request.REQUEST['a'] == 'remove':
+            if not request.user.has_perm('testcases.change_testcaseplan'):
+                return direct_to_template(request, 'case/get_plan.html', {
+                    'test_case': tc,
+                    'test_plans': tps,
+                    'message': 'Permission denied',
+                })
+            
             for tp in tps:
                 tc.remove_plan(tp)
     
