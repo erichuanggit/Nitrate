@@ -101,7 +101,7 @@
 				</ul>
 				{% if perms.comments.add_comments %}
 				<form class="update_form" method="POST">
-					<table>
+					<table class='noborder'>
 						{% get_comment_form for test_case_run as comment_form %}
 						<tr>
 							<td>
