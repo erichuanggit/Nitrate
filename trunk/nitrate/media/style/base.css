@@ -38,6 +38,7 @@ body { font-size:12px;width:100%;min-width:1200px;line-height:16px;font-family:V
 .no-border{border:none;}
 .no-background{background:transparent;}
 .grey{color:#999; cursor:default}
+.log_grey{color:graytext; cursor:default;font-size:12px;font-weight:normal;margin-left:10px;}
 .border-1{border:1px solid #ccc;}
 .border-bottom{border-bottom:1px solid #ccc;}
 .border-top{border-top:1px solid #ccc;}
@@ -176,7 +177,7 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .option_prefer{-moz-background-clip:border;-moz-background-inline-policy:continuous;-moz-background-origin:padding;background:#f3f8fc none repeat scroll 0 0;border:1px outset #999988;margin:0 1em 1em;padding:0.8em; text-align:left;float:right; margin-right:10px;}
 .option_prefer lable{ margin-left:5px;}
 .comment li{margin:5px 10px 5px 0;border-bottom:1px dotted #666; position:relative}
-.commentdelete{width:16px;float:right; display:block; background-position:0 -16px; margin-top:-18px;}
+.commentdelete{float:right; display:block; background-position:0 -15px;padding-left:13px; margin-right:5px;cursor:pointer;}
 table.noborder,table.noborder td{border:none;background:transparent;}
 
 
@@ -651,6 +652,7 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .toplinks{ margin-left:20px;}
 a.section:link,a.section:visited{ color:#fff}
 .cursor_move{ cursor:move;}
+.cursor_pointer{cursor:pointer;}
 .cell ul{ margin:0px 0 0 -5px; padding:0px;}
 .cell ul.ul-no-format li{ display:block;}
 .runexecute_icon{ float:left; margin:5px 8px;}
