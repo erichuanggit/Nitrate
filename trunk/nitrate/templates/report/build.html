@@ -94,6 +94,11 @@ Nitrate.Utils.after_page_load(Nitrate.Report.Builds.on_load);
 					<td>{{ case_run_count.RUNNING }}</td>
 					<td>{{ case_run_count.RUNNING_percent|default:'0'|floatformat }}%</td>
 				</tr>
+				<tr class="variety_waived">
+					<td>WAIVED</td>
+					<td>{{ case_run_count.WAIVED }}</td>
+					<td>{{ case_run_count.WAIVED_percent|default:'0'|floatformat }}%</td>
+				</tr>
 			</table>
 			<!--end data of status of caserun -->
 		</divs>
