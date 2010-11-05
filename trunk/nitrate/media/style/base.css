@@ -191,9 +191,9 @@ table.noborder,table.noborder td{border:none;background:transparent;}
 /**************************buttons************************/
 .toolbar{ margin:0 0 2px 10px}
 .toolbar a{color:#fff;}
-.toolbar ul li{ list-style:none; padding:0px 10px;height:30px;line-height:30px; position:relative;background:#f7f7f7 url(/media/images/toolbar_bg.png) repeat-x left top; display:inline-block;-moz-border-radius: 5px;-khtml-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px; border:solid 1px #f1f0f0; cursor:pointer;z-index:0px;}
+.toolbar ul li{ list-style:none; padding:6px 10px;height:18px; position:relative;background:#f7f7f7 url(/media/images/toolbar_bg.png) repeat-x left top; display:inline-block;-moz-border-radius: 5px;-khtml-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px; border:solid 1px #f1f0f0; cursor:pointer;z-index:0px;}
 .toolbar ul ul{display:none;}
-.toolbar li:hover ul{display:block;position:absolute;top:27px;left:-2px; padding:5px;min-width:100px;background:#fafafa;border:solid 1px #235d9f;border-top:none;-moz-border-radius-bottomright:5px;-moz-border-radius-bottomleft:5px;z-index:1000;}
+.toolbar li:hover ul{display:block;position:absolute;top:27px;left:-2px; padding:5px;min-width:100px;background:#fafafa;border:solid 1px #235d9f;border-top:none;-moz-border-radius-bottomright:5px;-moz-border-radius-bottomleft:5px;-webkit-border-bottom-right-radius:5px;-webkit-border-bottom-left-radius:5px;z-index:1000;}
 .toolbar li:hover ul li{display:block; background:none;border:none;margin:0px;padding:0px 5px; height:25px;line-height:25px;}
 .toolbar_case{background-position: 0 -821px;padding-left:18px}
 .toolbar_run{background-position: 0 -837px;padding-left:18px}
