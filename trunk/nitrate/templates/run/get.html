@@ -292,7 +292,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 				{% endif %}
 				{% endcomment %}
 				{% if perms.testruns.change_testcaserun %}
-				<a class="assignee sprites" href="#" title="Assignee this case(s) to other people" onclick="changeCaseRunAssignee(this.up(2));">Assignee</a>
+				<a class="assignee sprites" href="#" title="Assignee this case(s) to other people" onclick="changeCaseRunAssignee(this.up(2).next());">Assignee</a>
 				{% endif %}
 				{% if perms.testruns.add_testcaserun %}
 				<a href="{% url tcms.testruns.views.assign_case test_run.run_id %}" class="add">Add Case</a>

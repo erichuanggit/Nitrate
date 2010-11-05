@@ -813,7 +813,7 @@ function removeRunCC(run_id, user, container)
     constructRunCC(container, run_id, parameters)
 }
 
-function changeCaseRunAssignee(form)
+function changeCaseRunAssignee(table)
 {
     var p = prompt('Please type new email or username for assignee');
     if(!p)
@@ -827,7 +827,29 @@ function changeCaseRunAssignee(form)
     getInfoAndUpdateObject(
         parameters,
         'testruns.testcaserun',
-        form.serialize(true).case_run,
+        serializeCaseRunFromInputList(table),
         'assignee'
     )
 }
+
+function serializeCaseRunFromInputList(table)
+{
+    var elements = $(table).adjacent('input[name="case_run"]:checked');
+    var returnobj = new Array();
+    for (i in elements) {
+        if (typeof(elements[i].value) == 'string')
+        returnobj.push(elements[i].value);
+    };
+    return returnobj
+}
+
+function serialzeCaseForm(form, table, serialized)
+{
+    if(typeof(serialized) != 'boolean')
+    var serialized = true;
+    var data = form.serialize(serialized);
+    data['case_run'] = serializeCaseFromInputList(table);
+    return data
+}
+
+
