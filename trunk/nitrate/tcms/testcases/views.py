@@ -177,7 +177,7 @@ def new(request, template_name = 'case/new.html'):
                     if not self.plan:
                         raise Http404
                     
-                    return HttpResponseRedirect(
+                    return HttpResponseRedirect('%s#reviewcases' %
                         reverse('tcms.testplans.views.get', args=[self.plan.pk, ]),
                     )
             
