@@ -94,12 +94,26 @@ Nitrate.TestRuns.Details.on_load = function()
         var case_text_version = c.getElementsBySelector('input[name="case_text_version"]')[0].value;
         var type = 'case_run';
         var callback = function(t) {
-            c_container.getElementsBySelector('.update_form')[0].observe('submit', updateCaseRunStatus);
+            // Observe the update case run stauts/comment form
+            c_container.adjacent('.update_form').invoke('stopObserving', 'submit');
+            c_container.adjacent('.update_form').invoke('observe', 'submit', updateCaseRunStatus);
+            
+            // Observe the delete comment form
+            var refresh_case = function(t) {
+                constructCaseRunZone(c_container, c, case_id);
+            }
+            
+            var rc_callback = function(e) {
+                e.stop();
+                if(!confirm(default_messages.confirm.remove_comment))
+                    return false;
+                removeComment(this, refresh_case)
+            };
+            c_container.adjacent('.form_comment').invoke('stopObserving', 'submit');
+            c_container.adjacent('.form_comment').invoke('observe', 'submit', rc_callback);
         }
-        
         toggleTestCaseContents(type, c, c_container, case_id, case_text_version, case_run_id, callback);
-    }
-    
+    }    
     $$('.expandable').invoke('observe', 'click', toggle_case_run);
 }
 
@@ -222,7 +236,7 @@ var updateCaseRunStatus = function(e)
         
         // Update the contents
         if (parameters['value'] != '') {
-			// Update the case run status icon
+            // Update the case run status icon
             var crs = Nitrate.TestRuns.CaseRunStatus;
             var icon_status = title.getElementsBySelector('.icon_status');
             icon_status.each(function(item) {
@@ -384,9 +398,9 @@ function constructCaseRunZone(container, title_container, case_id)
     var link = title_container.getElementsBySelector('.expandable')[0];
     console.log(link);
     if(container) {
-		var td = new Element('td', {'id': 'id_loading_' + case_id, 'colspan': 12});
+        var td = new Element('td', {'id': 'id_loading_' + case_id, 'colspan': 12});
         td.update(getAjaxLoading());
-		container.update(td);
+        container.update(td);
     }
     
     if(title_container) {
@@ -404,7 +418,7 @@ function addCaseRunBug(title_container, container, case_id, case_run_id, callbac
     if(!bug_id)
         return false
     debug_output(title_container);
-	debug_output(container);
+    debug_output(container);
     if(parseInt(bug_id) != bug_id) {
         alert('Wrong number.');
         return false;
@@ -464,25 +478,25 @@ function removeCaseRunBug(bug_id, parameters, callback)
     }
     
    var success = function(t) {
-		var returnobj = t.responseText.evalJSON();
-		
-		if(returnobj.rc == 0) {
-			if (callback)
-				return callback();
-			
-			return constructCaseRunZone(container, title_container);
-		} else {
-			alert(returnobj.response);
-			return false;
-		}
-	}
-	
-	new Ajax.Request(url, {
-		method: 'get',
-		parameters: parameters,
-		onSuccess: success,
-		onFailure: json_failure,
-	})
+        var returnobj = t.responseText.evalJSON();
+        
+        if(returnobj.rc == 0) {
+            if (callback)
+                return callback();
+            
+            return constructCaseRunZone(container, title_container);
+        } else {
+            alert(returnobj.response);
+            return false;
+        }
+    }
+    
+    new Ajax.Request(url, {
+        method: 'get',
+        parameters: parameters,
+        onSuccess: success,
+        onFailure: json_failure,
+    })
 }
 
 

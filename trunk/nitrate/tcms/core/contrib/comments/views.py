@@ -151,8 +151,7 @@ def delete(request, next=None):
                 request = request,
             )
     
-    if request.is_ajax():
-        return HttpResponse(simplejson.dumps(ajax_response))
-    
-    return next_redirect(request.POST.copy(), next, delete_done, c=comment.pk)
+
+    return HttpResponse(simplejson.dumps(ajax_response))
+    #return next_redirect(request.POST.copy(), next, delete_done, c=comment.pk)
 delete = permission_required("comments.can_moderate")(delete)

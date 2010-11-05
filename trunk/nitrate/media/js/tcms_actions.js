@@ -110,6 +110,7 @@ var default_messages = {
         'change_case_priority': 'Are you sure you want to change the priority?',
         'remove_case_component': 'Are you sure you want to delete these component(s)?\nThe action will unable to undo.',
         'remove_bookmark': 'Are you sure you wish to delete these bookmarks?',
+        'remove_comment': 'Are you sure to delete the comment?',
         'remove_tag': 'Are you sure you wish to delete the tag(s)'
     },
     'link': {
@@ -169,7 +170,9 @@ function getURLParam()
     param.url_case_run_bug = '/caserun/' + id + '/bug/';
     param.url_case_run_set_current = '/caserun/' + id + '/current/';
     
-    param.url_runs_env_value = '/runs/env_value/'
+    param.url_runs_env_value = '/runs/env_value/';
+
+    param.url_comments_remove = '/comments/delete/';
 
     param.url_manage_env_categories = '/management/environments/categories/';
     param.url_manage_env_properties = '/management/environments/properties/';
@@ -954,6 +957,20 @@ function bindCommentDeleteLink(container, parameters)
             parameters: d_form.serialize(),
             onSuccess: d_success,
         })
+    })
+}
+
+function removeComment(form, callback)
+{
+    var url = form.action;
+    var method = form.method;
+    var parameters = form.serialize(true);
+    
+    new Ajax.Request(url, {
+        method: method,
+        parameters: parameters,
+        onSuccess: callback,
+        onFailure: json_failure,
     })
 }
 

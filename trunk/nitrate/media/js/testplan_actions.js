@@ -344,7 +344,7 @@ Nitrate.TestPlans.Details.on_load = function()
     var plan_id = Nitrate.TestPlans.Instance.pk;
     // regUrl('display_summary');
     
-	// Initial the contents
+    // Initial the contents
     constructTagZone('tag', { plan: plan_id });
     constructPlanComponentsZone('components');
     // TableKit.Sortable.init('testreview_table');
@@ -1046,19 +1046,48 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             // Review case content call back;
             var review_case_content_callback = function(e) {
                 var comment_container_t = new Element('div');
+                // Change status/comment callback
                 
-                content.adjacent('.update_form').invoke('observe', 'submit', function(e) {
+                var cc_callback = function(e) {
                     e.stop();
                     var params = this.serialize(true);
-                    submitComment(comment_container_t, params, function(t) {
+                    var refresh_case = function(t) {
                         var td = new Element('td', {colspan: 12});
                         var id = 'id_loading_' + params['object_pk'];
                         td.appendChild(getAjaxLoading(id));
                         content.update(td);
                         fireEvent(btn, 'click');
                         fireEvent(btn, 'click');
-                    })
-                });
+                    }
+                    submitComment(comment_container_t, params, refresh_case);
+                };
+                content.adjacent('.update_form').invoke('stopObserving', 'submit');
+                content.adjacent('.update_form').invoke('observe', 'submit', cc_callback);
+                
+                // Observe the delete comment form
+                var rc_callback = function(e) {
+                    e.stop();
+                    if(!confirm(default_messages.confirm.remove_comment))
+                        return false;
+                    var params = this.serialize(true);
+                    var refresh_case = function(t) {
+                        var returnobj = t.responseText.evalJSON();
+                        if (returnobj.rc != 0) {
+                            alert(returnobj.response);
+                            return false;
+                        }
+                    
+                        var td = new Element('td', {colspan: 12});
+                        var id = 'id_loading_' + params['object_pk'];
+                        td.appendChild(getAjaxLoading(id));
+                        content.update(td);
+                        fireEvent(btn, 'click');
+                        fireEvent(btn, 'click');
+                    }
+                    removeComment(this, refresh_case)
+                };
+                content.adjacent('.form_comment').invoke('stopObserving', 'submit');
+                content.adjacent('.form_comment').invoke('observe', 'submit', rc_callback);
             };
             
             switch(template_type) {
@@ -1070,8 +1099,8 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             }
             
             toggleTestCaseContents(template_type, title, content, case_id, nil, nil, case_content_callback);
-        })
-    }
+        });
+    };
     
     var url = getURLParam().url_search_case;
     new Ajax.Updater(container, url, {

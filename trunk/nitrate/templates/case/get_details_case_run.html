@@ -92,16 +92,27 @@
 				<ul class="comment ul-no-format">
 					{% for comment in case_run_comments %}
 					<li>
+						{% ifequal comment.user user %}
+						<form action="{% url tcms.core.contrib.comments.views.delete %}" method="get" class="form_comment">
+							<input type="hidden" name="comment_id" value="{{ comment.pk }}" />
+							<input type="hidden" name="object_pk" value="{{ test_case_run.case.pk }}" />
+							<span class="strong">#{{ forloop.counter }}</span>
+							<span class="strong">{{ comment.user.email }}</span>
+							<span class="grey">{{ comment.submit_date }}</span>
+							<br/>
+							{{ comment.comment|linebreaksbr }}
+							<input class='commentdelete sprites' value='Delete Comment' type='submit' /> 
+						</form>
+						{% else %}
 						<span class="strong">#{{ forloop.counter }}</span>
 						<span class="strong">{{ comment.user.email }}</span>
 						<span class="grey">{{ comment.submit_date }}</span>
-						<input class='btn_remove_comment commentdelete sprites' value='Delete Comment' type='button'>
 						<br/>
-					{{ comment.comment|linebreaksbr }} 
+						{% endifequal %}
 					</li>
 					{% endfor %}
 				</ul>
-				{% if perms.comments.add_comments %}
+				{% if perms.comments.add_comment %}
 				<form class="update_form" method="POST">
 					<table class='noborder'>
 						{% get_comment_form for test_case_run as comment_form %}
