@@ -271,8 +271,9 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 	</div>
 	<div class="Detailform border-1">
 		<div class="mixbar"> 
-			{#}<span class="tit">Cases: {{ test_case_runs.count }}</span>{#}
+			{# <span class="tit">Cases: {{ test_case_runs.count }}</span> #}
 			<div class='mixbar_left'>
+				{% comment %}
 				<select name="case_run_status">
 					<option>Set Status</option>
 					{% for tcrs in test_case_run_status %}
@@ -284,7 +285,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 				{% else%}
 				<input type='button' class='comment_add_disable' value='Add Comment' title="Add comment to these selected cases">
 				{% endif %}
-				{% comment %}
 				{% if perms.testcases.add_testcasebug %}
 				<input type='button' class='bug_add' value='Add Bug' title="Add new bug to these selected cases">
 				{% else %}

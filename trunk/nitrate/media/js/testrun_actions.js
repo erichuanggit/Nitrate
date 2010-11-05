@@ -54,11 +54,6 @@ Nitrate.TestRuns.List.on_load = function()
 
 Nitrate.TestRuns.Details.on_load = function()
 {
-    // Open the selected case
-    if(window.location.hash) {
-        fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
-    }
-    
     // Observe the interface buttons
     if($('id_sort'))
         $('id_sort').observe('click', taggleSortCaseRun);
@@ -115,6 +110,17 @@ Nitrate.TestRuns.Details.on_load = function()
         toggleTestCaseContents(type, c, c_container, case_id, case_text_version, case_run_id, callback);
     }    
     $$('.expandable').invoke('observe', 'click', toggle_case_run);
+    
+    // Auto show the case run contents.
+    if(window.location.hash != '') {
+        fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
+    } else {
+        if($$('.is_current').length != 0) {
+            $$('.is_current').each(function(e) {
+                fireEvent(e.getElementsBySelector('.expandable')[0], 'click');
+            })
+        }
+    }
 }
 
 Nitrate.TestRuns.New.on_load = function()
