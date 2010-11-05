@@ -116,14 +116,14 @@ Nitrate.TestCases.Details.on_load = function()
     
     bindSelectAllCheckbox($('id_checkbox_all_components'), $('id_form_case_component'), 'component');
 
-    if($('id_table_cases')) {
-        TableKit.Sortable.init('id_table_cases',
-        {
-            rowEvenClass : 'roweven',
-            rowOddClass : 'rowodd',
-            nosortClass : 'nosort'
-        });
-    };
+   // if($('id_table_cases')) {
+     //   TableKit.Sortable.init('id_table_cases',
+       // {
+         //   rowEvenClass : 'roweven',
+           // rowOddClass : 'rowodd',
+            //nosortClass : 'nosort'
+        //});
+    //};
 
     var toggle_case_run = function(e) {
         var c = this.up(); // Container
