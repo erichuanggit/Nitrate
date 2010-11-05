@@ -34,6 +34,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 				<h2>Search Test Run</h2>
 				{% include 'run/form/search.html' %}
 			</div>
+			{% comment %}
 			<div>
 				<div class="relativeSearchTitle">Case Information Option<div class="down" id="relativeSearchOption_case"></div></div>
 				<div class="relativeSearchBox" style="display:none" id="relativeSearch_case">
@@ -41,6 +42,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 					<div class="clear"></div>
 				</div>
 			</div>
+			{% endcomment %}
 			<div class="bottom">
 				<input type="submit" size="7" value="Search" />
 				<input type="reset" size="7"  value="Reset" />
