@@ -101,13 +101,22 @@
 				</ul>
 				{% if perms.comments.add_comments %}
 				<form class="update_form" method="POST">
-					<table cellspacing="0" cellspan="0">
+					<table>
 						{% get_comment_form for test_case_run as comment_form %}
-						{{ comment_form.as_table }}
 						<tr>
 							<td>
+								{{ comment_form.comment }}
+								{{ comment_form.content_type }}
+								{{ comment_form.object_pk }}
+								{{ comment_form.timestamp }}
+								{{ comment_form.security_hash }}
+								{{ comment_form.name }}
+								{{ comment_form.email }}
+								{{ comment_form.url }}
 							</td>
-							<td align="right">
+						</tr>
+						<tr>
+							<td>
 								<input type="hidden" name="type" value="html" />
 								<input type="hidden" name="field" value="case_run_status" />
 								<input type="hidden" name="case_id" value="{{ test_case_run.case.pk }}" />

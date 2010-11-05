@@ -177,6 +177,7 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .option_prefer lable{ margin-left:5px;}
 .comment li{margin:5px 0px;border:1px outset #fff; position:relative}
 .commentdelete{width:16px;float:right; display:block; background-position:0 -16px; margin-top:-18px;}
+.update_form table,.update_form table td,.update_form table th{border:none;background:transparent;}
 
 /*****************************LAYOUT****************/
 #content{width:100%;float:left;z-index:1;}
@@ -269,8 +270,9 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .login .message{ color:red; text-align:center; }
 .login .login_table td .lab{ text-align:left; } 
 .login input[type='text'],.login input[type='password']{height:25px; border:solid 1px #ccc; width:250px;}
-.loginbutton{ background-position:5px -80px; background-color:#fff; height:26px; line-height:26px; padding:0 10px 0 24px;-moz-border-radius: 3px;-khtml-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px; border:solid 1px #ccc;}
+.loginbutton{ background-position:5px -80px; background-color:#fff; height:26px; line-height:26px; padding:0 10px 0 24px;-moz-border-radius: 3px;-khtml-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px; border:solid 1px #ccc;cursor:pointer;}
 .resetbutton{ background-position:5px -80px; background-color:#fff; height:26px; line-height:26px; padding:0 10px 0 24px;-moz-border-radius: 3px;-khtml-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px; border:solid 1px #ccc;}
+.cc{ margin:10px 0 0 20px;}
 /***********************End Home***************************/
 
 /***********************Admin Start***************************/
