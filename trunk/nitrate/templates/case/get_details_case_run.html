@@ -151,12 +151,17 @@
 		</tr>
 		<tr>
 			<td colspan="3">
-				<h4>Change Log</h4>
+				{% if test_case_run.log %}
+				<h4 onclick='this.next().toggle()' class='cursor_pointer'>Change Log<span class='log_grey'>Click to show detail information</span></h4>
+				<ul style='display:none'>
 				{% for log in test_case_run.log %}
 				<li>[{{ log.date }}] - [{{ log.who }}] - {{ log.action }}</li>
-				{% empty %}
-				<li class="grey">No log recorded.</li>
 				{% endfor %}
+				</ul>
+				{% else %}
+				<h4>Change Log</h4>
+				<ul><li class="grey">No log recorded.</li></ul>
+				{% endif %}
 			</td>
 		</tr>
 	</table>
