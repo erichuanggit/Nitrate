@@ -117,13 +117,13 @@
 					<input type="submit" value="{{ status }}" {% ifequal status test_case.case_status %}disabled="True"{% endifequal %} nclick="this.form.value='{{ tcs.pk }}'" />
 					{% endfor %}
 					{% endcomment %}
-					<input type="submit" class="submit-post margin-top">
+					<input type="submit" class="submit-post margin-top" value='Add Comment'>
 				</form>
 			</td>
 		</tr>
 		<tr>
 			<td colspan="3" class="row">
-				{% include 'case/get_details_case_log.html.html' %}
+				{% include 'case/get_details_case_log.html' %}
 			</td>
 		</tr>
 	</table>

@@ -72,10 +72,12 @@
 				<div class="content">{{ test_case.notes|urlize|linebreaksbr }}</div>
 			</td>
 		</tr>
+		{% comment %}
 		<tr>
 			<td colspan="3" class="row">
 				{% include 'case/get_details_case_log.html' %}
 			</td>
 		</tr>
+		{% endcomment %}
 	</table>
 </td>
