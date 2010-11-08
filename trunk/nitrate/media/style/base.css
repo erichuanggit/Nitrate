@@ -125,7 +125,7 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .spacer a:hover{color:#DC6F20;}
 .selected_tab{width:150px;color:#fff;font-weight:bold;-moz-border-radius:2px 2px 2px 2px;height:20px;float:left;padding-left:2px;}
 .clickable_area{background-color:#ccc;width:30%;}
-.mixbar{background:url("../images/action_bg.png") repeat-x left top #e6e6e6;width:100%;clear:both;border-bottom:1px solid #ccc; padding:3px 0;float:left;margin-top:4px;position:relative;}
+.mixbar{background:url("../images/action_bg.png") repeat-x left top #e6e6e6;width:100%;clear:both;border-bottom:1px solid #ccc; padding:3px 0;float:left;position:relative;}
 .mixbar_left{float:left; height:22px;line-height:22px;padding-left:5px;}
 .tagname{ margin-left:10px; height:20px; line-height:20px; float:left}
 .taglist{ margin-left:5px; float:left;line-height:20px; width:90%;}
@@ -565,7 +565,7 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .tab_navigation .hyperlink{ color:#FFF; margin-left:10px; float:left;}
 .tab_navigation .hyperlink a{ color:#f3f8fd;}
 .tab_navigation label{ margin-left:10px; float:left; color:#fff}
-.reorder_case{ position:absolute; right:5px; top:3px;}
+.reorder_case{ position:absolute; right:5px; top:5px;}
 #container { width:98%; margin-left:1%; float:left;}
 #id_upload_files{ float:left; width:95%; text-align:left; margin-left:10px;}
 #id_upload_files a{ margin-left:100px; color:red;}
