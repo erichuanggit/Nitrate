@@ -18,39 +18,27 @@
 
 from django import forms
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 from django.utils.translation import ugettext_lazy as _
 
-class RegistrationForm(forms.ModelForm):
-    username = forms.CharField(max_length=30)
+class RegistrationForm(UserCreationForm):
     email = forms.EmailField(max_length=30)
-    password1 = forms.CharField(
-        max_length=30, widget=forms.PasswordInput(render_value=False),
-    )
-    password2 = forms.CharField(
-        max_length=30, widget=forms.PasswordInput(render_value=False),
-    )
     
     class Meta:
         model = User
         fields = ("username",)
     
-    def clean_username(self):
-        username = self.cleaned_data["username"]
+    def clean_email(self):
+        email = self.cleaned_data['email']
         try:
-            User.objects.get(username=username)
+            User.objects.get(email=email)
         except User.DoesNotExist:
-            return username
-        raise forms.ValidationError(_("A user with that username already exists."))
-    
-    def clean_password2(self):
-        password1 = self.cleaned_data.get("password1", "")
-        password2 = self.cleaned_data["password2"]
-        if password1 != password2:
-            raise forms.ValidationError(_("The two password fields didn't match."))
-        return password2
+            return email
+        raise forms.ValidationError(_("A user with that email already exists."))
     
     def save(self, commit=True):
         user = super(RegistrationForm, self).save(commit=False)
+        user.email = self.cleaned_data['email']
         user.is_active = False
         user.set_password(self.cleaned_data["password1"])
         if commit:
@@ -61,18 +49,23 @@ class RegistrationForm(forms.ModelForm):
         from models import UserActivateKey
         return UserActivateKey.set_random_key_for_user(user = self.instance)
     
-    def send_confirm_mail(self, request, active_key, template_name = 'registeration/confirm_email.html'):
-        from tcms.core.utils import mailto
-        sn = request.get_host()
-        cu = sn + active_key.activation_key
+    def send_confirm_mail(self, request, active_key, template_name = 'registration/confirm_email.html'):
+        from django.conf import settings
+        from django.core.urlresolvers import reverse
+        from django.contrib.sites.models import Site
+        from tcms.core.utils import mailto, request_host_link
+        s = Site.objects.get(pk = settings.SITE_ID)
+        cu = '%s%s' % (
+            request_host_link(request, s.domain),
+            reverse('tcms.core.contrib.auth.views.confirm', args=[active_key.activation_key, ])
+        )
         mailto(
             template_name = template_name, to_mail = self.cleaned_data['email'],
-            subject = 'Your new %s account confirmation' % sn,
+            subject = 'Your new %s account confirmation' % s.domain,
             context = {
                 'user': self.instance,
+                'site': s,
                 'active_key': active_key,
                 'confirm_url': cu,
             }
         )
-        
-        return

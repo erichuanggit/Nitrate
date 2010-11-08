@@ -112,15 +112,15 @@ def confirm(request, activation_key):
         ))
     
     # Check the key expires date
-    if ak.key_expires < datetime.datetime.today():
-        ak.delete()
-        msg = 'They key is expired, please need re-register your account again.'
-        return HttpResponse(Prompt.render(
-            request = request,
-            info_type = Prompt.Info,
-            info = msg,
-            next = request.REQUEST.get('next', reverse('tcms.core.views.index'))
-        ))
+    #if ak.key_expires < datetime.datetime.today():
+    #    ak.delete()
+    #    msg = 'They key is expired, please need re-register your account again.'
+    #    return HttpResponse(Prompt.render(
+    #        request = request,
+    #        info_type = Prompt.Info,
+    #        info = msg,
+    #        next = request.REQUEST.get('next', reverse('tcms.core.views.index'))
+    #    ))
     
     # All thing done, start to active the user and use the user login
     user = ak.user
@@ -135,5 +135,5 @@ def confirm(request, activation_key):
         request = request,
         info_type = Prompt.Info,
         info = msg,
-        next = request.REQUEST.get('next', reverse('tcms.profiles.views.profile'))
+        next = request.REQUEST.get('next', reverse('tcms.profiles.views.redirect_to_profile'))
     ))
