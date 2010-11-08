@@ -476,7 +476,7 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .run_evenRow{ background:#f1f1f1; width:100%; clear:both; padding:3px 0px; float:left;}
 .run_oddRow{ background:#fff; width:100%; padding:3px 0px; clear:both;}
 .run_current{ background:#f3f8fc;}
-.highlight{ background: yellow !important;}
+.highlight{ background: #ffffca !important;}
 .caes_run label{ margin-right:10px; width:120px;}
 .case_run .row{ float:left; clear:both; width:98%; margin-left:1%; padding-top:5px;}
 .case_run .exist_comments ,.case_run .new_comment{ float:left; width:100%; margin:5px 0; }
