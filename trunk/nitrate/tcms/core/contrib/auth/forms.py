@@ -50,11 +50,10 @@ class RegistrationForm(UserCreationForm):
         return UserActivateKey.set_random_key_for_user(user = self.instance)
     
     def send_confirm_mail(self, request, active_key, template_name = 'registration/confirm_email.html'):
-        from django.conf import settings
         from django.core.urlresolvers import reverse
         from django.contrib.sites.models import Site
         from tcms.core.utils import mailto, request_host_link
-        s = Site.objects.get(pk = settings.SITE_ID)
+        s = Site.objects.get_current()
         cu = '%s%s' % (
             request_host_link(request, s.domain),
             reverse('tcms.core.contrib.auth.views.confirm', args=[active_key.activation_key, ])
