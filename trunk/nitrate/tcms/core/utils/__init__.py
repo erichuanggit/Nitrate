@@ -58,3 +58,14 @@ def calc_percent(x, y):
         return 0
     
     return float(x)/y*100
+
+def request_host_link(request, domain_name = None):
+    if request.is_secure():
+        protocol = 'https://'
+    else:
+        protocol = 'http://'
+    
+    if not domain_name:
+        domain_name = request.get_host()
+    
+    return protocol + domain_name
