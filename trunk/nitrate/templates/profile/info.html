@@ -40,7 +40,7 @@ Nitrate.Utils.after_page_load(Nitrate.Profiles.Infos.on_load);
 						<input type="hidden" name="user" value="{{ user.pk }}" />
 						{% if AUTH_BACKEND.can_register %}
 						{{ form.username }}
-						<a href="#">Change password</a>
+						<a href="{% url django.contrib.auth.views.password_change %}">Change password</a>
 						{% else %}
 						{{ user_profile.username }}
 						{% endif %}
