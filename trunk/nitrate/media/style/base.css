@@ -45,6 +45,7 @@ body { font-size:12px;width:100%;min-width:1200px;line-height:16px;font-family:V
 .border-left{border-left:1px solid #ccc;}
 .border-right{border-right:1px solid #ccc;}
 .background-light-grey{background:#f5f5f5;}
+.margin-bottom{margin-bottom:10px;}
 .margin-top{ margin-top:10px;}
 .marginLeft{ margin-left:10px;}
 .paddingLeft{ padding-left:10px;}
