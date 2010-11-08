@@ -699,6 +699,8 @@ a:link.remove,a:visited.remove{ color:#333;}
 .boxnotype .boxtitle{ font-weight:bold; margin:8px 10px;}
 .boxnotype ul,.linotype ol{ list-style-type:none;display:block; margin-left:10px;}
 .boxnotype li{ margin:5px 0;}
+.boxdotted{padding:10px; border:dotted 1px #ccc;}
+.boxdotted ul li{list-style-type:disc;margin:3px 0;}
 ul.clone_multiple_option{ margin:10px 0;}
 ul.clone_multiple_option li{ display:inline; list-style:none; margin:0px 5px 0 10px;}
 .clone_multiple_button{ width:98%; margin:10px auto;}
