@@ -435,10 +435,10 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .runsDetail .cell .button{ float:left; margin-top:12px; margin-left:5px;}
 .runsDetail .cell .note{ float:left; width:400px; text-align:justify; }
 .runsDetail .cell .note strong{ color:#000;}
-.statu{ width:200px; margin-right:10px; margin-bottom:10px; text-align:center; }
-.statu table{ margin:0 auto; width:100%; background:#fff; border:1px solid #ddd; }
-.statu table td{ background:#f6f6f6; height:18px; }
-.statu table th{ padding-left:2px; background:#f4f4f4; font-weight:normal; text-align:center; height:20px }
+.statu{ width:200px; margin:-40px 10px 10px 0;  text-align:center; }
+.statu table{ margin:0 auto; width:100%; background:#fff; border:1px solid #ddd;border-collapse:collapse; }
+.statu table td{ background:#fff; height:18px;border-bottom:1px solid #ddd;border-collapse:collapse; }
+.statu table th{ padding-left:2px; background:#f4f4f4; font-weight:normal; text-align:center; height:22px; border-right:1px solid #ddd;border-bottom:1px solid #ddd;border-collapse:collapse;}
 .runsDetail .cell .lab{ color:#3E5161; width:130px; vertical-align:top; }
 .runsDetail .check{ line-height:30px; color:#245B82; font-weight:600; float:left; padding:10px; }
 /*********************************Executing run ***************************/

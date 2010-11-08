@@ -84,55 +84,55 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 				<td valign="top"><a href="{{ test_run.get_url_path }}">[{{ test_run.pk }}] {{ test_run.summary }}</a></td>
 				<td valign="top">
                 {% if test_run.IDLE %}
-                <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=idel">{{ test_run.IDLE }}</a>
+                <a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=idel">{{ test_run.IDLE }}</a>
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.RUNNING %}
-                <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=running">{{ test_run.RUNNING }}</a>
+                <a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=running">{{ test_run.RUNNING }}</a>
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.PAUSED %}
-                <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=paused">{{ test_run.PAUSED }}</a>
+                <a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=paused">{{ test_run.PAUSED }}</a>
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.PASSED %}
-                <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=passed">{{ test_run.PASSED }}</a>
+                <a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=passed">{{ test_run.PASSED }}</a>
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.FAILED %}
-                <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=failed">{{ test_run.FAILED }}</a>
+                <a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=failed">{{ test_run.FAILED }}</a>
                 {% else %}
                 {% endif%}
                 </td>
 				<td valign="top">
                 {% if test_run.BLOCKED %}
-                <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=blocked">{{ test_run.BLOCKED }}</a>
+                <a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=blocked">{{ test_run.BLOCKED }}</a>
                 {% else %}
                 {% endif%}
                 </td>
 				<td valign="top">
                 {% if test_run.ERROR %}
-                <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=error">{{ test_run.ERROR }}</a>
+                <a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=error">{{ test_run.ERROR }}</a>
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.WAIVED %}
-                <a href="{% url tcms.testruns.views.execute test_run.pk %}?case_run_status=waived">{{ test_run.WAIVED }}</a>
+                <a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=waived">{{ test_run.WAIVED }}</a>
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.case_run.count %}
-                <a href="{% url tcms.testruns.views.execute test_run.pk %}">{{ test_run.case_run.count }}</a>
+                <a href="{% url tcms.testruns.views.get test_run.pk %}">{{ test_run.case_run.count }}</a>
                 {% else %}
                 {% endif %}
                 </td>
@@ -172,7 +172,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 		{% ifequal test_case_run.case_run_status.name 'FAILED' %}
 		<tr>
 			<td valign="top" ><a href="{{ test_case_run.case.get_url_path }}">{{ test_case_run.case.pk }}</a></td>
-            <td valign="top"><a href="{% url tcms.testruns.views.execute test_case_run.run_id %}#caserun_{{ test_case_run.pk }}">{{ test_case_run.pk }}</a></td>
+            <td valign="top"><a href="{% url tcms.testruns.views.get test_case_run.run_id %}#caserun_{{ test_case_run.pk }}">{{ test_case_run.pk }}</a></td>
 			<td valign="top" >{{ test_case_run.case.summary }}</td>
 			<td valign="top" >{{ test_case_run.case.category }}</td>
 			<td valign="top" >{{ test_case_run.tested_by }}</td>
@@ -231,7 +231,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 		{% ifequal test_case_run.case_run_status.name 'BLOCKED' %}
 		<tr>
 			<td valign="top"><a href="{{ test_case_run.case.get_url_path }}">{{ test_case_run.case.pk }}</a></td>
-			<td valign="top"><a href="{% url tcms.testruns.views.execute test_case_run.run_id %}#caserun_{{ test_case_run.pk }}">{{ test_case_run.pk }}</td>
+			<td valign="top"><a href="{% url tcms.testruns.views.get test_case_run.run_id %}#caserun_{{ test_case_run.pk }}">{{ test_case_run.pk }}</td>
 			<td valign="top">{{ test_case_run.case.summary }}</td>
 			<td valign="top">{{ test_case_run.case.category }}</td>
 			<td valign="top">{{ test_case_run.tested_by }}</td>

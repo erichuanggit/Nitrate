@@ -18,11 +18,10 @@
 				<th align="left" width="80" class="text" >Manager</th>
 				<th align="left" width="120" class="text" >Default Tester</th>
 				<th align="left" width="150" class="date-iso" >Start date</th>
-				<th align="left" width="80" class="text">Status</th>
-	            <th align="left" width="130" class="number">Build</th>
+				<th align="left" width="130" class="number">Build</th>
+				<th align="center" width="70" class="text" >Status</th>
 				<th align="left" width="50" class="number">Cases</th>
 				<th align="left" width="110" class="number" >Completed</th>
-				<th class="nosort" align="left" width="80">Actions</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -38,8 +37,8 @@
 				<td valign="top"><a href="mailto:{{ test_run.manager.email }}">{{ test_run.manager }}</a></td>
 				<td valign="top"><a href="mailto:{{ test_run.default_tester.email }}">{{ test_run.default_tester }}</a></td>
 				<td valign="top">{{ test_run.start_date }}</td>
+				<td valign="top">{{ test_run.build }}</td>
 				<td valign="top">{% if test_run.stop_date %}Finished{% else %}Running{% endif %}</td>
-	            <td valign="top">{{ test_run.build }}</td>
 				<td valign="top" align='center'>{{ test_run.total_num_caseruns|default:"0" }}</td>
 				<td valign="top">
             
@@ -51,6 +50,7 @@
 						</div>
 					</div>
 				</td>
+				{% comment %}
 				<td >
 					{% if perms.testruns.change_testcaserun %}
 					<a class="golink" href="{% url tcms.testruns.views.execute test_run.run_id %}?from_plan={{ test_plan.plan_id }}">Execute</a>
@@ -58,6 +58,7 @@
 					<span class="golink grey" title="Please login">None</span>
 					{% endif %}
 				</td>
+				{% endcomment %}
 			</tr>
 			{% empty %}
 			<tr>

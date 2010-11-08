@@ -78,11 +78,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 	<div class="statu" style="float:right;">
 		<table cellpadding="1" cellspacing="1" border="0" onCreate="var complete_status = new ProgressBar( new ProgressBar( 'complete_status_{{ test_run.run_id }}', {classProgressBar: 'progressBar4', style: ProgressBar.DETERMINATE, selection: {{ test_run.complete_cases|floatformat:0 }}} );">
 			<tr>
-				<th colspan="2">Cases Status</th>
-			</tr>
-			<tr>
 				<td colspan="2" align="center">
-				
 				<div class="progress-bar" style="float:none">
 					<div class="percent">{{ test_case_runs.count_by_status.complete_percent|floatformat:2 }}%</div>
 					<div class="progress-inner" style="width:{{ test_case_runs.count_by_status.complete_percent|floatformat:"0" }}px;">
@@ -92,7 +88,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 						{% endcomment %}
 					</div>
 				</div>
-				
 				</td>
 			</tr>
 			{% for k, v in test_case_runs.count_by_status.count_data.items %}
@@ -100,9 +95,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 				<th width="50%;">{{ k }}</th>
 				{% if v and perms.testruns.change_testcaserun %}
 				<td>
-					<a href="{% url tcms.testruns.views.execute test_run.run_id %}?case_run_status={{ k }}">
 						{{ v }}
-					</a>
 				</td>
 				{% else %}
 				<td>
@@ -114,7 +107,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 			<tr>
 				<th>Total</th>
 				{% if test_case_runs.count_by_status.total and perms.testruns.change_testcaserun %}
-				<td><a href="{% url tcms.testruns.views.execute test_run.run_id %}">{{ test_case_runs.count_by_status.total }}</a></td>
+				<td>{{ test_case_runs.count_by_status.total }}</td>
 				{% else %}
 				<td>{{ test_case_runs.count_by_status.total }}</td>
 				{% endif %}
