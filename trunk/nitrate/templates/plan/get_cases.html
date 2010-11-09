@@ -40,7 +40,7 @@
 					</ul>
 				</li>
 				{% if perms.testruns.add_testrun %}
-				<li><input type="button" class="new_run" title="Make new test run from selected cases" value="Run" onclick="var p = serialzeCaseForm(this.up(4), this.up(4).next()); postToURL('{% url tcms.testruns.views.new %}', p, 'get');"/></li>
+				<li onclick="var p = serialzeCaseForm(this.up(3), this.up(3).next()); postToURL('{% url tcms.testruns.views.new %}', p, 'get');"><input type="button" class="new_run" title="Make new test run from selected cases" value="Run" /></li>
 				{% else %}
 				<li><input type="button" class="new_run" title="Make new test run from selected cases" value="Run" disabled="true" /></li>
 				{% endif %}
