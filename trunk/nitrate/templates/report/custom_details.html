@@ -84,55 +84,64 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 				<td valign="top"><a href="{{ test_run.get_url_path }}">[{{ test_run.pk }}] {{ test_run.summary }}</a></td>
 				<td valign="top">
                 {% if test_run.IDLE %}
-                <a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=idel">{{ test_run.IDLE }}</a>
+                {#}<a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=idel">{{ test_run.IDLE }}</a>{#}
+				{{ test_run.IDLE }}
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.RUNNING %}
-                <a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=running">{{ test_run.RUNNING }}</a>
+                {#}<a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=running">{{ test_run.RUNNING }}</a>{#}
+				{{ test_run.RUNNING }}
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.PAUSED %}
-                <a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=paused">{{ test_run.PAUSED }}</a>
+                {#}<a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=paused">{{ test_run.PAUSED }}</a>{#}
+				{{ test_run.PAUSED }}
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.PASSED %}
-                <a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=passed">{{ test_run.PASSED }}</a>
+                {#}<a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=passed">{{ test_run.PASSED }}</a>{#}
+				{{ test_run.PASSED }}
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.FAILED %}
-                <a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=failed">{{ test_run.FAILED }}</a>
+                {#}<a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=failed">{{ test_run.FAILED }}</a>{#}
+				{{ test_run.FAILED }}
                 {% else %}
                 {% endif%}
                 </td>
 				<td valign="top">
                 {% if test_run.BLOCKED %}
-                <a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=blocked">{{ test_run.BLOCKED }}</a>
+                {#}<a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=blocked">{{ test_run.BLOCKED }}</a>{#}
+				{{ test_run.BLOCKED }}
                 {% else %}
                 {% endif%}
                 </td>
 				<td valign="top">
                 {% if test_run.ERROR %}
-                <a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=error">{{ test_run.ERROR }}</a>
+                {#}<a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=error">{{ test_run.ERROR }}</a>{#}
+				{{ test_run.ERROR }}
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.WAIVED %}
-                <a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=waived">{{ test_run.WAIVED }}</a>
+                {#}<a href="{% url tcms.testruns.views.get test_run.pk %}?case_run_status=waived">{{ test_run.WAIVED }}</a>{#}
+				{{ test_run.WAIVED }}
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.case_run.count %}
-                <a href="{% url tcms.testruns.views.get test_run.pk %}">{{ test_run.case_run.count }}</a>
+                {#}<a href="{% url tcms.testruns.views.get test_run.pk %}">{{ test_run.case_run.count }}</a>{#}
+				{{ test_run.case_run.count }}
                 {% else %}
                 {% endif %}
                 </td>
@@ -189,24 +198,24 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 		
 		{% if comments %}
 		<tr>
-			<td colspan="5">Comments:</td>
+			<td colspan="7">Comments:</td>
 		</tr>
 		{% for comment in comments %}
 		<tr class="border-bottom">
-			<td valign="top" colspan="5">{{ comment.comment|linebreaksbr }}<span class="grey">[{{ comment.user }} {{ comment.submit_date }}]</span></td>
+			<td valign="top" colspan="7">{{ comment.comment|linebreaksbr }}<span class="grey">[{{ comment.user }} {{ comment.submit_date }}]</span></td>
 		</tr>
 		{% endfor %}
 		{% endif %}
 		
 		{% if test_case_run.bug.count %}
 		<tr>
-			<td colspan="5">Bugs:</td>
+			<td colspan="7">Bugs:</td>
 		</tr>
 		{% endif %}
 		
 		{% for bug in test_case_run.bug.all %}
 		<tr class="border-bottom">
-			<td valign="top" colspan="5"><a href="{{ bug.get_url }}">{{ get_url }}</a> </td>
+			<td valign="top" colspan="7"><a href="{{ bug.get_url }}">{{ get_url }}</a> </td>
 		</tr>
 		{% endfor %}
 		
@@ -248,24 +257,24 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 		
 		{% if comments %}
 		<tr>
-			<td colspan="5">Comments:</td>
+			<td colspan="7">Comments:</td>
 		</tr>
 		{% for comment in comments %}
 		<tr class="border-bottom">
-			<td valign="top" colspan="5">{{ comment.comment|linebreaksbr }}<span class="grey">[{{ comment.user }} {{ comment.submit_date }}]</span></td>
+			<td valign="top" colspan="7">{{ comment.comment|linebreaksbr }}<span class="grey">[{{ comment.user }} {{ comment.submit_date }}]</span></td>
 		</tr>
 		{% endfor %}
 		{% endif %}
 		
 		{% if test_case_run.bug.count %}
 		<tr>
-			<td colspan="5">Bugs:</td>
+			<td colspan="7">Bugs:</td>
 		</tr>
 		{% endif %}
 		
 		{% for bug in test_case_run.bug.all %}
 		<tr class="border-bottom">
-			<td valign="top" colspan="5"><a href="{{ bug.get_url }}">{{ get_url }}</a> </td>
+			<td valign="top" colspan="7"><a href="{{ bug.get_url }}">{{ get_url }}</a> </td>
 		</tr>
 		{% endfor %}
 		
