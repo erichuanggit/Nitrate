@@ -62,8 +62,8 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 				<th align="left" class="text">Summary</th>
 				<th align="left" width="100" class="text">Author</th>
 				<th align="left" width="130" class="text">Default Tester</th>
-                <th align="left" width="140" class="text">Automated</th>
-                <th align="left" width="90" class="text">Status</th>
+				<th align="left" width="140" class="text">Automated</th>
+				<th align="left" width="90" class="text">Status</th>
 				<th align="left" width="120" class="text">Category</th>
 				<th align="left" width="60" class="text">Priority</th>
 				<th align="left" width="140" class="date-iso">Created</th>
@@ -72,7 +72,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 		<tbody>
 			{% for test_case in test_cases %}
 			<tr class="{% cycle 'odd' 'even' %}">
-                <td valign="top"><input type="checkbox" name="case" value="{{ test_case.case_id }}"></td>
+				<td valign="top"><input type="checkbox" name="case" value="{{ test_case.case_id }}"></td>
 				{% comment %}
 				<td>
 					<a id="blind_link_{{ forloop.counter }}" href="javascript:toggleTestCaseContents('{{ forloop.counter }}')">
@@ -83,16 +83,16 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 				<td valign="top"><a href="{% url tcms.testcases.views.get test_case.case_id %}">{{ test_case.case_id }}</a></td>
 				<td valign="top" class="subject"><a id="link_{{ test_case.case_id }}" href="{% url tcms.testcases.views.get test_case.case_id %}">{{ test_case.summary }}</a></td>
 				{% comment %}
-				<td valign="top" ><a id="link_{{ test_case.case_id }}" href="javascript:toggleTestCaseContents('{{ test_case.case_id }}')">{{ test_case.summary }}</a></td>
+				<td valign="top"><a id="link_{{ test_case.case_id }}" href="javascript:toggleTestCaseContents('{{ test_case.case_id }}')">{{ test_case.summary }}</a></td>
 				{% endcomment %}
-				<td valign="top" ><a href="{% url tcms.profiles.views.profile test_case.author.username %}">{{ test_case.author }}</a></td>
-				<td valign="top" >{% if test_case.default_tester_id %}<a href="{% url tcms.profiles.views.profile test_case.default_tester.username %}">{% endif %}{{ test_case.default_tester }}{% if test_case.default_tester_id %}</a>{% endif %}</td>
-                <td valign="top">{{ test_case.get_is_automated_status }}</td>
-                <td valign="top" >{{ test_case.case_status }}</td>
-				<td valign="top" >{{ test_case.category }}</td>
-				<td valign="top" align="center" >{{ test_case.priority }}</td>
+				<td valign="top"><a href="{% url tcms.profiles.views.profile test_case.author.username %}">{{ test_case.author }}</a></td>
+				<td valign="top">{% if test_case.default_tester_id %}<a href="{% url tcms.profiles.views.profile test_case.default_tester.username %}">{{ test_case.default_tester }}</a>{% else %}None{% endif %}</td>
+				<td valign="top">{{ test_case.get_is_automated_status }}</td>
+				<td valign="top">{{ test_case.case_status }}</td>
+				<td valign="top">{{ test_case.category }}</td>
+				<td valign="top" align="center">{{ test_case.priority }}</td>
 				
-				<td valign="top" >{{ test_case.create_date }}</td>
+				<td valign="top">{{ test_case.create_date }}</td>
 			</tr>
 			{% comment %}
 			<tr>
@@ -117,8 +117,8 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 			{% endfor %}
 		</tbody>
 	</table>
-    {% paginate %}
-    </form>
+	{% paginate %}
+	</form>
 	{% else %}
 	{% ifequal REQUEST_CONTENTS.a 'search' %}
 	<span class="prompt-message"><center>No test case found</center></span>

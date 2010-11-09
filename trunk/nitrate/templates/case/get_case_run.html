@@ -46,7 +46,7 @@
 				{% if test_case_run.assignee_id %}
 				<a href="{% url tcms.profiles.views.profile test_case_run.assignee.username %}">{{ test_case_run.assignee }}</a>
 				{% else%}
-				{{ test_case_run.assignee }}
+				None
 				{% endif %}
 			</td>
 			<td class="expandable">{{ test_case_run.close_date }}</td>
