@@ -283,17 +283,6 @@ Nitrate.TestPlans.Edit.on_load = function()
 
 Nitrate.TestPlans.List.on_load = function()
 {
-    
-    $('relativeSearchOption_case').observe('click', function(e){
-        if($('relativeSearch_case').getStyle('display') == 'none'){
-            Effect.BlindDown('relativeSearch_case',{ duration: 0.5 });
-            this.className = 'up'
-        } else {
-            Effect.BlindUp('relativeSearch_case',{ duration: 0.5 });
-            this.className = 'down'
-        }
-    })
-    
     if($('id_product')) {
         bind_version_selector_to_product(true);
     };

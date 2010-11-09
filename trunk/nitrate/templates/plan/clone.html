@@ -33,7 +33,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Clone.on_load);
 	<div class="Detailform border-1">
 		<form action="{% url tcms.testplans.views.clone %}" method="post">
 			{% for testplan in testplans %}
-			<input type="hidden" name="plan_id" value="{{ testplan.plan_id }}" />
+			<input type="hidden" name="plan" value="{{ testplan.pk }}" />
 			{% endfor %}
 			<table	class="editor" cellspacing="0" cellspan="0"> 
 				<tr>
@@ -52,7 +52,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Clone.on_load);
 								<span class="lab-50">{{ testplan.plan_id }}</span>
 								<span class="lab-100">{{ testplan.type }}</span>
 								<span>
-									<a href="{% url tcms.testplans.views.get testplan.plan_id %}" title="{{ testplan.name }} ({{ testplan.author.email }})">
+									<a href="{% url tcms.testplans.views.get testplan.pk %}" title="{{ testplan.name }} ({{ testplan.author.email }})">
 									 {{ testplan.name }}
 									</a>
 								</span>
