@@ -77,7 +77,7 @@ class TCMSLog(object):
             object_pk    = smart_unicode(object_pk),
             site__pk     = settings.SITE_ID,
         )
-        
+        qs = qs.selected_related('who__username')
         return qs
     
     def make(self, who, action):
