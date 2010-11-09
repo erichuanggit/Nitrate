@@ -760,7 +760,7 @@ def cc(request, run_id):
         'test_run': tr,
     })
 
-def update(request, run_id):
+def update_case_run_text(request, run_id):
     """
     Update the IDLE cases to newest text
     """
@@ -770,7 +770,13 @@ def update(request, run_id):
     except ObjectDoesNotExist, error:
         raise Http404(error)
     
-    tcrs = tr.case_run.filter(case_run_status__name = 'IDLE')
+    if request.REQUEST.get('case_run'):
+        tcrs = tr.case_run.filter(pk__in = request.REQUEST.getlist('case_run'))
+    else:
+        tcrs = tr.case_run.all()
+    
+    tcrs = tcrs.filter(case_run_status__name = 'IDLE')
+    
     count = 0
     updated_tcrs = ''
     for tcr in tcrs:

@@ -117,7 +117,7 @@ urlpatterns = patterns('',
     (r'^run/(?P<run_id>\d+)/removecaserun/$', 'tcms.testruns.views.remove_case_run'),
     (r'^run/(?P<run_id>\d+)/assigncase/$', 'tcms.testruns.views.assign_case'),
     (r'^run/(?P<run_id>\d+)/cc/$', 'tcms.testruns.views.cc'),
-    (r'^run/(?P<run_id>\d+)/update/$', 'tcms.testruns.views.update'),
+    (r'^run/(?P<run_id>\d+)/update/$', 'tcms.testruns.views.update_case_run_text'),
     (r'^run/(?P<run_id>\d+)/export/$', 'tcms.testruns.views.export'),
     
     (r'^caserun/(?P<case_run_id>\d+)/current/$', 'tcms.testruns.views.set_current'),
