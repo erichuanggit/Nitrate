@@ -2,8 +2,8 @@
 %define use_pylint 0
 
 Name:           nitrate
-Version:        3.1.1
-Release:        3
+Version:        3.2
+Release:        1
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -20,7 +20,7 @@ BuildRequires:  pylint
 BuildRequires:  Django
 %endif
 
-Requires:       Django = 1.1.1
+Requires:       Django = 1.2.3
 # Requires:     mod_python
 Requires:       mod_ssl
 Requires:       python-memcached
@@ -115,6 +115,75 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
+* Tue Nov 9 2010 Xuqing Kuang <xkuang@redhat.com> - 3.2-1
+- Fixed UI Bug #635329 - [TCMS]a small spelling mistake
+- Fixed #635369 - Add a test case with tags will fail via tcms xmlrpc
+- Fixed #635931 - [TCMS]The blank row in Status' drop-down box of Search test Runs
+- Fixed UI Bug #637471 - [TCMS][REF]The style in the home page
+- Completed Feature #637271 - Provide an XMLRPC function for adding a test case run comment
+- Makes Django 1.2 compatible
+- Add csrf to templates/admin pages for Django 1.2
+- Fixed #638639 Test run report "Finished at" field shows "Notes" content
+- Fixed UI Bug #638019 -[REF]Test Runs in the home page
+- Bug UI Bug #641252 - [TCMS][REF]"Testing Cases" to "Cases" in REPORTING
+- Refined the js, split the case to confirmed cases and reviewing cases
+- Fixed #637474 - [TCMS][REF]The sort of "Plan Type" data and the sort of "Environment Group" data in Search Plan page.
+- Fixed new admin URL
+- Fixed #634218 - Text box "Comment" is erased when timestamp expires
+- Fixed #634218 - clean_timestampe-->clean_timestamp
+- Fixed #638808 - The calendar icon broken after upgrade to django 1.2.3
+- Completed feature #634157 - Preselect product when adding new build
+- Fixed #637276 - TestCaseRun.attach_bug broken
+- Fixed #637715 - TestCaseRun.update() should set tester to authenticated user
+- Fixed UI Bug #643349 - Wrong product displayed on the test run execute page
+- Fixed #638526 - [TCMS]Refresh Page fail after "Disable Plan"
+- Fixed UI Bug #643324 - Provide a bit more space for the test run notes
+- Completed refine the test case review workflow
+- Fixed #644252 - error when modify the product name
+- Fixed UI Bug #644356 - Allow to sort test case runs
+- Fixed UI Bug #644354 - Displaying test case run details breaks layout
+- Fixed #644748 - Nitrate XML-RPC Service: failed to create new TestRun using the 'TestRun.create' verb
+- Completed basic info editing/viewing in profile
+- Add the title/nav/footer to 404 & 500 error page
+- Add NEED_UPDATE status to test case status
+- Fixed UI Bug #629122 - [REF] Display test case notes when expanding a test case
+- Fixed UI Bug #641790 - [TCMS]No warning after inputting "1.1" in the sort of case
+- Fixed UI Bug #643303 - [RFE] test-run report - show bugs near corresponding test-cases
+- Initial completed bookmark feature
+- Completed reviewer for case and the mail notification when update reviewer
+- Fixed #640756 - can't remove bugs from a test-case
+- Fixed #646324 - service error display when cancel tag edit
+- Fixed #638476 - Duplicated environment group name will cause error
+- Fixed #601756 - Editing a test case erases "component" field
+- Fixed #519029 - All URLs should be linkified
+- Fixed UI Bug #648760 - The spelling mistake happened in Estimated time
+- Arranged toolbar in the way mentioned
+- Merged the index page to profile
+- Fixed default url redirect after login
+- Initial completed the clone mulitple run from plan function
+- Refine Home page
+- Initial refined the mass status/priority operation function
+- Fixed add bookmark without content_type issue
+- Fixed UI Bug #646340 - no warning is displayed when test plan is not selected
+- Changed commit style, added order to comment
+- Fixed #636813 - No direct link to comment of run
+- Fixed #646399 - In case permission are not granted, you are asked for login credentials that are never accepted.
+- Fixed redirect to review cases after case creation
+- Refined the delete comment feature
+- Fixed log display in details page
+- Fixed auto case expanding in run page
+- Fixed #637870 - The sum of the percentage of the test status categories on the overall report for a given build do not sum to 100%
+- Fixed toolbar style on Chrome and safari
+- Fixed update assignee feature
+- Completed password change feature
+- Removed the execute run link
+- Completed registration feature
+- Completed password reset feature
+- Refined the update case run text and re-order case run feature
+- Completed paginatation for case/run/plan list
+- Fixed #645631 - need item to type Test Plan id directly when clone test case
+- Fixed #648325 - When clone multiple, check 'update manager', it has an error
+
 * Fri Sep 17 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.1-3
 - Fixed global plan search issue.
 
