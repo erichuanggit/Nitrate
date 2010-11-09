@@ -86,6 +86,7 @@ class UserProfile(models.Model):
     im = models.CharField(blank=True, default='', max_length=128)
     im_type_id = models.IntegerField(blank=True, default=1, max_length=4, null=True)
     address = models.TextField(blank=True, default='')
+    notes = models.TextField(blank=True, default='')
     class Meta:
         db_table = u'tcms_user_profiles'
     

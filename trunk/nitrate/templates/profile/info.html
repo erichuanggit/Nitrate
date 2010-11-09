@@ -80,6 +80,10 @@ Nitrate.Utils.after_page_load(Nitrate.Profiles.Infos.on_load);
 					<td>{{ form.address }}</td>
 				</tr>
 				<tr>
+					<td class="left_title sprites">Notes</td>
+					<td>{{ form.notes }}</td>
+				</tr>
+				<tr>
 					<td>{{ form.errors }}</td>
 					<td><input type="submit" value="Save Change" class="clear" /></td>
 			</table>
@@ -114,6 +118,9 @@ Nitrate.Utils.after_page_load(Nitrate.Profiles.Infos.on_load);
 				<td class="left_title sprites">Address</td>
 				<td>{{ user_profile.address|default:'<span class="grey">None</span>' }}</td>
 			</tr>
+			<tr>
+				<td class="left_title sprites">Notes</td>
+				<td>{{ user_profile.notes|linebreaksbr|default:'<span class="grey">None</span>' }}</td>
 		</table>
 		{% endifequal %}
 	</div>
