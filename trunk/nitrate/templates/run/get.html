@@ -299,7 +299,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 				{% endif %}
 				{% if perms.testruns.change_testcaserun %}
 				<a id="id_sort" class="sortlink" title="Click me,then Drag and drop the rows to adjust the order,and click 'Done Sorting' link to submit your changes">Re-order Cases</a>
-				<a title="Update the IDLE case runs to newest case text" href="update/" class="updatelink">Update</a>
+				<a title="Update the IDLE case runs to newest case text" href="javascript:void(0)" class="updatelink" onclick="postToURL('{% url tcms.testruns.views.update_case_run_text test_run.pk %}', serializeCaseRunFromInputList(this.up(1).next(), 'case_run'))">Update</a>
 				{% else %}
 				<span class="sortlink grey" >Re-order Cases</span>
 				<span class="updategrey">Update</span>

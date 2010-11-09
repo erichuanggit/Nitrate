@@ -58,7 +58,7 @@ Nitrate.TestRuns.Details.on_load = function()
     if($('id_sort'))
         $('id_sort').observe('click', taggleSortCaseRun);
     
-    $('id_check_all_button').observe('click', function(m) {
+    $('id_check_all_button').observe('click', function(e) {
         toggleAllCheckBoxes(this, 'id_table_cases', 'case_run');
     })
     
@@ -346,9 +346,10 @@ function changeCaseRunOrder(run_id, case_run_id, sort_key)
     updateObject(ctype, object_pk, field, value, vtype, s_callback);
 }
 
-function taggleSortCaseRun()
+function taggleSortCaseRun(event)
 {
-    if($('id_sort').innerHTML != 'Done Sorting'){
+    var element = event.srcElement;
+    if(element.innerHTML != 'Done Sorting'){
         // $('id_sort_control').show();
         // Remove the unsortable case text
         
@@ -385,14 +386,13 @@ function taggleSortCaseRun()
         //alert('Drag and drop the rows to adjust the order, click "Done Sorting" link to submit your changes, otherwise please refresh the page to cancel.');
     } else {
         // $('id_sort_control').hide();
-        $('id_sort').replace((new Element('span')).update('Submitting changes'));
+        // var element = element.replace((new Element('span')).update('Submitting changes'));
         
         $$('#id_table_cases input[type=checkbox]').each(function(t) {
             t.checked = true;
             t.disabled = false;
         });
-        
-        window.location.href='ordercaserun/?' + $('id_form_case_runs').serialize();
+        postToURL('ordercaserun/', serializeCaseRunFromInputList(element.up(1).next(), 'case_run'), 'get');
     }
 }
 function selectcase(){
@@ -832,15 +832,21 @@ function changeCaseRunAssignee(table)
     )
 }
 
-function serializeCaseRunFromInputList(table)
+function serializeCaseRunFromInputList(table, name)
 {
     var elements = $(table).adjacent('input[name="case_run"]:checked');
-    var returnobj = new Array();
+    var returnobj_list = new Array();
     for (i in elements) {
         if (typeof(elements[i].value) == 'string')
-        returnobj.push(elements[i].value);
+        returnobj_list.push(elements[i].value);
     };
-    return returnobj
+    if (name) {
+        var returnobj = {};
+        returnobj[name] = returnobj_list
+        return returnobj
+    }
+    
+    return returnobj_list;
 }
 
 function serialzeCaseForm(form, table, serialized)
