@@ -101,7 +101,7 @@ a:link.execute,a:visited.execute{ background:url(../images/sprites.png) no-repea
 .error_content ul li{ margin:10px 0 10px 20px; list-style-type:none; text-align:left;}
 /* End Error */
 
-.pagination{ margin:10px 5px; float:right;}
+.pagination{ margin:5px; float:right;}
 .pagination a{ margin:0 3px;}
 .mark a{color:green;}
 .mark{color:green;}
