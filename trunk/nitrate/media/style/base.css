@@ -190,7 +190,7 @@ table.noborder,table.noborder td{border:none;background:transparent;}
 #footer .footercontent a:link,#footer .footercontent a:visited{ color:#235d9f; margin:0 5px;}
 #footer .footercontent a:hover{ color:#5797ee;}
 /**************************buttons************************/
-.toolbar{ margin:0 0 2px 10px}
+.toolbar{ margin:0 0 5px 10px}
 .toolbar a{color:#fff;}
 .toolbar ul li{ list-style:none; padding:6px 10px;height:18px; position:relative;background:#f7f7f7 url(/media/images/toolbar_bg.png) repeat-x left top; display:inline-block;-moz-border-radius: 5px;-khtml-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px; border:solid 1px #f1f0f0; cursor:pointer;z-index:0px;}
 .toolbar ul ul{display:none;}
@@ -238,8 +238,8 @@ table.noborder,table.noborder td{border:none;background:transparent;}
 .component_disabled{background-position:0 -633px;padding-left:16px;color:graytext;}
 .assignee{ background-position:0 -30px; padding-left:16px;  border:none;cursor:pointer;}
 .assigneedisable{ background-position:0 -48px; padding-left:16px;border:none;color:graytext; }
-.actions .p1{background-position:0 -1032px; padding-left:16px;  border:none;cursor:pointer;}
-.actions .p2{background-position:0 -1048px; padding-left:16px;  border:none;cursor:pointer;}
+.actions .p1{background-position:0 -1048px; padding-left:16px;  border:none;cursor:pointer;}
+.actions .p2{background-position:0 -1032px; padding-left:16px;  border:none;cursor:pointer;}
 .actions .p3{background-position:0 -1064px; padding-left:16px;  border:none;cursor:pointer;}
 .actions .p4{background-position:0 -1080px; padding-left:16px;  border:none;cursor:pointer;}
 .actions .p5{background-position:0 -1096px; padding-left:16px;  border:none;cursor:pointer;}
