@@ -136,7 +136,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 			</div>
 			<div class="listinfo">
 				<div class="title">Manager:</div>
-				<a href="mailto:{{ test_run.manager.email }}">{{ test_run.manager.email }}</a>
+				<a href="{% url tcms.profiles.views.profile test_run.manager.username %}">{{ test_run.manager.email }}</a>
 			</div>
 			<div class="listinfo">
 				<div class="title">Estimated Time:</div>
@@ -229,7 +229,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 			<div class="listinfo">
 				<div class="title">Default Tester</div>
 				{% if test_run.default_tester %}
-				<a href="mailto:{{ test_run.default_tester.email }}">{{ test_run.default_tester.email }}</a>
+				<a href="{% url tcms.profiles.views.profile test_run.default_tester.username %}">{{ test_run.default_tester.email }}</a>
 				{% else %}
 				{{ test_run.default_tester }}
 				{% endif %}

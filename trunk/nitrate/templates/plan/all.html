@@ -111,7 +111,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
 					<td><input type="checkbox" name="plan" value="{{ test_plan.pk }}" title="Select/Unselect"></td>
 					<td class="{% if not test_plan.is_active %}underline{% endif %}"><a href="{% url tcms.testplans.views.get test_plan.plan_id %}">{{ test_plan.plan_id }}</a></td>
 					<td class="{% if not test_plan.is_active %}underline{% endif %}"><a href="{% url tcms.testplans.views.get test_plan.plan_id %}" title="Go to {{ test_plan.name }}">{{ test_plan }} </a></td>
-					<td><a title="Send email to {{ test_plan.author.email}}" href="mailto:{{ test_plan.author.email }}">{{ test_plan.author }}</a></td>
+					<td><a href="{% url tcms.profiles.views.profile test_plan.author.username %}">{{ test_plan.author }}</a></td>
 					<td class="col_product_content">{{ test_plan.product }}</td>
 					<td style="display:none" class="col_product_version_content">{{ test_plan.default_product_version }}</td>
 					<td>{{ test_plan.type }}</td>

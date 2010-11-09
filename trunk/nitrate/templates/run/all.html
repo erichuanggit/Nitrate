@@ -95,10 +95,10 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 			{% for test_run in test_runs %}
 			<tr class="{% cycle 'rowodd' 'roweven' %}">
 				<td><input type='checkbox' name="run" value="{{ test_run.pk }}" /></td>
-				<td><a href="{% url tcms.testruns.views.get test_run.run_id %}"/ >{{ test_run.run_id }}</a></td>
-				<td><a href="{% url tcms.testruns.views.get test_run.run_id %}"/>{{ test_run.summary|striptags }}</a></td>
-				<td><a href="mailto:{{ test_run.manager.email }}" title="Send email to {{ test_run.manager.email }}">{{ test_run.manager}}</a></td>
-				<td><a href="mailto:{{ test_run.default_tester.email }}" title="Send email to {{ test_run.default_tester.email }}">{{ test_run.default_tester }}</a></td>
+				<td><a href="{% url tcms.testruns.views.get test_run.run_id %}" />{{ test_run.run_id }}</a></td>
+				<td><a href="{% url tcms.testruns.views.get test_run.run_id %}" />{{ test_run.summary|striptags }}</a></td>
+				<td><a href="{% url tcms.profiles.views.profile test_run.manager.username %}">{{ test_run.manager }}</a></td>
+				<td>{% if test_run.default_tester_id %}<a href="{% url tcms.profiles.views.profile test_run.default_tester.username %}">{% endif %}{{ test_run.default_tester }}{% if test_run.default_tester_id %}</a>{% endif %}</td>
 				<td style="display:none" class="col_plan_content"><a href="{% url tcms.testplans.views.get test_run.plan_id %}" >{{ test_run.plan }}</a></td>
 				<td>{{ test_run.plan.product }}</td>
 				<td>{{ test_run.product_version }}</td>

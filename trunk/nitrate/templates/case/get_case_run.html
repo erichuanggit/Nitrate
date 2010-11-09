@@ -6,8 +6,8 @@
 			<th width="90">Case Run ID</th>
 			<th width="80">Run ID</th>
 			<th>Run Summary</th>
-			<th width="80">Assignee</th>
 			<th width="80">Tester</th>
+			<th width="80">Assignee</th>
 			<th width="150">Close date</th>
 			<th width="100">Category</th>
 			<th width="80">Priority</th>
@@ -36,13 +36,17 @@
 				{{ test_case_run.run.summary }}
 			</td>
 			<td>
-				<a href="mailto:{{ test_case_run.assignee.email }}" title="Send email to {{ test_case_run.assignee.email }}">{{ test_case_run.assignee }}</a>
-			</td>
-			<td>
 				{% if test_case_run.tested_by %}
-				<a href="mailto:{{ test_case_run.assignee.email }}" title="Send email to {{ test_case_run.assignee.email }}">{{ test_case_run.assignee }}</a>
+				<a href="{% url tcms.profiles.views.profile test_case_run.tested_by.username %}">{{ test_case_run.tested_by }}</a>
 				{% else %}
 				<label>None</label>
+				{% endif %}
+			</td>
+			<td>
+				{% if test_case_run.assignee_id %}
+				<a href="{% url tcms.profiles.views.profile test_case_run.assignee.username %}">{{ test_case_run.assignee }}</a>
+				{% else%}
+				{{ test_case_run.assignee }}
 				{% endif %}
 			</td>
 			<td class="expandable">{{ test_case_run.close_date }}</td>

@@ -24,16 +24,10 @@
 		{% endif %}
 		{% endif %}
 	</div>
-    <div class="listinfo">
-		<span class="title"><label for="id_tag">Tag</label></span>
-		<span class="listinfo_input">{{ search_form.tag__name__in }}</span>
-	</div>
-    {% comment %}
 	<div class="listinfo">
 		<span class="title"><label for="id_caserun_assignee">Case Run Assignee</label></span>
 		<span class="listinfo_input">{{ search_form.case_run__assignee__email__startswith }}</span>
 	</div>
-    {% endcomment %}
 </div>
 <div class="rightlistinfo">
 	<div class="listinfo">
@@ -52,7 +46,10 @@
 		<span class="title"><label for="id_status">Status</label></span>
 		<span class="listinfo_input">{{ search_form.status }}</span>
 	</div>
-	
+	<div class="listinfo">
+		<span class="title"><label for="id_tag">Tag</label></span>
+		<span class="listinfo_input">{{ search_form.tag__name__in }}</span>
+	</div>
 </div>
 <div class="clear"></div>
 

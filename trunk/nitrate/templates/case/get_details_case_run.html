@@ -80,11 +80,14 @@
 			<h4>Test Case Run Detail Information:</h4>
 			<div><span class="detail_title">Running Date:</span>{{ test_case_run.running_date }}  <span class="detail_title marginLeft" >Close Date:</span>{{ test_case_run.close_date }}</div>
 			<div><span class="detail_title">Build:</span>{{ test_case_run.build }} <span class="detail_title marginLeft">Text Version:</span>{{ test_case_run.case_text_version }}</div>
+			{% if test_case_run.notes %}
 			<div><span class="detail_title">Notes:</span>{{ test_case_run.notes|urlize|linebreaksbr }}</div>
+			{% endif %}
+			
 		</td>
 		</tr>
 		<tr>
-			<td colspan="3" style="border:none; background:none;padding-top:0px">
+			<td colspan="3" style="border:none; background:none;padding-top:0px" class='hide'>
 				{% get_comment_list for test_case_run as case_run_comments %}
 				<h4>Comments:</h4>
 				<ul class="comment ul-no-format">

@@ -43,10 +43,18 @@
 				<a id="link_{{ forloop.counter }}" href="#caserun_{{ test_case_run.pk }}" title="Expand test case">{{ test_case_run.case.summary }}</a>
 			</td>
 			<td>
-				<a href="mailto:{{ test_case_run.tested_by.email }}" class="link_tested_by">{{ test_case_run.tested_by }}</a>
+				{% if test_case_run.tested_by_id %}
+				<a href="{% url tcms.profiles.views.profile test_case_run.tested_by.username %}" class="link_tested_by">{{ test_case_run.tested_by }}</a>
+				{% else %}
+				None
+				{% endif %}
 			</td>
 			<td>
-				<a href="mailto:{{ test_case_run.assignee.email }}" class="link_assignee">{{ test_case_run.assignee }}</a>
+				{% if test_case_run.assignee_id %}
+				<a href="{% url tcms.profiles.views.profile test_case_run.assignee.username %}" class="link_assignee">{{ test_case_run.assignee }}</a>
+				{% else %}
+				None
+				{% endif %}
 			</td>
 			<td class="expandable center">{{ test_case_run.case.category }}</td>
 			<td class="expandable center">{{ test_case_run.case.priority }}</td>

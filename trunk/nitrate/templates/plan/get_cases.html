@@ -213,8 +213,8 @@
 			<td class="subject expandable">
 				<a class="blind_down_link">{{ test_case.summary }}</a>
 			</td>
-			<td class="col_author_content"><a title="Send email to {{ test_case.author.email }}" href="mailto:{{ test_case.author.email }}">{{ test_case.author }}</a></td>
-			<td class="col_author_content"><a title="Send email to {{ test_case.defaulte_tester.email }}" href="mailto:{{ test_case.author.email }}">{{ test_case.default_tester }}</a></td>
+			<td class="col_author_content"><a href="{% url tcms.profiles.views.profile test_case.author.username %}">{{ test_case.author }}</a></td>
+			<td class="col_author_content">{% if test_case.default_tester_id %}<a href="{% url tcms.profiles.views.profile test_case.default_tester.username %}">{% endif %}{{ test_case.default_tester }}{% if test_case.default_tester_id %}</a>{% endif %}</td>
 			<td class="col_tester_content expandable">{{ test_case.get_is_automated_status }}</td>
 			<!-- <td >{{ testcase.create_date }}</td>-->
 			<td>

@@ -96,7 +96,7 @@ Nitrate.Utils.after_page_load(Nitrate.Profiles.Infos.on_load);
 			</tr>
 			<tr>
 				<td class="left_title sprites email">Email</td>
-				<td>{{ user_profile.user.email }}</td>
+				<td><a href='mailto:{{ user_profile.user.email }}'>{{ user_profile.user.email }}</a></td>
 			</tr>
 			<tr>
 				<td class="left_title sprites">Phone number</td>

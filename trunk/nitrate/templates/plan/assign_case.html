@@ -35,7 +35,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.AssignCases.on_load);
 		</div>
 		<div class="cell">
 			<div class="sd">Author :</div>
-			<div id="display_author"><a href="mailto:{{ testplan.author.email }}">{{ testplan.author }}</a></div>
+			<div id="display_author"><a href="{% url tcms.profiles.views.profile testplan.author.username %}">{{ testplan.author }}</a></div>
 		</div>
 		<div class="cell">
 			<div class="sd">Product :</div>
@@ -73,7 +73,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.AssignCases.on_load);
 			<div  class="right-bar" >
 				<label class="errors" id="import-error">{{ xml_form.xml_file.errors }}</label>	
 				{{ xml_form.action }}
-				<label><b>Import XML file:</b></</label>
+				<label><b>Import XML file:</b></label>
 				{{ xml_form.xml_file }}
 				<input type="submit" value="Import" />
 				<br/>
@@ -124,7 +124,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.AssignCases.on_load);
 							</div>
 						</td>
 						<td valign="top"><a href="{% url tcms.testcases.views.get testcase.case_id %}?from_plan={{ testplan.plan_id }}">{{ testcase.summary }}</a></td>
-						<td valign="top"><a href="mailto:{{ testcase.author.email }}">{{ testcase.author.email }}</a></td> 
+						<td valign="top"><a href="{% url tcms.profiles.views.profile testcase.author.username %}">{{ testcase.author.email }}</a></td> 
 						<td valign="top">
 							{% if perms.testcases.change_testcase %}
 							<a id="case_status_{{ forloop.counter }}" onclick="javascript:showStatusSelect('{{ forloop.counter }}')" style="display: none;">{{ testcase.case_status }}</a>

@@ -112,7 +112,7 @@
 			{% endif %}
 			{% endcomment %}
 			<tr>
-				<td align="left" valign="top" colspan="7">
+				<td align="left" valign="top" colspan="7" class='hide'>
 					{% if test_case_run.get_bugs %}
 					<span class='notes_title'>Bugs ID:</span>
 					{% for bug in test_case_run.get_bugs %}
@@ -124,7 +124,7 @@
 					
 					{% get_comment_list for test_case_run as comments %}
 					{% if comments %}
-					<h4>Comments</h4>
+					<h4 style='padding:0px;margin:0px'>Comments</h4>
 					<span class="notes" >
 						<ul style="margin-left:10px;" class='comment'>
 							{% for comment in comments %}

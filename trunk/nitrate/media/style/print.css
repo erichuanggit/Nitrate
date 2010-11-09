@@ -83,7 +83,7 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .option_prefer{-moz-background-clip:border;-moz-background-inline-policy:continuous;-moz-background-origin:padding;background:#f3f8fc none repeat scroll 0 0;border:1px outset #999988;margin:0 1em 1em;padding:0.8em; text-align:left; width:220px; height:60px; position:absolute; right:5px; top:130px;}
 
 .option_prefer lable{ margin-left:5px;}
-.comment li{margin:5px 0px;border:1px outset #fff;}
+
 
 /***********************Environment Start***************************/
 .titlelink input[type="text"] { width: 40%; }
@@ -451,5 +451,5 @@ a:link.edit,a:visited.edit{ color:#333;}
 .add_env_button{ float:left; margin:20px 10px 10px 20px; }
 .add_env_button input{ margin-right:5px; }
 .comment{ width:98%;}
-.comment li{margin:5px 0px;border:1px outset #fff; position:relative}
+.comment li{margin:5px 0px;border-bottom:1px dotted #666666; position:relative}
 .notes_title{ margin:0px; color:#235d9f; font-size:1.0em; font-weight:bold; }

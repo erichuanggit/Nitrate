@@ -27,7 +27,7 @@
 			<td valign="top" class="subject">
 				<a href="{% url tcms.testreviews.views.get test_review.id %}">{{ test_review.summary }} review summary</a>
 			</td>
-			<td valign="top"><a href="mailto:{{ test_review.author.mail }}">{{ test_review.author }}</a></td>
+			<td valign="top"><a href="{% url tcms.profiles.views.profile test_review.author.username %}">{{ test_review.author }}</a></td>
 			<td valign="top">{{ test_review.start_date }}</td>
 			{% comment %}
 			<td valign="top">

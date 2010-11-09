@@ -34,8 +34,8 @@
 				<td valign="top" class="subject">
 					<a href="{% url tcms.testruns.views.get test_run.run_id %}?from_plan={{ test_plan.plan_id }}">{{ test_run.summary }}</a>
 				</td>
-				<td valign="top"><a href="mailto:{{ test_run.manager.email }}">{{ test_run.manager }}</a></td>
-				<td valign="top"><a href="mailto:{{ test_run.default_tester.email }}">{{ test_run.default_tester }}</a></td>
+				<td valign="top"><a href="{% url tcms.profiles.views.profile test_run.manager.username %}">{{ test_run.manager }}</a></td>
+				<td valign="top">{% if test_run.default_tester_id %}<a href="{% url tcms.profiles.views.profile test_run.default_tester.username %}">{{ test_run.default_tester }}</a>{% else%} None{% endif %}</td>
 				<td valign="top">{{ test_run.start_date }}</td>
 				<td valign="top">{{ test_run.build }}</td>
 				<td valign="top">{% if test_run.stop_date %}Finished{% else %}Running{% endif %}</td>
