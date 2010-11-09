@@ -183,6 +183,7 @@ rm -rf $RPM_BUILD_ROOT
 - Completed paginatation for case/run/plan list
 - Fixed #645631 - need item to type Test Plan id directly when clone test case
 - Fixed #648325 - When clone multiple, check 'update manager', it has an error
+- Linked the user linke to profile
 
 * Fri Sep 17 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.1-3
 - Fixed global plan search issue.
