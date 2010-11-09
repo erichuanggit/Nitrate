@@ -570,18 +570,14 @@ function showShortSummary()
 
 function createUploadPlanSummaryZone()
 {
-    try {
-        console.log('Successd to hook with the upload plan summary button');
-    } catch(err) {}
+    debug_output('Successd to hook with the upload plan summary button');
 
     new Ajax_upload($('id_btn_upload_plan_summary'), {
         action: '/plan/new/uploadsummary/',
         name: 'plan_summary',
 
         onSubmit: function(file, extension) {
-            try {
-                console.log('Upload plan document success submit');
-            } catch(err) {}
+            debug_output('Upload plan document success submit');
             
             if (! (extension && /^(txt|html|htm)$/.test(extension))) {
                         // extension is not allowed
@@ -597,11 +593,6 @@ function createUploadPlanSummaryZone()
         onComplete: function(file, response) {
             returnobj = response.evalJSON(true);
             summary = decodeURI(returnobj.summary);
-
-            try {
-                console.log("1" + returnobj.response);
-                console.log("2" + summary);
-            } catch(err) {}
 
             if(returnobj.response == 'ok') {
                 if(tinyMCE.get('id_summary'))

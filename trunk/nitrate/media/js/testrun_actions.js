@@ -402,7 +402,6 @@ function selectcase(){
 function constructCaseRunZone(container, title_container, case_id)
 {
     var link = title_container.getElementsBySelector('.expandable')[0];
-    console.log(link);
     if(container) {
         var td = new Element('td', {'id': 'id_loading_' + case_id, 'colspan': 12});
         td.update(getAjaxLoading());
@@ -528,9 +527,7 @@ function editValue(form,hidebox,selectid,submitid)
     var success = function(t){
         returnobj=t.responseText.evalJSON(true);
         
-        try {
-            console.log('Get environments succeed get ready to replace the select widget inner html');
-        } catch(err) {}
+        debug_output('Get environments succeed get ready to replace the select widget inner html');
         
         var values = returnobj.collect(function(o) {
                            return [o.pk, o.fields.value];

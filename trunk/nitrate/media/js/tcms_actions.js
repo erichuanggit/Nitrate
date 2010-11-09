@@ -414,9 +414,7 @@ function getEnvsByProductId(allow_blank, product_field)
     var success = function(t) {
         returnobj = t.responseText.evalJSON(true);
         
-        try {
-            console.log('Get environments succeed get ready to replace the select widget inner html');
-        } catch(err) {}
+        debug_output('Get environments succeed get ready to replace the select widget inner html');
         
         set_up_choices($('id_env_id'), 
                        returnobj.collect(function(o) {
@@ -475,9 +473,7 @@ function getVersionsByProductId(allow_blank, product_field, version_field)
     var success = function(t) {
         returnobj = t.responseText.evalJSON(true);
         
-        try {
-            console.log('Get versions succeed get ready to replace the select widget inner html');
-        } catch(err) {}
+        debug_output('Get versions succeed get ready to replace the select widget inner html');
 
         set_up_choices($(version_field), 
                        returnobj.collect(function(o) {
