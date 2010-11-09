@@ -538,7 +538,7 @@ def clone(request, template_name='run/clone.html'):
                     estimated_time = tr.estimated_time,
                     plan = tr.plan,
                     build = form.cleaned_data['build'],
-                    manager = form.cleaned_data['update_manager'] and form.cleaned_data['default_manager'] or tr.manager,
+                    manager = form.cleaned_data['update_manager'] and form.cleaned_data['manager'] or tr.manager,
                     default_tester = form.cleaned_data['update_default_tester'] and form.cleaned_data['default_tester'] or tr.default_tester,
                 )
                 
