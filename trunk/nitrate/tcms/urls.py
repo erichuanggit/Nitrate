@@ -68,9 +68,9 @@ urlpatterns = patterns('',
     (r'^accounts/passwordreset/done/$', 'django.contrib.auth.views.password_reset_done'),
     (r'^accounts/passwordreset/confirm//(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm'),
     (r'^accounts/profile/$', 'tcms.profiles.views.redirect_to_profile'), # Hacking for default url after login
-    (r'^accounts/(?P<username>[A-Za-z0-9\-]+)/profile/$', 'tcms.profiles.views.profile'),
-    (r'^accounts/(?P<username>[A-Za-z0-9\-]+)/bookmarks/$', 'tcms.profiles.views.bookmark'),
-    (r'^accounts/(?P<username>[A-Za-z0-9\-]+)/recent/$', 'tcms.profiles.views.recent'),
+    (r'^accounts/(?P<username>[\w.@+-]+)/profile/$', 'tcms.profiles.views.profile'),
+    (r'^accounts/(?P<username>[\w.@+-]+)/bookmarks/$', 'tcms.profiles.views.bookmark'),
+    (r'^accounts/(?P<username>[\w.@+-]+)/recent/$', 'tcms.profiles.views.recent'),
     
     # Testplans zone
     (r'^plan/new/$', 'tcms.testplans.views.new'),
