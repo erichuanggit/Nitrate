@@ -16,6 +16,10 @@
         <span class="title"><label for="id_tag">Tag</label></span>
         <span class="listinfo_input">  {{ search_plan_form.tag__name__in }}</span>
     </div>
+	<div class="listinfo">
+        <span class="title"><label for="id_case__default_tester__username__startswith">Case Default Tester</label></span>
+        <span class="listinfo_input">  {{ search_plan_form.case__default_tester__username__startswith }}</span>
+    </div>
     <div class="listinfo">
         <span class="title"><label for="id_is_active">Active</label></span>
         <span class="listinfo_input"> {{ search_plan_form.is_active }} <span class="grey">Uncheck will search active and inactive plans</span></span>
