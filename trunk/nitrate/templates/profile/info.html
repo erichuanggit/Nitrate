@@ -49,8 +49,8 @@ Nitrate.Utils.after_page_load(Nitrate.Profiles.Infos.on_load);
 				<tr>
 					<td class="left_title sprites username">Name</td>
 					<td>
+						{{ form.first_name }}
 						{{ form.last_name }}
-						{{ form.first_name}}
 					</td>
 				</tr>
 				<tr>
@@ -96,7 +96,7 @@ Nitrate.Utils.after_page_load(Nitrate.Profiles.Infos.on_load);
 			</tr>
 			<tr>
 				<td class="left_title sprites username">Name</td>
-				<td>{{ user_profile.user.last_name|default:'<span class="grey">Last name</span>' }} {{ user_profile.user.first_name|default:'<span class="grey">First name</span>' }}</td>
+				<td>{{ user_profile.user.first_name|default:'<span class="grey">First name</span>' }} {{ user_profile.user.last_name|default:'<span class="grey">Last name</span>' }}</td>
 			</tr>
 			<tr>
 				<td class="left_title sprites email">Email</td>
