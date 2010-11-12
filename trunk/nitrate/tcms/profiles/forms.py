@@ -21,6 +21,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from django import forms
 from django.contrib.auth.models import User
+from django.contrib.auth import get_backends
 
 from models import UserProfile, Bookmark, BookmarkCategory
 
@@ -34,16 +35,23 @@ IM_CHOICES = (
 
 BOOKMARK_EMPTY_LABEL = '---all---'
 
+can_register = False
+        
+for b in get_backends():
+    if getattr(b, 'can_register'):
+        can_register = True
+
 class UserProfileForm(forms.ModelForm):
-    user = forms.CharField(widget=forms.HiddenInput)
+    user = forms.CharField(widget = forms.HiddenInput)
     username = forms.RegexField(
-        label=_("Username"), max_length=30, regex=r'^[\w.@+-]+$',
+        label = _("Username"), max_length=30, regex=r'^[\w.@+-]+$',
         help_text = _("Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."),
-        error_messages = {'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")}
+        error_messages = {'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")},
+        required = False,
     )
-    first_name = forms.CharField(max_length=128, required = False)
-    last_name = forms.CharField(max_length=128, required = False)
-    email = forms.EmailField(label=_("E-mail"), max_length=75)
+    first_name = forms.CharField(max_length = 128, required = False)
+    last_name = forms.CharField(max_length = 128, required = False)
+    email = forms.EmailField(label=_("E-mail"), max_length=75, required = False)
     im_type_id = forms.ChoiceField(choices = IM_CHOICES)
     
     class Meta:
@@ -58,6 +66,24 @@ class UserProfileForm(forms.ModelForm):
             self.initial['last_name'] = instance.user.last_name
             self.initial['email'] = instance.user.email
     
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if can_register and not email:
+            raise forms.ValidationError(_('This field is required.'))
+
+        if not getattr(self.instance, 'pk'):
+            return email
+        
+        if email == self.instance.user.email:
+            return email
+        
+        try:
+            User.objects.get(email = email)
+        except ObjectDoesNotExis, error:
+            return email
+        
+        raise forms.ValidationError(_("A user with that email already exists."))
+    
     def clean_user(self):
         if not self.instance.pk:
             return User.objects.get(pk = self.cleaned_data['user'])
@@ -68,8 +94,12 @@ class UserProfileForm(forms.ModelForm):
         raise forms.ValidationError(_("User error."))
     
     def clean_username(self):
-        username = self.cleaned_data["username"]
-        if not self.instance.pk:
+        username = self.cleaned_data['username']
+
+        if can_register and not username:
+            raise forms.ValidationError(_('This field is required.'))
+        
+        if not getattr(self.instance, 'pk'):
             return username
         
         if username == self.instance.user.username:
@@ -83,16 +113,8 @@ class UserProfileForm(forms.ModelForm):
         raise forms.ValidationError(_("A user with that username already exists."))
     
     def save(self, commit = True):
-        from django.contrib.auth import get_backends
-        
         instance = super(UserProfileForm, self).save(commit=commit)
         user = instance.user
-        can_register = False
-        
-        for b in get_backends():
-            if getattr(b, 'can_register'):
-                can_register = True
-        
         if can_register:
             user.username = self.cleaned_data['username']
             user.email = self.cleaned_data['email']
@@ -157,3 +179,4 @@ class BookmarkForm(forms.Form):
             del cleaned_data['content_type']
             del cleaned_data['object_pk']
         return Bookmark.objects.create(**cleaned_data)
+
