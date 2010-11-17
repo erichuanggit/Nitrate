@@ -40,11 +40,10 @@
 					</ul>
 				</li>
 				{% if perms.testruns.add_testrun %}
-				<li onclick="var p = serialzeCaseForm(this.up(3), this.up(3).next()); postToURL('{% url tcms.testruns.views.new %}', p, 'get');"><input type="button" class="new_run" title="Make new test run from selected cases" value="Run" /></li>
+				<li onclick="var p = serialzeCaseForm(this.up(3), this.up(3).next()); postToURL('{% url tcms.testruns.views.new %}', p, 'get');"><span class="new_run" title="Make new test run from selected cases">Run</span></li>
 				{% else %}
 				<li><input type="button" class="new_run" title="Make new test run from selected cases" value="Run" disabled="true" /></li>
 				{% endif %}
-				
 				<li>
 					{% if perms.testcases.add_testcasetag %}
 					<span class='sprites toolbar_tag'>Tag</span>
@@ -52,16 +51,16 @@
 					<span class='sprites toolbar_tag_disabled'>Tag</span>
 					{% endif %}
 					<ul>
-					{% if perms.testcases.add_testcasetag %}
-					<li><input type="button" value="Add Tag" class="tag_add sprites" /></li>
-					{% else %} 
-					<li><input type="button" value="Add Tag" class="tag_add_disabled sprites" disabled="disabled" /></li>
-					{% endif %}
-					{% if perms.testcases.delete_testcasetag %}
-					<li><input type="button" value="Remove Tag" class="tag_delete sprites" /> </li>
-					{% else %}
-					<li><input type="button" value="Remove Tag" class="tag_delete_disabled sprites" disabled="disabled" /></li>
-					{% endif %}
+						{% if perms.testcases.add_testcasetag %}
+						<li><input type="button" value="Add Tag" class="tag_add sprites" /></li>
+						{% else %} 
+						<li><input type="button" value="Add Tag" class="tag_add_disabled sprites" disabled="disabled" /></li>
+						{% endif %}
+						{% if perms.testcases.delete_testcasetag %}
+						<li><input type="button" value="Remove Tag" class="tag_delete sprites" /> </li>
+						{% else %}
+						<li><input type="button" value="Remove Tag" class="tag_delete_disabled sprites" disabled="disabled" /></li>
+						{% endif %}
 					</ul>
 				</li>
 				{% if perms.testcases.change_testcase %}
@@ -174,7 +173,7 @@
 					Automated
 				</a>
 			</th>
-			<th align="left" width="120px">
+			<th align="left" width="130px">
 				<a title="Sort by status" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'case_status')">
 					Status
 				</a>
