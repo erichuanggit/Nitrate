@@ -79,8 +79,12 @@ Nitrate.TestPlans.Instance = {
 	<div class="listinfo_content">
 		<div class="leftlistinfo">
 			<div class="listinfo">
-				<div class="title">Author</div>
+				<div class="title">Plan Creator</div>
 				<div id="display_author"  class="name " > <a href="{% url tcms.profiles.views.profile test_plan.author.username %}">{{ test_plan.author }}</a></div>
+			</div>
+			<div class="listinfo">
+				<div class="title">Doc Author/Manager</div>
+				<div id="display_author"  class="name" ><a href="{% url tcms.profiles.views.profile test_plan.latest_text.author.username %}">{{ test_plan.latest_text.author }}</a></div>
 			</div>
 			<div class="listinfo">
 				<div class="title">Product</div>
