@@ -507,10 +507,8 @@ function removeCaseRunBug(bug_id, parameters, callback)
 
 function delCaseRun(run_id)
 {
-    var response = confirm('Are you sure to delete case run(s) ?');
-    
-    if(response)
-        window.location.href='removecaserun/?' + $('id_form_case_runs').serialize();
+    if(confirm('Are you sure to delete case run(s) ?'))
+       postToURL('removecaserun/', serializeCaseRunFromInputList('id_table_cases', 'case_run'));
 }
 
 function editValue(form,hidebox,selectid,submitid)
