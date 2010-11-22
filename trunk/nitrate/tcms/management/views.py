@@ -150,13 +150,14 @@ def environment_group_edit(request, template_name = 'environment/group_edit.html
     
     try:
         de = TCMSEnvGroup.objects.get(name = request.REQUEST.get('name'))
-        response = 'Duplicated name already exists, please change to another name.'
-        return direct_to_template(request, template_name, {
-            'environment': environment,
-            'properties': TCMSEnvProperty.get_active(),
-            'selected_properties': environment.property.all(),
-            'message': response,
-        })
+        if environment != de:
+            response = 'Duplicated name already exists, please change to another name.'
+            return direct_to_template(request, template_name, {
+                'environment': environment,
+                'properties': TCMSEnvProperty.get_active(),
+                'selected_properties': environment.property.all(),
+                'message': response,
+            })
     except TCMSEnvGroup.DoesNotExist, error:
         pass
     
