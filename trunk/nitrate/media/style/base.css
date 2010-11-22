@@ -840,8 +840,8 @@ a:link.edit,a:visited.edit{ color:#333;}
 
 .table_watchlist{ width:98%; margin:10px auto; border-collapse:collapse;border:solid 1px #d0d0d0;}
 .table_watchlist th{ text-align:left; padding-left:3px; background:url(../images/table_watchlist_bg.png) repeat-x left top #f1f1f1; height:30px; line-height:30px; border-bottom:solid 1px #d0d0d0; }
-.table_watchlist th .leftradius{ background:url(../images/table_watchlist_leftradius.png) no-repeat left top; width:6px; height:6px; float:left; display:block;margin:-10px 0 0 -4px;}
-.table_watchlist th .rightradius{ background:url(../images/table_watchlist_rightradius.png) no-repeat right top; width:6px; height:6px; float:right;display:block; margin:-1px 0px 0 0;}
+.table_watchlist th .leftradius{ background:url(../images/table_watchlist_leftradius.png) no-repeat left top; width:6px; height:6px; float:left; display:block;margin:-9px 0 0 -4px;}
+.table_watchlist th .rightradius{ background:url(../images/table_watchlist_rightradius.png) no-repeat right top; width:6px; height:6px; float:right;display:block; margin:-1px -1px 0 0;}
 .table_watchlist td{ padding-left:3px; min-height:25px; line-height:25px;}
 .table_watchlist td{ border-bottom:solid 1px #d0d0d0;}
 .table_watchlist_toolbar{background:url(../images/note_bg.png) repeat-x left bottom; padding:3px 0; margin-top:10px;}
