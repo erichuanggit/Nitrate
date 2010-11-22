@@ -34,7 +34,7 @@ from models import TestPlan, TestPlanType
 
 class PlanFileField(forms.FileField):
     default_error_messages = {
-        'invalid_file_type': 'The file you uploaded is not a correct Plain Text/HTML/ODT/PDF file.',
+        'invalid_file_type': 'The file you uploaded is not a correct, Html/Plain text/ODT file.',
         'unexcept_odf_error': 'Unable to analyse the file or the file you upload is not Open Document.',
     }
     
