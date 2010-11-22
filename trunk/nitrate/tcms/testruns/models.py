@@ -137,30 +137,21 @@ class TestRun(TCMSActionModel):
             )
         
         if query.get('people'):
-            q = q.filter(
-                Q(manager__first_name__startswith = query['people'])
-                | Q(manager__last_name__startswith = query['people'])
-                | Q(manager__username__icontains = query['people'])
-                | Q(manager__email__startswith = query['people'])
-                | Q(default_tester__first_name__startswith = query['people'])
-                | Q(default_tester__last_name__startswith = query['people'])
-                | Q(default_tester__username__icontains = query['people'])
-                | Q(default_tester__email__startswith = query['people'])
-        )
-        elif query.get('manager'):
-            q = q.filter(
-                Q(manager__first_name__startswith = query['manager'])
-                | Q(manager__last_name__startswith = query['manager'])
-                | Q(manager__username__icontains = query['manager'])
-                | Q(manager__email__startswith = query['manager'])
-        )
-        elif query.get('default_tester'):
-            q = q.filter(
-                Q(default_tester__first_name__startswith = query['default_tester'])
-                | Q(default_tester__last_name__startswith = query['default_tester'])
-                | Q(default_tester__username__icontains = query['default_tester'])
-                | Q(default_tester__email__startswith = query['default_tester'])
-            )
+            if query.get('people_type') == 'default_tester':
+                q = q.filter(default_tester = query['people'])
+            elif query.get('people_type') == 'manager':
+                q = q.filter(manager = query['people'])
+            else:
+                q = q.filter(
+                    Q(manager = query['people'])
+                    | Q(default_tester = query['people'])
+                )
+        
+        if query.get('manager'):
+            q = q.filter(manager = query['manager'])
+        
+        if query.get('default_tester'):
+            q = q.filter(default_tester = query['default_tester'])
         
         if query.get('sortby'):
             q = q.order_by(query.get('sortby'))
@@ -174,8 +165,8 @@ class TestRun(TCMSActionModel):
         if query.get('tag__name__in'):
             q = q.filter(tag__name__in = query['tag__name__in'])
         
-        if query.get('case_run__assignee__email__startswith'):
-            q = q.filter(case_run__assignee__email__startswith = query['case_run__assignee__email__startswith'])
+        if query.get('case_run__assignee'):
+            q = q.filter(case_run__assignee = query['case_run__assignee'])
         
         return q.distinct()
     

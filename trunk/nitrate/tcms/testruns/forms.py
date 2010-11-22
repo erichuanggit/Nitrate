@@ -236,13 +236,13 @@ class SearchRunForm(forms.Form):
         required=False,
     )
     people_type = forms.ChoiceField(choices=PEOPLE_TYPE_CHOICES, required=False)
-    people = forms.CharField(required=False)
-    manager = forms.CharField(required=False)
-    default_tester = forms.CharField(required=False)
+    people = UserField(required=False)
+    manager = UserField(required=False)
+    default_tester = UserField(required=False)
     status = forms.ChoiceField(choices=STATUS_CHOICES, required=False)
     tag__name__in = forms.CharField(label='Tag', required=False)
     
-    case_run__assignee__email__startswith = forms.CharField(required=False)
+    case_run__assignee = UserField(required=False)
     
     def clean_tag__name__in(self):
         return TestTag.string_to_list(self.cleaned_data['tag__name__in'])
