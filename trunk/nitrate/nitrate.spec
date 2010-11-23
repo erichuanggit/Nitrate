@@ -3,7 +3,7 @@
 
 Name:           nitrate
 Version:        3.2
-Release:        1
+Release:        2
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -115,6 +115,27 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
+* Tue Nov 23 2010 Xuqing Kuang <xkuang@redhat.com> - 3.2-2
+- Fixed own username/email in user profile display without register support
+- Completed UI FEAT - Add case default tester in search plan
+- Fixed username regex like Django restrictive
+- Swap the first/last name in profile
+- Fixed the run information style
+- Fixed #652474 - Unable to update "Basic information" fields.
+- Fixed UI Bug - 652478 - Inconsistent size, font weight in Test Plan Cases tab
+- Fixed #654211 - [TCMS]search run product is not same with run detai
+- Fixed #654967 - [TCMS]Fail to add Properties to environment group and show …
+- Fixed #654955 - [TCMS]fail:Search Test Run by Manager
+- Fixed #654949 - [TCMS]Fail:Remove Case from Test Run
+- Fixed UI Bug #654213 - New: [TCMS][REF]Remove "Test" in TESTING--->Search …
+- Fixed UI Bug #654505 - [TCMS][REF]Where is Description of bookmark.
+- Fixed UI Bug #654529 - [TCMS]Unify tips about Upload file format
+- Fixed #654922 - [TCMS]Fail:Remove test cases tag
+- Fixed #589633 - Not able to change author of plan
+- Fixed UI Bug #654553 - [TCMS]Default Component
+- Fixed UI Bug #627074 - Planning: Default components "update" removes …
+- Fixed #656174 - Can't record Case or Case-Run Log
+
 * Tue Nov 9 2010 Xuqing Kuang <xkuang@redhat.com> - 3.2-1
 - Fixed UI Bug #635329 - [TCMS]a small spelling mistake
 - Fixed #635369 - Add a test case with tags will fail via tcms xmlrpc
