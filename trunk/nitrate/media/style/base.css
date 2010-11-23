@@ -205,7 +205,7 @@ table.noborder,table.noborder td{border:none;background:transparent;}
 .toolbar_status{background-position: 0 -807px;padding-left:18px}
 .toolbar_priority{background-position: 0 -904px;padding-left:18px}
 
-.actions .export,.actions .filter_action, .actions .import, .actions .print_view,.actions .add_new, .actions .clone, .actions .add_new , .actions .delete,.actions .new_run ,.actions .proposed ,.actions .confirmed ,.actions .disabled,.actions .new_review,.actions .sortlink, .actions .search,.actions .need_update,.actions .p1,.actions .p2,.actions .p3,.actions .p4,.actions .p5{border:none;background:url("../images/operation.png") no-repeat;height:16px; line-height:16px; cursor:pointer; }
+.actions .export,.actions .filter_action, .actions .import, .actions .print_view,.actions .add_new, .actions .clone, .actions .add_new , .actions .delete,.actions .new_run ,.actions .proposed ,.actions .confirmed ,.actions .disabled,.actions .new_review,.actions .sortlink, .actions .search,.actions .need_update,.actions .p1,.actions .p2,.actions .p3,.actions .p4,.actions .p5{border:none;background:url("../images/operation.png") no-repeat;height:16px; line-height:16px; cursor:pointer;font-size:12px; }
 .actions a{cursor:pointer;}
 .actions input.export{background-position: 0 -384px;padding-left:16px;}
 .actions input.export[disabled='true']{background-position: 0px -868px;padding-left:16px;color:graytext;}
