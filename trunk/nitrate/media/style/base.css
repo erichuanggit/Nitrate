@@ -129,7 +129,7 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .mixbar_left{float:left; height:22px;line-height:22px;padding-left:5px;}
 .tagname{ margin-left:10px; height:20px; line-height:20px; float:left}
 .taglist{ margin-left:5px; float:left;line-height:20px; width:90%;}
-.taglist a{margin:0 1px;}
+.taglist a{margin:0 2px;}
 .tit{font-weight:bold;margin-left:10px; height:23px; line-height:23px;}
 .mixbar .tit{font-weight:bold;}
 .disablelink, .enablelink,.spadelink , .addlink, .editlink, .deletelink, .sortlink,.updatelink,.updategrey,.comment_add,.bug_add{background:transparent url(../images/operation.png) no-repeat;text-decoration:none;height:16px;line-height:16px;cursor:pointer; }
