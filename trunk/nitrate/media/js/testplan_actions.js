@@ -1156,7 +1156,7 @@ function constructPlanComponentModificationDialog(container)
             constructPlanComponentsZone('components', this.serialize());
             clearDialog();
         };
-        var notice = '';
+        var notice = 'Press "Ctrl" to select multiple default component';
         var s = new Element('input', {'type': 'submit', 'name': 'a', 'value': 'Update'}); // Submit button
         
         var f = constructForm(d.innerHTML, action, form_observe, notice, s);
