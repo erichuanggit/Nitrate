@@ -519,7 +519,7 @@ function renderComponentForm(container, parameters, form_observe)
     
     var callback = function(t) {
         var action = getURLParam().url_cases_component;
-        var notice = '';
+        var notice = 'Press "Ctrl" to select multiple default component';
         
         var h = new Element('input', {'type': 'hidden', 'name': 'a', 'value': 'add'});
         var a = new Element('input', {'type': 'submit', 'value': 'Add'});
