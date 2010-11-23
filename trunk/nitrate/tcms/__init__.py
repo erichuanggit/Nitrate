@@ -16,7 +16,7 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-VERSION = (3, 2, 0, 'final', 1, True)
+VERSION = (3, 2, 0, 'final', 2, True)
 XMLRPC_VERSION = (1, 1, 0, 'final', 1)
 
 def get_version():
