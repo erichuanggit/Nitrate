@@ -43,6 +43,7 @@ Nitrate.Utils.after_page_load(Nitrate.Profiles.Infos.on_load);
 						<a href="{% url django.contrib.auth.views.password_change %}">Change password</a>
 						{% else %}
 						{{ user_profile.user.username }}
+						<input type="hidden" name="username" value="{{ user_profile.user.username }}" />
 						{% endif %}
 					</td>
 				</tr>
@@ -60,6 +61,7 @@ Nitrate.Utils.after_page_load(Nitrate.Profiles.Infos.on_load);
 						{{ form.email }}
 						{% else %}
 						{{ user_profile.user.email }}
+						<input type="hidden" name="email" value="{{ user_profile.user.email }}" />
 						{% endif %}
 					</td>
 				</tr>
