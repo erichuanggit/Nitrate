@@ -109,7 +109,7 @@ class UserProfileForm(forms.ModelForm):
         can_register = False
         
         for b in get_backends():
-            if getattr(b, 'can_register'):
+            if getattr(b, 'can_register', None):
                 can_register = True
         
         instance = super(UserProfileForm, self).save(commit=commit)
