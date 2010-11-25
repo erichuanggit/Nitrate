@@ -12,16 +12,6 @@ Nitrate.TestRuns.List.on_load = function()
     bind_version_selector_to_product(true, $('id_product'));
     bind_build_selector_to_product(true, $('id_product'));
     
-    $('relativeSearchOption_case').observe('click', function(e){
-        if($('relativeSearch_case').getStyle('display') == 'none'){
-            Effect.BlindDown('relativeSearch_case',{ duration: 0.5 });
-            this.className = 'up'
-        } else {
-            Effect.BlindUp('relativeSearch_case',{ duration: 0.5 });
-            this.className = 'down'
-        }
-    })
-    
     $('id_check_all_runs').observe('click',function(e){
         clickedSelectAll(this, 'testruns_table', 'run')
     })
@@ -50,6 +40,18 @@ Nitrate.TestRuns.List.on_load = function()
         }
         
     })
+    
+    if($('relativeSearchOption_case')) {
+        $('relativeSearchOption_case').observe('click', function(e){
+            if($('relativeSearch_case').getStyle('display') == 'none'){
+                Effect.BlindDown('relativeSearch_case',{ duration: 0.5 });
+                this.className = 'up'
+            } else {
+                Effect.BlindUp('relativeSearch_case',{ duration: 0.5 });
+                this.className = 'down'
+            }
+        })
+    }
 }
 
 Nitrate.TestRuns.Details.on_load = function()
