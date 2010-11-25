@@ -833,7 +833,7 @@ a:link.edit,a:visited.edit{ color:#333;}
 .profile #basic_info td input{ margin-right:5px; color:grey}
 .profile #basic_info td input:focus{ color:#333;}
 .profile #basic_info td span{ width:70px; display:inline-block}
-.left_title{width:200px; background:url(../images/background-settings-form-li.png) repeat-x left bottom #eee; font-weight:bold;}
+.left_title{width:200px; background:url(../images/background-settings-form-li.png) repeat-x left bottom #eee;}
 .left_title .username{ background-position:0 -755px; padding-left:20px; margin:6px 20px;}
 .left_title .login_info{ background-position:0 -787px; padding-left:20px; margin:6px 20px;}
 .left_title .email{ background-position:0 -771px; padding-left:20px; margin:6px 20px;}
