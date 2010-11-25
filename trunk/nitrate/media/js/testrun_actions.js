@@ -12,11 +12,6 @@ Nitrate.TestRuns.List.on_load = function()
     bind_version_selector_to_product(true, $('id_product'));
     bind_build_selector_to_product(true, $('id_product'));
     
-<<<<<<< HEAD
-    $('id_check_all_runs').observe('click',function(e){
-        clickedSelectAll(this, 'testruns_table', 'run')
-    })
-=======
     if($('relativeSearchOption_case')) {
         $('relativeSearchOption_case').observe('click', function(e) {
             if($('relativeSearch_case').getStyle('display') == 'none'){
@@ -29,7 +24,6 @@ Nitrate.TestRuns.List.on_load = function()
         });
     };
     
->>>>>>> 030d28801cf16498f3ee0c5063ef8fe1d428b06d
     if($('testruns_table')) {
         $('id_check_all_runs').observe('click',function(e) {
             clickedSelectAll(this, 'testruns_table', 'run')
@@ -49,30 +43,6 @@ Nitrate.TestRuns.List.on_load = function()
         $('id_search_people').name = $F('id_people_type');
     });
     
-<<<<<<< HEAD
-    $('run_column_add').observe('change', function(t) {
-        switch(this.value) {
-            case 'col_plan':
-                $('col_plan_head').show();
-                $$('.col_plan_content').each(function(t){ t.show() });
-                $('col_plan_option').hide();
-                break;
-        }
-        
-    })
-    
-    if($('relativeSearchOption_case')) {
-        $('relativeSearchOption_case').observe('click', function(e){
-            if($('relativeSearch_case').getStyle('display') == 'none'){
-                Effect.BlindDown('relativeSearch_case',{ duration: 0.5 });
-                this.className = 'up'
-            } else {
-                Effect.BlindUp('relativeSearch_case',{ duration: 0.5 });
-                this.className = 'down'
-            }
-        })
-    }
-=======
     if($('run_column_add')) {
         $('run_column_add').observe('change', function(t) {
             switch(this.value) {
@@ -84,7 +54,6 @@ Nitrate.TestRuns.List.on_load = function()
             };
         });
     };
->>>>>>> 030d28801cf16498f3ee0c5063ef8fe1d428b06d
 }
 
 Nitrate.TestRuns.Details.on_load = function()
