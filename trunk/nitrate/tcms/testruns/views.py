@@ -230,7 +230,9 @@ def all(request, template_name = 'run/all.html'):
             # It's a search here.
             query_result = True
             trs = TestRun.list(search_form.cleaned_data)
-            trs = trs.select_related('manager', 'default_tester', 'build', 'plan', 'plan__product')
+            trs = trs.select_related(
+                'manager', 'default_tester', 'build', 'plan', 'build__product__name',
+            )
             
             # Further optimize by adding caserun attributes:
             trs = trs.extra(

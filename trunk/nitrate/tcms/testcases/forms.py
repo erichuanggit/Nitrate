@@ -135,7 +135,6 @@ class BaseCaseForm(forms.Form):
     is_automated = forms.MultipleChoiceField(
         choices = AUTOMATED_CHOICES,
         widget = forms.CheckboxSelectMultiple(),
-        required = False,
     )
     is_automated_proposed = forms.BooleanField(
         label = 'Autoproposed', required = False

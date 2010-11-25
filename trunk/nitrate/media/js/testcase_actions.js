@@ -572,6 +572,11 @@ function constructCaseAutomatedForm(container, parameters, callback)
         var action = '/cases/automated/';
         var form_observe = function(e) {
             e.stop();
+            if(this.getElementsBySelector('input[type="checkbox"]:checked').length == 0) {
+                alert('Nothing selected');
+                return false;
+            }
+            
             var params = this.serialize(true);
             params['case'] = parameters['case'];
             new Ajax.Request(getURLParam().url_cases_automated, {
