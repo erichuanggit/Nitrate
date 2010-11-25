@@ -35,23 +35,16 @@ IM_CHOICES = (
 
 BOOKMARK_EMPTY_LABEL = '---all---'
 
-can_register = False
-        
-for b in get_backends():
-    if getattr(b, 'can_register'):
-        can_register = True
-
 class UserProfileForm(forms.ModelForm):
     user = forms.CharField(widget = forms.HiddenInput)
     username = forms.RegexField(
         label = _("Username"), max_length=30, regex=r'^[\w.@+-]+$',
         help_text = _("Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."),
         error_messages = {'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")},
-        required = False,
     )
     first_name = forms.CharField(max_length = 128, required = False)
     last_name = forms.CharField(max_length = 128, required = False)
-    email = forms.EmailField(label=_("E-mail"), max_length=75, required = False)
+    email = forms.EmailField(label=_("E-mail"), max_length=75)
     im_type_id = forms.ChoiceField(choices = IM_CHOICES)
     
     class Meta:
@@ -68,9 +61,6 @@ class UserProfileForm(forms.ModelForm):
     
     def clean_email(self):
         email = self.cleaned_data['email']
-        if can_register and not email:
-            raise forms.ValidationError(_('This field is required.'))
-
         if not getattr(self.instance, 'pk'):
             return email
         
@@ -78,9 +68,12 @@ class UserProfileForm(forms.ModelForm):
             return email
         
         try:
-            User.objects.get(email = email)
+            u = User.objects.get(email = email)
         except ObjectDoesNotExis, error:
             return email
+        
+        if u == self.instance:
+            return username
         
         raise forms.ValidationError(_("A user with that email already exists."))
     
@@ -95,9 +88,6 @@ class UserProfileForm(forms.ModelForm):
     
     def clean_username(self):
         username = self.cleaned_data['username']
-
-        if can_register and not username:
-            raise forms.ValidationError(_('This field is required.'))
         
         if not getattr(self.instance, 'pk'):
             return username
@@ -106,13 +96,22 @@ class UserProfileForm(forms.ModelForm):
             return username
         
         try:
-            User.objects.get(username=username)
+            u = User.objects.get(username=username)
         except ObjectDoesNotExist:
+            return username
+        
+        if u == self.instance:
             return username
         
         raise forms.ValidationError(_("A user with that username already exists."))
     
     def save(self, commit = True):
+        can_register = False
+        
+        for b in get_backends():
+            if getattr(b, 'can_register', None):
+                can_register = True
+        
         instance = super(UserProfileForm, self).save(commit=commit)
         user = instance.user
         if can_register:
