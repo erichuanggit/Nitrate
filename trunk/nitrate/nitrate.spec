@@ -3,7 +3,7 @@
 
 Name:           nitrate
 Version:        3.2
-Release:        2
+Release:        3
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -115,6 +115,16 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
+* Tue Nov 30 2010 Xuqing Kuang <xkuang@redhat.com - 3.2-3
+- Fixed UI Bug #654944 - [TCMS][RFE]Email content:Assign cases to …
+- Fixed UI Bug #656215 - Select all checkbox in search run page broken.
+- Fixed #646912 - editing TC, leaving all automated/manual/autoproposed …
+- Remove the JSCal2 DateTime? widget(no longer in use).
+- Added grappelli skin for tinyMCE
+- Fixed UI Bug #657452 - [TCMS3.2-2]put mouse on the status buttons and no tips …
+- Fixed #658385 - TCMS is spamming with "Assignee of run X has ben …
+- Fixed #658181 - TCMS xmlrpc: 403 FORBIDDEN
+
 * Tue Nov 23 2010 Xuqing Kuang <xkuang@redhat.com> - 3.2-2
 - Fixed own username/email in user profile display without register support
 - Completed UI FEAT - Add case default tester in search plan
