@@ -115,7 +115,12 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
-* Tue Nov 30 2010 Xuqing Kuang <xkuang@redhat.com - 3.2-3
+* Thu Dec 1 2010 Xuqing Kuang <xkuang@redhat.com> - 3.2-3
+- Fixed #658160 - Changing case status does not work reliably
+- Fixed UI Bug #658495 - Some case run comments not displayed
+- Re-enabled assignee update notification.
+
+* Tue Nov 30 2010 Xuqing Kuang <xkuang@redhat.com> - 3.2-3
 - Fixed UI Bug #654944 - [TCMS][RFE]Email content:Assign cases to …
 - Fixed UI Bug #656215 - Select all checkbox in search run page broken.
 - Fixed #646912 - editing TC, leaving all automated/manual/autoproposed …
