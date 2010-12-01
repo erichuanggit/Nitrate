@@ -3,7 +3,7 @@
 
 Name:           nitrate
 Version:        3.2
-Release:        3
+Release:        4
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -115,7 +115,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
-* Thu Dec 1 2010 Xuqing Kuang <xkuang@redhat.com> - 3.2-3
+* Thu Dec 1 2010 Xuqing Kuang <xkuang@redhat.com> - 3.2-4
 - Fixed #658160 - Changing case status does not work reliably
 - Fixed UI Bug #658495 - Some case run comments not displayed
 - Re-enabled assignee update notification.
