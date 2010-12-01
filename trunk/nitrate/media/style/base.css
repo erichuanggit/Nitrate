@@ -179,8 +179,8 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .option_prefer{-moz-background-clip:border;-moz-background-inline-policy:continuous;-moz-background-origin:padding;background:#f3f8fc none repeat scroll 0 0;border:1px outset #999988;margin:0 1em 1em;padding:0.8em; text-align:left;float:right; margin-right:10px;}
 .option_prefer lable{ margin-left:5px;}
 #id_comment{width:600px;height:200px;}
-.comment li{margin:5px 10px 5px 0;border-bottom:1px dotted #666; position:relative}
-.commentdelete{float:right; display:block; background-position:0 -15px;padding-left:13px; margin-right:5px;cursor:pointer;}
+.comment li{margin:5px 10px 5px 0;border-bottom:1px dotted #666;}
+.commentdelete{float:right; display:block; background-position:0 -15px;padding-left:13px; margin:-20px 5px 0 0;cursor:pointer;}
 table.noborder,table.noborder td{border:none;background:transparent;}
 
 
