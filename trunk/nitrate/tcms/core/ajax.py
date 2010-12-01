@@ -296,7 +296,7 @@ def update(request):
     from django.utils import simplejson
     # Initial the response
     ajax_response = { 'rc': 0, 'response': 'ok' }
-    
+    now = datetime.datetime.now()
     # Initial the data
     data = request.REQUEST.copy()
     ctype = data.get("content_type")
@@ -317,7 +317,7 @@ def update(request):
         # Temporary solution is convert all of data to str
         # 'bool': lambda x: x == 'True',
         'bool': lambda x: x == 'True' and 1 or 0,
-        'datetime': lambda x: x == 'NOW' and str(datetime.datetime.now()) or str(datetime.datetime(x)), # FIXME
+        'datetime': lambda x: x == 'NOW' and str(now) or str(datetime.datetime(x)), # FIXME
         'int': lambda x: str(int(x)),
         'str': lambda x: str(x),
         'None': lambda x: None,
@@ -379,6 +379,42 @@ def update(request):
         if mail_context:
             mail_context['request'] = request
             mailto(**mail_context)
+    
+    # Special hacking for updating test case run status
+    # https://bugzilla.redhat.com/show_bug.cgi?id=658160 
+    if ctype == 'testruns.testcaserun' and field == 'case_run_status':
+        if len(targets) == 1:
+            targets[0].set_current()
+        
+        for t in targets:
+            field = 'close_date'
+            t.log_action(
+                who = request.user,
+                action = 'Field %s changed from %s to %s.' % (
+                    field, getattr(t, field), now
+                )
+            )
+            if t.tested_by != request.user:
+                field = 'tested_by'
+                t.log_action(
+                    who = request.user,
+                    action = 'Field %s changed from %s to %s.' % (
+                        field, getattr(t, field), request.user
+                    )
+                )
+            
+            field = 'assignee'
+            if t.assignee != request.user:
+                t.log_action(
+                    who = request.user,
+                    action = 'Field %s changed from %s to %s.' % (
+                        field, getattr(t, field), request.user
+                    )
+                )
+                t.assignee = request.user
+            t.save()
+        targets.update(close_date = now)
+        targets.update(tested_by = request.user)
     
     del ctype, object_pk, field, value, targets
     return HttpResponse(simplejson.dumps(ajax_response))

@@ -295,16 +295,17 @@ var updateCaseRunStatus = function(e)
     
     // Update the object when changing the status
     if(parameters['value'] != '') {
-        updateObject(ctype, object_pk, 'close_date', 'NOW', 'datetime');
+        // updateObject(ctype, object_pk, 'close_date', 'NOW', 'datetime');
         updateObject(ctype, object_pk, field, value, vtype, callback);
         
+        /*
         if(parameters['assignee'] != Nitrate.User.pk)
             updateObject(ctype, object_pk, 'assignee', Nitrate.User.pk);
         if(parameters['tested_by'] != Nitrate.User.pk)
             updateObject(ctype, object_pk, 'tested_by', Nitrate.User.pk);
-        
+        */
         // Set the case run to be current
-        new Ajax.Request(getURLParam(object_pk).url_case_run_set_current);
+        // new Ajax.Request(getURLParam(object_pk).url_case_run_set_current);
     }
 }
 

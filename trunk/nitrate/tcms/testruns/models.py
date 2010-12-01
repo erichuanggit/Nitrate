@@ -409,12 +409,12 @@ class TestCaseRun(TCMSActionModel):
         # template, subject, context
         tcrs = objects.select_related()
         scence_templates = {
-            #'assignee': {
-            #    'template_name': 'mail/change_case_run_assignee.txt',
-            #    'subject': 'Assignee of run %s has been changed' % tr.run_id,
-            #    'to_mail': tr.get_notify_addrs(),
-            #    'context': {'test_run': tr, 'test_case_runs': tcrs},
-            #}
+            'assignee': {
+                'template_name': 'mail/change_case_run_assignee.txt',
+                'subject': 'Assignee of run %s has been changed' % tr.run_id,
+                'to_mail': tr.get_notify_addrs(),
+                'context': {'test_run': tr, 'test_case_runs': tcrs},
+            }
         }
         
         return scence_templates.get(field)
