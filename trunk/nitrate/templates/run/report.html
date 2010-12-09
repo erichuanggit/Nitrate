@@ -150,19 +150,19 @@
 		
 		<table	class="list border-1" cellpadding="0" cellspacing="0">
 			<tr>
-				<th height="25px" width="190">Bug Tracker</th>
+				<th width="150px">Bug ID</th>
 				<th>Bug Url</th>
 			</tr>
 			{% for bug in test_case_run_bugs %}
 			<tr>
-				<td>{{ bug.bug_system.name }}</td>
-				<td><a href="{{ bug.get_absolute_url }}" >{{ bug.get_absolute_url }}</a></td>
+				<td>{{ bug }}</td>
+				<td><a href="{{ SETTINGS.BUGZILLA_URL }}show_bug.cgi?id={{ bug }}" >{{ SETTINGS.BUGZILLA_URL }}show_bug.cgi?id={{ bug }}</a></td>
 			</tr>
 			{% endfor %}
 			<tr>
 				<td>View all bugs</td>
-				<td><a href="{{ SETTINGS.BUGZILLA_URL }}buglist.cgi?bugidtype=include&bug_id={% for bug in test_case_run_bugs %}{{ bug.bug_id }}{% if not forloop.last %},{% endif %}{% endfor %}">
-							 {{ SETTINGS.BUGZILLA_URL }}buglist.cgi?bugidtype=include&bug_id={% for bug in test_case_run_bugs %}{{ bug.bug_id }}{% if not forloop.last %},{% endif %}{% endfor %}</a></td>
+				<td><a href="{{ SETTINGS.BUGZILLA_URL }}buglist.cgi?bugidtype=include&bug_id={% for bug in test_case_run_bugs %}{{ bug }}{% if not forloop.last %},{% endif %}{% endfor %}">
+							 {{ SETTINGS.BUGZILLA_URL }}buglist.cgi?bugidtype=include&bug_id={% for bug in test_case_run_bugs %}{{ bug }}{% if not forloop.last %},{% endif %}{% endfor %}</a></td>
 			</tr>
 		</table>
 		

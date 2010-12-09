@@ -119,7 +119,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 			</tr>
 			<tr>
 				<th colspan="2">
-					<a class="strong" href="{% url tcms.testruns.views.report test_run.run_id %}#buglist" title="Show ALl Bugs">Show All Bugs ({{ test_case_run_bugs.count }})</a>
+					<a class="strong" href="{% url tcms.testruns.views.report test_run.run_id %}#buglist" title="Show ALl Bugs">Show All Bugs ({{ test_case_run_bugs|length }})</a>
 				</th>
 			</tr>
 		</table>

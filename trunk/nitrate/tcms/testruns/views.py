@@ -295,7 +295,8 @@ def get(request, run_id, template_name = 'run/get.html'):
     # Get the test case run bugs summary
     tcr_bugs = TestCaseBug.objects.select_related('bug_system').all()
     tcr_bugs = tcr_bugs.filter(case_run__case_run_id__in = tcrs.values_list('case_run_id', flat=True))
-    
+    tcr_bugs = tcr_bugs.values_list('bug_id', flat=True)
+    tcr_bugs = set(tcr_bugs)
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
