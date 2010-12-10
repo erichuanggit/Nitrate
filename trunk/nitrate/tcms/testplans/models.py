@@ -28,6 +28,11 @@ from tcms.management.models import TCMSEnvPlanMap
 from tcms.testcases.models import TestCasePlan
 from tcms.core.models import TCMSActionModel
 
+try:
+    from tcms.core.contrib.plugins_support.signals import register_model
+except ImportError:
+    register_model = None
+
 class TestPlanType(TCMSActionModel):
     id = models.AutoField(db_column='type_id', primary_key=True)
     name = models.CharField(max_length=64, unique=True)
@@ -354,3 +359,10 @@ class TestPlanComponent(models.Model):
     class Meta:
         db_table = u'test_plan_components'
         unique_together = ('plan', 'component')
+
+if register_model:
+    register_model(TestPlan)
+    register_model(TestPlanText)
+    register_model(TestPlanType)
+    register_model(TestPlanTag)
+    register_model(TestPlanComponent)

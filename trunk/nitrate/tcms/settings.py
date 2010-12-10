@@ -150,8 +150,22 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'tcms.core.context_processors.settings_processor',
 )
 
-# XML-RPC methods
+#
+# Default apps settings
+#
 
+# Defene the custom comment app
+# http://docs.djangoproject.com/en/dev/ref/contrib/comments/custom/
+
+COMMENTS_APP = 'tcms.core.contrib.comments'
+
+# Define the custom profile models
+AUTH_PROFILE_MODULE = 'profiles.UserProfile'
+
+#
+# XML-RPC interface settings
+#
+# XML-RPC methods
 XMLRPC_METHODS = {
     'TCMS_XML_RPC': (
         ('tcms.xmlrpc.auth', 'Auth'),
@@ -169,26 +183,19 @@ XMLRPC_METHODS = {
 
 XMLRPC_TEMPLATE = 'xmlrpc.html'
 
+# Cache backend
+CACHE_BACKEND = 'locmem://'
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+
 # wadofstuff serializer settings
 # http://code.google.com/p/wadofstuff/wiki/DjangoFullSerializers
 SERIALIZATION_MODULES = {
     'json': 'tcms.core.lib.wadofstuff.django.serializers.json',
 }
 
-# Cache backend
-CACHE_BACKEND = 'locmem://'
-SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
-
-# Authentication backends
-# For the login/register/logout reaon, we only support the internal auth backends.
-# Here we use TCMS Email Auth Backend by default
-AUTHENTICATION_BACKENDS = (
-    'tcms.core.contrib.auth.backends.DBModelBackend',
-)
-
+#
 # Debug settings
-# It can be show in console when DEBUG_PROPAGATE_EXCEPTIONS is True
-
+#
 # Debug log file, default is output to console
 DEBUG_LOG_FILE = '/var/log/shipshape.log'
 # Debug level is following:
@@ -197,30 +204,26 @@ DEBUG_LOG_FILE = '/var/log/shipshape.log'
 # - 5 is Error
 DEBUG_LEVEL = 0
 
-# Attachement file download path
-# it could be spcified to a different out of MEDIA_URL
-# FILE_UPLOAD_DIR = path.join(MEDIA_DIR, 'uploads').replace('\\','/'),
-FILE_UPLOAD_DIR = '/var/tmp/uploads'
-
-# Bugzilla author xmlrpc url
-BUGZILLA3_RPC_SERVER = ''
-BUGZILLA_URL = ''
-
 # Needed by django.core.context_processors.debug:
 # See http://docs.djangoproject.com/en/dev/ref/templates/api/#django-core-context-processors-debug
-
 INTERNAL_IPS = ('127.0.0.1', )
 
-# Defene the custom comment app
-# http://docs.djangoproject.com/en/dev/ref/contrib/comments/custom/
+#
+# Plugins
+#
+SIGNAL_PLUGINS = (
+    # 'tcms.plugins.example',
+)
 
-COMMENTS_APP = 'tcms.core.contrib.comments'
+# Authentication backends
+# For the login/register/logout reaon, we only support the internal auth backends.
+AUTHENTICATION_BACKENDS = (
+    'tcms.core.contrib.auth.backends.DBModelBackend',
+)
 
-# Define the custom profile models
-AUTH_PROFILE_MODULE = 'profiles.UserProfile'
-
+#
 # Mail settings
-
+#
 # Set the default send mail address
 # See http://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_HOST = ''
@@ -255,17 +258,6 @@ MAX_UPLOAD_SIZE = 5242880
 #MOTD_LOGIN = """<p>This is a development instance of the TCMS</p> 
 # <p>(this is MOTD_LOGIN)</p>"""
 
-
-# Kerberos settings
-KRB5_REALM = ''
-
-# First run - to detemine need port user or not.
-FIRST_RUN = True
-
-# Enable the administrator delete permission
-# In another word it's set the admin to super user or not.
-SET_ADMIN_AS_SUPERUSER = False
-
 # The URLS will be list in footer
 # Example:
 #FOOTER_LINKS = (
@@ -274,3 +266,30 @@ SET_ADMIN_AS_SUPERUSER = False
 #   ('http://foo.com', 'foo')
 #)
 FOOTER_LINKS = ()
+
+# Attachement file download path
+# it could be spcified to a different out of MEDIA_URL
+# FILE_UPLOAD_DIR = path.join(MEDIA_DIR, 'uploads').replace('\\','/'),
+FILE_UPLOAD_DIR = '/var/tmp/uploads'
+
+#
+# Installation settings
+#
+# First run - to detemine need port user or not.
+FIRST_RUN = True
+
+# Enable the administrator delete permission
+# In another word it's set the admin to super user or not.
+SET_ADMIN_AS_SUPERUSER = False
+
+#
+# Authentication backend settings
+#
+# Bugzilla author xmlrpc url
+# Required by bugzilla authentication backend
+BUGZILLA3_RPC_SERVER = ''
+BUGZILLA_URL = ''
+
+# Kerberos settings
+# Required by kerberos authentication backend
+KRB5_REALM = ''

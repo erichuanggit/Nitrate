@@ -26,6 +26,11 @@ from tcms.testcases.models import TestCaseBug, TestCaseText, NoneText
 
 from signals import post_run_saved
 
+try:
+    from tcms.core.contrib.plugins_support.signals import register_model
+except ImportError:
+    register_model = None
+
 # Create your models here.
 
 class TestRun(TCMSActionModel):
@@ -520,3 +525,8 @@ class TCMSEnvRunValueMap(models.Model):
 
 # Signals handler
 signals.post_save.connect(post_run_saved, sender=TestRun)
+
+if register_model:
+    register_model(TestRun)
+    register_model(TestCaseRun)
+    register_model(TestRunTag)

@@ -20,6 +20,11 @@ from django.db import models
 from tcms.core.models import TCMSBaseSharedModel, TCMSActionModel, BlobField
 from tcms.core.utils.xmlrpc import XMLRPCSerializer
 
+try:
+    from tcms.core.contrib.plugins_support.signals import register_model
+except ImportError:
+    register_model = None
+
 # Products zone
 
 def get_as_choices(iterable, allow_blank):
@@ -448,3 +453,15 @@ class TCMSEnvValue(TCMSActionModel):
     @classmethod
     def get_active(cls):
         return cls.objects.filter(is_active=True)
+
+if register_model:
+    register_model(Classification)
+    register_model(Product)
+    register_model(Priority)
+    register_model(Version)
+    register_model(TestBuild)
+    register_model(TestTag)
+    register_model(Component)
+    register_model(TCMSEnvGroup)
+    register_model(TCMSEnvValue)
+    register_model(TestAttachment)

@@ -21,6 +21,11 @@ from django.core.urlresolvers import reverse
 from django.db import models, connection, transaction
 from tcms.core.models import TCMSActionModel, TimedeltaField
 
+try:
+    from tcms.core.contrib.plugins_support.signals import register_model
+except ImportError:
+    register_model = None
+
 AUTOMATED_CHOICES = ( 
     (0, 'Manual'), 
     (1, 'Auto'), 
@@ -595,3 +600,10 @@ class TestCaseBug(TCMSActionModel):
     
     def get_url(self):
         return self.bug_system.url_reg_exp % self.bug_id
+
+if register_model:
+    register_model(TestCase)
+    register_model(TestCaseText)
+    register_model(TestCasePlan)
+    register_model(TestCaseBug)
+    register_model(TestCaseComponent)
