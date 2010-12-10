@@ -259,9 +259,6 @@ MAX_UPLOAD_SIZE = 5242880
 # Kerberos settings
 KRB5_REALM = ''
 
-# Testopia XML version
-TESTOPIA_XML_VERSION = '1.1'
-
 # First run - to detemine need port user or not.
 FIRST_RUN = True
 
