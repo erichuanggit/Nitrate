@@ -54,6 +54,7 @@ Nitrate.TestRuns.List.on_load = function()
             };
         });
     };
+	
 }
 
 Nitrate.TestRuns.Details.on_load = function()
@@ -124,6 +125,12 @@ Nitrate.TestRuns.Details.on_load = function()
                 fireEvent(e.getElementsBySelector('.expandable')[0], 'click');
             })
         }
+    }
+
+	if($('filter_case_run')) {
+	        $('filter_case_run').observe('click',function(e){
+            $('id_filter').toggle();
+        })
     }
 }
 

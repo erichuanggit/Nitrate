@@ -38,10 +38,15 @@ def is_mine(object, user):
 @register.filter(name='smart_unicode')
 def smart_unicode(object):
     from django.utils.encoding import smart_unicode
+    if not object:
+        return object
     return smart_unicode(object)
 
 @register.filter(name='smart_int')
 def smart_int(object):
+    if not object:
+        return object
+    
     try:
         return int(object)
     except ValueError:

@@ -262,7 +262,7 @@ def get(request, run_id, template_name = 'run/get.html'):
     from tcms.testcases.models import TestCaseBug
     from tcms.management.models import Priority
     SUB_MODULE_NAME = "runs"
-    from pprint import pprint
+    
     # Get the test run
     try:
         tr = TestRun.objects.select_related().get(run_id = run_id)
@@ -272,12 +272,15 @@ def get(request, run_id, template_name = 'run/get.html'):
     # Get the test case runs belong to the run
     tcrs = tr.case_run.all()
     
+    # Count the status
+    status_counter = CaseRunStatusCounter(tcrs)
+    
     # Redirect to assign case page when a run does not contain any case run
     if not tcrs.count():
         return HttpResponseRedirect(
             reverse('tcms.testruns.views.assign_case', args=[run_id,])
         )
-    pprint(clean_request(request))
+    
     # Continue to search the case runs with conditions
     tcrs = tcrs.filter(**clean_request(request))
     if request.REQUEST.get('order_by'):
@@ -296,9 +299,6 @@ def get(request, run_id, template_name = 'run/get.html'):
     })
     tcrs = tcrs.distinct()
     
-    # Count the status
-    tcrs.count_by_status = CaseRunStatusCounter(tcrs)
-    
     # Get the test case run bugs summary
     tcr_bugs = TestCaseBug.objects.select_related('bug_system').all()
     tcr_bugs = tcr_bugs.filter(case_run__case_run_id__in = tcrs.values_list('case_run_id', flat=True))
@@ -310,6 +310,7 @@ def get(request, run_id, template_name = 'run/get.html'):
         'test_run': tr,
         'from_plan': request.GET.get('from_plan', False),
         'test_case_runs': tcrs,
+        'status_counter': status_counter,
         'test_case_run_bugs': tcr_bugs,
         'test_case_run_status': TestCaseRunStatus.objects.order_by('pk'),
         'priorities': Priority.objects.all()

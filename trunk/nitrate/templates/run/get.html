@@ -80,17 +80,13 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 			<tr>
 				<td colspan="2" align="center">
 				<div class="progress-bar" style="float:none">
-					<div class="percent">{{ test_case_runs.count_by_status.complete_percent|floatformat:2 }}%</div>
-					<div class="progress-inner" style="width:{{ test_case_runs.count_by_status.complete_percent|floatformat:"0" }}px;">
-						{% comment %}
-						<div class="progress-failed" style="width:{{ test_case_runs.count_by_status.failed_percent|floatformat:"0" }}px;">
-						</div>
-						{% endcomment %}
+					<div class="percent">{{ status_counter.complete_percent|floatformat:2 }}%</div>
+					<div class="progress-inner" style="width:{{ status_counter.complete_percent|floatformat:"0" }}px;">
 					</div>
 				</div>
 				</td>
 			</tr>
-			{% for k, v in test_case_runs.count_by_status.count_data.items %}
+			{% for k, v in status_counter.count_data.items %}
 			<tr>
 				<th width="50%;"><a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '{{ k.pk }}')">{{ k }}</a></th>
 				<td>{{ v }}</td>
@@ -254,6 +250,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 		<div class="mixbar"> 
 			<span class="tit" style='float:left'>Cases: {{ test_case_runs.count }}</span>
 			<div class='mixbar_left'>
+				<input id="id_check_box_auto_blinddown" type="checkbox" checked="true" />
+				<label for="id_check_box_auto_blinddown">Automatically display next test case</label>
+				<input id="id_check_box_highlight" type="checkbox" />
+				<label for="id_check_box_highlight">Highligt My Assigned Runs</label>
+			</div>
+			<div class="reorder_case">
 				{% comment %}
 				<select name="case_run_status">
 					<option>Set Status</option>
@@ -292,12 +294,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 				<span class="sortlink grey" >Re-order Cases</span>
 				<span class="updategrey">Update</span>
 				{% endif %}
-			</div>
-			<div class="reorder_case">
-				<input id="id_check_box_auto_blinddown" type="checkbox" checked="true" />
-				<label for="id_check_box_auto_blinddown">Automatically display next test case</label>
-				<input id="id_check_box_highlight" type="checkbox" />
-				<label for="id_check_box_highlight">Highligt My Assigned Runs</label>
+				<a title="Click to show filter case-run options" class="btn_filter filtercase" id='filter_case_run'>Show filter options</a>
 			</div>
 		</div>
 		{% include 'run/get_case_runs.html' %}

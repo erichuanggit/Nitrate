@@ -1,29 +1,51 @@
 {% load extra_filters %}
 
-<form id="id_filter" action="." method="get">
+<form id="id_filter" action="." method="get" style='display:none'>
 	<input type="hidden" name="order_by" value="{{ REQUEST_CONTENTS.order_by }}" />
-	<label for="id_summary">Summary</label><input id="id_summary" type="text" name="case__summary__icontains" value="{{ REQUEST_CONTENTS.case__summary__icontains }}" /><br />
-	<label for="id_default_tester">Default tester</label><input id="id_default_tester" type="text" name="tested_by__email__startswith" value="{{ REQUEST_CONTENTS.tested_by__email__startswith }}" /><br />
-	<label for="id_assignee">Assignee</label><input id="id_assignee" type="text" name="assignee__email__startswith" value="{{ REQUEST_CONTENTS.assignee__email__startswith }}" /><br />
-	<label for="id_bug">Bug</label><input id="id_bug" type="text" name="case_run_bug__bug_id__in" value="{{ REQUEST_CONTENTS.case_run_bug__bug_id__in }}" /><br />
-	<label for="id_case_run_status">Status</label>
-	<select id="id_case_run_status" name="case_run_status__pk">
-		<option value="">--------</option>
-		{% for case_run_status in test_case_run_status %}
-		<option value="{{ case_run_status.pk }}" {% ifequal case_run_status.pk REQUEST_CONTENTS.case_run_status__pk|smart_int %}selected="selected"{% endifequal %}>{{ case_run_status }}</option>
-		{% endfor %}
-	</select>
-	<br />
-	<label for="id_priority">Priority</label>
-	<select id="id_priority" name="case__priority__pk">
-		<option value="">--------</option>
-		{% for priority in priorities %}
-		<option value="{{ priority.pk }}" {% ifequal priority.pk REQUEST_CONTENTS.case__priority__pk|smart_int %}selected="selected"{% endifequal %}>{{ priority }}</option>
-		{% endfor %}
-	</select>
-	<br />
-	<input type="submit" />
-	<input type="reset" />
+	<div class="leftlistinfo">
+		<div class="listinfo">
+			<span class="title"><label for="id_summary">Summary</label></span>
+			<input id="id_summary" type="text" name="case__summary__icontains" value="{{ REQUEST_CONTENTS.case__summary__icontains }}" />
+		</div>
+		<div class="listinfo">
+			<span class="title"><label for="id_default_tester">Default tester</label></span>
+			<input id="id_default_tester" type="text" name="tested_by__email__startswith" value="{{ REQUEST_CONTENTS.tested_by__email__startswith }}" />
+		</div>
+		<div class="listinfo">
+			<span class="title"><label for="id_assignee">Assignee</label></span>
+			<input id="id_assignee" type="text" name="assignee__email__startswith" value="{{ REQUEST_CONTENTS.assignee__email__startswith }}" />
+		</div>
+	</div>
+	<div class="rightlistinfo">
+		<div class="listinfo">
+			<span class="title"><label for="id_bug">Bug</label></span>
+			<input id="id_bug" type="text" name="case_run_bug__bug_id__in" value="{{ REQUEST_CONTENTS.case_run_bug__bug_id__in }}" />
+			<span class='grey'>You can type multiple bugs by comma.</span>
+		</div>
+		<div class="listinfo">
+			<span class="title"><label for="id_case_run_status">Status</label></span>
+			<select id="id_case_run_status" name="case_run_status__pk">
+				<option value="">--------</option>
+				{% for case_run_status in test_case_run_status %}
+				<option value="{{ case_run_status.pk }}" {% ifequal case_run_status.pk REQUEST_CONTENTS.case_run_status__pk|smart_int %}selected="selected"{% endifequal %}>{{ case_run_status }}</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div class="listinfo">
+			<span class="title"><label for="id_priority">Priority</label></span>
+			<select id="id_priority" name="case__priority__pk">
+				<option value="">--------</option>
+				{% for priority in priorities %}
+				<option value="{{ priority.pk }}" {% ifequal priority.pk REQUEST_CONTENTS.case__priority__pk|smart_int %}selected="selected"{% endifequal %}>{{ priority }}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+	<div class='clear'></div>
+	<div class='button_box2'>
+	<input type="submit" value='Search' />
+	<input type="reset" value='Reset' />
+	</div>
 </form>
 
 <table class="list" id="id_table_cases" cellspacing="0" cellspan="0">
