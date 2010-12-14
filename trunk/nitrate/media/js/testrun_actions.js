@@ -123,15 +123,32 @@ Nitrate.TestRuns.Details.on_load = function()
         if($$('.is_current').length != 0) {
             $$('.is_current').each(function(e) {
                 fireEvent(e.getElementsBySelector('.expandable')[0], 'click');
-            })
-        }
-    }
-
-	if($('filter_case_run')) {
-	        $('filter_case_run').observe('click',function(e){
+            });
+        };
+    };
+    
+    if($('filter_case_run')) {
+        $('filter_case_run').observe('click',function(e) {
             $('id_filter').toggle();
-        })
-    }
+        });
+    };
+    
+    // Mass operations
+    if($('id_mass_change_case_run_status')) {
+        $('id_mass_change_case_run_status').observe('change', function(e) {
+            var object_pks = serializeCaseRunFromInputList($('id_table_cases'));
+            debug_output(this.value);
+            if(this.value == '')
+                return false;
+            if(object_pks.length == 0) {
+                alert(default_messages.alert.no_case_selected);
+                return false;
+            };
+            if(!confirm(default_messages.confirm.change_case_status))
+                return false;
+            updateObject('testruns.testcaserun', object_pks, 'case_run_status', this.value, 'int', reloadWindow);
+        });
+    };
 }
 
 Nitrate.TestRuns.New.on_load = function()
@@ -434,8 +451,7 @@ function addCaseRunBug(title_container, container, case_id, case_run_id, callbac
     
     if(!bug_id)
         return false
-    debug_output(title_container);
-    debug_output(container);
+    
     if(parseInt(bug_id) != bug_id) {
         alert('Wrong number.');
         return false;

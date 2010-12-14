@@ -1310,8 +1310,16 @@ function constructForm(content, action, form_observe, info, s, c)
     return f
 }
 
-function reloadWindow()
+var reloadWindow = function(t)
 {
+    if(t) {
+        var returnobj = t.responseText.evalJSON();
+        if(returnobj.rc != 0) {
+            alert(returnobj.response);
+            return false;
+        }
+    }
+    
     window.location.reload(true);
 }
 
