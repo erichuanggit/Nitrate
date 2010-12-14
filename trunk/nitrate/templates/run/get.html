@@ -92,25 +92,13 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 			</tr>
 			{% for k, v in test_case_runs.count_by_status.count_data.items %}
 			<tr>
-				<th width="50%;">{{ k }}</th>
-				{% if v and perms.testruns.change_testcaserun %}
-				<td>
-						{{ v }}
-				</td>
-				{% else %}
-				<td>
-					{{ v }}
-				</td>
-				{% endif %}
+				<th width="50%;"><a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '{{ k.pk }}')">{{ k }}</a></th>
+				<td>{{ v }}</td>
 			</tr>
 			{% endfor %}
 			<tr>
-				<th>Total</th>
-				{% if test_case_runs.count_by_status.total and perms.testruns.change_testcaserun %}
+				<th><a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '')">Total</a></th>
 				<td>{{ test_case_runs.count_by_status.total }}</td>
-				{% else %}
-				<td>{{ test_case_runs.count_by_status.total }}</td>
-				{% endif %}
 			</tr>
 			<tr>
 				<th colspan="2">

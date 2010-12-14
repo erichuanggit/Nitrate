@@ -23,8 +23,10 @@ def string_to_list(strs, spliter = ','):
     """Convert the string to list"""
     if isinstance(strs, list):
         str_list = map(lambda t: str(t).strip(), strs)
-    else:
+    elif strs.find(spliter):
         str_list = map(lambda t: str(t).strip(), strs.split(spliter))
+    else:
+        str_list = [strs]
     return [s for s in str_list if s]
 
 def form_errors_to_list(form):
@@ -69,3 +71,23 @@ def request_host_link(request, domain_name = None):
         domain_name = request.get_host()
     
     return protocol + domain_name
+
+def clean_request(request, keys = None):
+    """
+    Clean the request strings
+    """
+    request_contents = request.REQUEST.copy()
+    if not keys: keys = request_contents.keys()
+    rt = {}
+    for k in keys:
+        k = str(k)
+        if request_contents.get(k):
+            if k == 'order_by':
+                continue
+            
+            v = request.REQUEST[k]
+            # Convert the value to be list if it's __in filter.
+            if k.endswith('__in') and isinstance(v, unicode):
+                v = string_to_list(v)
+            rt[k] = v
+    return rt

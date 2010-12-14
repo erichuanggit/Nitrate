@@ -35,6 +35,18 @@ def is_mine(object, user):
     
     return False
 
+@register.filter(name='smart_unicode')
+def smart_unicode(object):
+    from django.utils.encoding import smart_unicode
+    return smart_unicode(object)
+
+@register.filter(name='smart_int')
+def smart_int(object):
+    try:
+        return int(object)
+    except ValueError:
+        return object
+
 #@register.filter(name='absolute_url')
 @register.inclusion_tag('mail/new_run.txt', takes_context = True)
 def absolute_url(context):
@@ -44,3 +56,4 @@ def absolute_url(context):
         return None
     
     return object.get_absolute_url(request)
+

@@ -26,19 +26,12 @@ class CaseRunStatusCounter:
     def __init__(self, case_runs):
         self.case_run_status = []
         self.count_data = {}
+        self.case_runs = case_runs.select_related('case_run_status')
         
-        if case_runs and hasattr(case_runs, '__iter__') and hasattr(case_runs[0], 'case_run_status'):
-            self.case_runs = case_runs.select_related('case_run_status')
-        else:
-            self.case_runs = []
-        
-        for tcr in TestCaseRunStatus.objects.all():
-            setattr(self, tcr.name, 0)
-            self.count_data[tcr.name] = 0
-            self.case_run_status.append(tcr.name)
-        
+        for tcrs in TestCaseRunStatus.objects.all():
+            self.count_data[tcrs] = 0
+            self.case_run_status.append(tcrs)
         self.total = len(self.case_runs)
-        
         self.count()
     
     def count(self):
@@ -46,10 +39,9 @@ class CaseRunStatusCounter:
         Count the case run numbers by case run status
         """
         for case_run in self.case_runs:
-            if hasattr(case_run, 'case_run_status'):
-                self.count_data[getattr(case_run.case_run_status, 'name')] = getattr(self, getattr(case_run.case_run_status, 'name')) + 1
-                setattr(self, getattr(case_run.case_run_status, 'name'), getattr(self, getattr(case_run.case_run_status, 'name')) + 1)
-                
+            if case_run.case_run_status in self.case_run_status:
+                self.count_data[case_run.case_run_status] += 1
+        
         return self
     
     def complete_percent(self):

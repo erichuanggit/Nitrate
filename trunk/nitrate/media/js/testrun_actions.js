@@ -852,10 +852,23 @@ function serializeCaseRunFromInputList(table, name)
 function serialzeCaseForm(form, table, serialized)
 {
     if(typeof(serialized) != 'boolean')
-    var serialized = true;
+        var serialized = true;
     var data = form.serialize(serialized);
     data['case_run'] = serializeCaseFromInputList(table);
     return data
 }
 
+function sortCaseRun(form, order)
+{
+    if (form.order_by.value == order)
+        form.order_by.value = '-' + order;
+    else
+        form.order_by.value = order;
+    fireEvent(form.getElementsBySelector('input[type="submit"]')[0], 'click');
+}
 
+function showCaseRunsWithSelectedStatus(form, status_id)
+{
+    form.case_run_status__pk.value = status_id;
+    fireEvent(form.getElementsBySelector('input[type="submit"]')[0], 'click');
+}
