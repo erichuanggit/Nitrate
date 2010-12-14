@@ -80,7 +80,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 			<tr>
 				<td colspan="2" align="center">
 				<div class="progress-bar" style="float:none">
-					<div class="percent">{{ status_counter.complete_percent|floatformat:2 }}%</div>
+					<div class="percent">{{ status_counter.complete_percent|floatformat:0 }}.00%</div>
 					<div class="progress-inner" style="width:{{ status_counter.complete_percent|floatformat:"0" }}px;">
 					</div>
 				</div>

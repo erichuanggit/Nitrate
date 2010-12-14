@@ -50,8 +50,11 @@ class CaseRunStatusCounter:
         """
         if not self.total:
             return 0
-        
-        return float(self.PASSED + self.ERROR + self.FAILED + self.WAIVED) / self.total * 100
+        percent = 0.0
+        for case_run in self.case_run_status:
+            if case_run.name in ['PASSED', 'ERROR', 'FAILED', 'WAIVED']:
+                percent += self.count_data[case_run]
+        return percent / self.total * 100
 
 class RunsCounter:
     def __init__(self, running = 0, finished = 0):
