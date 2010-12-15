@@ -82,7 +82,7 @@ def clean_request(request, keys = None):
     for k in keys:
         k = str(k)
         if request_contents.get(k):
-            if k == 'order_by':
+            if k == 'order_by' or k == 'from_plan':
                 continue
             
             v = request.REQUEST[k]

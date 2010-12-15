@@ -149,6 +149,18 @@ Nitrate.TestRuns.Details.on_load = function()
             updateObject('testruns.testcaserun', object_pks, 'case_run_status', this.value, 'int', reloadWindow);
         });
     };
+
+    if($('filter_case_run')) {
+            $('filter_case_run').observe('click',function(e){
+                if($('id_filter').getStyle('display') == 'none'){
+                    $('id_filter').show();
+                    this.update(default_messages.link.hide_filter);
+                } else {
+                    $('id_filter').hide();
+                    this.update(default_messages.link.show_filter);
+                };
+        });
+    };
 }
 
 Nitrate.TestRuns.New.on_load = function()
