@@ -389,7 +389,6 @@ function changeCaseRunOrder(run_id, case_run_id, sort_key)
 
 function taggleSortCaseRun(event)
 {
-	console.log(event);
     var element = event.target;
     
     if(element.innerHTML != 'Done Sorting'){
