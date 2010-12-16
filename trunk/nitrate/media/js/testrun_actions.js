@@ -389,7 +389,9 @@ function changeCaseRunOrder(run_id, case_run_id, sort_key)
 
 function taggleSortCaseRun(event)
 {
-    var element = event.srcElement;
+	console.log(event);
+    var element = event.target;
+    
     if(element.innerHTML != 'Done Sorting'){
         // $('id_sort_control').show();
         // Remove the unsortable case text
