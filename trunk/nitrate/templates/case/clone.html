@@ -62,32 +62,38 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Clone.on_load);
 					<div class="linotype">{{ clone_form.case }}</div>
 				</div>
 				<div class="listinfo">
-					<label class="strong title">Clone Settings </label>
+					<label class="strong title">Clone Settings</label>
 					<fieldset class="choose">
 						<legend class="">Case Properties</legend>
 						<ul class="ul-no-format">
 							<li>
 								{{ clone_form.copy_case }}
 								<span>
-									<label for="copy_case">Create a Copy (Unchecking will create a link to selected case)</label>
+									<label for="id_copy_case">{{ clone_form.copy_case.help_text }}</label>
 								</span>
 							</li>
 							<li>
 								{{ clone_form.maintain_case_orignal_author }}
 								<span>
-									<label for="orignal_author">Keep original author(Unchecking will make me as author of the copied test case)</label>
+									<label for="orignal_author">{{ clone_form.maintain_case_orignal_author.help_text }}</label>
 								</span>
 							</li>
 							<li>
 								{{ clone_form.maintain_case_orignal_default_tester }}
 								<span>
-									<label for="orignal_author">Keep original default tester(Unchecking will make me as default tester of the copied test case)</label>
+									<label for="id_maintain_case_orignal_default_tester">{{ clone_form.maintain_case_orignal_default_tester.help_text }}</label>
 								</span>
 							</li>
 							<li>
 								{{ clone_form.copy_component }}
 								<span>
-									<label for="old_component">Copy the component to new product you specific (Unchecking will remove component of copied test case )</label>
+									<label for="id_copy_component">{{ clone_form.copy_component.help_text }}</label>
+								</span>
+							</li>
+							<li>
+								{{ clone_form.copy_attachment }}
+								<span>
+									<label for="id_copy_attachments">{{ clone_form.copy_attachment.help_text }}</label>
 								</span>
 							</li>
 						</ul>
@@ -96,7 +102,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Clone.on_load);
 			</div>
 			<div class="submit-row">
 				<input type="submit" name="submit" value="Clone" />
-				<input type="button" value="Back" onclick="history.go('-1')"/>
+				<input type="button" value="Back" onclick="window.history.go('-1')"/>
 			</div>
 		</form>
 	</div>

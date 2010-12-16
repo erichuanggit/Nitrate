@@ -28,7 +28,7 @@ from django.utils import simplejson
 from tcms.core import forms
 from tcms.core.utils import Prompt
 
-from models import TestCase, TestCaseStatus
+from models import TestCase, TestCaseStatus, TestCaseAttachment
 
 MODULE_NAME = "testcases"
 
@@ -697,6 +697,13 @@ def clone(request, template_name='case/clone.html'):
                     
                     for tag in tc_src.tag.all():
                         tc_dest.add_tag(tag = tag)
+                    
+                    if clone_form.cleaned_data['copy_attachment']:
+                        for attachment in tc_src.attachment.all():
+                            TestCaseAttachment.objects.create(
+                                case = tc_dest,
+                                attachment = attachment,
+                            )
                 else:
                     tc_dest = tc_src
                 
@@ -774,6 +781,7 @@ def clone(request, template_name='case/clone.html'):
             'maintain_case_orignal_author': True,
             'maintain_case_orignal_default_tester': True,
             'copy_component': True,
+            'copy_attachment': True,
         })
         clone_form.populate(case_ids = request.REQUEST.getlist('case'))
     
