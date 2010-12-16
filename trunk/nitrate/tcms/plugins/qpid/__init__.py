@@ -16,10 +16,6 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-from django import dispatch
+from signals import QPIDProcessor
 
-# Define the signals built-in TCMS internal
-initial = dispatch.Signal()
-create = dispatch.Signal()
-update = dispatch.Signal()
-delete = dispatch.Signal()
+receiver = QPIDProcessor()

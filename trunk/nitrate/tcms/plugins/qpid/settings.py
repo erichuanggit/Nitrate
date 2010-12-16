@@ -15,11 +15,22 @@
 # 
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
+#
+# Plugin settings
+# Please see the doc in based.py or Connection.__init__() function from qpid-python.
+# https://svn.apache.org/repos/asf/qpid/trunk/qpid/python/qpid/messaging/endpoints.py
+# The argument is same with it.
 
-from django import dispatch
+URL = 'amqp://guest/guest@10.66.93.193:5672'
 
-# Define the signals built-in TCMS internal
-initial = dispatch.Signal()
-create = dispatch.Signal()
-update = dispatch.Signal()
-delete = dispatch.Signal()
+PLUGIN_SETTINGS = {
+    'host': 'amqp://guest/guest@10.66.93.193:5672', # Buggy here, the argument can't use
+    'username': 'guest',
+    'password': 'guest',
+    'queue_name': 'message_queue',
+    'sasl_mechanisms': 'PLAIN',
+    'heartbeat': 5,
+    'reconnect': True,
+    'reconnect_timeout': 10,
+    'reconnect_limit': 5,
+}

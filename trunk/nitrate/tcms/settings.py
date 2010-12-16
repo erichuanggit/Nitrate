@@ -213,6 +213,7 @@ INTERNAL_IPS = ('127.0.0.1', )
 #
 SIGNAL_PLUGINS = (
     # 'tcms.plugins.example',
+    # 'tcms.plugins.qpid',
 )
 
 # Authentication backends
