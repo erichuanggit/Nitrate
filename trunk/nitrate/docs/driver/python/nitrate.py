@@ -74,12 +74,29 @@ class CookieTransport(xmlrpclib.Transport):
         self.send_user_agent(h)
         self.send_content(h,request_body)
         
-        errcode, errmsg, headers = h.getreply()
+        if hasattr(h, 'getresponse'): # Python 2.7
+            response = h.getresponse()
+            headers = response.getheaders()
+            status = response.status
+            reason = response.reason
+        else:
+            # Python < 2.6 compatible
+            status, reason, headers = h.getreply()
+        
+        # This object is needed to provide cookielib with the interface it
+        # expects.
+        class Headers:
+            def __init__(self, headerList): self.headerList = headerList
+            def getheaders(self, header):
+                for hdr in self.headerList:
+                    if hdr[0].lower() == header.lower():
+                        return [hdr[1]]
+                return [""]
         
         # ADDED: parse headers and get cookies here
         # fake a response object that we can fill with the headers above
         class CookieResponse:
-            def __init__(self,headers): self.headers = headers
+            def __init__(self,headers): self.headers = Headers(headers)
             def info(self): return self.headers
         cookie_response = CookieResponse(headers)
         # Okay, extract the cookies from the headers
@@ -88,12 +105,12 @@ class CookieTransport(xmlrpclib.Transport):
         if hasattr(self.cookiejar,'save'):
             self.cookiejar.save(self.cookiejar.filename)
         
-        if errcode != 200:
+        if status != 200:
             raise xmlrpclib.ProtocolError(
                 host + handler,
-                errcode, errmsg,
+                status, reason,
                 headers
-                )
+            )
         
         self.verbose = verbose
         
@@ -102,7 +119,10 @@ class CookieTransport(xmlrpclib.Transport):
         except AttributeError:
             sock = None
         
-        return self._parse_response(h.getfile(), sock)
+        # Python < 2.6 compatible
+        if hasattr(h, 'getfile'):
+            return self._parse_response(h.getfile(), sock)
+        return self.parse_response(response) # Python 2.7
 
 class SafeCookieTransport(xmlrpclib.SafeTransport,CookieTransport):
     '''SafeTransport subclass that supports cookies.'''
@@ -334,8 +354,7 @@ class NitrateXmlrpc(object):
         cmd = "self.server." + verb + "(" + params + ")"
         if DEBUG:
             print cmd
-        #from pprint import pprint
-        #pprint(self.server._ServerProxy__transport.cookiejar._cookies)
+        
         try:
             return eval(cmd)
         except xmlrpclib.Error, e:
