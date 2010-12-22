@@ -127,12 +127,6 @@ Nitrate.TestRuns.Details.on_load = function()
         };
     };
     
-    if($('filter_case_run')) {
-        $('filter_case_run').observe('click',function(e) {
-            $('id_filter').toggle();
-        });
-    };
-    
     // Mass operations
     if($('id_mass_change_case_run_status')) {
         $('id_mass_change_case_run_status').observe('change', function(e) {
@@ -150,6 +144,7 @@ Nitrate.TestRuns.Details.on_load = function()
         });
     };
 
+    // Filter Case-Run
     if($('filter_case_run')) {
             $('filter_case_run').observe('click',function(e){
                 if($('id_filter').getStyle('display') == 'none'){

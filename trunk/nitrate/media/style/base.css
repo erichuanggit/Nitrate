@@ -518,7 +518,7 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .list .even:hover td ,.list .odd:hover td ,.list .evenRow:hover td ,.list .oddRow:hover td{ background:#FFF9EA; }
 .list th { border-bottom : 1px solid #ccc; color:#fff; text-align:left; background:#235D9F; padding:0px 0px 0px 5px; height:25px; line-height:25px;}
 .list th a{ color:#fff; }
-.list td { border-top:1px solid #ccc; line-height:2.0em; padding:2px 0px 0px 5px; height:23px; line-height:23px; }
+.list td { border-top:1px solid #ccc; line-height:2.0em; padding:2px 0px 0px 5px; height:23px; line-height:23px;word-wrap:break-word; }
 .list .inactive td a{ color:#666; text-decoration:line-through; }
 .list .hide .no-border td{ border:none; }
 .list .hide-display{ border-bottom:1px solid #ccc; float:left; width:100%; }

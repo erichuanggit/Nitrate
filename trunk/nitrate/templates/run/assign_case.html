@@ -76,16 +76,16 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.AssignCase.on_load);
 			<table id="id_table_cases" class="list" cellpadding="0" cellspacing="0" border="0" >
 				<thead>
 					<tr>
-						<th class="nosort" align="left" width="4%"><input id="id_check_all_button" type="checkbox" /></th>
-						<th class="nosort" align="left" width="4%"></th>
-						<th  class="sortcol" align="left" width="4%">#</th>
-						<th  class="sortcol" align="left" width="26%">Test Case Summary</th>
-						<th class="sortcol" align="left" width="20%">Author</th>
-						<th  class="sortcol" align="left" width="20%">Created Date</th>
-						<th class="sortcol" align="left" width="8%">Category</th>
-						<th  class="sortcol" align="left"  width="8%">Priority</th>
-						<th class="sortcol" align="left" width="8%">Sort Key</th>
-						<th  class="sortcol" align="left"  width="8%">Selected</th>
+						<th class="nosort" align="left" width="20px"><input id="id_check_all_button" type="checkbox" /></th>
+						<th class="nosort" align="left" width="20px"></th>
+						<th  class="sortcol" align="left" width="50px">#</th>
+						<th  class="sortcol">Test Case Summary</th>
+						<th class="sortcol" width="130">Author</th>
+						<th  class="sortcol" width="150">Created Date</th>
+						<th class="sortcol" width="150">Category</th>
+						<th  class="sortcol"  width="70">Priority</th>
+						<th class="sortcol" width="70">Sort Key</th>
+						<th  class="sortcol"  width="70">Selected</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -108,7 +108,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.AssignCase.on_load);
 								{{ test_case.summary }}
 							</a>
 						</td>
-						<td>{{ test_case.author.email }}</td>
+						<td>{{ test_case.author }}</td>
 						<td>{{ test_case.create_date }}</td>
 						<td>{{ test_case.category }}</td>
 						<td>{{ test_case.priority }}</td>
