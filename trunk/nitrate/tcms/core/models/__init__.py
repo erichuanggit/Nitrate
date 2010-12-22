@@ -33,6 +33,37 @@ class TCMSActionModel(models.Model, UrlMixin):
         abstract = True
     
     @classmethod
+    def list(cls, query = {}):
+        """Filter the objects with query dictionary"""
+        from django.db.models import Q
+        from tcms.core.utils import clean_request
+        if hasattr(cls._meta, 'exclude_fields'):
+            exclude_fields = cls._meta.exclude_fields
+        else:
+            exclude_fields = []
+        
+        new_query = clean_request(query, exclude_keys=exclude_fields)
+        # build a QuerySet:
+        q = cls.objects
+        # add any necessary filters to the query:
+        if query.get('tq'):
+            # Check the name field
+            for f in cls._meta.fields:
+                if f.name == 'name': # Check for test plan
+                    q = q.filter(
+                        Q(pk__icontains = query['tq']) | Q(name__icontains = query['tq'])
+                    )
+                    break
+                
+                if f.name == 'summary': # Check for test case & run
+                    q = q.filter(
+                        Q(pk__icontains = query['tq']) | Q(summary__icontains = query['tq'])
+                    )
+                    break
+        
+        return q.filter(**new_query).distinct()
+    
+    @classmethod
     def to_xmlrpc(cls, query = {}):
         """
         Convert the query set for XMLRPC

@@ -1,36 +1,36 @@
 <div class="cell">
 	<label class="sd" for="id_pk__in">ID</label>
-	{{ search_form.pk__in }}
+	<input type="text" name="pk__in" value="{{ REQUEST_CONTENTS.pk__in }}" />
 </div>
 <div class="cell">
 	<label class="sd" for="id_product_id">Product</label>
-	{{ search_form.product }}
+	<select id="id_product_id" name="product_id"></select>
 </div>
 <div class="cell">
 	<label class="sd" for="id_version_id">Product version</label>
-	{{ search_form.default_product_version }}
+	<select id="id_product_id" name="default_product_version"></select>
 </div>
 <div class="cell">
 	<label class="sd" for="id_type_id">Plan Type</label>
-	{{ search_form.type }}
+	<select id="id_product_id" name="type_id"></select>
 </div>
 <div class="cell">
 	<label class="sd" for="id_env_group_id">Environment Group</label>
-	{{ search_form.env_group }}
+	<select id="id_product_id" name="env_group_id"></select>
 </div>
 <div class="cell">
 	<label class="sd" for="id_author_id">Plan Author</label>
-	{{ search_form.author__email__startswith }}
+	<input type="text" name="author__email__startswith" value="{{ REQUEST_CONTENTS.author__email__startswith}}" />
 </div>
 <div class="cell">
 	<label class="sd" for="id_tag_id">Tag</label>
-	{{ search_form.tag__name__in }}
+	<input type="text" name="tag__name__in" value="{{ REQUEST_CONTENTS.tag__name__in}}" />
 </div>
 <div class="cell">
 	<label class="sd" for="id_name_id">Plan Summary</label>
-	{{ search_form.name__icontains }}
+	<input type="text" name="tag__name__in" value="{{ REQUEST_CONTENTS.name__icontains}}" />
 </div>
 <div class="cell">
 	<label class="sd" for="id_is_active_id">Active</label>
-	{{ search_form.is_active }}
+	<input type="checkbox" name="is_active" value="1" {% if REQUEST_CONTENTS.is_active %}checked{% endif %} />
 </div>

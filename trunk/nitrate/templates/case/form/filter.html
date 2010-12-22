@@ -4,45 +4,50 @@
 <div class="leftlistinfo">
 	<div class="listinfo">
 		<span class="title">Case</span>
-	 	{{ search_form.summary }}
+	 	<input type="text" name="summary__icontains" value="{{ REQUEST_CONTENTS.summary__icontains }}" />
 	</div>
 	<div class="listinfo">
 		<span class="title">Author</span>
-	 	{{ search_form.author }}
+	 	<input type="text" name="author__email__startswith" value="{{ REQUEST_CONTENTS.author__email__startswith }}" />
 	</div>
 	<div class="listinfo">
 		<span class="title">Tester</span>
-	 	{{ search_form.default_tester }}
+	 	<input type="text" name="default_tester__email__startswith" value="{{ REQUEST_CONTENTS.default_tester__email__startswith }}" />
 	</div>
 	<div class="listinfo_liinline">
 		<span class="title">Priority</span>
-		{{ search_form.priority }}
+		<select id="id_priority__pk" name="priority__pk"></select>
 	</div>
     <div class="listinfo_liinline">
 		<span class="title">Automated</span>
-		{{ search_form.is_automated }}
-        <div class="automatedlist">
-		{{ search_form.is_automated_proposed }}
-		<label>{{ search_form.is_automated_proposed.label }}</label>
-        </div>
+		<input type="checkbox" name="is_automated" value="0" {% ifequal REQUEST_CONTENTS.is_automated 0 %}selected{% endifequal %} />
+		<label>Manual</label>
+		<input type="checkbox" name="is_automated" value="1" {% ifequal REQUEST_CONTENTS.is_automated 1 %}selected{% endifequal %} />
+		<label>Auto</label>
+		<div class="automatedlist">
+			<input type="checkbox" name="is_automated_proposed" value="1" {% if REQUEST_CONTENTS.is_automated_proposed %}selected{% endif %} />
+			<label>Autoproposed</label>
+		</div>
 	</div>
 </div>
 <div class="rightlistinfo">
 	<div class="listinfo">
 		<span class="title">Category</span>
-		 {{ search_form.category }}
+		<select id="id_category__pk" name="category__pk"></select>
 	</div>
 	<div class="listinfo_liinline">
 		<span class="title">Status</span>
-	 {{ search_form.case_status }}
+		<select id="id_case_status__pk" name="case_status__pk"></select>
 	</div>
 	<div class="listinfo">
 		<span class="title">Component</span>
-		{{ search_form.component }}
+		<select id="id_component__in" name="component__in"></select>
 	</div>
 	<div class="listinfo">
 		<span class="title">Tag</span>
-		{{ search_form.tag__name__in }}
+		<input type="text" name="tag__name__in" value="{{ REQUEST_CONTENTS.tag__name__in }}" />
 	</div>
 </div>
-<div class="setinput">{{ search_form.errors }}</div>
+{% if error_messages %}
+<div class="setinput">{{ error_messages }}</div>
+{% endif %}

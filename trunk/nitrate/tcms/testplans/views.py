@@ -22,7 +22,7 @@ from django.contrib.auth.decorators import user_passes_test, login_required
 from django.views.generic.simple import direct_to_template
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, FieldError
 from django.utils import simplejson
 
 from tcms.core.utils import Prompt
@@ -144,8 +144,6 @@ def delete(request, plan_id):
         return HttpResponse("<script>alert('Nothing yet');history.go(-1);</script>")
 
 def all(request, template_name = 'plan/all.html'):
-    from forms import SearchPlanForm
-    
     # Define the default sub module
     SUB_MODULE_NAME = 'plans'
     
@@ -155,50 +153,48 @@ def all(request, template_name = 'plan/all.html'):
     
     # if it's a search request the page will be fill
     if request.REQUEST.items():
-        search_form = SearchPlanForm(request.REQUEST)
-        if request.REQUEST.get('product'):
-            search_form.populate(product_id = request.REQUEST['product'])
-        else:
-            search_form.populate()
+        # Detemine the query is the user's plans and change the sub module value
+        if request.REQUEST.get('author'):
+            if request.user.is_authenticated():
+                if request.REQUEST['author'] == request.user.username \
+                or request.REQUEST['author'] == request.user.email:
+                    SUB_MODULE_NAME = "my_plans"
         
-        if search_form.is_valid():
-            # Detemine the query is the user's plans and change the sub module value
-            if request.REQUEST.get('author'):
-                if request.user.is_authenticated():
-                    if request.REQUEST['author'] == request.user.username \
-                    or request.REQUEST['author'] == request.user.email:
-                        SUB_MODULE_NAME = "my_plans"
-            
-            query_result = True
-            # build a QuerySet:
-            tps = TestPlan.list(search_form.cleaned_data)
-            tps = tps.select_related('author', 'type', 'product')
-            
-            # We want to get the number of cases and runs, without doing
-            # lots of per-test queries.
-            # 
-            # Ideally we would get the case/run counts using m2m field tricks
-            # in the ORM
-            # Unfortunately, Django's select_related only works on ForeignKey
-            # relationships, not on ManyToManyField attributes
-            # See http://code.djangoproject.com/ticket/6432
-            
-            # SQLAlchemy can handle this kind of thing in several ways.
-            # Unfortunately we're using Django
-            
-            # The cleanest way I can find to get it into one query is to
-            # use QuerySet.extra()
-            # See http://docs.djangoproject.com/en/dev/ref/models/querysets
-            tps = tps.extra(select = {
-                'num_cases': RawSQL.num_cases,
-                'num_runs': RawSQL.num_runs,
-                'num_children': RawSQL.num_plans,
+        query_result = True
+        # build a QuerySet:
+        try:
+            tps = TestPlan.list(request.REQUEST)
+        except FieldError, error:
+            return direct_to_template(request, template_name, {
+                'module': MODULE_NAME,
+                'sub_module': SUB_MODULE_NAME,
+                'test_plans' : tps,
+                'query_result' : query_result,
+                'error_messages': error,
             })
-    else:
-        # Set search active plans only by default
-        # I wish to use 'default' argument, as the same as in ModelForm
-        # But it looks does not work
-        search_form = SearchPlanForm(initial = { 'is_active': True })
+        
+        tps = tps.select_related('author', 'type', 'product')
+        
+        # We want to get the number of cases and runs, without doing
+        # lots of per-test queries.
+        # 
+        # Ideally we would get the case/run counts using m2m field tricks
+        # in the ORM
+        # Unfortunately, Django's select_related only works on ForeignKey
+        # relationships, not on ManyToManyField attributes
+        # See http://code.djangoproject.com/ticket/6432
+        
+        # SQLAlchemy can handle this kind of thing in several ways.
+        # Unfortunately we're using Django
+        
+        # The cleanest way I can find to get it into one query is to
+        # use QuerySet.extra()
+        # See http://docs.djangoproject.com/en/dev/ref/models/querysets
+        tps = tps.extra(select = {
+            'num_cases': RawSQL.num_cases,
+            'num_runs': RawSQL.num_runs,
+            'num_children': RawSQL.num_plans,
+        })
     
     if request.REQUEST.get('action') == 'clone_case':
         template_name = 'case/clone_select_plan.html'
@@ -221,7 +217,6 @@ def all(request, template_name = 'plan/all.html'):
         'sub_module': SUB_MODULE_NAME,
         'test_plans' : tps,
         'query_result' : query_result,
-        'search_plan_form' : search_form,
     })
 
 def get(request, plan_id, template_name = 'plan/get.html'):
@@ -627,49 +622,34 @@ def cases(request, plan_id):
             """
             Handle to form to add case to plans.
             """
-            from tcms.testcases.forms import SearchCaseForm
-            
             SUB_MODULE_NAME = 'plans'
-            tcs = None
+            tcs = TestCase.objects.none()
             
             if request.REQUEST.get('action') == 'add_to_plan':
-                if request.user.has_perm('testcases.add_testcaseplan'):
-                    tcs = TestCase.objects.filter(case_id__in = request.REQUEST.getlist('case'))
-                    
-                    for tc in tcs:
-                        tp.add_case(case = tc)
-                else:
+                if not request.user.has_perm('testcases.add_testcaseplan'):
                     return HttpResponse("Permission Denied")
+                tcs = TestCase.objects.filter(pk__in = request.REQUEST.getlist('case'))
+                
+                for tc in tcs:
+                    tp.add_case(case = tc)
                 
                 return HttpResponseRedirect(
                     reverse('tcms.testplans.views.get', args = [plan_id, ])
                 )
             
             if request.REQUEST.get('action') == 'search':
-                form = SearchCaseForm(request.REQUEST)
-                form.populate(product_id = request.REQUEST.get('product'))
-                if form.is_valid():
-                    tcs = TestCase.list(form.cleaned_data)
-                    tcs = tcs.select_related(
-                        'author', 'default_tester', 'case_status',
-                        'priority', 'category', 'tag__name'
-                    )
-                    tcs = tcs.exclude(case_id__in = tp.case.values_list(
-                        'case_id', flat = True
-                    ))
-            else:
-                form = SearchCaseForm(initial = {
-                    'product': tp.product_id,
-                    'product_version': tp.get_version_id(),
-                    'case_status_id': TestCaseStatus.get_CONFIRMED()
-                })
+                tcs = TestCase.list(request.REQUEST)
+                tcs = tcs.select_related(
+                    'author', 'default_tester', 'case_status',
+                    'priority', 'category', 'tag__name'
+                )
+                tcs = tcs.exclude(case_id__in = tp.case.values_list('pk', flat = True))
             
             return direct_to_template(request, template_name, {
                 'module': MODULE_NAME,
                 'sub_module': SUB_MODULE_NAME,
                 'test_plan': tp,
                 'test_cases': tcs,
-                'search_form': form,
             })
         
         def delete_cases(self):

@@ -1,54 +1,66 @@
 <div class="leftlistinfo">
 	<div class="listinfo">
         <span class="title"><label for="id_summary">Run Summary</label></span>
-        <span class="listinfo_input">{{ search_form.summary }}</span>
+        <span class="listinfo_input"><input type="text" name="summary__icontains" value="{{ REQUEST_CONTENTS.summary__icontains }}"></span>
 	</div>
 	<div class="listinfo">
 		<span class="title"><label for="id_product_id">Product</label></span> 
-		<span class="listinfo_input">{{ search_form.product }}</span>
+		<span class="listinfo_input"><select id="id_selector_product" name="build__product__pk"></select></span>
 	</div>
 	<div class="listinfo">
 		<span class="title"><label for="id_env_group_id">Environment Group</label></span>
-		<span class="listinfo_input">{{ search_form.env_group }}</span>
+		<span class="listinfo_input"><select id="id_selector_env_group" name="env_value__group__pk"></select></span>
 	</div>
 	<div class="listinfo">
 		<span class="title"><label for="id_people_type">Owner</label></span>
-		<span style="float:left;">{{ search_form.people_type }}</span>
+		<span style="float:left;">
+			<select  id="id_people_type" name="people_type">
+				<option value="people" {% ifequal REQUEST_CONTENTS.people_type 'people' %}selected{% endifequal %}>Manager | Tester</option>
+				<option value="manager__username__startswith" {% ifequal REQUEST_CONTENTS.people_type 'manager__username__startswith' %}selected{% endifequal %}>Manager</option>
+				<option value="default_tester__username__startswith" {% ifequal REQUEST_CONTENTS.people_type 'default_tester__username__startswith' %}selected{% endifequal %}>Defaut tester</option>
+			</select>	
+		</span>
 		{% if REQUEST_CONTENTS.people %}
 		<div class="name_short"><input id="id_search_people" type="text" name="people" value="{{ REQUEST_CONTENTS.people }}" /></div>
 		{% else %}
-		{% if REQUEST_CONTENTS.manager %}
-		<div class="name_short"><input id="id_search_people" type="text" name="people" value="{{ REQUEST_CONTENTS.manager }}" /></div>
+		{% if REQUEST_CONTENTS.manager__username__startswith %}
+		<div class="name_short"><input id="id_search_people" type="text" name="people" value="{{ REQUEST_CONTENTS.manager__username__startswith }}" /></div>
 		{% else %}
-		<div class="name_short"><input id="id_search_people" type="text" name="people" value="{{ REQUEST_CONTENTS.default_tester }}" /></div>
+		<div class="name_short"><input id="id_search_people" type="text" name="people" value="{{ REQUEST_CONTENTS.default_tester__username__startswith }}" /></div>
 		{% endif %}
 		{% endif %}
 	</div>
 	<div class="listinfo">
 		<span class="title"><label for="id_caserun_assignee">Case Run Assignee</label></span>
-		<span class="listinfo_input">{{ search_form.case_run__assignee }}</span>
+		<span class="listinfo_input"><input type="text" name="case_run__assignee__email__startswith" value="{{ REQUEST_CONTENTS.case_run__assignee__email__startswith }}" /></span>
 	</div>
 </div>
 <div class="rightlistinfo">
 	<div class="listinfo">
 		<span class="title"><label for="id_plan">Plan</label></span>
-		<span class="listinfo_input">{{ search_form.plan }}</span>
+		<span class="listinfo_input"><input type="text" name="plan__name__icontains" value="{{ REQUEST_CONTENTS.plan__name__icontains }}" /></span>
 	</div>
 	<div class="listinfo">
 		<span class="title"><label for="id_version_id">Product Version</label></span>
-		<span class="listinfo_input">{{ search_form.product_version }}</span>
+		<span class="listinfo_input"><select id="id_selector_product_version" name="product_version"></select></span>
 	</div>
 	<div class="listinfo">
 		<span class="title"><label for="id_build_id">Build</label></span>
-		<span class="listinfo_input">{{ search_form.build }}</span>
+		<span class="listinfo_input"><select id="id_selector_build" name="build__pk"></select></span>
 	</div>
 	<div class="listinfo">
 		<span class="title"><label for="id_status">Status</label></span>
-		<span class="listinfo_input">{{ search_form.status }}</span>
+		<span class="listinfo_input">
+			<select name="stop_date__isnull">
+				<option value="">Both</option>
+				<option value="0">Running</option>
+				<option value="1">Finished</option>
+			</select>
+		</span>
 	</div>
 	<div class="listinfo">
 		<span class="title"><label for="id_tag">Tag</label></span>
-		<span class="listinfo_input">{{ search_form.tag__name__in }}</span>
+		<span class="listinfo_input"><input type="text" name="tag__name__in" value="{{ REQUEST_CONTENTS.tag__name__in }}"></span>
 	</div>
 </div>
 <div class="clear"></div>

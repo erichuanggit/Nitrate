@@ -22,7 +22,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.views.generic.simple import direct_to_template
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse, Http404
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, FieldError
 from django.utils import simplejson
 
 from tcms.core import forms
@@ -223,58 +223,46 @@ def all(request, template_name="case/all.html"):
     from_plan: Plan ID
        -- [number]: When the plan ID defined, it will build the case page in plan
     """
-    from forms import SearchCaseForm, CaseFilterForm
-    
     from tcms.core.utils.raw_sql import RawSQL
     from tcms.testplans.models import TestPlan
     from tcms.management.models import Priority, TestTag
-    
+    error = None
     # Intial the plan in plan details page
     if request.REQUEST.get('from_plan'):
         tp = TestPlan.objects.get(pk = request.REQUEST['from_plan'])
-        SearchForm = CaseFilterForm
         # Hacking for case plan
-        if request.REQUEST.get('template_type') == 'case':
+        if request.REQUEST.get('tt') == 'case':
             template_name = 'plan/get_cases.html'
-        elif request.REQUEST.get('template_type') == 'review_case':
+        elif request.REQUEST.get('tt') == 'review_case':
             template_name = 'plan/get_review_cases.html'
     else:
         tp = TestPlan.objects.none()
-        SearchForm = SearchCaseForm
     
     # Initial the form and template
     if request.REQUEST.get('a') in ('search', 'sort'):
-        search_form = SearchForm(request.REQUEST)
+        query = request.REQUEST
     else:
         # Hacking for case plan
         confirmed_status_name = 'CONFIRMED'
-        if request.REQUEST.get('template_type') == 'case': # 'c' is meaning component
+        if request.REQUEST.get('tt') == 'case': # 'c' is meaning component
             d_status = TestCaseStatus.objects.filter(name = confirmed_status_name)
-        elif request.REQUEST.get('template_type') == 'review_case':
+        elif request.REQUEST.get('tt') == 'review_case':
             d_status = TestCaseStatus.objects.exclude(name = confirmed_status_name)
         else:
             d_status = TestCaseStatus.objects.all()
         
         d_status_ids = d_status.values_list('pk', flat=True)
-        
-        search_form = SearchForm(initial={
-            'case_status': d_status_ids
-        })
-    
-    # Populate the form
-    if request.REQUEST.get('product'):
-        search_form.populate(product_id = request.REQUEST['product'])
-    elif tp and tp.product_id:
-        search_form.populate(product_id = tp.product_id)
-    else:
-        search_form.populate()
+        query = {'case_status': d_status_ids}
     
     # Query the database when search
-    if request.REQUEST.get('a') in ('search', 'sort') and search_form.is_valid():
-        tcs = TestCase.list(search_form.cleaned_data)
-    elif request.REQUEST.get('a') == 'initial':
-        tcs = TestCase.objects.filter(case_status__in = d_status)
-    else:
+    try:
+        if request.REQUEST.get('a') in ('search', 'sort'):
+            tcs = TestCase.list(query)
+        elif request.REQUEST.get('a') == 'initial':
+            tcs = TestCase.objects.filter(case_status__in = d_status)
+        else:
+            tcs = TestCase.objects.none()
+    except FieldError, error:
         tcs = TestCase.objects.none()
     
     # Search the relationship
@@ -293,10 +281,8 @@ def all(request, template_name="case/all.html"):
     tcs = tcs.distinct()
     
     # Resort the order
-    if request.REQUEST.get('case_sort_by'):
-        tcs = tcs.order_by(
-            request.REQUEST.get('case_sort_by')
-        )
+    if request.REQUEST.get('order_by'):
+        tcs = tcs.order_by(request.REQUEST['order_by'])
     
     # Initial the case ids
     if request.REQUEST.get('case'):
@@ -311,11 +297,11 @@ def all(request, template_name="case/all.html"):
         'module': MODULE_NAME,
         'test_cases': tcs,
         'test_plan': tp,
-        'search_form': search_form,
         'selected_case_ids': selected_case_ids,
         'case_status': TestCaseStatus.objects.all(),
         'priorities': Priority.objects.all(),
         'case_own_tags': ttags,
+        'error_messages': error,
     })
 
 def get(request, case_id, template_name = 'case/get.html'):
@@ -644,7 +630,6 @@ def text_history(request, case_id, template_name='case/history.html'):
 def clone(request, template_name='case/clone.html'):
     """Clone one case or multiple case into other plan or plans"""
     from tcms.testplans.models import TestPlan
-    from tcms.testplans.forms import SearchPlanForm
     from tcms.management.models import Product
     from forms import CloneCaseForm
     
@@ -659,7 +644,6 @@ def clone(request, template_name='case/clone.html'):
         ))
     
     tp = None
-    search_plan_form = SearchPlanForm()
     
     # Do the clone action
     if request.method == 'POST':
@@ -788,15 +772,12 @@ def clone(request, template_name='case/clone.html'):
     # Generate search plan form
     if request.REQUEST.get('from_plan'):
         tp = TestPlan.objects.get(plan_id = request.REQUEST['from_plan'])
-        search_plan_form = SearchPlanForm(initial={ 'product': tp.product_id, 'is_active': True })
-        search_plan_form.populate(product_id = tp.product_id)
     
     return direct_to_template(request, template_name, {
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_plan': tp,
         # 'testcases': tcs,
-        'search_form': search_plan_form,
         'clone_form': clone_form,
     })
 

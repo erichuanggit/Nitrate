@@ -367,7 +367,7 @@ Nitrate.TestPlans.Details.on_load = function()
     // Initial the case plan
     var run_case_params = {
         'a': 'initial',
-        'template_type': 'case',
+        'tt': 'case',
         'from_plan': plan_id
     }
     
@@ -382,7 +382,7 @@ Nitrate.TestPlans.Details.on_load = function()
     // Initial the review case
     var review_case_params = {
         'a': 'initial',
-        'template_type': 'review_case',
+        'tt': 'review_case',
         'from_plan': plan_id
     }
     constructPlanDetailsCasesZone('reviewcases', plan_id, review_case_params);
@@ -1022,7 +1022,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             var title = this.up(); // Container
             var content = this.up().next(); // Content Containers
             var case_id = title.getElementsBySelector('input[name="case"]')[0].value;
-            var template_type = form.adjacent('input[name="template_type"]')[0].value;
+            var template_type = form.adjacent('input[name="tt"]')[0].value;
             // Review case content call back;
             var review_case_content_callback = function(e) {
                 var comment_container_t = new Element('div');
@@ -1200,10 +1200,10 @@ function sortCase(container, plan_id, order) {
     var parameters = form.serialize(true);
     parameters.a = 'sort';
     
-    if(parameters.case_sort_by == order)
-        parameters.case_sort_by = '-' + order;
+    if(parameters.order_by == order)
+        parameters.order_by = '-' + order;
     else
-        parameters.case_sort_by = order;
+        parameters.order_by = order;
     constructPlanDetailsCasesZone(container, plan_id, parameters)
 }
 

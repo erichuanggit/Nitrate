@@ -31,7 +31,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 	</div>
 	<form action="{% url tcms.testruns.views.all %}" method="get">
 		<div id="itemSearch" class="itemSearch">
-			<input type="hidden" name="action" value="search" />
+			<input type="hidden" name="a" value="search" />
 			<div>
 				<h2>Search Run</h2>
 				{% include 'run/form/search.html' %}

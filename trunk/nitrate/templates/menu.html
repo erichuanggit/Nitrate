@@ -110,12 +110,12 @@
 	<div class="right-action">
 		<form action="{% url tcms.core.views.search %}" method="get">
 			<span>
-				<select id="search_type" name="search_type">
-					<option value="plans"{% ifequal module 'testplans' %} selected{% endifequal %}>Test Plan</option>
-					<option value="runs"{% ifequal module 'testruns' %} selected{% endifequal %}>Test Run</option>
-					<option value="cases"{% ifequal module 'testcases' %} selected{% endifequal %}>Test Case</option>
+				<select name="content_type">
+					<option value="testplans.testplan"{% ifequal module 'testplans' %} selected{% endifequal %}>Test Plan</option>
+					<option value="testruns.testrun"{% ifequal module 'testruns' %} selected{% endifequal %}>Test Run</option>
+					<option value="testcases.testcase"{% ifequal module 'testcases' %} selected{% endifequal %}>Test Case</option>
 				</select>
-				<input id="search_content" name="search_content" type="text" value="{{ REQUEST_CONTENTS.search }}" size="15" />
+				<input name="tq" type="text" value="{{ REQUEST_CONTENTS.tq }}" size="15" />
 				<input type="button" value="Go" onclick="$('search_content').value == '' || this.form.submit()"/>
 			</span>
 		</form>
