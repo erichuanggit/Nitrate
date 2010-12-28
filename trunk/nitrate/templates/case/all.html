@@ -26,13 +26,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 		{% endif %}
 	</div>
 	<form action="{% url tcms.testcases.views.all %}" method="get">
-		<input type="hidden" name="a" value="search" />
 		<div id="itemSearch" class="itemSearch">
 			<h2>Search Case</h2>
 			{% include "case/form/search.html" %}
 			<div class='clear'></div>
 			<div class="bottom" >
-				<input type="submit" size="7" value="Search" name="" title="Search test case" />
+				<input type="submit" size="7" name="a" value="search" name="" title="Search test case" />
 				<input type="reset" size="7" value="Reset" name="" title="Reset the search keyword" />
 			</div>
 		</div>
@@ -55,65 +54,48 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 	<table class="list border-bottom" id="testcases_table" cellpadding="0" cellspacing="0" border="0">
 		<thead>
 			<tr>
+				<th width="18px">
+					<a class="blind_all_link" href="javascript:blinddownAllCases()">
+						<img src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="" class="collapse">
+					</a>
+				</th>
 				<th width="20" class="nosort">
 					<input type="checkbox" id="id_checkbox_all_case" title="Select all/Select none">
 				</th>
-				<th align="left" width="50" class="number">ID</th>
-				<th align="left" class="text">Summary</th>
-				<th align="left" width="100" class="text">Author</th>
-				<th align="left" width="130" class="text">Default Tester</th>
-				<th align="left" width="140" class="text">Automated</th>
-				<th align="left" width="90" class="text">Status</th>
-				<th align="left" width="120" class="text">Category</th>
-				<th align="left" width="60" class="text">Priority</th>
-				<th align="left" width="140" class="date-iso">Created</th>
+				<th width="50">ID</th>
+				<th>Summary</th>
+				<th width="100">Author</th>
+				<th width="130">Default Tester</th>
+				<th width="140">Automated</th>
+				<th width="90" >Status</th>
+				<th width="120">Category</th>
+				<th width="60">Priority</th>
+				<th width="140" colspan='2'>Created</th>
 			</tr>
 		</thead>
 		<tbody>
 			{% for test_case in test_cases %}
 			<tr class="{% cycle 'odd' 'even' %}">
-				<td valign="top"><input type="checkbox" name="case" value="{{ test_case.case_id }}"></td>
-				{% comment %}
-				<td>
-					<a id="blind_link_{{ forloop.counter }}" href="javascript:toggleTestCaseContents('{{ forloop.counter }}')">
-						<img id="blind_icon_{{ forloop.counter }}" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
-					</a>
+				<td class="expandable">
+					<img class="collapse blind_icon" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
 				</td>
-				{% endcomment %}
+				<td valign="top"><input type="checkbox" name="case" value="{{ test_case.case_id }}"></td>
 				<td valign="top"><a href="{% url tcms.testcases.views.get test_case.case_id %}">{{ test_case.case_id }}</a></td>
-				<td valign="top" class="subject"><a id="link_{{ test_case.case_id }}" href="{% url tcms.testcases.views.get test_case.case_id %}">{{ test_case.summary }}</a></td>
-				{% comment %}
-				<td valign="top"><a id="link_{{ test_case.case_id }}" href="javascript:toggleTestCaseContents('{{ test_case.case_id }}')">{{ test_case.summary }}</a></td>
-				{% endcomment %}
+				<td valign="top" class="expandable"><a id="link_{{ test_case.case_id }}" href="{% url tcms.testcases.views.get test_case.case_id %}">{{ test_case.summary }}</a></td>
 				<td valign="top"><a href="{% url tcms.profiles.views.profile test_case.author.username %}">{{ test_case.author }}</a></td>
 				<td valign="top">{% if test_case.default_tester_id %}<a href="{% url tcms.profiles.views.profile test_case.default_tester.username %}">{{ test_case.default_tester }}</a>{% else %}None{% endif %}</td>
 				<td valign="top">{{ test_case.get_is_automated_status }}</td>
 				<td valign="top">{{ test_case.case_status }}</td>
 				<td valign="top">{{ test_case.category }}</td>
 				<td valign="top" align="center">{{ test_case.priority }}</td>
-				
-				<td valign="top">{{ test_case.create_date }}</td>
+				<td valign="top" colspan='2'>{{ test_case.create_date }}</td>
 			</tr>
-			{% comment %}
-			<tr>
-				<td id="hidenRow_{{ test_case.case_id }}" style="display: none;"  colspan="7">
-					<td colspan="5" >
-						<div>
-							<h4>SETUP</h4>
-							<p> {{ test_case.latest_text.setup|safe }}</p>
-							<h4>ACTIONS</h4>
-							<p>{{ test_case.latest_text.action|safe }}</p>
-						</div>
-					</td>
-					<td colspan="4">
-						<h4>BREAKDOWN</h4>
-						<p>{{ test_case.latest_text.breakdown|safe }}</p>
-						<h4>EFFECT</h4>
-						<p>{{ test_case.latest_text.effect|safe }}</p>
-					</td>
+			
+			<tr class="case_content hide" style="display: none;">
+				<td colspan="11">
+					<div id="id_loading_{{ test_case.pk }}" class="ajax_loading"></div>
 				</td>
 			</tr>
-			{% endcomment %}
 			{% endfor %}
 		</tbody>
 	</table>

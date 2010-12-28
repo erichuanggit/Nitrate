@@ -14,15 +14,27 @@ Nitrate.TestCases.List.on_load = function()
             clickedSelectAll(this, this.up(4), 'case')
         });
     };
-    if($('testcases_table')) {
-        TableKit.Sortable.init('testcases_table',
-        {
-            rowEvenClass : 'roweven',
-            rowOddClass : 'rowodd',
-            nosortClass : 'nosort'
-        });
-    };
-
+    //if($('testcases_table')) {
+        //TableKit.Sortable.init('testcases_table',
+        //{
+            //rowEvenClass : 'roweven',
+            //rowOddClass : 'rowodd',
+            //nosortClass : 'nosort'
+        //});
+    //};
+	var toggle_case = function(e) {
+        var c = this.up(); // Container
+        var c_container = c.next(); // Content Containers
+        var case_id = c.getElementsBySelector('input[name="case"]')[0].value;
+        
+        var type = 'case';
+        toggleTestCaseContents(type, c, c_container, case_id);
+    }
+    
+    $$('.expandable').invoke('observe', 'click', toggle_case);
+	if(window.location.hash == '#expandall'){
+		blinddownAllCases();
+	}
 }
 
 Nitrate.TestCases.Details.on_load = function()
