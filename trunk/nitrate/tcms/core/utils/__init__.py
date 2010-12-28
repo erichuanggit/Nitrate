@@ -78,6 +78,9 @@ def clean_request(query, exclude_keys = [], keys = None):
     """
     Clean the request strings
     """
+    if not query:
+        return {}
+    
     excluded_keys = ['a', 'f', 'q', 't', 'tt', 'tq',  'page', 'order_by', 'from_plan', 'template_type']
     if exclude_keys:
         excluded_keys.extend(exclude_keys)
