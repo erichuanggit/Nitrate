@@ -379,7 +379,12 @@ def printable(request, template_name = 'case/printable.html'):
     
     if not request.REQUEST.get('plan') and not request.REQUEST.get('case') \
     and not request.REQUEST.get('case_status'):
-        raise Http404()
+        return HttpResponse(Prompt.render(
+            request = request,
+            info_type = Prompt.Info,
+            info = 'At least one plan is required.',
+            next = 'javascript:window.history.go(-1)'
+        ))
     
     if request.REQUEST.get('plan'):
         tps = TestPlan.objects.filter(pk__in = request.REQUEST.getlist('plan'))
