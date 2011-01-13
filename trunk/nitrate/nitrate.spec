@@ -7,7 +7,7 @@ Release:        4
 Summary:        Test Case Management System
 
 Group:          Development/Languages
-License:        Internal RH for now
+License:        GPLv2+
 URL:            https://fedorahosted.org/nitrate/browser/trunk/nitrate
 Source0:        nitrate-%{version}-%{release}.tar.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
