@@ -1,58 +1,55 @@
 <div class="leftlistinfo">
+    <div class="listinfo">
+        <span class="title"><label for="id_name">Plan Name</label></span>
+        <span class="listinfo_input">{{ search_plan_form.name__icontains }}</span>
+    </div>
+    <div class="listinfo">
+        <span class="title"><label for="id_author">Author</label></span>
+        <span class="listinfo_input">{{ search_plan_form.author__email__startswith }}</span>
+    </div>
+    
+    <div class="listinfo">
+        <span class="title"><label for="id_type_id">Plan Type</label></span>
+        <span class="listinfo_input">{{ search_plan_form.type }}</span>
+    </div>
+    <div class="listinfo">
+        <span class="title"><label for="id_tag">Tag</label></span>
+        <span class="listinfo_input">  {{ search_plan_form.tag__name__in }}</span>
+    </div>
 	<div class="listinfo">
-		<span class="title"><label for="id_name__icontains">Plan Name</label></span>
-		<span class="listinfo_input"><input id="id_name__icontains" type="text" name="name__icontains" value="{{ REQUEST_CONTENTS.name__icontains }}"></span>
-	</div>
-	<div class="listinfo">
-		<span class="title"><label for="id_author">Author</label></span>
-		<span class="listinfo_input"><input id="id_author" type="text" name="author__email__startswith" value="{{ REQUEST_CONTENTS.author__email__startswith }}"></span>
-	</div>
-
-	<div class="listinfo">
-		<span class="title"><label for="id_type_id">Plan Type</label></span>
-		<span class="listinfo_input"><select id="id_type_id" name="type_id"></select></span>
-	</div>
-	<div class="listinfo">
-		<span class="title"><label for="id_tag">Tag</label></span>
-		<span class="listinfo_input"><input id="id_tag" name="tag__name__in" value="{{ REQUEST_CONTENTS.tag__name__in }}" /></span>
-	</div>
-	<div class="listinfo">
-		<span class="title"><label for="id_case__default_tester__username__startswith">Case Default Tester</label></span>
-		<span class="listinfo_input"><input id="id_case__default_tester__username__startswith" name="case__default_tester__username__startswith" value="{{ REQUEST_CONTENTS.case__default_tester__username__startswith }}" /></span>
-	</div>
-	<div class="listinfo">
-		<span class="title"><label for="id_is_active">Active</label></span>
-		<span class="listinfo_input">
-			<input type="checkbox" name="is_active" value="1" {% if REQUEST_CONTENTS.is_active %}checked{% endif %} />
-			<label class="grey">Uncheck will search active and inactive plans</label>
-		</span>
-	</div>
-
+        <span class="title"><label for="id_case__default_tester__username__startswith">Case Default Tester</label></span>
+        <span class="listinfo_input">  {{ search_plan_form.case__default_tester__username__startswith }}</span>
+    </div>
+    <div class="listinfo">
+        <span class="title"><label for="id_is_active">Active</label></span>
+        <span class="listinfo_input"> {{ search_plan_form.is_active }} <span class="grey">Uncheck will search active and inactive plans</span></span>
+    </div>
+    
 </div>
 <div class="rightlistinfo">
-	<div class="listinfo">
-		<span class="title"><label for="id_product_id">Product</label></span>
-		<span class="listinfo_input"><select id="id_product_id" name="product_id"></select></span>
-	</div>
-	<div class="listinfo">
-		<span class="title"><label for="id_default_product_version">Product Version</label></span>
-		<span class="listinfo_input"><select id="id_default_product_version" name="default_product_version"></select></span>
-	</div>
-	<div class="listinfo">
-		<span class="title"><label for="id_env_group_id">Environment Group</label></span>
-		<span class="listinfo_input"><select id="id_env_group_id" name="env_group_id"></select></span>
-	</div>
-
-	<div class="listinfo">
-		<span class="title"><label for="id_creation_date_start">Created after:</label></span>
-		<span class="listinfo_input"><input type="text" name="create_date__gte" value="{{ REQUEST_CONTENTS.create_date__gte }}" class="vDateField"></span>
-	</div>
-	<div class="listinfo">
-		<span class="title"><label for="id_creation_date">Created before:</label></span>
-		<span class="listinfo_input"><input type="text" name="create_date__lte" value="{{ REQUEST_CONTENTS.create_date__lte }}" class="vDateField"></span>
-	</div>
-	<div class="listinfo">
-		<span class="title">{{ error_messages }}</span>
-	</div>
+    <div class="listinfo">
+        <span class="title"><label for="id_product_id">Product</label></span>
+        <span class="listinfo_input">{{ search_plan_form.product }}</span>
+    </div>
+    <div class="listinfo">
+        <span class="title"><label for="id_version_id">Product Version</label></span>
+           <span class="listinfo_input"> {{ search_plan_form.default_product_version }}</span>
+    </div>
+    <div class="listinfo">
+        <span class="title"><label for="id_env_group_id">Environment Group</label></span>
+            <span class="listinfo_input">{{ search_plan_form.env_group }}</span>
+    </div>
+    
+    <div class="listinfo">
+        <span class="title"><label for="id_creation_date_start">Created after:</label></span>
+        <span class="listinfo_input" id=creation_sdate>{{ search_plan_form.create_date__gte }}</span>
+    </div>
+    <div class="listinfo">
+        <span class="title"><label for="id_creation_date">Created before:</label></span>
+        <span class="listinfo_input" id=creation_sdate>{{ search_plan_form.create_date__lte }}</span>
+    </div>
+    <div class="listinfo">
+        <span class="title">{{ search_plan_form.errors }}</span>
+    </div>
 </div>
 <div class="clear"></div>

@@ -162,7 +162,7 @@ class TestCase(TCMSActionModel):
     
     def __unicode__(self):
         return self.summary
-    
+
     @classmethod
     def create(cls, author, values):
         """
@@ -185,17 +185,96 @@ class TestCase(TCMSActionModel):
             default_tester = values['default_tester'],
             notes = values['notes'],
         )
-    
+
     @classmethod
     def update(cls, case_ids, values):
         if isinstance(case_ids, int):
             case_ids = [case_ids, ]
+
         fields = [field.name for field in cls._meta.fields]
+        
         tcs = cls.objects.filter(pk__in = case_ids)
+
         for k, v in values.items():
             if k in fields and v is not None and v != u'':
                 tcs.update(**{k: v})
+
         return tcs
+    
+    @classmethod
+    def list(cls, query):
+        """List the cases with request"""
+        from django.db.models import Q
+        q = cls.objects
+        if query.get('search'):
+            q = q.filter(
+                Q(pk__icontains = query['search'])
+                | Q(summary__icontains = query['search'])
+                | Q(author__email__startswith = query['search'])
+            )
+        
+        if query.get('summary'):
+            q = q.filter(Q(summary__icontains=query['summary']))
+        
+        if query.get('author'):
+            q = q.filter(
+                Q(author__first_name__startswith = query['author'])
+                | Q(author__last_name__startswith = query['author'])
+                | Q(author__username__icontains = query['author'])
+                | Q(author__email__startswith = query['author'])
+            )
+        
+        if query.get('default_tester'):
+            q = q.filter(
+                Q(default_tester__first_name__startswith = query['default_tester'])
+                | Q(default_tester__last_name__startswith = query['default_tester'])
+                | Q(default_tester__username__icontains = query['default_tester'])
+                | Q(default_tester__email__startswith = query['default_tester'])
+            )
+        
+        if query.get('tag__name__in'):
+            q = q.filter(tag__name__in = query['tag__name__in'])
+        
+        if query.get('category'):
+            q = q.filter(category = query['category'])
+        
+        if query.get('priority'):
+            q = q.filter(priority__in = query['priority'])
+        
+        if query.get('case_status'):
+            q = q.filter(case_status__in = query['case_status'])
+        
+        #If plan exists, remove leading and trailing whitespace from it.
+        plan_str = query.get('plan','').strip()
+        if plan_str:
+            try:
+                # Is it an integer?  If so treat as a plan_id:
+                plan_id = int(plan_str)
+                q = q.filter(plan__plan_id = plan_id)
+            except ValueError:
+                # Not an integer - treat plan_str as a plan name:
+                q = q.filter(plan__name__icontains = plan_str)
+        del plan_str
+        
+        if query.get('product'):
+            q = q.filter(
+                Q(category__product = query['product'])
+                | Q(component__product = query['product'])
+            )
+        
+        if query.get('component'):
+            q = q.filter(component = query['component'])
+        
+        if query.get('bug_id'):
+            q = q.filter(case_bug__bug_id__in = query['bug_id'])
+        
+        if query.get('is_automated'):
+            q = q.filter(is_automated = query['is_automated'])
+        
+        if query.get('is_automated_proposed'):
+            q = q.filter(is_automated_proposed = query['is_automated_proposed'])
+        
+        return q.distinct()
     
     @classmethod
     def list_confirmed(self):
@@ -399,8 +478,6 @@ class TestCase(TCMSActionModel):
     
     def get_url_path(self, request = None):
         return reverse('tcms.testcases.views.get', args=[self.pk, ])
-
-setattr(TestCase._meta, 'exclude_fields', ['case', 'action', 'new_case_status_id', 'new_priority_id'])
 
 class TestCaseText(TCMSActionModel):
     case = models.ForeignKey(TestCase, related_name='text')

@@ -1,63 +1,59 @@
 <div class="leftlistinfo">
 <div class="listinfo">
 	<div class="title"><label for="id_summary">Case Summary</label></div>
-	<div class="setinput"><input type="text" name="summary__icontains" value="{{ REQUEST_CONTENTS.summary__icontains }}" /></div>
+	<div class="setinput">{{ search_form.summary }}{{ search_form.summary.errors }}</div>
 </div>
 <div class="listinfo">
 	<div class="title"><label for="id_author">Author</label></div>
-	<div class="setinput"><input type="text" name="author__email__startswith" value="{{ REQUEST_CONTENTS.author__email__startswith }}" /></div>
+	<div class="setinput">{{ search_form.author }}{{ search_form.author.errors }}</div>
 </div>
 <div class="listinfo">
 	<div class="title"><label for="id_product">Product</label></div>
-	<div class="setinput"><select id="id_category__product__pk" name="category__product__pk"></select></div>
+	<div class="setinput">{{ search_form.product }}{{ search_form.product.errors }}</div>
 </div>
 
 
 <div class="listinfo">
-	<div class="title"><label for="id_plan">Plan Name</label></div>
-	<div class="setinput"><input type="text" name="plan__name__icontains" value="{{ REQUEST_CONTENTS.plan__name__icontains }}" /></div>
+	<div class="title"><label for="id_plan">Plan</label></div>
+	<div class="setinput">{{ search_form.plan }}{{ search_form.plan.errors }}</div>
 </div>
 <div class="listinfo_liinline">
 	<div class="title"><label for="id_priority">Priority</label></div>
-	<div class="setinput"><select id="id_priority__pk" name="priority__pk"></select></div>
+	<div class="setinput">{{ search_form.priority }}{{ search_form.priority.errors }}</div>
 </div>
 <div class="listinfo_liinline">
 		<span class="title">Automated</span>
-		<input type="checkbox" name="is_automated" value="0" {% if REQUEST_CONTENTS.is_automated %}selected{% endif %} />
-		<label>Manual</label>
-		<input type="checkbox" name="is_automated" value="1" {% if REQUEST_CONTENTS.is_automated %}selected{% endif %} />
-		<label>Auto</label>
-		<div class="automatedlist">
-		<input type="checkbox" name="is_automated_proposed" value="1" {% if REQUEST_CONTENTS.is_automated_proposed %}selected{% endif %} />
-		<label>Autoproposed</label>
-		</div>
+		{{ search_form.is_automated }}
+        <div class="automatedlist">
+		{{ search_form.is_automated_proposed }}
+		<label>{{ search_form.is_automated_proposed.label }}</label>
+        </div>
 	</div>
+
 </div>
 
 
 <div class="rightlistinfo">
 <div class="listinfo">
 	<div class="title"><label for="id_category">Category</label></div>
-	<div class="setinput"><select id="id_category__pk" name="category__pk"></select></div>
+	<div class="setinput">{{ search_form.category }}{{ search_form.category.errors }}</div>
 </div>
 
 <div class="listinfo_liinline">
 	<div class="title"><label for="id_case_status">Status</label></div>
-	<div class="setinput"><select id="id_case_status__pk" name="case_status__pk"></select></div>
+	<div class="setinput">{{ search_form.case_status }}{{ search_form.case_status.errors }}</div>
 </div>
 <div class="listinfo">
 	<div class="title"><label for="id_component">Component</label></div>
-	<div class="setinput"><select id="id_component__in" name="component__in"></select></div>
+	<div class="setinput">{{ search_form.component }}{{ search_form.component.errors }}</div>
 </div>
 <div class="listinfo">
 	<div class="title"><label for="id_bug_id">Bug ID</label></div>
-	<div class="setinput"><input type="text" name="case_bug__bug_id__in" value="{{ REQUEST_CONTENTS.case_bug__bug_id__in }}" /></div>
+	<div class="setinput">{{ search_form.bug_id }}{{ search_form.bug_id.errors }}</div>
 </div>
 <div class="listinfo">
 	<div class="title"><label for="id_tag">Tag</label></div>
-	<div class="setinput"><input type="text" name="tag__name__in" value="{{ REQUEST_CONTENTS.tag__name__in }}" /></div>
+	<div class="setinput">{{ search_form.tag__name__in }}{{ search_form.tag__name__in.errors }}</div>
 </div>
-	{% if error_messages %}
-	<div class="setinput">{{ error_messages }}</div>
-	{% endif %}
+	<div class="setinput">{{ search_form.errors }}</div>
 </div>

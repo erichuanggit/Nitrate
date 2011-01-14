@@ -104,6 +104,28 @@ class TestPlan(TCMSActionModel):
     
     def __unicode__(self):
         return self.name
+        
+    @classmethod
+    def list(cls, query = None):
+        """docstring for list_plans"""
+        from django.db.models import Q
+        
+        new_query = {}
+        
+        for k, v in query.items():
+            if v and k not in ['action', 't', 'f', 'a']:
+                new_query[k] = hasattr(v, 'strip') and v.strip() or v
+        
+        # build a QuerySet:
+        q = cls.objects
+        # add any necessary filters to the query:
+        
+        if new_query.get('search'):
+            q = q.filter(Q(plan_id__icontains = new_query['search']) \
+                            | Q(name__icontains = new_query['search']))
+            del new_query['search']
+        
+        return q.filter(**new_query).distinct()
     
     def confirmed_case(self):
         return self.case.filter(case_status__name = 'CONFIRMED')
@@ -260,7 +282,6 @@ class TestPlan(TCMSActionModel):
         version = self.get_default_product_version()
         return version and version.id or None
 
-setattr(TestPlan._meta, 'exclude_fields', ['action'])
 
 class TestPlanText(TCMSActionModel):
     plan = models.ForeignKey(
