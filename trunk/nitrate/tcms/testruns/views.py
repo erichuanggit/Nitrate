@@ -275,7 +275,7 @@ def get(request, run_id, template_name = 'run/get.html'):
         )
     
     # Continue to search the case runs with conditions
-    tcrs = tcrs.filter(**clean_request(request.REQUEST))
+    tcrs = tcrs.filter(**clean_request(request))
     if request.REQUEST.get('order_by'):
         tcrs = tcrs.order_by(request.REQUEST['order_by'])
     

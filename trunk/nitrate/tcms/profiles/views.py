@@ -154,14 +154,13 @@ def recent(request, username, template_name='profile/recent.html'):
         up = {'user': request.user}
     
     plans_query = {
-        'author__username': request.user.username,
-        'is_active': True,
+        'author': request.user,
     }
     
     runs_query = {
-        'people_type': 'people',
         'people': request.user,
-        'stop_date__isnull': 1,
+        'is_active': True,
+        'status': 'running',
     }
     
     tps = TestPlan.list(plans_query)
