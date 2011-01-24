@@ -10,7 +10,7 @@ RELEASE=$(shell rpm -q --qf "%{RELEASE}\n" --specfile $(SPECFILE)|head -n1)
 SRPM=$(NAME)-$(VERSION)-$(RELEASE).src.rpm
 TARBALL=nitrate-$(VERSION)-$(RELEASE).tar.bz2
 PWD=$(shell pwd)
-RPMBUILD_OPTIONS=--nodeps --define "_sourcedir $(PWD)" --define "_srcrpmdir $(PWD)"
+RPMBUILD_OPTIONS=--nodeps --define "_topdir $(PWD)" --define "_sourcedir $(PWD)" --define "_srcrpmdir $(PWD)"
 
 WORK_DIR=/tmp/nitrate-$(VERSION)-$(RELEASE)
 SOURCE_DIR = $(WORK_DIR)/nitrate/trunk/
