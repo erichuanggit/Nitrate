@@ -117,12 +117,12 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 *Mon Jan 24 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-1
 
-Fixed bug 661951 - Messed-up warning message pop up when clicking Add...
+Fixed bug 661951 - Messed-up warning message pop up when clicking Add without entering Bug ID
 Fixed bug 665945 - run export button dosn't work
 Fixed bug 667293 - The first product is the default product.
 Fixed bug 665934 - choose no plan to "Printalbe Copy"
 Fixed Bug 654953 - [RFE] Report an expanded list of Test Cases by Tag
-Fixed bug 664467 - TCMS: cells overlapping when using long name for test...
+Fixed bug 664467 - TCMS: cells overlapping when using long name for test case summary
 Fixed bug 662944 - Resort case run is broken in Firefox
 Fixed bug 642644 - update nitrate.py to work with the latest xmlrpclib
 Fixed bug 578717 - [REF] Provide filter in test run
