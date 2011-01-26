@@ -446,9 +446,9 @@ class TestCase(TCMSActionModel):
         to = list(set(to))
         mailto(template, subject, to, context, request)
     
-    def remove_bug(self, id):
+    def remove_bug(self, bug_id):
         try:
-            bug = self.case_bug.get(id = id)
+            bug = self.case_bug.get(bug_id = bug_id)
             bug.delete()
         except:
             raise

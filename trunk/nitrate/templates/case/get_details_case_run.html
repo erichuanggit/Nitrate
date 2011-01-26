@@ -57,6 +57,7 @@
 						{% if bug.case_run_id %}
 						<span class="grey"> - From Run</span>
 						<a href="{% url tcms.testruns.views.get bug.case_run.run_id %}">{{ bug.case_run.run_id }}</a>
+						<a href="javascript:void(0);" class="deletelink" title="Remove this bug" onclick="removeCaseRunBug(this.up(7).previous(), this.up(7), this.previous(2).innerHTML, {{ test_case_run.case_id }}, {{ test_case_run.pk }})">Remove</a>
 						{% endif %}
 					</li>
 					{% empty %}
