@@ -357,7 +357,7 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
         form = EditPlanForm(initial = {
             'name': tp.name,
             'product': tp.product_id,
-            'product_version': tp.get_version_id(),
+            'default_product_version': tp.get_version_id(),
             'type': tp.type_id,
             'text': tp.latest_text() and tp.latest_text().plan_text or '',
             'parent': tp.parent_id,
@@ -542,7 +542,7 @@ def clone(request, template_name = 'plan/clone.html'):
         if len(tps) == 1:
             clone_form = ClonePlanForm(initial = {
                 'product': tps[0].product.id,
-                'product_version': tps[0].get_version_id(),
+                'default_product_version': tps[0].get_version_id(),
                 'copy_texts': True,
                 'copy_attachements': True,
                 'copy_environment_group': True,
