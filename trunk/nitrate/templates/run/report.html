@@ -18,7 +18,7 @@
 	<div class="report_sub_title">[{{ test_run.run_id }}] {{ test_run.summary}}</div></div>
 	<div class="report_content">
 	<div id="content">
-		<div class="listcontent">
+		<div class="listinfo_content" style="float:left; width:95%">
 			<div class="leftlistinfo">
 				<div class="listinfo">
 					<span class="title">Test Plan:</span>{{ test_run.plan.plan_id }}:{{ test_run.plan.name }}
@@ -45,9 +45,6 @@
 						</ul>
 					</div>
 				</div>
-				<div class="listinfo">
-					<span class="title">Note:</span>{{ test_run.notes|linebreaksbr }}
-				</div>
 			
 			</div>
 			<div class="rightlistinfo">
@@ -71,6 +68,9 @@
 				<div class="listinfo">
 					<span class="title">Finished at:</span>{{ test_run.stop_date }}
 				</div>
+			</div>
+			<div class="listinfo">
+				<span class="title">Note:</span>{{ test_run.notes|linebreaksbr }}
 			</div>
 			<div class="clear"></div>
 		</div>

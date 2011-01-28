@@ -400,10 +400,10 @@ a:link.remove,a:visited.remove{ color:#333;}
 .leftlistinfo{ width:49%; float:left;}
 .rightlistinfo{ width:49%; float:left;}
 .listinfo{margin-left:160px; clear:both; padding-top:5px;}
-.listinfo .title{margin-left:-160px; float:left; color:#3E5161; padding-left:10px; width:160px;}
+.listinfo .title{margin-left:-160px; float:left; color:#3E5161; width:160px;}
 .listinfo .contenttext{float:left; color:#3E5161; padding-left:15px; }
 .listinfo .title_h4{margin-left:-160px; float:left; color:#3E5161; padding-left:10px; width:160px;color:#235d9f; font-size:1.0em;}
-.listinfo .linotype ul,.listinfo .linotype ol{ list-style-type:none;display:block; margin-left:10px;}
+.listinfo .linotype ul,.listinfo .linotype ol{ list-style-type:none;display:block;}
 .listinfo .listinfo_input input[type='text'],.listinfo .listinfo_input select{ width:250px;}
 
 .listinfo_liinline{margin-left:160px; clear:both; padding-top:5px;}

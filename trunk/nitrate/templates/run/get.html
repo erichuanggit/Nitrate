@@ -82,8 +82,11 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 				<div class="progress-bar" style="float:none">
 					<div class="percent">{{ status_counter.complete_percent|floatformat:0 }}.00%</div>
 					<div class="progress-inner" style="width:{{ status_counter.complete_percent|floatformat:"0" }}px;">
+						<div class="progress-failed" style="width:{{ status_counter.failed_percent|floatformat:"0" }}px;">
 					</div>
 				</div>
+				
+				
 				</td>
 			</tr>
 			{% for k, v in status_counter.count_data.items %}
@@ -196,9 +199,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 				{% endfor%}
 			</div>
 		   
-			<div class="listinfo">
-				<div class="title">Note:</div>{{ test_run.notes|urlize|linebreaksbr }}
-			</div>
+			
 		
 		</div>
 		<div class="rightlistinfo">
@@ -242,6 +243,8 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 				<div class="linotype">{% include 'run/get_cc.html' %}</div>
 			</div>
 		</div>
+		<div class="listinfo">
+			<div class="title">Note:</div>{{ test_run.notes|urlize|linebreaksbr }}
 		</div>
 		<div class="clear"></div>
 	</div>
