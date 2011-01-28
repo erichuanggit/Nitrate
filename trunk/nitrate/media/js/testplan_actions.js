@@ -742,7 +742,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 if(!this.value)
                     return false;
                 
-                if(!params['case']){
+                if(!params['case'] && params['case'].length == 0){
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
@@ -774,7 +774,8 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 if(!this.value)
                     return false;
                 
-                if(!params['case']){
+
+                if(!params['case'] && params['case'].length == 0){
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
@@ -803,6 +804,12 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             var element = form.adjacent('input.btn_automated')[0];
             element.observe('click', function(e) {
                 var params = serialzeCaseForm(form, table);
+               
+                if(params['case'] && params['case'].length == 0){
+                    alert(default_messages.alert.no_case_selected);
+                    return false;
+                }
+
                 params['a'] = 'change';
                 var c = getDialog();
                 var callback = function(t) {
@@ -832,7 +839,10 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     'case': serializeCaseFromInputList(table),
                     'product': Nitrate.TestPlans.Instance.fields.product_id
                 };
-                
+                if(params['case'] && params['case'].length == 0){
+                    alert(default_messages.alert.no_case_selected);
+                    return false;
+                }
                 var form_observe = function(e) {
                     e.stop();
                     
