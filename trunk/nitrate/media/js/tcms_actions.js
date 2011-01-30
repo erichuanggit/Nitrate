@@ -104,6 +104,7 @@ var default_messages = {
         'last_case_run': 'It is the last case run',
         'bookmark_added': 'Bookmark added.',
         'no_run_selected': 'No run selected.',
+        'invalid_bug_id': 'Please input a valid bug id.',
     },
     'confirm': {
         'change_case_status': 'Are you sure you want to change the status?',

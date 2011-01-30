@@ -300,7 +300,7 @@ class BasePlanForm(forms.Form):
         queryset = TCMSEnvGroup.get_active().all(),
         required = False
     )
-    parent = forms.CharField(required = False)
+    parent = forms.IntegerField(required = False)
     
     def clean_default_product_version(self):
         if hasattr(self.cleaned_data['default_product_version'], 'value'):

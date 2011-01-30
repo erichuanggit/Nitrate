@@ -37,6 +37,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
 	</div>
 	<div id="itemSearch" class="itemSearch">
 		<form id="id_search_plan_form" action="{% url tcms.testplans.views.all %}" method="get">
+			<input type="hidden" name="action" value="search" />
 			<h2>Search Plan</h2>
 			{% include 'plan/form/search.html' %}
 			{% comment %}

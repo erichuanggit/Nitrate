@@ -92,6 +92,89 @@ class TestRun(TCMSActionModel):
     def __unicode__(self):
         return self.summary
     
+    @classmethod
+    def list(cls, query):
+        from django.db.models import Q
+        
+        q = cls.objects
+        
+        if query.get('search'):
+           q = q.filter(
+                Q(run_id__icontains = query['search']) |
+                Q(summary__icontains = query['search'])
+            )
+        
+        if query.get('summary'):
+            q = q.filter(summary__icontains = query['summary'])
+        
+        if query.get('product'):
+            q = q.filter(build__product = query['product'])
+        
+        if query.get('product_version'):
+            q = q.filter(product_version = query['product_version'])
+        
+        plan_str = query.get('plan')
+        if plan_str:
+            try:
+                # Is it an integer?  If so treat as a plan_id:
+                plan_id = int(plan_str)
+                q = q.filter(plan__plan_id = plan_id)
+            except ValueError:
+                # Not an integer - treat plan_str as a plan name:
+                q = q.filter(plan__name__icontains = plan_str)
+        del plan_str
+        
+        if query.get('build'):
+            q = q.filter(build = query['build'])
+        
+        # Old style environment search
+        #if query.get('env_id'):
+        #    q = q.filter(environment__environment_id = query.get('env_id'))
+        
+        # New environment search
+        if query.get('env_group'):
+            q = q.filter(plan__env_group = query['env_group'])
+        
+        if query.get('people_id'):
+            q = q.filter(
+                Q(manager__id = query['people_id'])
+                | Q(default_tester__id = query['people_id'])
+            )
+        
+        if query.get('people'):
+            if query.get('people_type') == 'default_tester':
+                q = q.filter(default_tester = query['people'])
+            elif query.get('people_type') == 'manager':
+                q = q.filter(manager = query['people'])
+            else:
+                q = q.filter(
+                    Q(manager = query['people'])
+                    | Q(default_tester = query['people'])
+                )
+        
+        if query.get('manager'):
+            q = q.filter(manager = query['manager'])
+        
+        if query.get('default_tester'):
+            q = q.filter(default_tester = query['default_tester'])
+        
+        if query.get('sortby'):
+            q = q.order_by(query.get('sortby'))
+        
+        if query.get('status'):
+            if query.get('status').lower() == 'running':
+                q = q.filter(stop_date__isnull = True)
+            if query.get('status').lower() == 'finished':
+                q = q.filter(stop_date__isnull = False)
+        
+        if query.get('tag__name__in'):
+            q = q.filter(tag__name__in = query['tag__name__in'])
+        
+        if query.get('case_run__assignee'):
+            q = q.filter(case_run__assignee = query['case_run__assignee'])
+        
+        return q.distinct()
+    
     def belong_to(self, user):
         if self.manager == user or self.plan.author == user:
             return True
@@ -255,8 +338,6 @@ class TestRun(TCMSActionModel):
         to = self.get_notify_addrs()
         mailto(template, subject, to, context, request)
 
-setattr(TestRun._meta, 'exclude_fields', ['people_type', 'people'])
-
 class TestCaseRunStatus(TCMSActionModel):
     id = models.AutoField(db_column='case_run_status_id', primary_key=True)
     name = models.CharField(max_length=60, blank=True)
@@ -355,10 +436,9 @@ class TestCaseRun(TCMSActionModel):
         except:
             raise
     
-    def remove_bug(self, id):
+    def remove_bug(self, bug_id):
         try:
-            bug = self.case_run_bug.get(id = id)
-            bug.delete()
+            self.case.remove_bug(bug_id = bug_id)
         except:
             raise
     

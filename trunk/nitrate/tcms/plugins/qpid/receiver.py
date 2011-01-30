@@ -21,7 +21,7 @@ from base import QPIDBase
 
 class QPIDReceiver(QPIDBase):
     def __init__(self, url, **kwargs):
-        super(QPIDSender, self).__init__(url, **kwargs)
+        super(QPIDReceiver, self).__init__(url, **kwargs)
         self.receiver = None
     
     def init_receiver(self):

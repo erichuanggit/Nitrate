@@ -202,7 +202,7 @@ def all(request, template_name = 'run/all.html'):
     """
     Read the test runs from database and display them
     """
-    from django.db.models import Q
+    from tcms.testruns.forms import SearchRunForm
     from tcms.core.utils.raw_sql import RawSQL
     SUB_MODULE_NAME = "runs"
     
@@ -219,33 +219,40 @@ def all(request, template_name = 'run/all.html'):
     
     # If it's a search
     if request.REQUEST.items():
-        # It's a search here.
-        query_result = True
-        trs = TestRun.list(request.REQUEST)
-        if request.REQUEST.get('people'):
-            trs = trs.filter(
-                Q(manager__username__startswith = request.REQUEST['people']) |
-                Q(default_tester__username__startswith = request.REQUEST['people'])
-            )
-        trs = trs.select_related(
-            'manager', 'default_tester', 'build', 'plan', 'build__product__name',
-        )
+        search_form = SearchRunForm(request.REQUEST)
         
-        # Further optimize by adding caserun attributes:
-        trs = trs.extra(
-            select={
-                'completed_case_run_percent': RawSQL.completed_case_run_percent,
-                'total_num_caseruns': RawSQL.total_num_caseruns,
-                'failed_case_run_percent': RawSQL.failed_case_run_percent,
-                'env_groups': RawSQL.environment_group_for_run,
-            },
-        )
+        if request.REQUEST.get('product'):
+            search_form.populate(product_id = request.REQUEST['product'])
+        else:
+            search_form.populate()
+        
+        if search_form.is_valid():
+            # It's a search here.
+            query_result = True
+            trs = TestRun.list(search_form.cleaned_data)
+            trs = trs.select_related(
+                'manager', 'default_tester', 'build', 'plan', 'build__product__name',
+            )
+            
+            # Further optimize by adding caserun attributes:
+            trs = trs.extra(
+                select={
+                    'completed_case_run_percent': RawSQL.completed_case_run_percent,
+                    'total_num_caseruns': RawSQL.total_num_caseruns,
+                    'failed_case_run_percent': RawSQL.failed_case_run_percent,
+                    'env_groups': RawSQL.environment_group_for_run,
+                },
+            )
+    else:
+        search_form = SearchRunForm()
+        # search_form.populate()
     
     return direct_to_template(request, template_name, { 
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_runs': trs,
         'query_result': query_result,
+        'search_form': search_form,
     })
 
 def get(request, run_id, template_name = 'run/get.html'):
@@ -275,7 +282,7 @@ def get(request, run_id, template_name = 'run/get.html'):
         )
     
     # Continue to search the case runs with conditions
-    tcrs = tcrs.filter(**clean_request(request.REQUEST))
+    tcrs = tcrs.filter(**clean_request(request))
     if request.REQUEST.get('order_by'):
         tcrs = tcrs.order_by(request.REQUEST['order_by'])
     
@@ -448,7 +455,7 @@ def bug(request, case_run_id, template_name = 'run/execute_case_run.html'):
                 return self.render(response = response)
             
             try:
-                self.case_run.remove_bug(self.request.REQUEST.get('pk'))
+                self.case_run.remove_bug(self.request.REQUEST.get('bug_id'))
             except ObjectDoesNotExist, error:
                 response = {'rc': 1, 'response': error}
                 return self.render(response = response)

@@ -38,7 +38,7 @@
 			<div class="absoluteright">
 				<label>
 					{% if user.is_authenticated %}
-					<a href={% url tcms.profiles.views.profile user.username %}>Welcome, {{ user }}</a>
+					<a href="{% url tcms.profiles.views.profile user.username %}">Welcome, {{ user }}</a>
 					{% if AUTH_BACKEND.can_logout %}
 					[
 					<a href="{% url tcms.core.contrib.auth.views.logout %}?next={{ request.path }}">Logout</a>

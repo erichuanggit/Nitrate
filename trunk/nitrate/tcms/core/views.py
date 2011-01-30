@@ -42,21 +42,29 @@ def search(request):
     from django.db import models
     from django.core.exceptions import ObjectDoesNotExist
     
-    qcontent = request.REQUEST.get('tq', '') # Search content
-    ctype = request.REQUEST.get('content_type') # Content type
+    request_content = request.REQUEST.get('search_content', '')
+    request_type = request.REQUEST.get('search_type')
     
     # Get search contents
-    app_label = ctype.split('.')[0]
-    model = ctype.split('.')[1]
-    base_search_url = reverse('tcms.%s.views.all' % app_label)
+    search_types = {
+        'plans': ('testplans', 'testplan', reverse('tcms.testplans.views.all')),
+        'runs': ('testruns', 'testrun', reverse('tcms.testruns.views.all')),
+        'cases': ('testcases', 'testcase', reverse('tcms.testcases.views.all'))
+    }
+    
+    search_type = search_types.get(request_type)
+    
+    app_label = search_type[0]
+    model = search_type[1]
+    base_search_url = search_type[2]
     
     # Try to get the object directly
     try:
-        qcontent = int(qcontent)
-        target = models.get_model(*[app_label, model])._default_manager.get(pk=qcontent)
-        url = '%s?tq=%s' % (
+        request_content = int(request_content)
+        target = models.get_model(*[app_label, model])._default_manager.get(pk=request_content)
+        url = '%s?search=%s' % (
             reverse('tcms.%s.views.get' % app_label, args=[target.pk]),
-            qcontent
+            request_content
         )
         
         return HttpResponseRedirect(url)
@@ -66,5 +74,6 @@ def search(request):
         pass
     
     # Redirect to search all page
-    url = '%s?a=search&tq=%s' % (base_search_url, qcontent)
+    url = '%s?a=search&search=%s' % (base_search_url, request_content)
+    
     return HttpResponseRedirect(url)

@@ -1,4 +1,5 @@
 {% load extra_filters %}
+<form id="id_form_case_runs">
 <div class="mixbar"> 
 	<span class="tit" style='float:left'>Cases: {{ test_case_runs.count }}</span>
 	<div class='mixbar_left'>
@@ -49,7 +50,7 @@
 		<a title="Click to show filter case-run options" class="btn_filter filtercase" id='filter_case_run'>Show filter options</a>
 	</div>
 </div>
-
+</form>
 <form id="id_filter" action="." method="get" style='display:none'>
 	<input type="hidden" name="order_by" value="{{ REQUEST_CONTENTS.order_by }}" />
 	<div class="leftlistinfo">

@@ -2,12 +2,12 @@
 %define use_pylint 0
 
 Name:           nitrate
-Version:        3.2
-Release:        4
+Version:        3.3
+Release:        1
 Summary:        Test Case Management System
 
 Group:          Development/Languages
-License:        Internal RH for now
+License:        GPLv2+
 URL:            https://fedorahosted.org/nitrate/browser/trunk/nitrate
 Source0:        nitrate-%{version}-%{release}.tar.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -115,6 +115,27 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
+*Mon Jan 24 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-1
+
+Fixed bug 661951 - Messed-up warning message pop up when clicking Add without entering Bug ID
+Fixed bug 665945 - run export button dosn't work
+Fixed bug 667293 - The first product is the default product.
+Fixed bug 665934 - choose no plan to "Printalbe Copy"
+Fixed Bug 654953 - [RFE] Report an expanded list of Test Cases by Tag
+Fixed bug 664467 - TCMS: cells overlapping when using long name for test case summary
+Fixed bug 662944 - Resort case run is broken in Firefox
+Fixed bug 642644 - update nitrate.py to work with the latest xmlrpclib
+Fixed bug 578717 - [REF] Provide filter in test run
+Fixed bug 653812 - Filtering test case runs 
+Fixed bug 534063 - [RFE] Allow sorting / filtering test cases while executing the test run
+Fixed bug 660234 - Add links to IDLE, PASSED, WAIVED items in report table again
+Fixed bug 661579 - Incorrect bug counting method - Ugly code, Ugly bug
+Completed feature #662679 - Attachments get lost when cloning test case
+Completed feature #663520 QPID support for TCMS
+Completed global signal processor
+Fixed case run percent counter
+Improve the style of filtering test case runs
+
 * Thu Dec 1 2010 Xuqing Kuang <xkuang@redhat.com> - 3.2-4
 - Fixed #658160 - Changing case status does not work reliably
 - Fixed UI Bug #658495 - Some case run comments not displayed

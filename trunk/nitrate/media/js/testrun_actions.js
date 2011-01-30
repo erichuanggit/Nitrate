@@ -429,7 +429,7 @@ function taggleSortCaseRun(event)
             t.checked = true;
             t.disabled = false;
         });
-        postToURL('ordercaserun/', serializeCaseRunFromInputList(element.up(1).next(), 'case_run'), 'get');
+        postToURL('ordercaserun/', serializeCaseRunFromInputList(element.up(2).next().next(), 'case_run'), 'get');
     }
 }
 function selectcase(){
@@ -500,7 +500,7 @@ function addCaseRunBug(title_container, container, case_id, case_run_id, callbac
         onFailure: json_failure,
     })
 }
-function removeCaseRunBug(bug_id, parameters, callback)
+function removeCaseRunBug(title_container, container, bug_id, case_id, case_run_id, callback)
 {   
     if(!bug_id)
         return false;
@@ -510,10 +510,10 @@ function removeCaseRunBug(bug_id, parameters, callback)
     
     var url = '/caserun/' + case_run_id + '/bug/';
     
-    var parameter = {
+    var parameters = {
         a: 'remove',
-        index_id: index_id,
-        run: run_id,
+//        index_id: index_id,
+//        run: run_id,
         case_run: case_run_id,
         bug_id: bug_id,
     }
@@ -524,8 +524,8 @@ function removeCaseRunBug(bug_id, parameters, callback)
         if(returnobj.rc == 0) {
             if (callback)
                 return callback();
-            
-            return constructCaseRunZone(container, title_container);
+
+            return constructCaseRunZone(container, title_container, case_id);
         } else {
             alert(returnobj.response);
             return false;

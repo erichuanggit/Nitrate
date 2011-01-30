@@ -395,6 +395,15 @@ function showCaseLog(container, case_id)
 
 function addCaseBug(form, callback)
 {
+
+	//Error handling. alert if user input an invalid number.
+	bug_id = form.bug_id.getValue();
+
+	if(isNaN(bug_id) || bug_id == ""){
+		alert(default_messages.alert.invalid_bug_id);
+		return false;
+	}
+
     var complete = function(t) {
         if($('response')) {
             alert($('response').innerHTML);

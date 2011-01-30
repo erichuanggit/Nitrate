@@ -30,7 +30,6 @@ class CustomSearchForm(forms.Form):
     product = forms.ModelChoiceField(
         label = 'Product',
         queryset = Product.objects.all(),
-        empty_label = None,
     )
     build_run__product_version = forms.ModelChoiceField(
         label = 'Product version',

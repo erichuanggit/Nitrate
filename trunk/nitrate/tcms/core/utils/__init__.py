@@ -16,17 +16,15 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-from django.utils.encoding import smart_unicode
-
 from mailto import *
 from prompt import *
 
 def string_to_list(strs, spliter = ','):
     """Convert the string to list"""
     if isinstance(strs, list):
-        str_list = map(lambda t: smart_unicode(t).strip(), strs)
+        str_list = map(lambda t: str(t).strip(), strs)
     elif strs.find(spliter):
-        str_list = map(lambda t: smart_unicode(t).strip(), strs.split(spliter))
+        str_list = map(lambda t: str(t).strip(), strs.split(spliter))
     else:
         str_list = [strs]
     return [s for s in str_list if s]
@@ -74,37 +72,22 @@ def request_host_link(request, domain_name = None):
     
     return protocol + domain_name
 
-def clean_request(query, exclude_keys = [], keys = None):
+def clean_request(request, keys = None):
     """
     Clean the request strings
     """
-    if not query:
-        return {}
-    
-    excluded_keys = ['a', 'f', 'q', 't', 'tt', 'tq',  'page', 'order_by', 'from_plan', 'template_type']
-    if exclude_keys:
-        excluded_keys.extend(exclude_keys)
-    
-    request_contents = query.copy()
+    request_contents = request.REQUEST.copy()
     if not keys: keys = request_contents.keys()
     rt = {}
     for k in keys:
         k = str(k)
-        if not request_contents.get(k):
-            continue
-        
-        if k in excluded_keys:
-            continue
-        
-        v = query[k]
-        # Convert the value to be list if it's __in filter.
-        if k.endswith('__in'):
-            rc_list = request_contents.getlist(k)
-            if len(rc_list) > 1:
-                v = rc_list
-            elif isinstance(v, unicode):
+        if request_contents.get(k):
+            if k == 'order_by' or k == 'from_plan':
+                continue
+            
+            v = request.REQUEST[k]
+            # Convert the value to be list if it's __in filter.
+            if k.endswith('__in') and isinstance(v, unicode):
                 v = string_to_list(v)
-        else:
-            v = smart_unicode(v)
-        rt[k] = v
+            rt[k] = v
     return rt
