@@ -26,7 +26,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.AssignCase.on_load);
 		>> <a href="{% url tcms.testplans.views.all %}">...</a>
 		>> <a href="{% url tcms.testplans.views.get test_run.plan_id %}">...</a>
 		>> <a href="{% url tcms.testruns.views.get test_run.run_id %}">{{ test_run.run_id }}: {{ test_run.summary }}</a>
-		>> Assign test case
+		>> Add test case
 	</div>
 	<h2 id="display_title"><a href="{% url tcms.testruns.views.get test_run.run_id %}">{{ test_run.summary }}</a></h2>
 	<table class="runsDetail" border="0" width="66%" cellspacing="0" cellpadding="0">
