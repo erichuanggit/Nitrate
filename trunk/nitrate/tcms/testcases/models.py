@@ -18,6 +18,7 @@
 
 from datetime import datetime
 from django.core.urlresolvers import reverse
+from django.core.exceptions import MultipleObjectsReturned
 from django.db import models, connection, transaction
 from tcms.core.models import TCMSActionModel, TimedeltaField
 
@@ -302,7 +303,7 @@ class TestCase(TCMSActionModel):
     
     def add_bug(self, bug_id, bug_system, summary = None, description = None, case_run = None):
         try:
-            self.case_bug.create(
+            self.case_bug.get_or_create(
                 bug_id = bug_id,
                 case_run = case_run,
                 bug_system = bug_system,
@@ -450,6 +451,12 @@ class TestCase(TCMSActionModel):
         try:
             bug = self.case_bug.get(bug_id = bug_id)
             bug.delete()
+        #Backward compatibility, delete duplicate bugs.
+        except MultipleObjectsReturned:
+            try:
+                self.case_bug.filter(bug_id = bug_id).delete()
+            except:
+                raise
         except:
             raise
     

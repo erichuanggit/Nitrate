@@ -57,7 +57,7 @@
 			<a href="{% url tcms.testruns.views.bug test_case_run.pk %}?a=file" target="_blank" class="buglink" title="File a bug on bugzilla">File</a>
 			<a href="#bug" class="addlink" title="Add" onclick="addCaseRunBug(this.up(4).previous(), this.up(4), {{ test_case_run.case_id }}, {{ test_case_run.pk }})">Add</a>
 			<ul class="ul-no-format" style="display:block; margin-left:16px;">
-			   {% for bug in test_case_run.get_bugs %}
+			   {% for bug in test_case_run.case.get_bugs %}
 				<li class="listyledisc"><a href="{{ bug.get_absolute_url }}">{{ bug }}</a>
 				<a href="javascript:void(0)" onclick="removeCaseRunBug(this.up(4).previous(), {{ test_case_run.pk }}, {{ bug.pk }})">
 				<img src="{{ MEDIA_URL }}/images/icon_cross.png" width="12" height="12" title="remove this tag" />

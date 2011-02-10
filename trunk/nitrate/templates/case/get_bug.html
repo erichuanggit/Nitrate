@@ -17,7 +17,7 @@
 		<td><a href="{{ bug.get_absolute_url }}">{{ bug.get_absolute_url }}</a></td>
         <td>
 			{% if perms.testcases.delete_testcasebug %}
-			<a class="remove" onclick="removeCaseBug('{{ bug.pk }}', '{{ test_case.pk }}')">Remove</a>
+			<a class="remove" onclick="removeCaseBug('{{ bug.bug_id }}', '{{ test_case.pk }}')">Remove</a>
 			{% else %}
 			<label class="grey">None</label>
 			{% endif %}
