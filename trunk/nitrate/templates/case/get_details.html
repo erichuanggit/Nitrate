@@ -42,7 +42,7 @@
 				</ul>
 				<h4><span class="title strong">bug:</span></h4>
 				<ul class="ul-no-format">
-					{% for bug in bugs %}
+					{% for bug in test_case.get_bugs %}
 					<li>
 						<a href="{{ bug.get_absolute_url }}">{{ bug }}</a>
 						{% if bug.case_run_id %}
