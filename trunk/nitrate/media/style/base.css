@@ -494,8 +494,8 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 /***********************Testcase Start***************************/
 .control { padding:10px; }
 .float-tip{ width:80%; float:left; margin:10px; padding:10px 10px 10px 40px; background:#FFFAD7 url(../images/tip_bg.png) no-repeat 10px; -moz-box-shadow:1px 1px 1px #333; }
-.even,.evenRow, .roweven{background:#f1f1f1; }
-.odd, .oddRow, .rowodd{ background:#ffffff; }
+.even,.evenRow,.roweven{background:#f1f1f1; }
+.odd,.oddRow,.rowodd{ background:#ffffff; }
 
 .selection_row { background:#f3f8fe; border:0px; }
 .progress-bar{ width:100px; background:#fff url(../images/evenbg.png) repeat-x; height:24px; border:1px solid #ccc; vertical-align:middle; margin:3px 0px 2px 0px; font-size:12px; text-align:right; }
