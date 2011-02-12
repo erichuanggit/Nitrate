@@ -466,6 +466,10 @@ Nitrate.TestPlans.Clone.on_load = function()
             $('id_keep_case_default_tester').disabled = true;
         }
     })
+    // Populate product version field.
+    if($('id_product') && !$F('id_default_product_version')){
+        fireEvent($('id_product'),'change');
+    }
 }
 
 function getTestPlanParam()
