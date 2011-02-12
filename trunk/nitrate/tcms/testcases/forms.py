@@ -191,7 +191,11 @@ class BaseCaseForm(forms.Form):
             return 2
         
         if len(data):
-            return data[0]
+            #FIXME: Should data always be a list?
+            try:
+                return int(data[0])
+            except ValueError, e:
+                return data[0]
         
         return data
     

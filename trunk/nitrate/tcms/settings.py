@@ -30,6 +30,8 @@ DEBUG_PROPAGATE_EXCEPTIONS = False
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
+    ('Victor Chen', 'vchen@redhat.com'),
+    ('Yuguang Wang', 'yuwang@redhat.com'),
 )
 
 MANAGERS = ADMINS
