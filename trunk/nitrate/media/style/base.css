@@ -714,7 +714,7 @@ ul.clone_multiple_option li{ display:inline; list-style:none; margin:0px 5px 0 1
 
 
 
-.listinfo_doc_content{ padding-top:10px; width:100%; background:#f5f5f5; margin-top:30px;}
+.listinfo_doc_content{ padding-top:10px; width:100%; background:#f5f5f5; margin-top:30px;padding-bottom:12px;}
 .listinfo_doc{ margin-top:5px;margin-left:10px; }
 .listinfo_doc .title{ width:80px;color:#3E5161; float:left}
 .listinfo_doc .summary ol,.listinfo_doc .summary ul{margin-left:100px;}
