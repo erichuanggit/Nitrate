@@ -1265,12 +1265,16 @@ function refreshSelectFilter(element, clean)
 
 function clickedSelectAll(checkbox, form, name)
 {
-    if(checkbox.checked) {
-        $(form).adjacent('input[name='+ name + ']').invoke('setAttribute', 'checked', true);
-    } else {
-        $(form).adjacent('input[name='+ name + ']').invoke('setAttribute', 'checked', false);
-        $(form).adjacent('input[name='+ name + ']').invoke('removeAttribute', 'checked');
-    }
+//	  Bug here: setAttribute, removeAttribute does not always work.
+//    if(checkbox.checked) {
+//        $(form).adjacent('input[name='+ name + ']').invoke('setAttribute', 'checked', true);
+//    } else {
+//        $(form).adjacent('input[name='+ name + ']').invoke('setAttribute', 'checked', false);
+//        $(form).adjacent('input[name='+ name + ']').invoke('removeAttribute', 'checked');
+//    }
+	var checkboxes = $(form).adjacent('input[name='+ name + ']');
+	for (i = 0; i < checkboxes.length; i++)
+		  checkboxes[i].checked = checkbox.checked? true:false;
 }
 
 function bindSelectAllCheckbox(element, form, name)
