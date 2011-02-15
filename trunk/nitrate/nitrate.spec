@@ -3,7 +3,7 @@
 
 Name:           nitrate
 Version:        3.3
-Release:        1
+Release:        2
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -115,8 +115,22 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 %changelog
-*Mon Jan 24 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-1
+*Tue Feb 15 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-2
+Fixed bug 664025 - TCMS main check box to control test cases doesn't work
+Fixed bug 658372 - Cannot select "Product Version" when clone multiple test plans
+Fixed bug 667304 - Click "Build" label, it won't be sorted by build
+Fixed bug 654533 - [TCMS]Document Version in test plan on opera browser
+Fixed bug 672873 - xml export can't be parsed
+Fixed bug 664743 - [RFE] supply existing bugs when marking test-case-run as failed
+Fixed bug 672857 - Typo in error message when a test plan hasn't been
+Fixed bug 657474 [TCMS3.2-2]List the runs which have not environment
+Fixed bug 649293 - Make the case run "notes" field visible in the run
+Fixed bug 643324 - Provide a bit more space for the test run notes
+Fixed bug 653815 - Unable to re-order test cases in test run
+Fixed bug 658475 - The bug can not be deleted inside the run
+Fixed bug 672622 - product version gets set to "unused" when editing a plan
 
+*Mon Jan 24 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-1
 Fixed bug 661951 - Messed-up warning message pop up when clicking Add without entering Bug ID
 Fixed bug 665945 - run export button dosn't work
 Fixed bug 667293 - The first product is the default product.
