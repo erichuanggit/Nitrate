@@ -33,6 +33,7 @@ body { font-size:12px;width:100%;min-width:1200px;line-height:16px;font-family:V
 .radius{box-shadow: 2px 2px 2px #c5c3c3;-moz-box-shadow: 5px 5px 5px #c5c3c3;-webkit-box-shadow: 5px 5px 5px #c5c3c3;-moz-border-radius: 5px;-khtml-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px; border:solid 1px #CCC }
 .red{color:red;}
 .left_float{ float:left}
+.right_float{ float:right}
 .strong{font-weight:600;}
 .hidden {display: none;}
 .no-border{border:none;}
@@ -427,6 +428,8 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .color-paused{ background:#f5b800; }
 .color-blocked{ background:#cccccc; }
 .color-error{ background:#993333; }
+.coverage_report{ float:right;}
+.coverage_report span{margin:0 10px 0 5px;}
 /***********************Report End***************************/
 /***********************Run Start***************************/
 /*********************************runs Detail***************************/
@@ -780,7 +783,7 @@ a:link.edit,a:visited.edit{ color:#333;}
 /*Report*/
 .report_title_bg{ border-bottom:1px solid #C4C4C4; margin-top:15px;color:#242424;font-family:"Helvetica Neue (TT)","Helvetica Neue","Helvetica","Arial",sans-serif;font-size:14px;font-weight:bold;padding-bottom:6px;padding-left:10px;text-shadow:0 1px 0 #eee; position:relative}
 .report_bar{background:url("../images/action_bg.png") repeat-x left top #e6e6e6;width:100%;clear:both;border-bottom:1px solid #ccc;border-top:1px solid #ccc; padding:3px 0;float:left; position:relative; margin:0px 0; min-height:25px; line-height:25px;}
-.report_bar span{ margin-left:10px; font-weight:bold}
+.report_bar b{ margin-left:10px; font-weight:bold}
 .report_pass{ background:#A4D047;}
 .report_cover{ background:#96bae5;}
 .button_box{ width:100%; text-align:center; margin:10px 0 0px 0; padding:5px 0; }
@@ -793,6 +796,8 @@ a:link.edit,a:visited.edit{ color:#333;}
 .table_noborder{ width:99%; margin:5px auto;border-collapse:collapse;}
 .table_noborder th{background:url(../images/table_header_bg.png) repeat-x left top; height:26px; line-height:26px;padding-left:5px; border:solid 1px #a2a2a2; border-top:none;border-collapse:collapse; }
 .table_noborder td{ padding-left:5px; min-height:25px; line-height:25px;}
+.table_noborder td span{ margin:0 5px 0 5px;}
+.table_noborder td strong{ margin-right:15px;}
 .report_total{background:url(../images/table_header_bg.png) repeat-x left -1px #cdcdcd; height:26px; line-height:26px; font-size:12px; font-weight:bold;border:solid 1px #a2a2a2;padding:3px 0 0 0px; width:99%; margin:5px auto;}
 /*End Report*/
 
