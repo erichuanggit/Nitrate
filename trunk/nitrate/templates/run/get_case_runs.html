@@ -107,7 +107,7 @@
 			</th>
 			<th width="18">
 				<a id="id_blind_all_link" title="Expand all cases">
-					<img id="id_blind_all_img" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="" class="collapse">
+					<img id="id_blind_all_img" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="" class="collapse-all">
 				</a>
 			</th>
 			<th width="90"><a href="javascript:void(0)" onclick="sortCaseRun($('id_filter'), 'pk')">Case Run ID</a></th>
@@ -131,7 +131,7 @@
 				<input type="hidden" name="case_text_version" value="{{ test_case_run.case_text_version }}" />
 			</td>
 			<td title="expand test case" class="expandable center vmiddle">
-				<img class="blind_icon collapse" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="" />
+				<img class="blind_icon expand" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="" />
 			</td>
 			<td class="center expandable">
 				<a href="#caserun_{{ test_case_run.pk }}">#{{ test_case_run.pk }}</a>

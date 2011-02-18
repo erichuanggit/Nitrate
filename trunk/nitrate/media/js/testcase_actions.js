@@ -23,7 +23,7 @@ Nitrate.TestCases.List.on_load = function()
         //});
     //};
 	var toggle_case = function(e) {
-        var c = this.up(); // Container
+        var c = this; // Container
         var c_container = c.next(); // Content Containers
         var case_id = c.getElementsBySelector('input[name="case"]')[0].value;
         
@@ -31,7 +31,7 @@ Nitrate.TestCases.List.on_load = function()
         toggleTestCaseContents(type, c, c_container, case_id);
     }
     
-    $$('.expandable').invoke('observe', 'click', toggle_case);
+    $$('.case_title').invoke('observe', 'click', toggle_case);
 	if(window.location.hash == '#expandall'){
 		blinddownAllCases();
 	}
@@ -138,7 +138,7 @@ Nitrate.TestCases.Details.on_load = function()
     //};
 
     var toggle_case_run = function(e) {
-        var c = this.up(); // Container
+        var c = this; // Container
         var c_container = c.next(); // Content Containers
         var case_id = c.getElementsBySelector('input[name="case"]')[0].value;
         var case_run_id = c.getElementsBySelector('input[name="case_run"]')[0].value;
@@ -147,7 +147,7 @@ Nitrate.TestCases.Details.on_load = function()
         toggleTestCaseContents(type, c, c_container, case_id, case_text_version, case_run_id);
     }
     
-    $$('.expandable').invoke('observe', 'click', toggle_case_run);
+    $$('.case_title').invoke('observe', 'click', toggle_case_run);
 }
 
 Nitrate.TestCases.Create.on_load = function()
@@ -274,13 +274,12 @@ function toggleAllCheckBoxes(element, container, name)
 
 function blinddownAllCases(element)
 {
-    $$('.collapse').each(function(e) {
+    $$('img.expand').each(function(e) {
         fireEvent(e, 'click');
     })
-    
     if (element) {
-        element.removeClassName('collapse');
-        element.addClassName('expand');
+        element.removeClassName('collapse-all');
+        element.addClassName('expand-all');
         element.href="javascript:blindupAllCases()";
         element.src="/media/images/t2.gif";
     }
@@ -288,13 +287,13 @@ function blinddownAllCases(element)
 
 function blindupAllCases(element)
 {
-    $$('.expand').each(function(e) {
+    $$('.collapse').each(function(e) {
         fireEvent(e, 'click');
     })
     
     if(element) {
-        element.removeClassName('expand');
-        element.addClassName('collapse');
+        element.removeClassName('expand-all');
+        element.addClassName('collapse-all');
         element.href="javascript:blinddownAllCases()";
         element.src="/media/images/t1.gif";
     }
