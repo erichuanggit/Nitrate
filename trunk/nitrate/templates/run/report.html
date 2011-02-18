@@ -8,14 +8,11 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<meta http-equiv="Content-Language" content="utf-8" />
 	<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/print.css" media="all" />
-	<style>
-	body{background:#235D9F; height:100%}
-	</style>
 </head>
 <body>
 	<div class="report_title">
 	Test Log Report
-	<div class="report_sub_title">[{{ test_run.run_id }}] {{ test_run.summary}}</div></div>
+	<div class="report_sub_title"><a href='#'>[{{ test_run.run_id }}] {{ test_run.summary}}</a></div></div>
 	<div class="report_content">
 	<div id="content">
 		<div class="listinfo_content" style="float:left; width:95%">
@@ -74,6 +71,10 @@
 			</div>
 			<div class="clear"></div>
 		</div>
+		<div class="clear"></div>
+		<div class="table_noborder">
+	         Manual Cases<span class="red">34%</span>Automated Cases<span class="red">66%</span>Manual/Automated Cases<span class="red">0</span></td>
+		</div>
 		{% if test_case_runs.count %}
 		
 		
@@ -82,6 +83,7 @@
 				<th width="100px">Case-Run ID</th>
 				<th width="100">Case ID</th>
 				<th>Summary</th>
+				<th width="100">Mode</th>
 				<th width="100">Tested by</th>
 				<th width="150">Category</th>
 				<th width="100">Status</th>
@@ -92,6 +94,7 @@
 				<td>{{ test_case_run.case_run_id }}</td>
 				<td>{{ test_case_run.case_id }}</td>
 				<td>{{ test_case_run.case.summary }}</td>
+				<td>{{ test_case_run.case.get_is_automated_status }}</td>
 				<td>{{ test_case_run.tested_by }}</td>
 				<td>{{ test_case_run.case.category }}</td>
 				<td><span class="highlight">{{ test_case_run.case_run_status.name|upper }}</span></td>
@@ -101,7 +104,7 @@
 			{% if test_case_run.log %}
 			<tr>
 				<td class="sep" align="right" valign="top"><span class="notes">Logs:</span></td>
-				<td class="sep" align="left" valign="top" colspan="7">
+				<td class="sep" align="left" valign="top" colspan="8">
 					<span class="notes">
 						{% for log in test_case_run.log %}
 						<li>[{{ log.date }}] - [{{ log.who }}] - {{ log.action }}</li>
@@ -112,7 +115,7 @@
 			{% endif %}
 			{% endcomment %}
 			<tr>
-				<td align="left" valign="top" colspan="7" class='hide'>
+				<td align="left" valign="top" colspan="8" class='hide'>
 					{% if test_case_run.get_bugs %}
 					<span class='notes_title'>Bugs ID:</span>
 					{% for bug in test_case_run.get_bugs %}

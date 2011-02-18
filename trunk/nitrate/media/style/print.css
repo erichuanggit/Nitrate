@@ -20,9 +20,15 @@ input,select,#header,.crumble,#footer,#response{ display:none}
 /*---------------End Display Depatrtment-----------------*/
 
 .body_bg{background:#235D9F;}
-.report_content{ background:#F3F8FD; width:98%; padding:10px 0; margin:0px auto; clear:both; min-height:600px;}
-.report_title{ color:#FFF; height:80px; line-height:40px; text-align:center; font-size:20px;}
-.report_sub_title{ color:#fff; font-size:14px;}
+.report_content{ background:#F3F8FD; width:98%;margin:0px auto 10px; clear:both; min-height:600px;-moz-border-radius: 1em;-webkit-border-radius: 1em;border:1px solid #999; padding:5px;-moz-box-shadow:2px 3px 2px #ccc;}
+.report_title{ color:#235D9F; height:80px; line-height:40px; text-align:center; font-size:20px;text-shadow:1px 1px 1px #eee;}
+.report_sub_title a,.report_sub_title{ color:#235D9F; font-size:14px;}
+.table_noborder{ margin:5px auto;border-collapse:collapse;border-top:solid 1px #ccc; padding:10px 0 0 10px;}
+.table_noborder th{background:url(../images/table_header_bg.png) repeat-x left top; height:26px; line-height:26px;padding-left:5px; border:solid 1px #a2a2a2; border-top:none;border-collapse:collapse; }
+.table_noborder td{ padding-left:5px; min-height:25px; line-height:25px;}
+.table_noborder span{ margin:0 10px 0 5px;}
+.table_noborder strong{ margin:0 10px 0 0;}
+.red{color:red;}
 .mark a{color:green;}
 .mark{color:green;}
 .strong{font-weight:600;}

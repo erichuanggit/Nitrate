@@ -27,7 +27,10 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomSearch.on_load);
 		</div>
 	</form>
 	{% if builds %}
-    <div class="report_bar"><span>{{ builds|length }} builds are selected</span></div>
+    <div class="report_bar">
+	<b>{{ builds|length }} builds are selected</b>
+	<div class='coverage_report'>Plan<span class="red">30</span> Run<span class="red">32</span>Manual Cases<span class="red">34%</span>Automated Cases<span class="red">66%</span>Manual/Automated Cases<span class="red">0%</span></div>
+	</div>
 	<table class="list border-bottom" cellpadding="0" cellspacing="0" border="0"  id="id_table_report" >
 		<thead>
 			<tr>
