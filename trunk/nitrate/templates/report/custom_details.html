@@ -35,21 +35,21 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
             <td width="110">Passed Case-Run</td>
             <td width="100"><div class="progress-bar">
                 <div class="progress-inner" style="width:auto;	margin-right:-50px;text-align:cente">
-                    <div class="progress-passed" style="width:{{ build.case_runs_passed_percent|floatformat:0 }}px;">
+                    <div class="progress-passed" style="width:{{ build.get_case_runs_passed_percent|floatformat:0 }}px;">
                         &nbsp;
                     </div>
                 </div>
-                <div class="percent">{{ build.case_runs_passed_percent|floatformat }}% ({{ build.case_runs_passed_count }})</div>
+                <div class="percent">{{ build.get_case_runs_passed_percent|floatformat }}% ({{ build.case_runs_passed_count }})</div>
             </div></td>
             <td width="100">Failed Case-Run</td>
             <td width="100">
              <div class="progress-bar">
                 <div class="progress-inner" style="width:auto;	margin-right:-50px;text-align:cente">
-                    <div class="progress-failed" style="width:{{ build.case_runs_failed_percent|floatformat:0 }}px;">
+                    <div class="progress-failed" style="width:{{ build.get_case_runs_failed_percent|floatformat:0 }}px;">
                         &nbsp;
                     </div>
                 </div>
-                <div class="percent">{{ build.case_runs_failed_percent|floatformat }}% ({{ build.case_runs_failed_count }})</div>
+                <div class="percent">{{ build.get_case_runs_failed_percent|floatformat }}% ({{ build.case_runs_failed_count }})</div>
             </div>
             </td>
             <td >&nbsp;</td>

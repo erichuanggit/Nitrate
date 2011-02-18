@@ -19,6 +19,7 @@
 from django.db import models
 from tcms.core.models import TCMSBaseSharedModel, TCMSActionModel, BlobField
 from tcms.core.utils.xmlrpc import XMLRPCSerializer
+from tcms.core.utils import calc_percent
 
 try:
     from tcms.core.contrib.plugins_support.signals import register_model
@@ -224,6 +225,11 @@ class Version(TCMSActionModel):
         return (self.id, self.value)
     
 #  Test builds zone
+class TestBuildManager(models.Manager):
+    
+    pass
+#    def get_plans_count(self):
+#        return sum(self.values_list('plans_count', flat = True))
 
 class TestBuild(TCMSActionModel):
     build_id = models.AutoField(max_length=10, unique=True, primary_key=True)
@@ -232,6 +238,7 @@ class TestBuild(TCMSActionModel):
     milestone = models.CharField(max_length=20,default='---')
     description = models.TextField(blank=True)
     is_active = models.BooleanField(db_column='isactive', default=True)
+    objects = TestBuildManager()
     
     class Meta:
         db_table = u'test_builds'
@@ -269,6 +276,18 @@ class TestBuild(TCMSActionModel):
     
     def as_choice(self):
         return (self.build_id, self.name)
+
+    def get_case_runs_failed_percent(self):
+        if hasattr(self, 'case_runs_failed_count'):
+            return calc_percent(self.case_runs_failed_count, self.case_runs_count)
+        else:
+            return None 
+    
+    def get_case_runs_passed_percent(self):
+        if hasattr(self, 'case_runs_passed_count'):
+            return calc_percent(self.case_runs_passed_count, self.case_runs_count)
+        else:
+            return None 
 
 # Test environments zone
 

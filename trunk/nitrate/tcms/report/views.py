@@ -243,7 +243,8 @@ def custom_search(request, template_name='report/custom_search.html'):
     from forms import CustomSearchForm
     
     SUB_MODULE_NAME = 'custom_search'
-    
+    total_plans_count = 0
+    total_runs_count = 0
     default_case_run_status = TestCaseRunStatus.objects.filter(name__in = ['passed', 'failed'])
     
     if request.REQUEST.get('a', '').lower() == 'search':
@@ -265,21 +266,26 @@ def custom_search(request, template_name='report/custom_search.html'):
             tbs = tbs.extra(select=extra_query)
             
             tbs = tbs.distinct()
+            total_plans_count = sum(tbs.values_list('plans_count', flat = True))
+            total_runs_count = sum(tbs.values_list('runs_count', flat = True))
         else:
             tbs = TestBuild.objects.none()
     else:
         form = CustomSearchForm()
         tbs = TestBuild.objects.none()
     
-    for tcrss in default_case_run_status:
-        for tb in tbs:
-            setattr(tb, 'case_runs_%s_percent' % tcrss.name.lower(), calc_percent(getattr(tb, 'case_runs_%s_count' % tcrss.name.lower()), tb.case_runs_count))
+#FIXME: Hard coded, difficult to maintain.  Added class methods to get the entries(Temporary solution).
+#    for tcrss in default_case_run_status:
+#        for tb in tbs:
+#            setattr(tb, 'case_runs_%s_percent' % tcrss.name.lower(), calc_percent(getattr(tb, 'case_runs_%s_count' % tcrss.name.lower()), tb.case_runs_count))
     
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'form': form,
         'builds': tbs,
+        'total_plans_count': total_plans_count,
+        'total_runs_count': total_runs_count,
     })
 
 def custom_details(request, template_name='report/custom_details.html'):
@@ -288,7 +294,6 @@ def custom_details(request, template_name='report/custom_details.html'):
     from tcms.testplans.models import TestPlan
     from tcms.testruns.models import TestCaseRun, TestCaseRunStatus, TestRun
     from forms import CustomSearchDetailsForm
-    from pprint import pprint
     SUB_MODULE_NAME = 'custom_search'
     
     default_case_run_status = TestCaseRunStatus.objects.all()
