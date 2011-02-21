@@ -338,7 +338,11 @@ def get_text(request, plan_id, plan_text_version = None):
     >>> TestPlan.get_text(137, 4)
     """
     tp = TestPlan.objects.get(plan_id = plan_id)
-    return tp.get_text_with_version(plan_text_version = plan_text_version).serialize()
+    test_plan_text = tp.get_text_with_version(plan_text_version = plan_text_version)
+    if test_plan_text:
+        return test_plan_text.serialize()
+    else:
+        return "No plan text with version '%s' found." % plan_text_version
 
 def lookup_type_id_by_name(request, name):
     """DEPRECATED - CONSIDERED HARMFUL Use TestPlan.check_plan_type instead"""
