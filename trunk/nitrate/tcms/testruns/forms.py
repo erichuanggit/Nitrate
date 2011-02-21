@@ -179,6 +179,10 @@ class XMLRPCNewRunForm(BaseRunForm):
         
         return data
 
+    def clean_tag(self):
+        tag = self.cleaned_data.get('tag')
+        return str(tag)
+        
 class XMLRPCUpdateRunForm(XMLRPCNewRunForm):
     plan = forms.ModelChoiceField(
         label = 'Test Plan',

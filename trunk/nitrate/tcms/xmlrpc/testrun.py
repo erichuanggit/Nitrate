@@ -19,6 +19,7 @@
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
 from django.core.exceptions import ObjectDoesNotExist
 from tcms.testruns.models import TestRun, TestCaseRun
+from management.models import TestTag
 from utils import pre_process_ids
 
 __all__ = (
@@ -182,9 +183,9 @@ def create(request, values):
                 del c
         
         if form.cleaned_data['tag']:
-            if isinstance(form.cleaned_data['tag'], str):
-                tags = [c.strip() for c in form.cleaned_data['tag'].split(',') if c]
-                del c
+            tags = form.cleaned_data['tag']
+            if isinstance(tags, str):
+                tags = [c.strip() for c in tags.split(',') if c]
             
             for tag in tags:
                 t, c = TestTag.objects.get_or_create(name = tag)
