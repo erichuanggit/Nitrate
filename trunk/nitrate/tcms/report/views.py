@@ -21,6 +21,7 @@ from django.views.generic.simple import direct_to_template
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
+from tcms.testruns.models import TestRun
 from tcms.management.models import Classification, Product
 from tcms.core.utils import calc_percent
 from tcms.core.utils.counter import CaseRunStatusCounter, RunsCounter
@@ -245,6 +246,7 @@ def custom_search(request, template_name='report/custom_search.html'):
     SUB_MODULE_NAME = 'custom_search'
     total_plans_count = 0
     total_runs_count = 0
+    auto_count = manual_count = both_count = total_count = 0
     default_case_run_status = TestCaseRunStatus.objects.filter(name__in = ['passed', 'failed'])
     
     if request.REQUEST.get('a', '').lower() == 'search':
@@ -266,8 +268,13 @@ def custom_search(request, template_name='report/custom_search.html'):
             tbs = tbs.extra(select=extra_query)
             
             tbs = tbs.distinct()
-            total_plans_count = sum(tbs.values_list('plans_count', flat = True))
-            total_runs_count = sum(tbs.values_list('runs_count', flat = True))
+            trs = TestRun.objects.filter(build__in = tbs)
+            for tr in trs:
+                manual_count += tr.case_run.get_manual_case_count()
+                auto_count += tr.case_run.get_automated_case_count()
+                both_count += tr.case_run.get_both()
+            total_plans_count = sum(filter(lambda s: s is not None, tbs.values_list('plans_count', flat = True)))
+            total_runs_count = sum(filter(lambda s: s is not None, tbs.values_list('runs_count', flat = True)))
         else:
             tbs = TestBuild.objects.none()
     else:
@@ -286,6 +293,10 @@ def custom_search(request, template_name='report/custom_search.html'):
         'builds': tbs,
         'total_plans_count': total_plans_count,
         'total_runs_count': total_runs_count,
+        'manual_count': manual_count,
+        'auto_count': auto_count,
+        'both_count': both_count,
+        'all_count': manual_count + auto_count + both_count,
     })
 
 def custom_details(request, template_name='report/custom_details.html'):

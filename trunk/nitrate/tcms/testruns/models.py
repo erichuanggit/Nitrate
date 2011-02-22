@@ -372,7 +372,22 @@ class TestCaseRunStatus(TCMSActionModel):
         except cls.DoesNotExist:
             return None
 
+class TestCaseRunManager(models.Manager):
+    
+    def get_automated_case_count(self):
+        return self.filter(case__is_automated = 1).count()
+    
+    def get_manual_case_count(self):
+        return self.filter(case__is_automated = 0).count()
+    
+    def get_both(self):
+        count1 = self.get_automated_case_count()
+        count2 = self.get_manual_case_count()
+        return self.count() - count1 - count2
+    
+
 class TestCaseRun(TCMSActionModel):
+    objects = TestCaseRunManager()
     case_run_id = models.AutoField(primary_key=True)
     assignee = models.ForeignKey(
         'auth.User',

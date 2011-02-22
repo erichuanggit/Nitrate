@@ -19,7 +19,7 @@
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
 from django.core.exceptions import ObjectDoesNotExist
 from tcms.testruns.models import TestRun, TestCaseRun
-from management.models import TestTag
+from tcms.management.models import TestTag
 from utils import pre_process_ids
 
 __all__ = (
