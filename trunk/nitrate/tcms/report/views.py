@@ -360,13 +360,14 @@ def custom_details(request, template_name='report/custom_details.html'):
             tp.runs = []
             
             for tr in trs:
-                total_count += tr.case_run.count()
-                manual_count += tr.case_run.get_manual_case_count()
-                auto_count += tr.case_run.get_automated_case_count()
-                both_count += tr.case_run.get_both()
                 if tp.plan_id == tr.plan_id:
                     tp.runs.append(tr)
-        
+
+        total_count = tcrs.count()
+        both_count = tcrs.filter(case__is_automated_proposed = True).count()
+        auto_count = tcrs.filter(case__is_automated = 1).exclude(case__is_automated_proposed = True).count()
+        manual_count = tcrs.filter(case__is_automated = 0).exclude(case__is_automated_proposed = True).count()
+
         cursor = connection.cursor()
         for tr in trs:
             cursor.execute(RawSQL.custom_details_case_run_count % tr.pk)
