@@ -26,6 +26,7 @@ from tcms.management.models import Classification, Product
 from tcms.core.utils import calc_percent
 from tcms.core.utils.counter import CaseRunStatusCounter, RunsCounter
 from tcms.core.utils.raw_sql import ReportSQL as RawSQL
+from testruns.models import TestCaseRun
 
 MODULE_NAME = "report"
 
@@ -76,7 +77,8 @@ def overview(request, product_id, template_name='report/overview.html'):
             total += row[1]
     
     trs = TestRun.objects.filter(plan__product = product)
-    case_run_counter = CaseRunStatusCounter(trs)
+    tcrs = TestCaseRun.objects.filter(run__in = trs)
+    case_run_counter = CaseRunStatusCounter(tcrs)
     for row in rows:
         if row[0]:
             setattr(case_run_counter, row[0], row[1])
