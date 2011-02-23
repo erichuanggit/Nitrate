@@ -21,12 +21,11 @@ from django.views.generic.simple import direct_to_template
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
-from tcms.testruns.models import TestRun
+from tcms.testruns.models import TestRun, TestCaseRun
 from tcms.management.models import Classification, Product
 from tcms.core.utils import calc_percent
 from tcms.core.utils.counter import CaseRunStatusCounter, RunsCounter
 from tcms.core.utils.raw_sql import ReportSQL as RawSQL
-from testruns.models import TestCaseRun
 
 MODULE_NAME = "report"
 
