@@ -274,6 +274,8 @@ def custom_search(request, template_name='report/custom_search.html'):
             total_runs_count = sum(filter(lambda s: s is not None, tbs.values_list('runs_count', flat = True)))
             
             tbs = list(tbs)
+            #Set case_runs_count=0 by default. 
+            map(lambda s: setattr(s, 'case_runs_count', 0), tbs)
             trs = TestRun.objects.filter(build__in = tbs)
             for tr in trs:
                 manual_count += tr.case_run.get_manual_case_count()
@@ -319,6 +321,7 @@ def custom_details(request, template_name='report/custom_details.html'):
     
     default_case_run_status = TestCaseRunStatus.objects.all()
     auto_count = manual_count = both_count = total_count = 0
+    tbs = tps = trs = tcrs = tcrses = None
     
     form = CustomSearchDetailsForm(request.REQUEST)
     form.populate(product_id = request.REQUEST.get('product'))
