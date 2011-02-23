@@ -75,7 +75,8 @@ def overview(request, product_id, template_name='report/overview.html'):
         if row[0]:
             total += row[1]
     
-    case_run_counter = CaseRunStatusCounter([])
+    trs = TestRun.objects.filter(plan__product = product)
+    case_run_counter = CaseRunStatusCounter(trs)
     for row in rows:
         if row[0]:
             setattr(case_run_counter, row[0], row[1])

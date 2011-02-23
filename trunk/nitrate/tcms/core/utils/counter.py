@@ -26,7 +26,7 @@ class CaseRunStatusCounter:
     def __init__(self, case_runs):
         self.case_run_status = []
         self.count_data = {}
-        self.case_runs = case_runs.select_related('case_run_status')
+        self.case_runs = case_runs.select_related('case_run_status') #        self.case_runs = case_runs.select_related('case_run_status')
         
         for tcrs in TestCaseRunStatus.objects.all():
             self.count_data[tcrs] = 0
