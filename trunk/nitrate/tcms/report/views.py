@@ -261,20 +261,28 @@ def custom_search(request, template_name='report/custom_search.html'):
             extra_query = {
                 'plans_count': RawSQL.custom_search_plans_count,
                 'runs_count': RawSQL.custom_search_runs_count,
-                'case_runs_count': RawSQL.custom_search_case_runs_count,
+#                'case_runs_count': RawSQL.custom_search_case_runs_count,
             }
             for tcrss in default_case_run_status:
                 extra_query['case_runs_%s_count' % tcrss.name.lower()] = RawSQL.custom_search_case_runs_count_by_status % tcrss.pk
+            tbs = tbs.distinct()
             tbs = tbs.extra(select=extra_query)
             
-            tbs = tbs.distinct()
+            total_plans_count = sum(filter(lambda s: s is not None, tbs.values_list('plans_count', flat = True)))
+            total_runs_count = sum(filter(lambda s: s is not None, tbs.values_list('runs_count', flat = True)))
+            
+            tbs = list(tbs)
             trs = TestRun.objects.filter(build__in = tbs)
             for tr in trs:
                 manual_count += tr.case_run.get_manual_case_count()
                 auto_count += tr.case_run.get_automated_case_count()
                 both_count += tr.case_run.get_both()
-            total_plans_count = sum(filter(lambda s: s is not None, tbs.values_list('plans_count', flat = True)))
-            total_runs_count = sum(filter(lambda s: s is not None, tbs.values_list('runs_count', flat = True)))
+                if tr.build in tbs:
+                    origi_num = 0
+                    if hasattr(tbs[tbs.index(tr.build)],'case_runs_count'):
+                        origi_num = getattr(tbs[tbs.index(tr.build)],'case_runs_count')
+                    setattr(tbs[tbs.index(tr.build)], 'case_runs_count', origi_num + tr.case_run.count())
+                    
         else:
             tbs = TestBuild.objects.none()
     else:
@@ -296,7 +304,7 @@ def custom_search(request, template_name='report/custom_search.html'):
         'manual_count': manual_count,
         'auto_count': auto_count,
         'both_count': both_count,
-        'all_count': manual_count + auto_count + both_count,
+        'total_count': manual_count + auto_count + both_count,
     })
 
 def custom_details(request, template_name='report/custom_details.html'):
@@ -308,6 +316,7 @@ def custom_details(request, template_name='report/custom_details.html'):
     SUB_MODULE_NAME = 'custom_search'
     
     default_case_run_status = TestCaseRunStatus.objects.all()
+    auto_count = manual_count = both_count = total_count = 0
     
     form = CustomSearchDetailsForm(request.REQUEST)
     form.populate(product_id = request.REQUEST.get('product'))
@@ -348,6 +357,10 @@ def custom_details(request, template_name='report/custom_details.html'):
             tp.runs = []
             
             for tr in trs:
+                total_count += tr.case_run.count()
+                manual_count += tr.case_run.get_manual_case_count()
+                auto_count += tr.case_run.get_automated_case_count()
+                both_count += tr.case_run.get_both()
                 if tp.plan_id == tr.plan_id:
                     tp.runs.append(tr)
         
@@ -370,4 +383,9 @@ def custom_details(request, template_name='report/custom_details.html'):
         'test_runs': trs,
         'test_case_runs': tcrs,
         'test_case_run_status': tcrses,
+        'total_count': total_count,
+        'manual_count': manual_count,
+        'auto_count': auto_count,
+        'both_count': both_count,
+        
     })

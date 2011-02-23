@@ -1,4 +1,5 @@
 {% load comments %}
+{% load report_tags %}
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -73,7 +74,7 @@
 		</div>
 		<div class="clear"></div>
 		<div class="table_noborder">
-	         Manual Cases<span class="red">34%</span>Automated Cases<span class="red">66%</span>Manual/Automated Cases<span class="red">0</span></td>
+	         Manual Cases<span class="red">{{test_run.case_run.get_manual_case_count|percentage:test_run.case_run.count}}({{test_run.case_run.get_manual_case_count}}/{{test_run.case_run.count}})</span>Automated Cases<span class="red">{{test_run.case_run.get_automated_case_count|percentage:test_run.case_run.count}}({{test_run.case_run.get_automated_case_count}}/{{test_run.case_run.count}})</span>Manual/Automated Cases<span class="red">{{test_run.case_run.get_both|percentage:test_run.case_run.count}}({{test_run.case_run.get_both}}/{{test_run.case_run.count}})</span></td>
 		</div>
 		{% if test_case_runs.count %}
 		

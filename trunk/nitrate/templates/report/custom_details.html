@@ -1,6 +1,7 @@
 {% extends "tcms_base.html" %}
 
 {% load comments %}
+{% load report_tags %}
 
 {% block subtitle %}Reporting{% endblock %}
 
@@ -31,7 +32,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
     <table cellpadding="0" cellspacing="0" class="table_noborder" border="0">
     	{% for build in builds %}
         <tr>
-            <td><strong>{{ build }}</strong>Plan<span class="red">{{ build.plans_count }}</span> Run<span class="red">{{ build.runs_count }}</span>Manual Cases<span class="red">34%</span>Automated Cases<span class="red">66%</span>Manual/Automated Cases<span class="red">0%</span></td>
+            <td><strong>{{ build }}</strong>Plan<span class="red">{{ build.plans_count }}</span> Run<span class="red">{{ build.runs_count }}</span>Manual Cases<span class="red">{{manual_count|percentage:total_count}}({{manual_count}}/{{total_count}})</span>Automated Cases<span class="red">{{auto_count|percentage:total_count}}({{auto_count}}/{{total_count}})</span>Manual/Automated Cases<span class="red">{{both_count|percentage:total_count}}({{both_count}}/{{total_count}})</span></td>
             <td width="110">Passed Case-Run</td>
             <td width="100"><div class="progress-bar">
                 <div class="progress-inner" style="width:auto;	margin-right:-50px;text-align:cente">
