@@ -75,7 +75,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 		</thead>
 		<tbody>
 			{% for test_case in test_cases %}
-			<tr class="{% cycle 'odd' 'even' %}">
+			<tr class="case_title {% cycle 'odd' 'even' %}">
 				<td class="expandable">
 					<img class="collapse blind_icon" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
 				</td>
