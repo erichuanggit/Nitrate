@@ -97,7 +97,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 			{% endfor %}
 			<tr>
 				<th><a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '')">Total</a></th>
-				<td>{{ test_case_runs.count_by_status.total }}</td>
+				<td>{{ test_case_runs.count }}</td>
 			</tr>
 			<tr>
 				<th colspan="2">
