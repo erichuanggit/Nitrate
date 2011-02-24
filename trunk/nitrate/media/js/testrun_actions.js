@@ -309,7 +309,7 @@ var updateCaseRunStatus = function(e)
             
             // Update related people
             var usr = Nitrate.User;
-            title.getElementsBySelector('.link_tested_by, .link_assignee').each(function(i) {
+            title.getElementsBySelector('.link_tested_by').each(function(i) {
                 i.href = 'mailto:' + usr.email;
                 i.update(usr.username);
             })

@@ -411,7 +411,7 @@ def update(request):
                         field, getattr(t, field), request.user
                     )
                 )
-                t.assignee = request.user
+                #t.assignee = request.user
             t.save()
         targets.update(close_date = now)
         targets.update(tested_by = request.user)

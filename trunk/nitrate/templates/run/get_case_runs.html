@@ -159,7 +159,7 @@
 				{% if test_case_run.tested_by_id %}
 				<a href="{% url tcms.profiles.views.profile test_case_run.tested_by.username %}" class="link_tested_by">{{ test_case_run.tested_by }}</a>
 				{% else %}
-				None
+				<a class="link_tested_by">None</a>
 				{% endif %}
 			</td>
 			<td>
