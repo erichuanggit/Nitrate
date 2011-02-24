@@ -75,3 +75,8 @@ class CustomSearchDetailsForm(CustomSearchForm):
         label = 'Build',
         queryset = TestBuild.objects.none(),
     )
+    
+    #FIXME: Remove version from custom report due to data inconsistency.
+    #See https://bugzilla.redhat.com/show_bug.cgi?id=678203
+    def clean_build_run__product_version(self):
+        return None

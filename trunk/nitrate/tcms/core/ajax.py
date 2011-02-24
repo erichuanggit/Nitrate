@@ -378,7 +378,10 @@ def update(request):
         )
         if mail_context:
             mail_context['request'] = request
-            mailto(**mail_context)
+            try:
+                mailto(**mail_context)
+            except:
+                pass
     
     # Special hacking for updating test case run status
     # https://bugzilla.redhat.com/show_bug.cgi?id=658160 

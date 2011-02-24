@@ -24,7 +24,6 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 	<div class="report_title_bg">
 		<form action="{% url tcms.report.views.custom_details %}">
 			{{ form.product.label }}: {{ form.product }}<br />
-			{{ form.build_run__product_version.label }}: {{ form.build_run__product_version }}<br />
 			{{ form.pk__in.label }}: {{ form.pk__in }}<br />
 			<input type="submit" value="Submit" />
 		</form>
