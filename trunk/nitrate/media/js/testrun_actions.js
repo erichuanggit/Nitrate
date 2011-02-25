@@ -106,7 +106,7 @@ Nitrate.TestRuns.Details.on_load = function()
     
     // Observe the case run toggle and the comment form
     var toggle_case_run = function(e) {
-        var c = this; // Container
+        var c = this.up(); // Container
         var c_container = c.next(); // Content Containers
         var case_id = c.getElementsBySelector('input[name="case"]')[0].value;
         var case_run_id = c.getElementsBySelector('input[name="case_run"]')[0].value;
@@ -132,8 +132,8 @@ Nitrate.TestRuns.Details.on_load = function()
             c_container.adjacent('.form_comment').invoke('observe', 'submit', rc_callback);
         }
         toggleTestCaseContents(type, c, c_container, case_id, case_text_version, case_run_id, callback);
-    }    
-    $$('.case_title').invoke('observe', 'click', toggle_case_run);
+    }
+    $$('.expandable').invoke('observe', 'click', toggle_case_run);
     
     // Auto show the case run contents.
     if(window.location.hash != '') {

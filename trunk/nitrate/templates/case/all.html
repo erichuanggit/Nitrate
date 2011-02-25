@@ -55,8 +55,8 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 		<thead>
 			<tr>
 				<th width="18px">
-					<a class="blind_all_link" href="javascript:blinddownAllCases()">
-						<img src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="" class="collapse">
+					<a id="id_blind_all_link">
+						<img src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="" class="collapse-all">
 					</a>
 				</th>
 				<th width="20" class="nosort">
@@ -77,7 +77,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 			{% for test_case in test_cases %}
 			<tr class="case_title {% cycle 'odd' 'even' %}">
 				<td class="expandable">
-					<img class="collapse blind_icon" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
+					<img class="expand blind_icon" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
 				</td>
 				<td valign="top"><input type="checkbox" name="case" value="{{ test_case.case_id }}"></td>
 				<td valign="top"><a href="{% url tcms.testcases.views.get test_case.case_id %}">{{ test_case.case_id }}</a></td>
