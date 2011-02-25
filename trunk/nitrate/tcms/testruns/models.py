@@ -380,10 +380,17 @@ class TestCaseRunManager(models.Manager):
     def get_manual_case_count(self):
         return self.filter(case__is_automated = 0).count()
     
+    
     def get_both(self):
         count1 = self.get_automated_case_count()
         count2 = self.get_manual_case_count()
         return self.count() - count1 - count2
+    
+    def get_caserun_failed_count(self):
+        return self.filter(case_run_status__name = 'failed').count()
+    
+    def get_caserun_passed_count(self):
+        return self.filter(case_run_status__name = 'passed').count()
     
 
 class TestCaseRun(TCMSActionModel):
