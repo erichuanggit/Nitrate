@@ -681,7 +681,7 @@ function addProperty(run_id,env_group_id)
 {
     
     $('dialog').show();
-    $('dialog').update("<div class='add_env_content'><div class='add_env_close' onclick='this.up(1).hide()'></div><div class='env_title' id='id_title_group'></div><div class='add_env_box'>Property<br/><br/><select id='id_add_env_property'></select></div><div class='add_env_box'>Value<br/><br/><select id='id_add_env_value'></select></div><div class='add_env_button'><input type='button' value='Add' id='id_env_add'/><input type='button' value='Reset' onclick='this.up(2).hide()'/></div></div>")
+    $('dialog').update("<div class='add_env_content'><div class='add_env_close' onclick='this.up(1).hide()'></div><div class='env_title' id='id_title_group'></div><div class='add_env_box'>Property<br/><br/><select id='id_add_env_property'></select></div><div class='add_env_box'>Value<br/><br/><select id='id_add_env_value'></select></div><div class='add_env_button'><input type='button' value='Add' id='id_env_add'/><input type='button' value='Cancel' onclick='this.up(2).hide()'/></div></div>")
     
     var success = function(t){
         returnobj=t.responseText.evalJSON(true);
