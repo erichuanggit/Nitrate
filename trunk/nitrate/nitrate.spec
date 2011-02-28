@@ -3,7 +3,7 @@
 
 Name:           nitrate
 Version:        3.3
-Release:        2
+Release:        3
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -114,7 +114,21 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/%{name}/*
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
+
+
 %changelog
+*Fri Feb 25 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-3
+Fixed bug 680315 - [Reporting]Open a product will lead to the error page.
+Fixed bug 680321 - [Test Run]Click "View My Assigned Runs" will list all runs
+Fixed bug 627236 - s/2009/2010/ orequivalent of date in page footer
+Fixed bug 680322 - New: [spelling mistake]"Highligt" should be "Highlight"
+Fixed Bug 680059 - [Test Run]The total number of test case run is NULL
+remove "running date" add "run date"
+Fixed bug 676259 - [FEAT] Need to get a break out of manual vs auto in the tcms reporting section
+Fixed bug 678643 - TestPlan.get_text - multiple failures
+Fixed bug 674754 - [xmlrpc] TestRun.create() fails when list of tags provided
+Fixed bug 676590 - In run execute page, 'expand all' generates tons of http requests
+
 *Tue Feb 15 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-2
 Fixed bug 664025 - TCMS main check box to control test cases doesn't work
 Fixed bug 658372 - Cannot select "Product Version" when clone multiple test plans
