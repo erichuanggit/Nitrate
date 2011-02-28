@@ -42,7 +42,7 @@
 		{% endif %}
 		{% if perms.testruns.change_testcaserun %}
 		<a id="id_sort" class="sortlink" title="Click me,then Drag and drop the rows to adjust the order,and click 'Done Sorting' link to submit your changes">Re-order Cases</a>
-		<a title="Update the IDLE case runs to newest case text" href="javascript:void(0)" class="updatelink" onclick="postToURL('{% url tcms.testruns.views.update_case_run_text test_run.pk %}', serializeCaseRunFromInputList(this.up(1).next(), 'case_run'))">Update</a>
+		<a title="Update the IDLE case runs to newest case text" href="javascript:void(0)" class="updatelink" onclick="postToURL('{% url tcms.testruns.views.update_case_run_text test_run.pk %}', serializeCaseRunFromInputList(this.up(2).next(), 'case_run'))">Update</a>
 		{% else %}
 		<span class="sortlink grey" >Re-order Cases</span>
 		<span class="updategrey">Update</span>
@@ -136,19 +136,19 @@
 	</thead>
 	<tbody>
 		{% for test_case_run in test_case_runs %}
-		<tr class="case_title {% cycle 'odd' 'even' %} {% if test_case_run.is_current %}is_current run_current{% endif %} {% ifequal test_case_run.assignee user%} mine {%endifequal%}">
+		<tr class="{% cycle 'odd' 'even' %} {% if test_case_run.is_current %}is_current run_current{% endif %} {% ifequal test_case_run.assignee user%} mine {%endifequal%}">
 			<td>
 				<input type="checkbox" name="case_run" value="{{ test_case_run.pk }}" title="Select/Unselect" />
 				<input type="hidden" name="case" value="{{ test_case_run.case.pk }}" />
 				<input type="hidden" name="case_text_version" value="{{ test_case_run.case_text_version }}" />
 			</td>
-			<td title="expand test case" class="expandable center vmiddle">
+			<td title="expand test case" class="expandable center vmiddle case_title">
 				<img class="blind_icon expand" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="" />
 			</td>
-			<td class="center expandable">
+			<td class="case_title center expandable">
 				<a href="#caserun_{{ test_case_run.pk }}">#{{ test_case_run.pk }}</a>
 			</td>
-			<td class="expandable center">
+			<td class="case_title expandable center">
 				<a href="{% url tcms.testcases.views.get test_case_run.case_id %}?from_plan={{ test_case_run.run.plan_id }}">{{ test_case_run.case_id }}</a>
 			</td>
 			
