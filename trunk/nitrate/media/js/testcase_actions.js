@@ -315,11 +315,11 @@ function toggleAllCases(element){
 		element.addClassName('locked');
 //        var element = this.down();
         if (element.hasClassName('collapse-all')) {
-        	this.title = "Collapse all cases"
+        	element.title = "Collapse all cases"
             blinddownAllCases(element);
         } 
         else {
-        	this.title = "Expand all cases"
+        	element.title = "Expand all cases"
             blindupAllCases(element);
         };
         
