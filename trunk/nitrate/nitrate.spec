@@ -3,7 +3,7 @@
 
 Name:           nitrate
 Version:        3.3
-Release:        3
+Release:        4
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -117,6 +117,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+*Fri Mar 3 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-4
+Fixed bug 681156 - [Test Plan]Can not expand all the test case in test plan.
+Fixed Bug 679677 - [Test Run]The button should be "cancel" in Property page.
+Fixed Bug 672495 - Old test run shows updated case information but its text version is unchanged.
+
 *Fri Feb 25 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-3
 Fixed bug 680315 - [Reporting]Open a product will lead to the error page.
 Fixed bug 680321 - [Test Run]Click "View My Assigned Runs" will list all runs
