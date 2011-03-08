@@ -1,0 +1,260 @@
+{% load ifin %}
+{% load comments %}
+<form action="{% url tcms.testcases.views.all %}" method="get">
+	<input type="hidden" name="template_type" value="review_case" />
+	<input type="hidden" name="case_sort_by" value="{{ REQUEST_CONTENTS.case_sort_by }}" />
+	<input type="hidden" name="plan" value="{{ REQUEST_CONTENTS.from_plan }}" />
+	<input type="hidden" name="from_plan" value="{{ REQUEST_CONTENTS.from_plan }}" />
+	<input type="hidden" name="template_type" value="{{ REQUEST_CONTENTS.template_type }}" />
+	<input type="hidden" name="new_case_status_id" />
+	<input type="hidden" name="new_priority_id" />
+	<div class="tab_navigation actions">
+		<div class='toolbar'>
+			<ul>
+				<li>
+					{% if perms.testcases.add_testcase %}
+					<span class='sprites toolbar_case' onclick="window.location.href='{% url tcms.testcases.views.new %}?from_plan={{ test_plan.plan_id }}';">Case</span>
+					{% else %}
+					<span class='sprites toolbar_case'>Case</span>
+					{% endif %}
+					<ul>
+						{% if perms.testcases.add_testcase %}
+						<li><input class="add_new" type="button" value="Write new case" onclick="window.location.href='{% url tcms.testcases.views.new %}?from_plan={{ test_plan.plan_id }}';"/></li>
+						<li><input type="button" class="import" value="Import cases from XML" onclick="$('id_import_case_zone').toggle();" /></li>
+						<li><input type="button" class="search" value="Add cases from other plans" onclick="window.location.href='{% url tcms.testplans.views.cases test_plan.plan_id %}?a=link_cases'" /></li>
+						{% else %}
+						<li><input class="add_new" type="button" disabled="true" value="Write new case"/></li>
+						<li><input type="button" class="import" disabled="true" value="Import cases from XML"	/></li>
+						<li><input type="button" class="search" disabled="true" value="Add cases from other plans"	 /></li>
+						{% endif %}
+						<li><input type="button" class="export" title="Export selected cases into XML file" value="Export" onclick="postToURL('{% url tcms.testcases.views.export %}', serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
+						<li><input type="button" class="print_view" value="Print"  title="print view of selected cases" onclick="postToURL('{% url tcms.testcases.views.printable %}', serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
+						{% if perms.testcases.add_testcase %}
+						<li><input type="button" class="clone" value="Clone" title="Clone selected cases to another test plan" onclick="postToURL('{% url tcms.testcases.views.clone %}', serialzeCaseForm(this.up(6), this.up(6).next()), 'get');" /></li>
+						{% else %}
+						<li><input type="button" class="clone" value="Clone" title="Clone selected cases to another test plan" disabled="true"/></li>
+						{% endif %}
+						{% if perms.testcases.delete_testcaseplan %}
+						<li><input type="button" class="delete" value="Remove" title="Remove selected cases from this plan" onclick="unlinkCasePlan(this.up(7), serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
+						{% else %}
+						<li><input type="button" class="delete" value="Remove" title="Remove selected cases from this plan" disabled="true"/></li>
+						{% endif %}
+					</ul>
+				</li>
+				<li>
+					{% if perms.testcases.add_testcasetag %}
+					<span class='sprites toolbar_tag'>Tag</span>
+					{% else %}
+					<span class='sprites toolbar_tag_disabled'>Tag</span>
+					{% endif %}
+					<ul>
+						{% if perms.testcases.add_testcasetag %}
+						<li><input type="button" value="Add Tag" class="tag_add sprites" /></li>
+						{% else %} 
+						<li><input type="button" value="Add Tag" class="tag_add_disabled sprites" disabled="disabled" /></li>
+						{% endif %}
+						{% if perms.testcases.delete_testcasetag %}
+						<li><input type="button" value="Remove Tag" class="tag_delete sprites" /></li>
+						{% else %}
+						<li><input type="button" value="Remove Tag" class="tag_delete_disabled sprites" disabled="disabled" /></li>
+						{% endif %}
+					</ul>
+				</li>
+				{% if perms.testcases.change_testcase %}
+				<li><input type="button" value="Automated" title="change automated" class="btn_automated automated sprites" /></li>
+				<li><input type="button" value="Reviewer" title="change reviewer" class="btn_reviewer assignee sprites" /></li>
+				<li><input type="button" value="Component" class="btn_component sprites component" /></li>
+				<li><span class='sprites toolbar_status'>Status</span>
+					<ul>
+						{% for cs in case_status %}
+						<li><input type='button' value='Set {{ cs }}' class='btn_case_status {{ cs|lower }}' onclick="this.form.new_case_status_id.value={{ cs.pk }}; fireEvent(form.new_case_status_id, 'change')"　/></li>
+						{% endfor %}
+					</ul>
+				</li>
+				<li><span class='sprites toolbar_priority'>Priority</span>
+					<ul>
+						{% for priority in priorities %}
+						<li><input type='button' value='Set {{ priority }}' class='btn_case_priority {{ priority|lower }}' onclick="this.form.new_priority_id.value={{ priority.pk }}; fireEvent(form.new_priority_id, 'change')" /></li>
+						{% endfor %}
+					</ul>
+				</li>
+				{% else %}
+				<li><input type="button" value="Automated" title="change automated" class="btn_automated automated_disabled sprites" disabled="Trues" /></li>
+				<li><input type="button" value="Reviewer" title="change reviewer" class="btn_reviewer assigneedisable sprites" disabled /></li>
+				<li><input id="id_batch_component" type="button" value="Component" class="btn_component sprites component_disabled" disabled="disabled"/></li>
+				{% endif %}
+			</ul>
+			
+			<span class="reorder_case">
+				<a class="btn_filter filtercase" title="Click to show filter options">Show filter options</a>
+				{% if perms.testcases.change_testcase %}
+				<a class="btn_sort sortlink" title="Click me,then Drag and drop the rows to adjust the order,and click 'Done Sorting' link to submit your changes">Re-order cases</a>
+				{% endif %}
+			</span>
+
+
+			{% comment %}
+			{% if perms.testcases.change_testcase %}
+			<select name="new_case_status_id" id="new_case_set_status">
+				<option title="please choose a status" value="">Set status</option>
+				{% for case_stat in case_status %}
+				<option value="{{ case_stat.id }}" title="Set selected test cases {{ case_stat.name }}">{{ case_stat.name }}</option>
+				{% endfor %}
+			</select>
+			<select name="new_priority_id">
+				<option title="please choose a priority" value="">Set priority</option>
+				{% for priority in priorities %}
+				<option value="{{ priority.id }}">{{ priority.value }}</option>
+				{% endfor %}
+			</select>
+			{% else %}
+			<select name="new_case_status_id" disabled>
+				<option title="please choose a status" value="">Set status</option>
+			</select>
+			<select name="new_priority_id" disabled>
+				<option title="please choose a priority" value="">Set priority</option>
+			</select>
+			{% endif %}
+			{% endcomment %}
+		</div>
+		<div class="mixbar">
+			<div class="tagname">Tags:</div>
+			<div class="taglist">
+				{% for tag in case_own_tags %}
+				<a href="#testcases">{{ tag }}</a>
+				{% empty %}
+				<div class="grey">No tags in cases</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+	<div class="list_filter" {% ifnotequal REQUEST_CONTENTS.a 'search' %} style="display:none;" {% endifnotequal %}>
+		{% include 'case/form/filter.html' %}
+		<div class="submit-row bottom">
+		<span class="tit">{{ test_cases|length }} Cases</span>
+			<input type="submit" value="Filter cases" />
+		</div>
+	</div>
+</form>
+<table class="list" cellpadding="1" cellspacing="0" border="0">
+	<thead>
+		<tr>
+			<th class="nosort" align="left" width="18px">
+				<a class="blind_all_link">
+				    <!--Here add function toggleAllCases to t1.gif-->
+					<img src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="" class="collapse-all" onclick="javascript:toggleAllCases(this)" title='Expand all cases'>
+				</a>
+			</th>
+			<th class="nosort" align="left" width="20px">
+				<input type="checkbox" value="all" checked />
+			</th>
+			<th align="left" width="50px">
+				<a title="Sort by case ID" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'case_id')">
+					#
+				</a>
+			</th>
+			<th align="left">
+				<a title="Sort by Summary" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'summary')">
+					Test Case Summary
+				</a>
+			</th>
+			<th align="left" width="90px">
+				<a title="Sort by Author" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'author')">
+					Author
+				</a>
+			</th>
+			<th align="left" width="110px">
+				<a title="Sort by Reviewer" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'reviewer')">
+					Reviewer
+				</a>
+			</th>
+			<th align="left" width="140px">
+				<a title="Sort by automated" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'is_automated')">
+					Automated
+				</a>
+			</th>
+			<th align="left" width="130px">
+				<a title="Sort by status" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'case_status')">
+					Status
+				</a>
+			</th>
+			<th align="left" width="100px">
+				<a title="Sort by categoty" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'category__name')">
+					Category
+				</a>
+			</th>
+			<th align="left" width="60px">
+				<a title="Sort by prority" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'priority')">
+					Priority
+				</a>
+			</th>
+			<th align="left" width="80px" style="display:none">Text version</th>
+			<th align="left" width="40px">
+				<a title="Sort by sortkey" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'sortkey')">
+					Sort
+				</a>
+			</th>
+			<th align="left" width="60px">Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for test_case in test_cases %}
+		<tr class="case_title {% cycle 'odd' 'even' %}" >
+			<td class="expandable">
+				<img class="expand blind_icon" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
+			</td>
+			<td>
+				<input type="checkbox" name="case" value="{{ test_case.pk }}" class="checkbox" {% ifin test_case.pk selected_case_ids %}checked{% endifin %} />
+			</td>
+			<td>
+				<a href="{% url tcms.testcases.views.get test_case.case_id %}?from_plan={{ test_plan.plan_id }}">{{ test_case.pk }}</a>
+			</td>
+			<td class="subject expandable">
+				<a class="blind_down_link">{{ test_case.summary }}</a>
+			</td>
+			<td class="col_author_content"><a href="{% url tcms.profiles.views.profile test_case.author.username %}">{{ test_case.author }}</a></td>
+			<td class="col_author_content">{% if test_case.reviewer_id %}<a href="{% url tcms.profiles.views.profile test_case.reviewer.username %}">{{ test_case.reviewer }}</a>{% else%} None {% endif %}</td>
+			<td class="col_tester_content expandable">{{ test_case.get_is_automated_status }}</td>
+			<!-- <td >{{ testcase.create_date }}</td>-->
+			<td>
+				{% if perms.testcases.change_testcase %}
+				<a class="show_change_status_link" href="javascript:void(0);" onclick="this.hide(); this.next().show()" style="display: none;">
+					{{ test_case.case_status }}
+				</a>
+				<select class="change_status_selector">
+					{% for case_stat in case_status %}
+					<option {% ifequal case_stat.pk test_case.case_status_id %} selected="1" {% endifequal %} value="{{ case_stat.id }}">{{ case_stat.name }}</option>
+					{% endfor %}
+				</select>
+				{% else %}
+				{{ test_case.case_status }}
+				{% endif %}
+			</td>
+			<td class="col_priority_category expandable">{{ test_case.category }}</td>
+			<td class="col_priority_content expandable" align="center">{{ test_case.priority }}</td>
+			<td valign="top" width="8%" class="col_category_content expandable" style="display:none">{{ test_case.category }}</td>
+			<td class="col_sortkey_content" align="center">
+				<a href="javascript:void(0);" class="mark case_sortkey">{{ test_case.sortkey }}</a>
+			</td>
+			<td align="center" >
+				{% if perms.testcases.change_testcase %}
+				<a class="editlink" href="{% url tcms.testcases.views.edit test_case.case_id %}?from_plan={{ test_plan.plan_id }}">Edit</a>
+				{% else %}
+				<span class="editlink grey">Edit</span>
+				{% endif %}
+			</td>
+		</tr>
+		<tr class="case_content hide" style="display: none;">
+			<td colspan="12">
+				<div id="id_loading_{{ test_case.pk }}" class="ajax_loading review_cases"></div>
+			</td>
+		</tr>
+		{% empty %}
+		<tr>
+			<td colspan="12">
+				<center class="prompt-message prompt">No test case was found in this plan.</center></span>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>

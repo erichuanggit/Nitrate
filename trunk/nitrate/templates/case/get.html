@@ -1,0 +1,229 @@
+{% extends "tcms_base.html" %}
+
+{% block subtitle %}Test case - {{ test_case.case_id }}: {{ test_case.summary }}{% endblock %}
+
+{% block custom_stylesheet %}
+{% endblock %}
+
+{% block custom_javascript %}
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/fastinit.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/tablekit.js"></script>
+<script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
+<script type="text/javascript">
+Nitrate.Utils.after_page_load(Nitrate.TestCases.Details.on_load);
+
+Nitrate.TestCases.Instance = {
+	pk: {{ test_case.pk }},
+	product_id: {{ test_case.category.product.pk }},
+	category_id: {{ test_case.category_id }},
+	author_id: {{ test_case.author_id }},
+}
+</script>
+{% endblock %}
+
+{% block content_type %}
+	<input type="hidden" name="content_type" value="testcases.testcase" />
+	<input type="hidden" name="object_pk" value="{{ test_case.pk }}" />
+	<input type="hidden" name="name" value="{{ test_case.summary }}" />
+	<input type="hidden" name="description" value="{{ test_case.notes }}" />
+{% endblock %}
+
+{% block contents %}
+<div id="content">
+	{% if test_plan %}
+	<div id="tcms_values" class="hidden">
+		<input id="value_product_id" type="hidden" name="product_id" value="{{ test_plan.product_id }}" />
+		<input id="id_case_id" type="hidden" name="case_id" value="{{ test_case.case_id }}" />
+	</div>
+	<div class="sprites crumble">
+		<a href="{% url tcms.core.views.index %}">Home</a>
+		>> Plan: <a href="{% url tcms.testplans.views.get test_plan.plan_id %}">{{ test_plan.plan_id }}:{{ test_plan.name }}</a> 
+		>>Case: {{ test_case.case_id }}: {{ test_case.summary }}
+	</div>
+	{% else %}
+	<div class="sprites crumble">
+		<a href="{% url tcms.core.views.index %}">Home</a>
+		>><a href="{% url tcms.testcases.views.all %}">Search Case</a>
+		>>Case: {{ test_case.case_id }}: {{ test_case.summary }}
+	</div>
+	<div id="tcms_values" class="hidden">
+		<input id="id_case_id" type="hidden" name="case_id" value="{{ test_case.case_id }}" />
+	</div>
+	{% endif %}
+	<div class="control">
+		{% if perms.testcases.change_testcase %}
+		<span id="id_buttons" ><input id="btn_edit" type="button" value="Edit" onclick="window.location.href='{% url tcms.testcases.views.edit test_case.case_id %}?from_plan={{ test_plan.plan_id }}'"/></span>
+		{% endif %}
+		{% if perms.testcases.add_testcaseplan %}
+		<span id=""><input type="button" id="btn_clone" value="Clone case" onclick="window.location.href='{% url tcms.testcases.views.clone %}?from_plan={{ test_plan.plan_id }}&case={{ test_case.case_id }}'"/></span>
+		{% endif %}
+		{% if test_plan %}
+		<span class="right-action">
+			<a href="{% url tcms.testplans.views.get test_plan.plan_id %}">Back to Test Plan</a>
+		</span>
+		{% endif %}
+	</div>
+	<div class="Detailform">
+		<h2 id="display_title">{{ test_case.summary }}</h2>
+		<fieldset class="no-border">
+			<div class="editor-side">
+				{% comment %}
+				<div class="cell">
+					<div class="sd">Component:</div>
+					<dl class="ul-no-format" style="float:left">
+						{% for component in test_case.component.all %}
+						<dd id="display_category" >{{ component.name }}</dd>
+						{% empty %}
+						<dd class="grey">No component</dd>
+						{% endfor %}
+					</dl>
+				</div>
+				{% endcomment %}
+				<div class="cell">
+					<div class="sd">Default Tester:</div>
+					<div >
+						{% if test_case.default_tester	%}
+						<span id="display_default_tester"><a href="{% url tcms.profiles.views.profile test_case.default_tester.username %}">{{ test_case.default_tester.email }}</a></span>
+						{% else %}
+						<span >No default tester</span>
+						{% endif %}
+					</div>
+				</div>
+				<div class="cell">
+					<div class="sd">Product</div>
+					<div>
+						<span>{{ test_case.category.product }}</span>
+					</div>
+				</div>
+				<div class="cell">
+					<div class="sd">Category:</div>
+					<div>
+						<span id="display_category" >{{ test_case.category }}</span>
+					</div>
+				</div>
+				<div class="cell">
+					<div class="sd">Estimated Time:</div>
+					<div id="display_estimated_time">{{ test_case.estimated_time }}</div>
+				</div>
+				<div class="cell">
+					<div class="sd">Priority:</div>
+					<div><span id="display_priority" >{{ test_case.priority }}</span></div>
+				</div>
+				<div class="cell">
+					<div class="sd">Status:</div>
+					<div><span id="display_priority" >{{ test_case.case_status }}</span></div>
+				</div>
+				<div class="cell">
+					<div class="sd">Notes:</div>
+					<div><span id="display_priority" >{{ test_case.notes|urlize|linebreaksbr }}</span></div>
+				</div>
+			</div>
+			<div class="editor-side">
+				<div class="cell">
+					<div class="sd">Author:</div>
+					<span class="name">
+						<a href="{% url tcms.profiles.views.profile test_case.author.username %}">
+							{{ test_case.author.email }}
+						</a>
+					</span>
+				</div>
+				<div class="cell">
+					<div class="sd">Created:</div>
+					<div><span class="name">{{ test_case.create_date }}</span></div>
+				</div>	
+				<div class="cell">
+					<div class="sd">Automated:</div>
+					<div class="name">{{ test_case.get_is_automated_status }}</div>
+				</div>
+				<div class="cell">
+					<div class="sd">Requirement:</div>
+					<div>
+						<span id="display_requirement" class="name {% if not test_case.requirement %}grey{% endif %}" >{{ test_case.requirement|default:'None' }}</span>
+					</div>
+				</div>
+				<div class="cell">
+					<div class="sd">Script:</div>
+					<div>
+						<span id="display_script" class="name {% if not test_case.script %}grey{% endif %}">{{ test_case.script|default:'None' }}</span>
+					</div>
+				</div>
+				<div class="cell">
+					<div class="sd"><span>Alias:</span></div>
+					<div>
+						<span id="display_script" class="name {% if not test_case.alias %}grey{% endif %}">{{ test_case.alias|default:'None' }}</span>
+					</div>
+				</div>
+				<div class="cell">
+					<div class="sd"><span>Arguments</span></div>
+					<div>
+						<span id="display_script" class="name {% if not test_case.arguments %}grey{% endif %}">{{ test_case.arguments|default:'None' }}</span>
+					</div>
+				</div>
+			</div>
+		</fieldset>
+	</div>
+	<div class="Detailform border-1">
+		<ul id="contentTab" class="content_tab" >
+			<li id="tab_document" class="tab tab_focus">
+				<a href="#document" title="document">Document</a>
+			</li>
+			<li id="tab_attachment" class="tab">
+				<a href="#attachment" title="attachment">Attachments ({{ test_case.attachment.count }})</a>
+			</li>
+			<li id="tab_case_plan" class="tab">
+				<a href="#plan" title="plan">Test plans ({{ test_case.plan.count }})</a>
+			</li>
+			<li id="tab_component" class="tab">
+				<a href="#component" title="component">Components ({{ test_case.component.count }})</a>
+			</li>
+			{% comment %}
+			<li id="tab_case_depend" class="tab" style="display:none">
+				<a href="#depend" title="depend">Dependencies </a>
+			</li>
+			{% endcomment %}
+			<li id="tab_case_tag" class="tab">
+				<a href="#tag" title="tag">Tags ({{ test_case.tag.count }})</a>
+			</li>
+			<li id="tab_case_bug" class="tab">
+				<a href="#bug" title="bug">Bugs ({{ test_case.case_bug.count }})</a>
+			</li>
+			<li id="tab_case_run" class="tab">
+				<a href="#case_run" title="case_run">Case Runs ({{ test_case_runs.count }})</a>
+			</li>
+			<li id="tab_case_log" class="tab">
+				<a href="#log" title="log">Change Logs</a>
+			</li>
+		</ul>
+		<div  id="document" class="Detailform-variety_2 tab_list" style="clear:left;">
+			{% include "case/get_text.html" %}
+		</div>
+		<div id="attachment" class="tab_list"  style="display:none">
+			{% include "case/get_attachment.html" %}
+		</div>
+		<div id="plan" style="display:none" class="tab_list">
+			<div class="ajax_loading"></div>
+		</div>
+		<div id="component" style="display:none" class="tab_list">
+			{% include "case/get_component.html" %}
+		</div>
+		{% comment %}
+		<div id="depend" class="tab_list" style="display:none">
+			{% include "case/get_depend.html" %}
+		</div>
+		{% endcomment %}
+		<div id="tag" class="tab_list" style="display:none">
+			<div class="ajax_loading"></div>
+		</div>
+		<div id="bug" class="tab_list" style="display:none">
+			{% include "case/get_bug.html" %}
+		</div>
+		 <div id="case_run" class="tab_list" style="display:none">
+			{% include "case/get_case_run.html" %}
+		</div>
+		<div id="log" class="tab_list"	style="display:none">
+			{% include "case/get_log.html" %}
+		</div>
+	</div>
+</div>
+{% endblock %}
+

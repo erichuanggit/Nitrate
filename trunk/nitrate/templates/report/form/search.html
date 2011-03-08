@@ -1,0 +1,61 @@
+<div class="listinfo_content">
+	<div class="leftlistinfo">
+		<div class="listinfo">
+			<span class="title">{{ form.product.label }}</span>
+			<span class="listinfo_input">
+				{{ form.product }}
+			</span>
+		</div>
+		<div class="listinfo">
+			<span class="title">{{ form.build_run__product_version.label }}</span>
+			<span class="listinfo_input">
+				{{ form.build_run__product_version }}
+			</span>
+		</div>
+        <div class="listinfo">
+			<span class="title">{{ form.testcaserun__case__category.label }}</span>
+			<span class="listinfo_input">
+				{{ form.testcaserun__case__category }}
+			</span>
+		</div>
+		<div class="listinfo">
+			<span class="title">{{ form.testcaserun__case__component.label }}</span>
+			<span class="listinfo_input">
+				{{ form.testcaserun__case__component }}
+			</span>
+		</div>
+		
+		{% comment %}
+		<div class="listinfo">
+			<span class="title">{{ form.plan__author__email__startswith.label }}</span>
+			<span class="listinfo_input">
+				{{ form.plan__author__email__startswith }}
+			</span>
+		</div>
+
+		<div class="listinfo">
+			<span class="title"><label for="id_type_id">Date</label></span>
+			<span class="listinfo_input"><input type="text" style="width:110px" /> -- <input type="text" style="width:115px"/></span>
+		</div>
+		{% endcomment %}
+	</div>
+	<div class="rightlistinfo">
+		<div class="listinfo">
+			<span class="title">{{ form.build_run__plan__name__icontains.label }}</span>
+			<span class="listinfo_input">
+				{{ form.build_run__plan__name__icontains }}
+			</span>
+		</div>
+        <div class="listinfo">
+			<span class="title">{{ form.pk__in.label }}</span>
+			<span class="listinfo_input">
+				{{ form.pk__in }}
+			</span>
+		</div>
+		
+	</div>
+	<div class="errors">
+		{{ form.errors }}
+	</div>
+</div>
+<div class="clear"></div>

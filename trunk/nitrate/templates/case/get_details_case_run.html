@@ -1,0 +1,193 @@
+{% load comments %}
+
+<td colspan="12">
+	<table class="case_detail">
+		<tr>
+			<td valign="top">
+				<h4>Setup:</h4>
+				<div class="content">{{ test_case_text.setup|safe }}</div>
+			</td>
+			<td class="" valign="top">
+				<h4>Breakdown:</h4>
+				<div class="content">{{ test_case_text.breakdown|safe }}</div>
+			</td>
+			<td valign="top" rowspan="2" width="200">
+				<h4><span class="title strong">Attachment:</span></h4>
+				<ul class="ul-no-format">
+					{% if perms.management.add_testattachment %}
+					<li><a href="{% url tcms.testcases.views.attachment test_case_run.case_id %}?from_plan={{ testrun.plan_id }}" class="addlink" target="_blank">Add Attachment</a></li>
+					{% endif %}
+					{% for attachment_file in test_case.attachment.all %}
+					<li>
+						<a href="{% url tcms.core.files.check_file attachment_file.attachment_id %}">
+							{{ attachment_file.file_name }}
+						</a>
+					</li>
+					{% empty %}
+					<li class="grey">No attachment found</li>
+					{% endfor %}
+				</ul>
+				<h4><span class="title strong">Component:</span></h4>
+				<ul class="ul-no-format">
+					{% for component in test_case.component.all %}
+					<li>{{ component.name }}</li>
+					{% empty %}
+					<li class="grey">No component found</li>
+					{% endfor %}
+				</ul>
+				<h4><span class="title strong">Tag:</span></h4>
+				<ul class="ul-no-format">
+					{% for tag in test_case.tag.all %}
+					<li>{{ tag }}</li>
+					{% empty %}
+					<li class="grey">No tag found</li>
+					{% endfor %}
+				</ul>
+				<h4><span class="title strong">bug:</span></h4>
+				<ul class="ul-no-format">
+					<li>
+						<a href="{% url tcms.testruns.views.bug test_case_run.pk %}?a=file" target="_blank" class="buglink" title="File a bug on bugzilla">File</a>
+						{% if perms.testcases.add_testcasebug %}
+						<a href="javascript:void(0);" class="addlink" title="Add" onclick="addCaseRunBug(this.up(7).previous(), this.up(7), {{ test_case_run.case_id }}, {{ test_case_run.pk }})">Add</a>
+						{% endif %}
+					</li>
+					{% comment %}
+					{% for bug in test_case_run.get_bugs %}
+					<li>
+						<a href="{{ bug.get_absolute_url }}">{{ bug }}</a>
+						{% if bug.case_run_id %}
+						<span class="grey"> - From Run</span>
+						<a href="{% url tcms.testruns.views.get bug.case_run.run_id %}">{{ bug.case_run.run_id }}</a>
+						<a href="javascript:void(0);" class="deletelink" title="Remove this bug" onclick="removeCaseRunBug(this.up(7).previous(), this.up(7), this.previous(2).innerHTML, {{ test_case_run.case_id }}, {{ test_case_run.pk }})">Remove</a>
+						{% endif %}
+					</li>
+					{% empty %}
+					<li class="grey">No bug found</li>
+					{% endfor %}
+					{% endcomment %}
+                    {% for bug in test_case_run.case.get_bugs %}
+                    <li>
+                        <a href="{{ bug.get_absolute_url }}">{{ bug }}</a>
+                        {% if bug.case_run_id %}
+                        <span class="grey"> - From Run</span>
+                        <a href="{% url tcms.testruns.views.get bug.case_run.run_id %}">{{ bug.case_run.run_id }}</a>
+                        <a href="javascript:void(0);" class="deletelink" title="Remove this bug" onclick="removeCaseRunBug(this.up(7).previous(), this.up(7), this.previous(2).innerHTML, {{ test_case_run.case_id }}, {{ test_case_run.pk }})">Remove</a>
+                        {% else %}
+                        <span class="grey"> - From Case</span>
+                        <a href="{% url tcms.testcases.views.get bug.case_id %}">{{ bug.case_id }}</a>
+                        {% endif %}
+                    </li>
+                    {% empty %}
+                    <li class="grey">No bug found</li>
+                    {% endfor %}
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td class="" valign="top">
+				<h4>Actions:</h4>
+				<div class="content">{{ test_case_text.action|safe }}</div>
+			</td>
+			<td class="" valign="top">
+				<h4>Expected Results:</h4>
+				<div class="content">{{ test_case_text.effect|safe }}</div>
+			</td>
+		</tr>
+		<tr>
+		<td colspan="3" style="border:none; background:none">
+			<h4>Test Case Run Detail Information:</h4>
+			<div><span class="detail_title">{% comment %}Running Date:</span>{{ test_case_run.running_date }} {% endcomment %}<span class="detail_title">Run Date:</span>{{ test_case_run.close_date }}</div>
+			<div><span class="detail_title">Build:</span>{{ test_case_run.build }} <span class="detail_title marginLeft">Text Version:</span>{{ test_case_run.case_text_version }}</div>
+			{% if test_case_run.notes %}
+			<div><div class="detail_title">Notes</div>{{ test_case_run.notes|urlize|linebreaksbr }}</div>
+			{% endif %}
+			
+		</td>
+		</tr>
+		<tr>
+			<td colspan="3" style="border:none; background:none;padding-top:0px" class='hide'>
+				{% get_comment_list for test_case_run as case_run_comments %}
+				<h4>Comments:</h4>
+				<ul class="comment ul-no-format">
+					{% for comment in case_run_comments %}
+					<li>
+						
+						<span class="strong">#{{ forloop.counter }}</span>
+						<span class="strong">{{ comment.user.email }}</span>
+						<span class="grey">{{ comment.submit_date }}</span>
+						<br/>
+						{{ comment.comment|linebreaksbr }}
+						{% ifequal comment.user user %}
+						<form action="{% url tcms.core.contrib.comments.views.delete %}" method="get" class="form_comment">
+							<input type="hidden" name="comment_id" value="{{ comment.pk }}" />
+							<input type="hidden" name="object_pk" value="{{ test_case_run.case.pk }}" />
+							<input class='commentdelete sprites' value='Delete Comment' type='submit' /> 
+						</form>
+						{% endifequal %}
+					</li>
+					{% endfor %}
+				</ul>
+				{% if perms.comments.add_comment %}
+				<form class="update_form" method="POST">
+					<table class='noborder'>
+						{% get_comment_form for test_case_run as comment_form %}
+						<tr>
+							<td>
+								{{ comment_form.comment }}
+								{{ comment_form.content_type }}
+								{{ comment_form.object_pk }}
+								{{ comment_form.timestamp }}
+								{{ comment_form.security_hash }}
+								{{ comment_form.name }}
+								{{ comment_form.email }}
+								{{ comment_form.url }}
+							</td>
+							<td>
+								<div class='boxdotted'>
+									<strong>Tips</strong>
+									<ul>
+										<li>Click the status button to change the case's status</li>
+										<li>Type comment and click status button, then you can submit comment and change status at the same time.</li>
+										<li>Type comment and click 'submit' button, then just submit comment.</li>
+									</ul>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td colspan='2'>
+								<input type="hidden" name="type" value="html" />
+								<input type="hidden" name="field" value="case_run_status" />
+								<input type="hidden" name="case_id" value="{{ test_case_run.case.pk }}" />
+								<input type="hidden" name="assignee" value="{{ test_case_run.assignee.pk }}" />
+								<input type="hidden" name="tested_by" value="{{ test_case_run.tested_by.pk }}" />
+								<input type="hidden" name="value" value="" />
+								{% if perms.testruns.change_testcaserun %}
+								{% for crs in test_case_run_status %}
+								<input type="submit" class="btn btn_{{ crs.name.lower }}" title="{{ crs.name }}" value="" {% ifequal crs test_case_run.case_run_status %}disabled="True"{% endifequal %} onclick="this.form.value.value={{ crs.pk }}" />
+								{% endfor %}
+								{% endif %}
+								<input type="submit" class="submit-post" value="Submit">
+							</td>
+						</tr>
+					</table>
+				</form>
+				{% endif %}
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3">
+				{% if test_case_run.log %}
+				<h4 onclick='this.next().toggle()' class='cursor_pointer'>Change Log<span class='log_grey'>Click to show detail information</span></h4>
+				<ul style='display:none'>
+				{% for log in test_case_run.log %}
+				<li>[{{ log.date }}] - [{{ log.who }}] - {{ log.action }}</li>
+				{% endfor %}
+				</ul>
+				{% else %}
+				<h4>Change Log</h4>
+				<ul><li class="grey">No log recorded.</li></ul>
+				{% endif %}
+			</td>
+		</tr>
+	</table>
+</td>

@@ -1,0 +1,155 @@
+{% extends "tcms_base.html" %}
+
+{% block subtitle %}Components Report - {{ product }}{% endblock %}
+
+{% block custom_stylesheet %}
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/print.css" media="print" />
+{% endblock %}
+
+{% block custom_javascript %}
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/fastinit.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/tablesort.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/report.js"></script>
+<script type="text/javascript">
+Nitrate.Utils.after_page_load(Nitrate.Report.List.on_load);
+</script>
+{% endblock %}
+
+{% block contents %}
+<div id="content">
+	<div class="sprites crumble">
+		<a href="{% url tcms.core.views.index %}">Home</a>
+		>><a href="/report">Reporting</a>
+		>>{{ product }}
+	</div>
+	{% include 'report/nav.html' %}
+	<div class="Detailform border-1" style="border-top:none;background:#f1f1f1 ;">
+		{% comment %}
+		<div class="crumb">
+			<span class="right-action"> <label class="select">report</label> | <label class="">dashboard </label></span>
+		</div>
+		{% endcomment %}
+		{% if component %}
+		<div class="report">
+			<h2>Component: {{ component }}</h2>
+			{% comment %}
+			<div class="page_control">
+				<span><a href="#">celt051</a></span>
+				|
+				<span><a href="#">rt73usb-firmware</a> </span>
+				<select>
+					<option>rt73usb-firmware</option>
+					<option>celt051</option>
+				</select>
+			</div>
+			<!--filter of data report -->
+			<fieldset class="filter">
+				<legend>Filter</legend>
+				<div class="option_row">
+					<span class="lab"><label>Test Run</label></span>
+					<select>
+						<option>All</option>
+						<option>Running</option>
+						<option>Finished</option>
+					</select>
+				</div>
+				<div class="option_row">
+					<span class="lab"><label>Case Category</label></span>
+					<select>
+						<option>Defult</option>
+						<option>Regression</option>
+						<option>Feature</option>
+						<option>Bug verification</option>
+					</select>
+				</div>
+				<div class="apply_row">
+					<a class="applylink"><a>Apply</a></a>
+				</div>
+			</fieldset>
+			{% endcomment %}
+			<!--end of filter of data report -->
+			<!--data of status of caserun -->
+			<table class="report_data report" border="0" cellspacing="1" cellpadding="0" width="75%">
+				{% comment %}
+				<tr>
+					<td colspan="3">
+						<ul class="ul-no-format">
+							<li>Testing Cases :1245</li>
+						</ul>
+					</td>
+				</tr>
+				{% endcomment %}
+				<tr class="variety_pass">
+					<td>PASSED</td>
+					<td>{{ case_run_count.PASSED }}</td>
+					<td>{{ case_run_count.PASSED_percent|default:'0'|floatformat }}%</td>
+				</tr>
+				<tr class="variety_fail">
+					<td>FAILED</td>
+					<td>{{ case_run_count.FAILED }}</td>
+					<td>{{ case_run_count.FAILED_percent|default:'0'|floatformat }}%</td>
+				</tr>
+				<tr class="variety_idel">
+					<td>IDLE</td>
+					<td>{{ case_run_count.IDLE }}</td>
+					<td>{{ case_run_count.IDLE_percent|default:'0'|floatformat }}%</td>
+				</tr>
+				<tr class="variety_error">
+					<td>ERROR</td>
+					<td>{{ case_run_count.ERROR }}</td>
+					<td>{{ case_run_count.ERROR_percent|default:'0'|floatformat }}%</td>
+				</tr>
+				<tr class="variety_tested">
+					<td>PAUSED</td>
+					<td>{{ case_run_count.PAUSED }}</td>
+					<td>{{ case_run_count.PAUSED_percent|default:'0'|floatformat }}%</td>
+				</tr>
+				<tr  class="variety_block">
+					<td>BLOCKED</td>
+					<td>{{ case_run_count.BLOCKED }}</td>
+					<td>{{ case_run_count.BLOCKED_percent|default:'0'|floatformat }}%</td>
+				</tr>
+				<tr class="variety_running">
+					<td>RUNNING</td>
+					<td>{{ case_run_count.RUNNING }}</td>
+					<td>{{ case_run_count.RUNNING_percent|default:'0'|floatformat }}%</td>
+				</tr>
+				<tr class="variety_waived">
+					<td>WAIVED</td>
+					<td>{{ case_run_count.WAIVED }}</td>
+					<td>{{ case_run_count.WAIVED_percent|default:'0'|floatformat }}%</td>
+				</tr>
+			</table>
+			{% endif %}
+			<!--end data of status of caserun -->
+			<table class="list" border="0" cellspacing="0" cellpadding="0" width="100%">
+				<tr>
+					<th width="20%">Component</th>
+					<th width="35%">Testing Cases</th>
+					<th width="35%">Testing Cases Status</th>
+				</tr>
+				{% for component in components %}
+				<tr>
+					<td class="variety_0">
+						<a href="?component_id={{ component.id }}">{{ component }}</a>
+					</td>
+					<td class="variety_1">
+						<span class="">{{ component.total_cases }}</span>
+					</td>
+					<td class="variety_4">
+						<div class="progress-bar">
+							<div class="progress-inner" style="width:{{ component.finished_case_run_percent|default:'0' }}px">							<div class="percent">{{ component.finished_case_run_percent|default:'0' }}%</div>
+							</div>
+						</div>
+						{% if component.failed_case_run_count %}
+						<span class="strong emphasize">{{ component.failed_case_run_count|default:'0' }} Failed</span>
+						{% endif %}
+
+					</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+	</div>
+</div><!--content over -->
+{% endblock %}

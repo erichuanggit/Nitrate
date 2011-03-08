@@ -1,0 +1,256 @@
+{% extends "tcms_base.html" %}
+
+{% block subtitle %}{{ test_run.summary }}{% endblock %}
+
+{% block custom_javascript %}
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/progressbar/progressbar.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/fastinit.js"></script>
+<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/tablednd.js'></script>
+<script type="text/javascript" src='{{ MEDIA_URL }}/js/testrun_actions.js'></script>
+<script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
+<script type="text/javascript">
+{#　Define the case_run_status array for all of case run status　#}
+Nitrate.TestRuns.CaseRunStatus = new Array();
+{% for crs in test_case_run_status %}
+Nitrate.TestRuns.CaseRunStatus.push('{{ crs.name|lower }}');
+{% endfor %}
+Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
+</script>
+{% endblock %}
+
+{% block content_type %}
+	<input type="hidden" name="content_type" value="testruns.testrun" />
+	<input type="hidden" name="object_pk" value="{{ test_run.pk }}" />
+	<input type="hidden" name="name" value="{{ test_run.name }}" />
+	<input type="hidden" name="description" value="{{ test_run.notes }}" />
+{% endblock %}
+
+{% block contents %}
+<div id="content">
+	<!-- Store some values for easier javascript acccess -->
+	<div id="tcms_values" class="hidden">
+		<input id="value_run_id" type="hidden" name="run_id" value="{{ test_run.run_id }}" />
+		<input id="value_product_id" type="hidden" name="product_id" value="{{ test_run.build.product_id }}" />
+	</div>
+	<div class="sprites crumble">
+		<a href="{% url tcms.core.views.index %}">Home</a>
+		{% if request.REQUEST.from_plan %}
+		>> <a href="{% url tcms.testplans.views.all %}">Seach Plan</a>
+		>>Test Plan: <a href="{% url tcms.testplans.views.get test_run.plan.plan_id %}">[{{ test_run.plan.plan_id }}] {{ test_run.plan.name }}</a>
+		{% else %}
+		>> <a href="{% url tcms.testruns.views.all %}">Search Runs</a>
+		{% endif %}
+		>> [{{ test_run.run_id }}] {{ test_run.summary }}
+	</div>
+	<div class="control">
+		{% if perms.testruns.change_testcaserun %}
+		<input id="btn_edit" type="button" value="Edit" title="Edit this test run" onclick="window.location.href='{% url tcms.testruns.views.edit test_run.run_id %}?from_plan={{ request.REQUEST.from_plan }}'">
+		{% else %}
+		<input id="btn_edit" type="button" value="Edit" disabled="true">
+		{% endif %}
+		
+		{% if perms.testruns.add_testrun %}
+		<input type="button" value="Clone" title="Clone test run to other test build" onclick="window.location.href='{% url tcms.testruns.views.clone %}?run={{ test_run.pk }}'"/>
+		{% else %}
+		<input type="button" value="Clone" disabled="true"/>
+		{% endif %}
+		{% comment %}
+		{# The standalone execute page is not longer needed #}
+		{% if perms.testruns.change_testcaserun %}
+		<input type="button" value="Execute" title="Execute cases in this run" onclick="window.location.href='{% url tcms.testruns.views.execute test_run.pk %}'">
+		{% else %}
+		<input type="button" value="Execute" disabled="true">
+		{% endif %}
+		{% endcomment %}
+		{% if perms.testruns.delete_testrun %}
+		{% ifequal test_run.manager user %}
+		<input type="button" value="Delete" title="Delete the run" onclick="window.location.href='{% url tcms.testruns.views.delete test_run.pk %}'">
+		{% else %}
+		{% ifequal test_run.plan.author user %}
+		<input type="button" value="Delete" title="Delete the run" onclick="window.location.href='{% url tcms.testruns.views.delete test_run.pk %}'">
+		{% endifequal %}
+		{% endifequal %}
+		<input type="button" value="Export" title="Export cases in this run" onclick="window.location.href='{% url tcms.testruns.views.export test_run.pk %}?' + $('id_form_case_runs').serialize();" >
+		{% endif %}
+	</div>
+	<h2 id="display_title">{{ test_run.summary }}</h2>
+	<div>
+	<div class="statu" style="float:right;">
+		<table cellpadding="1" cellspacing="1" border="0" onCreate="var complete_status = new ProgressBar( new ProgressBar( 'complete_status_{{ test_run.run_id }}', {classProgressBar: 'progressBar4', style: ProgressBar.DETERMINATE, selection: {{ test_run.complete_cases|floatformat:0 }}} );">
+			<tr>
+				<td colspan="2" align="center">
+				<div class="progress-bar" style="float:none">
+					<div class="percent">{{ status_counter.complete_percent|floatformat:0 }}.00%</div>
+					<div class="progress-inner" style="width:{{ status_counter.complete_percent|floatformat:"0" }}px;">
+						<div class="progress-failed" style="width:{{ status_counter.failed_percent|floatformat:"0" }}px;">
+					</div>
+				</div>
+				
+				
+				</td>
+			</tr>
+			{% for k, v in status_counter.count_data.items %}
+			<tr>
+				<th width="50%;"><a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '{{ k.pk }}')">{{ k }}</a></th>
+				<td>{{ v }}</td>
+			</tr>
+			{% endfor %}
+			<tr>
+				<th><a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '')">Total</a></th>
+				<td>{{ test_case_runs.count }}</td>
+			</tr>
+			<tr>
+				<th colspan="2">
+					<a class="strong" href="{% url tcms.testruns.views.report test_run.run_id %}" title="report of test caserun">Report</a>
+				</th>
+			</tr>
+			<tr>
+				<th colspan="2">
+					<a class="strong" href="{% url tcms.testruns.views.report test_run.run_id %}#buglist" title="Show ALl Bugs">Show All Bugs ({{ test_case_run_bugs|length }})</a>
+				</th>
+			</tr>
+		</table>
+	</div>
+	<div class="listinfo_content" style="float:left; width:80%">
+		<div class="leftlistinfo">
+			<div class="listinfo">
+				<div class="title">Test Plan:</div>
+				<a href="{% url tcms.testplans.views.get test_run.plan.pk %}">[{{ test_run.plan.pk }}] {{ test_run.plan.name }}</a>
+			</div>
+			<div class="listinfo">
+				<div class="title">Product Version:</div>
+				<a href="{% url tcms.testruns.views.all %}?product={{ test_run.build.product_id }}&product_version={{ test_run.get_version_id }}" title="Search test runs of {{ test_run.product_version }}">{{ test_run.product_version }}</a>
+			</div>
+			<div class="listinfo">
+				<div class="title">Manager:</div>
+				<a href="{% url tcms.profiles.views.profile test_run.manager.username %}">{{ test_run.manager.email }}</a>
+			</div>
+			<div class="listinfo">
+				<div class="title">Estimated Time:</div>
+				{{ test_run.estimated_time }}
+			</div>
+			<div class="listinfo">
+				<div class="title">Started at:</div>
+				{{ test_run.start_date }}
+			</div>
+			<div class="listinfo" >
+				<div class="title">Tags:</div>
+				<div id="id_tag_container">
+				{% for tag in test_run.tag.all %}
+				<span>
+					{{ tag }}
+					{% if perms.testruns.delete_testruntag %}
+					<a href="javascript:void(0)" onclick="removeRuntag('id_tag_container', '{{ test_run.run_id }}', '{{ tag }}')"><img src="{{ MEDIA_URL }}/images/icon_cross.png" width="12" height="12" title="remove this tag" /></a>
+					{% endif %}
+				</span>
+				{% empty %}
+				<span class="grey">No tag.</span>
+				{% endfor %}
+				</div>
+			</div>
+			<div class="listinfo">
+				<div class="title">&nbsp;</div>
+				{% if perms.testruns.add_testruntag %}
+				<a class="addlink" href="javascript:void(0)" onclick="addRunTag('id_tag_container', '{{ test_run.run_id }}')">Add Tag</a> 
+				{% endif %}
+			</div>
+			<div class="listinfo">
+				<div class="title">Environment</div>
+				<div class="linotype">
+				<ul>
+					{% for run_env_value in test_run.env_value.select_related.all %}
+					<li>
+						<form class="" id="id_form_value_{{ run_env_value.pk }}">
+							<span class="lab">
+							<input type="hidden" value="{{ run_env_value.property_id }}" name="env_property_id"/>
+							{{ run_env_value.property }}: 
+							
+							<span id="id_env_value_{{ run_env_value.pk }}" style="display:">{{ run_env_value.value }}</span>
+								
+							<select style="display:none" name="env_value_id" id="id_select_value_{{ run_env_value.pk }}">
+								<option value="{{ run_env_value.pk }}" selected="True"></option>
+							</select>
+							<input type="button" value="Submit" name="submit" id="id_submit_value_{{ run_env_value.pk }}" style="display:none" onclick="submitValue('{{ test_run.run_id }}','{{ run_env_value.pk }}','id_env_value_{{ run_env_value.pk }}',this.previous(),'id_submit_value_{{ run_env_value.pk }}')"/>
+							
+							</span>
+							<span class="action_property">
+								{% if perms.testruns.change_tcmsenvrunvaluemap %}
+								<a href="javascript:void(0)" onclick="editValue(this.up(1),'id_env_value_{{ run_env_value.pk }}','id_select_value_{{ run_env_value.pk }}','id_submit_value_{{ run_env_value.pk }}')"><img src="{{ MEDIA_URL }}/images/icon_changelink.gif" title="Edit this value" /></a>
+								{% endif %}
+								{% if perms.testruns.delete_tcmsenvrunvaluemap %}
+								<a href="javascript:void(0)"><img src="{{ MEDIA_URL }}/images/remove_small.png" title="Remove this property" onclick="removeProperty('{{ test_run.run_id }}','{{ run_env_value.pk }}')"/></a>
+								{% endif %}
+							</span>
+						</form>
+					</li>
+					{% empty %}
+					<li class="grey">No environment.</li>
+					{% endfor %}
+				</ul>
+				</div>
+			</div>
+			<div class="listinfo">
+				<div class="title">&nbsp;</div>
+				{% if perms.testruns.add_tcmsenvrunvaluemap %}
+				<a class="addlink" href="javascript:void(0)" onclick="addProperty('{{ test_run.run_id }}','{{env_group.id}}')">Add Property</a> 
+				{% endif %}
+				{% for env_group in testplan.env_group.all %}
+				<input type="hidden" name="env_group_id" value="{{ env_group.id }}"/>
+				{% endfor%}
+			</div>
+		   
+			
+		
+		</div>
+		<div class="rightlistinfo">
+			<div class="listinfo">
+				<div class="title">Product</div>
+				<a href="{% url tcms.testruns.views.all %}?product={{ test_run.build.product_id }}" title="Search test runs of {{ test_run.build.product }}">{{ test_run.build.product }}</a>
+			</div>
+			<div class="listinfo">
+				<div class="title">Build</div>
+				<a href="{% url tcms.testruns.views.all %}?build={{ test_run.build_id }}" title="Search test runs of {{ test_run.build_id }}">{{ test_run.build }}</a>
+			</div>
+			<div class="listinfo">
+				<div class="title">Default Tester</div>
+				{% if test_run.default_tester %}
+				<a href="{% url tcms.profiles.views.profile test_run.default_tester.username %}">{{ test_run.default_tester.email }}</a>
+				{% else %}
+				{{ test_run.default_tester }}
+				{% endif %}
+			</div>
+			<div class="listinfo">
+				<div class="title">Status</div>
+				{% if test_run.stop_date %}
+				<span class="pauselink">
+					Finished
+				</span>
+				{% if perms.testruns.change_testrun %}
+				<input type="button"  class="spadelink" value="Set to Running" onclick="window.location.href='{% url tcms.testruns.views.change_status test_run.run_id %}?finished=0'">
+				{% endif %}
+				{% else %}
+				<span class="runninglink">Running</span>
+				{% if perms.testruns.change_testrun %}
+				<input type="button"class="spadelink" value="Set to Finished" onclick="window.location.href='{% url tcms.testruns.views.change_status test_run.run_id %}?finished=1'">
+				{% endif %}
+				{% endif %}
+			</div>
+			<div class="listinfo">
+				<div class="title">Finished at:</div>{{ test_run.stop_date }}
+			</div>
+			<div class="listinfo">
+				<div class="title">CC:</div>
+				<div class="linotype">{% include 'run/get_cc.html' %}</div>
+			</div>
+		</div>
+		<div class="listinfo">
+			<div class="title">Note:</div>{{ test_run.notes|urlize|linebreaksbr }}
+		</div>
+		<div class="clear"></div>
+	</div>
+	</div>
+	<div class="Detailform border-1">
+		{% include 'run/get_case_runs.html' %}
+	</div>
+</div>
+{% endblock %}
