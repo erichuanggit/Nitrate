@@ -157,7 +157,7 @@ def check_file(request, file_id):
             try:
                 f = open(stored_file_name, 'ro')
                 contents = f.read()
-            except IOError:
+            except IOError, error:
                 raise Http404(error)
         else:
             stored_file_name = os.path.join(
