@@ -29,6 +29,7 @@ from tcms.core import forms
 from tcms.core.utils import Prompt
 
 from models import TestCase, TestCaseStatus, TestCaseAttachment
+from tcms.testplans.models import TestPlan
 
 MODULE_NAME = "testcases"
 
@@ -337,7 +338,10 @@ def get(request, case_id, template_name = 'case/get.html'):
     
     # Get the specific test plan
     if request.GET.get('from_plan'):
-        tp = tps.get(pk = request.REQUEST['from_plan'])
+        try:
+            tp = tps.get(pk = request.REQUEST['from_plan'])
+        except TestPlan.DoesNotExist:
+            raise Http404
     else:
         tp = None
     
