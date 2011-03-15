@@ -11,25 +11,13 @@ from django.conf import settings
 from django.contrib.admin import widgets as admin_widgets
 from django.core.urlresolvers import reverse
 from django.forms.widgets import flatatt
-try:
-    from django.utils.encoding import smart_unicode
-except ImportError: # Django 1.1.1 compatible
-    from django.forms.util import smart_unicode
+from django.utils.encoding import smart_unicode
 from django.utils.html import escape
 from django.utils import simplejson
 from django.utils.datastructures import SortedDict
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, ugettext as _
-
-DEFAULT_CONFIG = getattr(settings, 'TINYMCE_DEFAULT_CONFIG',
-        {'theme': "simple"})
-USE_SPELLCHECKER = getattr(settings, 'TINYMCE_SPELLCHECKER', False)
-USE_COMPRESSOR = getattr(settings, 'TINYMCE_COMPRESSOR', False)
-USE_FILEBROWSER = getattr(settings, 'TINYMCE_FILEBROWSER', 'filebrowser' in settings.INSTALLED_APPS)
-if USE_COMPRESSOR:
-    JS_URL = reverse('tinymce-compressor')
-else:
-    JS_URL = getattr(settings, 'TINYMCE_JS_URL', '%sjs/tiny_mce/tiny_mce.js' % settings.MEDIA_URL)
+from tcms.core.lib.djangotinymce.tinymce import settings as tinymce_settings
 
 
 class TinyMCE(forms.Textarea):
@@ -64,10 +52,10 @@ class TinyMCE(forms.Textarea):
         final_attrs['name'] = name
         assert 'id' in final_attrs, "TinyMCE widget attributes must contain 'id'"
 
-        mce_config = DEFAULT_CONFIG.copy()
+        mce_config = tinymce_settings.DEFAULT_CONFIG.copy()
         mce_config.update(get_language_config(self.content_language))
-        if USE_FILEBROWSER:
-            mce_config['file_browser_callback'] = "DjangoFileBrowser"
+        if tinymce_settings.USE_FILEBROWSER:
+            mce_config['file_browser_callback'] = "djangoFileBrowser"
         mce_config.update(self.mce_attrs)
         mce_config['mode'] = 'exact'
         mce_config['elements'] = final_attrs['id']
@@ -75,11 +63,11 @@ class TinyMCE(forms.Textarea):
         mce_json = simplejson.dumps(mce_config)
 
         html = [u'<textarea%s>%s</textarea>' % (flatatt(final_attrs), escape(value))]
-        if USE_COMPRESSOR:
+        if tinymce_settings.USE_COMPRESSOR:
             compressor_config = {
-                'plugins': mce_config['plugins'],
-                'themes': mce_config['theme'],
-                'languages': mce_config['language'],
+                'plugins': mce_config.get('plugins', ''),
+                'themes': mce_config.get('theme', 'advanced'),
+                'languages': mce_config.get('language', ''),
                 'diskcache': True,
                 'debug': False,
             }
@@ -90,8 +78,11 @@ class TinyMCE(forms.Textarea):
         return mark_safe(u'\n'.join(html))
 
     def _media(self):
-        js = [JS_URL]
-        if USE_FILEBROWSER:
+        if tinymce_settings.USE_COMPRESSOR:
+            js = [reverse('tinymce-compressor')]
+        else:
+            js = [tinymce_settings.JS_URL]
+        if tinymce_settings.USE_FILEBROWSER:
             js.append(reverse('tinymce-filebrowser'))
         return forms.Media(js=js)
     media = property(_media)
@@ -130,7 +121,7 @@ def get_language_config(content_language=None):
     else:
         config['directionality'] = 'ltr'
 
-    if USE_SPELLCHECKER:
+    if tinymce_settings.USE_SPELLCHECKER:
         config['spellchecker_rpc_url'] = reverse('tinymce.views.spell_check')
 
     return config

@@ -10,7 +10,7 @@ setup(
     name = "django-%s" % app_name,
     version = version,
 
-    packages = [app_name],
+    packages = [app_name, '%s.templatetags' % app_name],
     package_data = {app_name: ['templates/tinymce/*']},
 
     author = "Joost Cassee",
@@ -28,6 +28,7 @@ Features:
 * Integration with the TinyMCE spellchecker.
 * Enables predefined link and image lists for dialogs.
 * Can compress the TinyMCE javascript files.
+* Integration with django-filebrowser.
 """,
     license = "MIT License",
     keywords = "django widget tinymce",
