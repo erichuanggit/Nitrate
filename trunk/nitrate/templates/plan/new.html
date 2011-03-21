@@ -41,7 +41,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Create.on_load);
 					<td>
 						<span class="name" >{{ form.product }}</span>
 						<span >{{ form.product.errors }}</span>
-                        <a id="id_addt_product" href="{{ ADMIN_PREFIX }}/management/product/add/" class="addlink" onclick="return popupAddAnotherWindow(this);">
+                        <a id="add_id_product" href="{{ ADMIN_PREFIX }}/management/product/add/" class="addlink" onclick="return popupAddAnotherWindow(this);">
 							Add Product
 						</a>
 						<span class="grey">After Add and Refresh page</span>
@@ -53,7 +53,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Create.on_load);
 					<td>
 						<span>{{ form.default_product_version }}</span>
 						<span >{{ form.default_product_version.errors }}</span>
-                        <a id="id_addt_product_version" href="{{ ADMIN_PREFIX }}/management/version/add/" class="addlink" onclick="return popupAddAnotherWindow(this, 'product');">
+                        <a id="add_id_default_product_version" href="{{ ADMIN_PREFIX }}/management/version/add/" class="addlink" onclick="return popupAddAnotherWindow(this, 'product');">
 							Add Product Version
 						</a>
 						<span class="grey">After Add and Refresh page</span>
