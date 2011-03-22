@@ -122,6 +122,8 @@ urlpatterns = patterns('',
     
     (r'^caserun/(?P<case_run_id>\d+)/current/$', 'tcms.testruns.views.set_current'),
     (r'^caserun/(?P<case_run_id>\d+)/bug/$', 'tcms.testruns.views.bug'),
+    (r'^caserun/comment-many/', 'tcms.core.ajax.comment_case_runs'),
+    (r'^caserun/update-bugs-for-many/', 'tcms.core.ajax.update_bugs_to_caseruns'),
     
     # Review zone
     #(r'^plan/(?P<plan_id>\d+)/newreview/$', 'tcms.testreviews.views.new'),
@@ -153,7 +155,7 @@ urlpatterns = patterns('',
 
 if settings.DEBUG:
     urlpatterns += patterns('',
-        (r'(^|/)media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': 'media', 'show_indexes': True}),
+        (r'(^|/)media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
     )
     
     urlpatterns += patterns('tcms.core.utils.test_template',
