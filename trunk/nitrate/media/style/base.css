@@ -890,3 +890,17 @@ ul.data_content_title li{ display:inline-block; margin-left:3px;}
 
 .data_content ul{ min-height:25px; line-height:25px; border-bottom:solid 1px #ccc; vertical-align:top}
 .data_content ul li{display:inline-block; margin-left:3px; height:inherit;}
+
+/*linan new*/
+li{list-style:none;}
+.btnBlueCaserun{float:left; position:relative; width:85px; padding:0 0 0 10px; margin-right:10px; height:21px; line-height:21px; color:#FFFFFF; text-align:left; background:url(../images/btn_blue_caserun.png) no-repeat 0px 0px; cursor:pointer;}
+.btnBlueCaserun ul{display:none; width:91px; padding:1px; border:1px solid #235D9F; background:#FFFFFF url(../images/btn_blue_caserun.png) -1px -42px repeat-x; border-top:0px; position:absolute; left:0px; top:20px;}
+.btnBlueCaserun ul li{list-style:none;}
+.btnBlueCaserun ul li a:link, .btnBlueCaserun ul li a:visited{display:block; text-decoration:none; color:#333333; padding-left:15px; height:21px; line-height21px;}
+.btnBlueCaserun ul li a:hover{display:block; background-color:#FFDFA3; color:#000000; padding-left:15px;}
+.btnBlue{cursor:pointer; height:21px; background:url(../images/btn_blue.png) repeat-x 0px -21px;}
+.btnBlueL{float:left; width:2px; height:21px; background:url(../images/btn_blue.png) no-repeat 0px 0px;}
+.btnBlueC{float:left; height:21px; line-height:21px; padding:0 5px; color:#FFFFFF;}
+.btnBlueR{float:left; width:2px; height:21px; background:url(../images/btn_blue.png) no-repeat 0px -42px;}
+.btnBlueFilter{float:right;}
+

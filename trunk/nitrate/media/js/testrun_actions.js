@@ -922,3 +922,59 @@ function showCaseRunsWithSelectedStatus(form, status_id)
     form.case_run_status__pk.value = status_id;
     fireEvent(form.getElementsBySelector('input[type="submit"]')[0], 'click');
 }
+
+/*
+Functions defined below are using jQuery.
+Author: ctang@redhat.com - 22 March 2011 
+*/
+
+function updateBugs(action){
+    var bug_ids = prompt("Specify bug IDs, using comma to seperate multiple IDs.");
+    if(!bug_ids){
+        alert(default_messages.alert.no_bugs_specified);
+        return false;
+    }
+    var runs = serializeCaseRunFromInputList($('id_table_cases'));
+    if(!runs){
+        alert(default_messages.alert.no_case_selected);
+        return false;
+    }
+    jQ.ajax({
+        url: '/caserun/update-bugs-for-many/',
+        success: reloadWindow,
+        data: {
+            'bugs': bug_ids,
+            'action': action,
+            'runs': runs.join(),
+            'bug_system': 1
+        }
+    });
+}
+
+function commentCaseRuns(){
+    var comment = prompt("")
+}
+
+jQ(document).ready(function(){
+    jQ('.btnBlueCaserun').mouseover(function(){
+        jQ(this).find('ul').show();
+    }).mouseout(function(){
+        jQ(this).find('ul').hide();
+    });
+    jQ('ul.statusOptions a').click(function(){
+        var option = jQ(this).attr('value');
+        var object_pks = serializeCaseRunFromInputList($('id_table_cases'));
+        if(option == '')
+            return false;
+        if(object_pks.length == 0) {
+            alert(default_messages.alert.no_case_selected);
+            return false;
+        };
+        if(!confirm(default_messages.confirm.change_case_status))
+            return false;
+        updateObject('testruns.testcaserun', object_pks, 'case_run_status', option, 'int', reloadWindow);
+    });
+    // URL updating bugs: /caserun/update-bugs-for-many/
+    // URL commenting bugs: /caserun/comment-many/
+    
+});

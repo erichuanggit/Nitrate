@@ -27,6 +27,7 @@ from django.http import HttpResponse
 from django.utils import simplejson
 from django.views.generic.simple import direct_to_template
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.models import User
 
 from tcms.testplans.models import TestPlan, TestCasePlan
 from tcms.testcases.models import TestCase, TestCaseTag, TestCaseBugSystem as BugSystem
@@ -415,15 +416,19 @@ def update(request):
                 )
 
             field = 'assignee'
-            if t.assignee != request.user:
-                t.log_action(
-                    who = request.user,
-                    action = 'Field %s changed from %s to %s.' % (
-                        field, getattr(t, field), request.user
+            try:
+                assignee = t.assginee
+                if assignee != request.user:
+                    t.log_action(
+                        who = request.user,
+                        action = 'Field %s changed from %s to %s.' % (
+                            field, getattr(t, field), request.user
+                        )
                     )
-                )
-                #t.assignee = request.user
-            t.save()
+                    #t.assignee = request.user
+                t.save()
+            except:
+                pass
         targets.update(close_date = now)
         targets.update(tested_by = request.user)
     return say_yes()
