@@ -2,6 +2,7 @@
 """
 Use this class to access Nitrate via XML-RPC
 This code is based on http://landfill.bugzilla.org/testopia2/testopia/contrib/drivers/python/testopia.py
+and https://fedorahosted.org/python-bugzilla/browser/bugzilla/base.py
 
 Example on how to access this library,
 
@@ -36,6 +37,17 @@ from cookielib import CookieJar
 VERBOSE = 0
 DEBUG = 0
 
+class CookieResponse:
+    '''Fake HTTPResponse object that we can fill with headers we got elsewhere.
+    We can then pass it to CookieJar.extract_cookies() to make it pull out the
+    cookies from the set of headers we have.'''
+    def __init__(self,headers): 
+        self.headers = headers
+        #log.debug("CookieResponse() headers = %s" % headers)
+    def info(self): 
+        return self.headers
+
+
 class CookieTransport(xmlrpclib.Transport):
     '''A subclass of xmlrpclib.Transport that supports cookies.'''
     cookiejar = None
@@ -59,75 +71,123 @@ class CookieTransport(xmlrpclib.Transport):
     
     # This is the same request() method from xmlrpclib.Transport,
     # with a couple additions noted below
-    def request(self, host, handler, request_body, verbose=0):
+    def request_with_cookies(self, host, handler, request_body, verbose=0):
         h = self.make_connection(host)
         if verbose:
             h.set_debuglevel(1)
-        
+
         # ADDED: construct the URL and Request object for proper cookie handling
-        request_url = "%s://%s/" % (self.scheme,host)
+        request_url = "%s://%s%s" % (self.scheme,host,handler)
+        #log.debug("request_url is %s" % request_url)
         cookie_request  = urllib2.Request(request_url) 
-        
+
         self.send_request(h,handler,request_body)
         self.send_host(h,host) 
         self.send_cookies(h,cookie_request) # ADDED. creates cookiejar if None.
         self.send_user_agent(h)
         self.send_content(h,request_body)
-        
-        if hasattr(h, 'getresponse'): # Python 2.7
-            response = h.getresponse()
-            headers = response.getheaders()
-            status = response.status
-            reason = response.reason
-        else:
-            # Python < 2.6 compatible
-            status, reason, headers = h.getreply()
-        
-        # This object is needed to provide cookielib with the interface it
-        # expects.
-        class Headers:
-            def __init__(self, headerList): self.headerList = headerList
-            def getheaders(self, header):
-                for hdr in self.headerList:
-                    if hdr[0].lower() == header.lower():
-                        return [hdr[1]]
-                return [""]
-        
+
+        errcode, errmsg, headers = h.getreply()
+
         # ADDED: parse headers and get cookies here
-        # fake a response object that we can fill with the headers above
-        class CookieResponse:
-            def __init__(self,headers): self.headers = Headers(headers)
-            def info(self): return self.headers
         cookie_response = CookieResponse(headers)
         # Okay, extract the cookies from the headers
         self.cookiejar.extract_cookies(cookie_response,cookie_request)
+        #log.debug("cookiejar now contains: %s" % self.cookiejar._cookies)
         # And write back any changes
         if hasattr(self.cookiejar,'save'):
-            self.cookiejar.save(self.cookiejar.filename)
-        
-        if status != 200:
+            try:
+                self.cookiejar.save(self.cookiejar.filename)
+            except Exception, e:
+                raise
+                #log.error("Couldn't write cookiefile %s: %s" % \
+                #        (self.cookiejar.filename,str(e)))
+
+        if errcode != 200:
             raise xmlrpclib.ProtocolError(
                 host + handler,
-                status, reason,
+                errcode, errmsg,
                 headers
-            )
-        
+                )
+
         self.verbose = verbose
-        
+
         try:
             sock = h._conn.sock
         except AttributeError:
             sock = None
-        
-        # Python < 2.6 compatible
-        if hasattr(h, 'getfile'):
-            return self._parse_response(h.getfile(), sock)
-        return self.parse_response(response) # Python 2.7
+
+        return self._parse_response(h.getfile(), sock)
+
+        # This is just python 2.7's xmlrpclib.Transport.single_request, with
+    # send additions noted below to send cookies along with the request
+    def single_request_with_cookies(self, host, handler, request_body, verbose=0):
+        h = self.make_connection(host)
+        if verbose:
+            h.set_debuglevel(1)
+
+        # ADDED: construct the URL and Request object for proper cookie handling
+        request_url = "%s://%s%s" % (self.scheme,host,handler)
+        #log.debug("request_url is %s" % request_url)
+        cookie_request  = urllib2.Request(request_url)
+
+        try:
+            self.send_request(h,handler,request_body)
+            self.send_host(h,host)
+            self.send_cookies(h,cookie_request) # ADDED. creates cookiejar if None.
+            self.send_user_agent(h)
+            self.send_content(h,request_body)
+
+            response = h.getresponse(buffering=True)
+
+            # ADDED: parse headers and get cookies here
+            cookie_response = CookieResponse(response.msg)
+            # Okay, extract the cookies from the headers
+            self.cookiejar.extract_cookies(cookie_response,cookie_request)
+            #log.debug("cookiejar now contains: %s" % self.cookiejar._cookies)
+            # And write back any changes
+            if hasattr(self.cookiejar,'save'):
+                try:
+                    self.cookiejar.save(self.cookiejar.filename)
+                except Exception, e:
+                    raise
+                    #log.error("Couldn't write cookiefile %s: %s" % \
+                    #        (self.cookiejar.filename,str(e)))
+
+            if response.status == 200:
+                self.verbose = verbose
+                return self.parse_response(response)
+        except xmlrpclib.Fault:
+            raise
+        except Exception:
+            # All unexpected errors leave connection in
+            # a strange state, so we clear it.
+            self.close()
+            raise
+
+        #discard any response data and raise exception
+        if (response.getheader("content-length", 0)):
+            response.read()
+        raise xmlrpclib.ProtocolError(
+            host + handler,
+            response.status, response.reason,
+            response.msg,
+            )
+
+    # Override the appropriate request method
+    if hasattr(xmlrpclib.Transport, 'single_request'):
+        single_request = single_request_with_cookies # python 2.7+
+    else:
+        request = request_with_cookies # python 2.6 and earlier
 
 class SafeCookieTransport(xmlrpclib.SafeTransport,CookieTransport):
     '''SafeTransport subclass that supports cookies.'''
     scheme = 'https'
-    request = CookieTransport.request
+    # Override the appropriate request method
+    if hasattr(xmlrpclib.Transport, 'single_request'):
+        single_request = CookieTransport.single_request_with_cookies
+    else:
+        request = CookieTransport.request_with_cookies
 
 # Stolen from FreeIPA source freeipa-1.2.1/ipa-python/krbtransport.py
 class KerbTransport(SafeCookieTransport):
