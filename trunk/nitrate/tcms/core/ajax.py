@@ -372,12 +372,15 @@ def update(request):
 
     if hasattr(targets[0], 'log_action'):
         for t in targets:
-            t.log_action(
-                who = request.user,
-                action = 'Field %s changed from %s to %s.' % (
-                    field, getattr(t, field), value
+            try:
+                t.log_action(
+                    who = request.user,
+                    action = 'Field %s changed from %s to %s.' % (
+                        field, getattr(t, field), value
+                    )
                 )
-            )
+            except (AttributeError, User.DoesNotExist):
+                pass
     targets.update(**{field: value})
 
     if hasattr(model, 'mail_scene'):
@@ -427,7 +430,7 @@ def update(request):
                     )
                     #t.assignee = request.user
                 t.save()
-            except:
+            except (AttributeError, User.DoesNotExist):
                 pass
         targets.update(close_date = now)
         targets.update(tested_by = request.user)
@@ -440,7 +443,8 @@ def comment_case_runs(request):
     data    = request.REQUEST.copy()
     comment = data.get('comment', None)
     if not comment: return say_no('Comments needed')
-    run_ids = data.get('run', '').split(',')
+    run_ids = [i for i in data.get('run', '').split(',') if i]
+    if not run_ids: return say_no('No runs selected.');
     runs    = TestCaseRun.objects.filter(pk__in=run_ids)
     if not runs: return say_no('No caserun found.')
     add_comment(runs, comment, request.user)

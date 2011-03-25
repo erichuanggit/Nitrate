@@ -863,7 +863,7 @@ function removeRunCC(run_id, user, container)
     constructRunCC(container, run_id, parameters)
 }
 
-function changeCaseRunAssignee(table)
+function changeCaseRunAssignee()
 {
     var p = prompt('Please type new email or username for assignee');
     if(!p)
@@ -873,11 +873,10 @@ function changeCaseRunAssignee(table)
           'info_type': 'users',
           'email__startswith': p,
     }
-    
     getInfoAndUpdateObject(
         parameters,
         'testruns.testcaserun',
-        serializeCaseRunFromInputList(table),
+        serializeCaseRunFromInputList($('id_table_cases')),
         'assignee'
     )
 }
@@ -951,8 +950,56 @@ function updateBugs(action){
     });
 }
 
+function showCommentForm(){
+    var dialog = getDialog();
+    var comment_form = '<ul>' +
+                            '<li><b>Comments: </b></li>' +
+                            '<li><textarea name="comments" id="commentText" style="width:100%;height:100px;"></textarea></li>' + 
+                            '<li><button id="btnComment">Confirm</button> <button id="btnCancelComment">Cancel</button>' +
+                            ' <span id="commentsErr"></span>' +
+                        '</ul>';
+    dialog.update(comment_form);
+    var commentText = jQ('#commentText');
+    var commentsErr = jQ('#commentsErr');
+    jQ('#btnComment').live('click', function(){
+        var error;
+        var comments = jQ.trim(commentText.val());
+        var runs = serializeCaseRunFromInputList($('id_table_cases'));
+        if(!comments)
+            error = 'No comments given.';
+        if(!runs)
+            error = default_messages.alert.no_case_selected;
+        if(error){
+            commentsErr.html(error);
+            return false;
+        }
+        jQ.ajax({
+            url: '/caserun/comment-many/',
+            data: {'comment': comments, 'run': runs.join()},
+            dataType: 'json',
+            success: function(res){
+                if(res.rc==0){
+                    reloadWindow();
+                }else{
+                    commentsErr.html(res.response);
+                    return false;
+                }
+            }
+        });
+    });
+    jQ('#btnCancelComment').live('click', function(){
+        dialog.hide();
+        commentText.val('');
+    });
+    dialog.show();
+}
+
 function commentCaseRuns(){
-    var comment = prompt("")
+    // comment multiple caseruns at a time.
+
+    dialog.update();
+    dialog.show();
+    
 }
 
 jQ(document).ready(function(){
@@ -976,5 +1023,4 @@ jQ(document).ready(function(){
     });
     // URL updating bugs: /caserun/update-bugs-for-many/
     // URL commenting bugs: /caserun/comment-many/
-    
 });

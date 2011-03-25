@@ -23,7 +23,7 @@
 				<li><a href="#" title="Update the IDLE case runs to newest case text" href="javascript:void(0)" onclick="postToURL('{% url tcms.testruns.views.update_case_run_text test_run.pk %}', serializeCaseRunFromInputList(this.up(2).next(), 'case_run'))">Update</a></li>
 				{% endif %}
 				{% if perms.testruns.change_testcaserun %}
-				<li><a href="#" title="Assignee this case(s) to other people" onclick="changeCaseRunAssignee(this.up(2).next());">Assignee</a></li>
+				<li><a href="#" title="Assignee this case(s) to other people" onclick="changeCaseRunAssignee();">Assignee</a></li>
 				{% endif %}
 			</ul>
 		</div>
@@ -45,8 +45,7 @@
 		<div class="btnBlueCaserun">
 			<span>Comment</span>
 			<ul>
-				<li><a href="#">Add</a></li>
-				<li><a href="#">Remove</a></li>	
+				<li><a href="javascript:_void();" onclick="showCommentForm();">Add</a></li>
 			</ul>
 		</div>
 		<ul class="btnBlue btnBlueFilter">
