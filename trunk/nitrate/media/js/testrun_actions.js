@@ -940,7 +940,15 @@ function updateBugs(action){
     }
     jQ.ajax({
         url: '/caserun/update-bugs-for-many/',
-        success: reloadWindow,
+        dataType: 'json',
+        success: function(res){
+            if(res.rc==0){
+                reloadWindow();
+            }else{
+                alert(res.response);
+                return false;
+            }
+        },
         data: {
             'bugs': bug_ids,
             'action': action,
