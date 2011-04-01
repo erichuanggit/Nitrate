@@ -111,7 +111,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc docs/INSTALL docs/AUTHORS docs/ChangeLog docs/README docs/RELEASENOTES docs/UPGRADING docs/XMLRPC docs/testopia-dump-blank.sql docs/mysql_initial.sql
 %{python_sitelib}/tcms/
-%{python_sitelib}/Nitrate-%{version}-py*.egg-info/
+%{python_sitelib}/Nitrate-%{version}-%{release}-py*.egg-info/
 %{_datadir}/%{name}/*
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
