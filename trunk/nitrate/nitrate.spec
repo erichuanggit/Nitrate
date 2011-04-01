@@ -3,13 +3,13 @@
 
 Name:           nitrate
 Version:        3.3
-Release:        5%{?dist}
+Release:        4%{?dist}
 Summary:        Test Case Management System
 
 Group:          Development/Languages
 License:        GPLv2+
 URL:            https://fedorahosted.org/nitrate/browser/trunk/nitrate
-Source0:        nitrate-%{version}-%{release}.tar.bz2
+Source0:        https://fedorahosted.org/releases/n/i/nitrate/%{name}-%{version}-%{release}.tar.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:      noarch
@@ -111,7 +111,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc docs/INSTALL docs/AUTHORS docs/ChangeLog docs/README docs/RELEASENOTES docs/UPGRADING docs/XMLRPC docs/testopia-dump-blank.sql docs/mysql_initial.sql
 %{python_sitelib}/tcms/
-%{python_sitelib}/Nitrate-%{version}-py*.egg-info/
+%{python_sitelib}/Nitrate-%{version}.*-py*.egg-info/
 %{_datadir}/%{name}/*
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
