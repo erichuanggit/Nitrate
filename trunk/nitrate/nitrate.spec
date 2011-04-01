@@ -3,7 +3,7 @@
 
 Name:           nitrate
 Version:        3.3
-Release:        4
+Release:        1%{?dist}
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -110,7 +110,8 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %doc docs/INSTALL docs/AUTHORS docs/ChangeLog docs/README docs/RELEASENOTES docs/UPGRADING docs/XMLRPC docs/testopia-dump-blank.sql docs/mysql_initial.sql
-%{python_sitelib}/*
+%{python_sitelib}/tcms/
+%{python_sitelib}/Nitrate-%{version}-py*.egg-info/
 %{_datadir}/%{name}/*
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
@@ -118,56 +119,56 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 *Fri Mar 3 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-4
-Fixed bug 681156 - [Test Plan]Can not expand all the test case in test plan.
-Fixed Bug 679677 - [Test Run]The button should be "cancel" in Property page.
-Fixed Bug 672495 - Old test run shows updated case information but its text version is unchanged.
+- Fixed bug 681156 - [Test Plan]Can not expand all the test case in test plan.
+- Fixed Bug 679677 - [Test Run]The button should be "cancel" in Property page.
+- Fixed Bug 672495 - Old test run shows updated case information but its text version is unchanged.
 
 *Fri Feb 25 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-3
-Fixed bug 680315 - [Reporting]Open a product will lead to the error page.
-Fixed bug 680321 - [Test Run]Click "View My Assigned Runs" will list all runs
-Fixed bug 627236 - s/2009/2010/ orequivalent of date in page footer
-Fixed bug 680322 - New: [spelling mistake]"Highligt" should be "Highlight"
-Fixed Bug 680059 - [Test Run]The total number of test case run is NULL
-remove "running date" add "run date"
-Fixed bug 676259 - [FEAT] Need to get a break out of manual vs auto in the tcms reporting section
-Fixed bug 678643 - TestPlan.get_text - multiple failures
-Fixed bug 674754 - [xmlrpc] TestRun.create() fails when list of tags provided
-Fixed bug 676590 - In run execute page, 'expand all' generates tons of http requests
+- Fixed bug 680315 - [Reporting]Open a product will lead to the error page.
+- Fixed bug 680321 - [Test Run]Click "View My Assigned Runs" will list all runs
+- Fixed bug 627236 - s/2009/2010/ orequivalent of date in page footer
+- Fixed bug 680322 - New: [spelling mistake]"Highligt" should be "Highlight"
+- Fixed Bug 680059 - [Test Run]The total number of test case run is NULL
+- remove "running date" add "run date"
+- Fixed bug 676259 - [FEAT] Need to get a break out of manual vs auto in the tcms reporting section
+- Fixed bug 678643 - TestPlan.get_text - multiple failures
+- Fixed bug 674754 - [xmlrpc] TestRun.create() fails when list of tags provided
+- Fixed bug 676590 - In run execute page, 'expand all' generates tons of http requests
 
 *Tue Feb 15 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-2
-Fixed bug 664025 - TCMS main check box to control test cases doesn't work
-Fixed bug 658372 - Cannot select "Product Version" when clone multiple test plans
-Fixed bug 667304 - Click "Build" label, it won't be sorted by build
-Fixed bug 654533 - [TCMS]Document Version in test plan on opera browser
-Fixed bug 672873 - xml export can't be parsed
-Fixed bug 664743 - [RFE] supply existing bugs when marking test-case-run as failed
-Fixed bug 672857 - Typo in error message when a test plan hasn't been
-Fixed bug 657474 [TCMS3.2-2]List the runs which have not environment
-Fixed bug 649293 - Make the case run "notes" field visible in the run
-Fixed bug 643324 - Provide a bit more space for the test run notes
-Fixed bug 653815 - Unable to re-order test cases in test run
-Fixed bug 658475 - The bug can not be deleted inside the run
-Fixed bug 672622 - product version gets set to "unused" when editing a plan
+- Fixed bug 664025 - TCMS main check box to control test cases doesn't work
+- Fixed bug 658372 - Cannot select "Product Version" when clone multiple test plans
+- Fixed bug 667304 - Click "Build" label, it won't be sorted by build
+- Fixed bug 654533 - [TCMS]Document Version in test plan on opera browser
+- Fixed bug 672873 - xml export can't be parsed
+- Fixed bug 664743 - [RFE] supply existing bugs when marking test-case-run as failed
+- Fixed bug 672857 - Typo in error message when a test plan hasn't been
+- Fixed bug 657474 [TCMS3.2-2]List the runs which have not environment
+- Fixed bug 649293 - Make the case run "notes" field visible in the run
+- Fixed bug 643324 - Provide a bit more space for the test run notes
+- Fixed bug 653815 - Unable to re-order test cases in test run
+- Fixed bug 658475 - The bug can not be deleted inside the run
+- Fixed bug 672622 - product version gets set to "unused" when editing a plan
 
 *Mon Jan 24 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-1
-Fixed bug 661951 - Messed-up warning message pop up when clicking Add without entering Bug ID
-Fixed bug 665945 - run export button dosn't work
-Fixed bug 667293 - The first product is the default product.
-Fixed bug 665934 - choose no plan to "Printalbe Copy"
-Fixed Bug 654953 - [RFE] Report an expanded list of Test Cases by Tag
-Fixed bug 664467 - TCMS: cells overlapping when using long name for test case summary
-Fixed bug 662944 - Resort case run is broken in Firefox
-Fixed bug 642644 - update nitrate.py to work with the latest xmlrpclib
-Fixed bug 578717 - [REF] Provide filter in test run
-Fixed bug 653812 - Filtering test case runs 
-Fixed bug 534063 - [RFE] Allow sorting / filtering test cases while executing the test run
-Fixed bug 660234 - Add links to IDLE, PASSED, WAIVED items in report table again
-Fixed bug 661579 - Incorrect bug counting method - Ugly code, Ugly bug
-Completed feature #662679 - Attachments get lost when cloning test case
-Completed feature #663520 QPID support for TCMS
-Completed global signal processor
-Fixed case run percent counter
-Improve the style of filtering test case runs
+- Fixed bug 661951 - Messed-up warning message pop up when clicking Add without entering Bug ID
+- Fixed bug 665945 - run export button dosn't work
+- Fixed bug 667293 - The first product is the default product.
+- Fixed bug 665934 - choose no plan to "Printalbe Copy"
+- Fixed Bug 654953 - [RFE] Report an expanded list of Test Cases by Tag
+- Fixed bug 664467 - TCMS: cells overlapping when using long name for test case summary
+- Fixed bug 662944 - Resort case run is broken in Firefox
+- Fixed bug 642644 - update nitrate.py to work with the latest xmlrpclib
+- Fixed bug 578717 - [REF] Provide filter in test run
+- Fixed bug 653812 - Filtering test case runs 
+- Fixed bug 534063 - [RFE] Allow sorting / filtering test cases while executing the test run
+- Fixed bug 660234 - Add links to IDLE, PASSED, WAIVED items in report table again
+- Fixed bug 661579 - Incorrect bug counting method - Ugly code, Ugly bug
+- Completed feature #662679 - Attachments get lost when cloning test case
+- Completed feature #663520 QPID support for TCMS
+- Completed global signal processor
+- Fixed case run percent counter
+- Improve the style of filtering test case runs
 
 * Thu Dec 1 2010 Xuqing Kuang <xkuang@redhat.com> - 3.2-4
 - Fixed #658160 - Changing case status does not work reliably
@@ -443,16 +444,16 @@ Improve the style of filtering test case runs
 - Optimized query count for performance.
 - Add examples to XML-RPC docs.
 - Completed following methods for XML-RPC: Product.filter(),
-  Product.filter_categories(), Product.filter_components(), Product.filter_versions(),
-  Product.get_component(), Product.get_tag(), Product.get_versions(),
-  Product.lookup_id_by_name(), TestCase.calculate_average_estimated_time(),
-  TestCase.calculate_total_estimated_time(), User.filter(), User.get(),
-  User.update().
+- Product.filter_categories(), Product.filter_components(), Product.filter_versions(),
+- Product.get_component(), Product.get_tag(), Product.get_versions(),
+- Product.lookup_id_by_name(), TestCase.calculate_average_estimated_time(),
+- TestCase.calculate_total_estimated_time(), User.filter(), User.get(),
+- User.update().
 - Fixed UI bugs: #590647, #583908, #570351, #588970, #588565, #578828, #562110,
-  #582958, #542664.
+- #582958, #542664.
 - Fixed app bugs: #582517, #582910, #584838, #586684, #584342, #578828
-  #577820, #583917, #562110, #580494, #570351, #589124, #577130, #561406, #586085,
-  #588595, #560791, #584459.
+- #577820, #583917, #562110, #580494, #570351, #589124, #577130, #561406, #586085,
+- #588595, #560791, #584459.
 
 * Fri Apr 16 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0-1b2.svn2665
 - Fixed #582517 - remove tag doesn't work
@@ -722,8 +723,7 @@ exact revision of the code
 - fix regexp for pylint errors
 
 * Tue Feb 24 2009 David Malcolm <dmalcolm@redhat.com> - 0.13-3
-- add code to invoke pylint.  Stop building the rpm if pylint finds
-a problem.
+- add code to invoke pylint.  Stop building the rpm if pylint finds a problem.
 
 * Wed Feb 18 2009 David Malcolm <dmalcolm@redhat.com> - 0.13-2.svn1309
 - add mod_python and python-memcached dependencies
