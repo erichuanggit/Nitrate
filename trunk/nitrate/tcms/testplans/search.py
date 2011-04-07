@@ -42,7 +42,7 @@ from tcms.management.models import Product, Version, Priority
 from datetime import datetime
 from functools import partial
 from itertools import chain
-from tcms.haystack.query import SearchQuerySet
+from haystack.query import SearchQuerySet
 import time
 
 # while debugging, using the following shortcuts
