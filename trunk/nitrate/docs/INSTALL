@@ -289,3 +289,9 @@ for bugzilla as the bugzilla(testopia) URL.
 == More information. == #more_info
  * http://docs.djangoproject.com
  * http://docs.djangoproject.com/en/dev/howto/deployment/
+
+== Full-text search using Haystack ==
+    1. Download Haystack using git-clone: https://github.com/toastdriven/django-haystack.git
+    2. Follow(http://docs.haystacksearch.org/1.0/tutorial.html#configuration) to add configurations to settings.py
+    3. Install xapian-core and xapian python bindings. (http://xapian.org/download)
+    4. Run this command to build index: python manage.py rebuild_index
