@@ -243,7 +243,7 @@ class CasePlanXMLField(forms.FileField):
             else:
                 raise forms.ValidationError(self.error_messages['test_case_element_is_needed'])
         
-        except ExpatError, error:
+        except Exception, error:
             raise forms.ValidationError('%s: %s' % (
                 self.error_messages['interpret_error'],
                 error
