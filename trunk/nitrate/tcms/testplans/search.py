@@ -105,7 +105,7 @@ class QueryCriteria(object):
         'plan': {
             'pl_id': 'plan_id__in',
             'pl_summary': 'summary__startswith',
-            'pl_type': 'type__in',
+            'pl_type': 'plan_type__in',
             'pl_authors': 'author__in',
             'pl_tags': 'tags__in',
             'pl_active': 'is_active',
@@ -141,10 +141,10 @@ class QueryCriteria(object):
         'run': {
             'r_id': 'run_id',
             'r_summary': 'summary__startswith',
-            'r_manager': 'manager__username__in',
-            'r_tester': 'tester__username__in',
+            'r_manager': 'manager__in',
+            'r_tester': 'tester__in',
             'r_running': 'is_finished',
-            'r_tags': 'tag__name__in',
+            'r_tags': 'tags__in',
             'r_created_since': 'create_date__gte',
             'r_created_before': 'create_date__lte',
             'p_product': 'product__in',
