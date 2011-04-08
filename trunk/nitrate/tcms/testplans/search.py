@@ -166,19 +166,25 @@ class QueryCriteria(object):
             if value:
                 print 'applying filter %s : %s' %(key, value)
                 qs = queryset or self.queryset
-                queryset = qs.filter(**{rules[key]: value})
+                if key in ('pl_tags', 'r_tags', 'cs_tags') and \
+                self.queries[key+'_exclude']:
+                    print G('to exclude')
+                    queryset = qs.exclude(**{rules[key]: value})
+                else:
+                    queryset = qs.filter(**{rules[key]: value})
         return queryset
 
 class PlanForm(forms.Form):
     PLAN_TYPE_CHOICES = [
         (t.pk, t.name) for t in cached_entities('TestPlanType')
     ]
-    pl_type     = LooseIF()
-    pl_summary  = LooseCF(max_length=50)
-    pl_id       = LooseCF()
-    pl_authors  = LooseCF(max_length=100)
-    pl_tags     = LooseCF(max_length=100)
-    pl_active   = forms.BooleanField(required=False)
+    pl_type         = LooseIF()
+    pl_summary      = LooseCF(max_length=50)
+    pl_id           = LooseCF()
+    pl_authors      = LooseCF(max_length=100)
+    pl_tags         = LooseCF(max_length=100)
+    pl_tags_exclude = forms.BooleanField(required=False)
+    pl_active       = forms.BooleanField(required=False)
     pl_created_since  = LooseDF()
     pl_created_before = LooseDF()
 
@@ -215,6 +221,7 @@ class CaseForm(forms.Form):
     cs_script   = LooseCF(max_length=200)
     cs_created_since  = LooseDF()
     cs_created_before = LooseDF()
+    cs_tags_exclude   = forms.BooleanField(required=False)
 
     def clean_cs_authors(self):
         return get_choice(self.cleaned_data['cs_authors'])
@@ -236,6 +243,7 @@ class RunForm(forms.Form):
     r_finished  = LooseDF()
     r_created_since  = LooseDF()
     r_created_before = LooseDF()
+    r_tags_exclude   = forms.BooleanField(required=False)
 
 def get_prod_queries(data):
     def _get(key):
