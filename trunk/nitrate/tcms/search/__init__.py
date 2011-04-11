@@ -113,13 +113,6 @@ class QueryCriteria(object):
             'pl_created_before': 'create_date__lte',
             'p_product': 'product__in',
         },
-        'product': {
-            'p_product': 'product__in',
-            'p_version': 'version__in',
-            'p_component': 'component__in',
-            'p_category': 'category__in',
-            'p_build': 'build__in',
-        },
         'case': {
             'cs_id': 'case_id',
             'cs_summary': 'summary__startswith',
@@ -298,8 +291,7 @@ def build_queryset(target_queries, target, result_kls, prod_queries=None):
     sq = SearchQuerySet().models(klasses[result_kls])
     target_queries.update(prod_queries)
     qc = QueryCriteria(sq, target_queries, result_kls)
-    qc = qc.filter()
-    return qc
+    return qc.filter()
 
 def evaluate_queryset(queryset, target, ctype):
     attr_map = {
