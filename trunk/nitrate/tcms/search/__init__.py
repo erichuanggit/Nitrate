@@ -31,6 +31,8 @@ from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
 from django.core.management.color import termcolors
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
+from django.utils import simplejson as json
 
 # from tcms
 from tcms.testplans.models import TestPlan, TestPlanType
@@ -138,8 +140,8 @@ class QueryCriteria(object):
             'r_tester': 'tester__in',
             'r_running': 'is_finished',
             'r_tags': 'tags__in',
-            'r_created_since': 'create_date__gte',
-            'r_created_before': 'create_date__lte',
+            'r_created_since': 'start_date__gte',
+            'r_created_before': 'start_date__lte',
             'p_product': 'product__in',
         }
     }
@@ -157,11 +159,10 @@ class QueryCriteria(object):
                 continue
             value   = self.queries.get(key, None)
             if value:
-                print 'applying filter %s : %s' %(key, value)
+                print 'applying filter %s : %s' % (key, value)
                 qs = queryset or self.queryset
                 if key in ('pl_tags', 'r_tags', 'cs_tags') and \
                 self.queries[key+'_exclude']:
-                    print G('to exclude')
                     queryset = qs.exclude(**{rules[key]: value})
                 else:
                     queryset = qs.filter(**{rules[key]: value})
@@ -280,7 +281,7 @@ def advance_search(request, tmpl='search/advanced_search.html'):
     results = sum_queried_results(plans, runs, cases, target)
     end = time.time()
     timecost = round(end - start, 3)
-    return HttpResponse('Time used: ' + str(timecost) + '<br/>' + str(results))
+    return render_results(request, results, timecost)
 
 def build_queryset(target_queries, target, result_kls, prod_queries=None):
     klasses = {
@@ -348,6 +349,45 @@ def sum_queried_results(plans, runs, cases, target):
         return set.intersection(*result)
     else:
         return None
+
+def render_results(request, results, time_cost, tmpl='search/results.html'):
+    klasses = {
+        'plan': {'class': TestPlan, 'result_key': 'test_plans'},
+        'case': {'class': TestCase, 'result_key': 'test_cases'},
+        'run': {'class': TestRun, 'result_key': 'test_runs'}
+    }
+    page    = request.GET.get('page_num', 1)
+    qs      = klasses[request.GET['target']]['class']._default_manager.filter(pk__in=results)
+    pager   = Paginator(qs, settings.SEARCH_PAGING)
+    try:
+        page = pager.page(page)
+        objects = page.object_list
+    except (EmptyPage, InvalidPage):
+        objects = page = None
+    return direct_to_template(request, tmpl,
+        {
+            klasses[request.GET['target']]['result_key']: objects,
+            'pager': pager,
+            'page': page,
+            'total': len(results),
+            'time_cost': time_cost,
+            'results': json.dumps(list(results)),
+            'queries': fmt_queries(request),
+        }
+    )
+
+def fmt_queries(request):
+    '''
+    Format the queries string.
+    '''
+    queries     = request.get_full_path().split('?')[1].split('&')
+    queries     = [q.split('=') for q in queries]
+    queries     = [q for q in queries if q[1]]
+    queries     = [
+        (k.replace('cs_', 'Case ').replace('pl_', 'plan ').replace('r_', 'Run ').replace('_', ' '), v)
+        for k, v in queries
+    ]
+    return queries
 
 if __name__ == '__main__':
     import doctest

@@ -1,0 +1,48 @@
+<table class="list border-bottom" id="testcases_table" cellpadding="0" cellspacing="0" border="0">
+	<thead>
+		<tr>
+			<th width="18px">
+				<a id="id_blind_all_link">
+					<img src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="" class="collapse-all">
+				</a>
+			</th>
+			<th width="20" class="nosort">
+				<input type="checkbox" id="id_checkbox_all_case" title="Select all/Select none">
+			</th>
+			<th width="50">ID</th>
+			<th>Summary</th>
+			<th width="100">Author</th>
+			<th width="130">Default Tester</th>
+			<th width="140">Automated</th>
+			<th width="90" >Status</th>
+			<th width="120">Category</th>
+			<th width="60">Priority</th>
+			<th width="140" colspan='2'>Created</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for test_case in test_cases %}
+		<tr class="case_title {% cycle 'odd' 'even' %}">
+			<td class="expandable">
+				<img class="expand blind_icon" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
+			</td>
+			<td valign="top"><input type="checkbox" name="case" value="{{ test_case.case_id }}"></td>
+			<td valign="top"><a href="{% url tcms.testcases.views.get test_case.case_id %}">{{ test_case.case_id }}</a></td>
+			<td valign="top" class="expandable"><a id="link_{{ test_case.case_id }}" href="{% url tcms.testcases.views.get test_case.case_id %}">{{ test_case.summary }}</a></td>
+			<td valign="top"><a href="{% url tcms.profiles.views.profile test_case.author.username %}">{{ test_case.author }}</a></td>
+			<td valign="top">{% if test_case.default_tester_id %}<a href="{% url tcms.profiles.views.profile test_case.default_tester.username %}">{{ test_case.default_tester }}</a>{% else %}None{% endif %}</td>
+			<td valign="top">{{ test_case.get_is_automated_status }}</td>
+			<td valign="top">{{ test_case.case_status }}</td>
+			<td valign="top">{{ test_case.category }}</td>
+			<td valign="top" align="center">{{ test_case.priority }}</td>
+			<td valign="top" colspan='2'>{{ test_case.create_date }}</td>
+		</tr>
+		
+		<tr class="case_content hide" style="display: none;">
+			<td colspan="11">
+				<div id="id_loading_{{ test_case.pk }}" class="ajax_loading"></div>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
