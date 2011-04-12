@@ -291,7 +291,20 @@ for bugzilla as the bugzilla(testopia) URL.
  * http://docs.djangoproject.com/en/dev/howto/deployment/
 
 == Full-text search using Haystack ==
-    1. Download Haystack using git-clone: https://github.com/toastdriven/django-haystack.git
-    2. Follow(http://docs.haystacksearch.org/1.0/tutorial.html#configuration) to add configurations to settings.py
-    3. Install xapian-core and xapian python bindings. (http://xapian.org/download)
-    4. Run this command to build index: python manage.py rebuild_index
+    1. Download Haystack using git-clone: https://github.com/toastdriven/django-haystack.git and install it
+    2. Install xapian-core and xapian python bindings. (http://xapian.org/download)
+    3. Install xapian-haystack
+    4. New configuration lines in settings.py regarding to searching:
+        5.1. SEARCH_PAGING = 100
+        5.2. In INSTALLED_APPS, append 'haystack'
+        5.3. HAYSTACK_SITECONF = 'tcms.confs.haystack_conf'
+        5.4. HAYSTACK_SEARCH_ENGINE = 'xapian'
+        5.5. HAYSTACK_XAPIAN_PATH = '%s/haystack_index/' % os.path.dirname(__file__)
+    5. Run this command to build index: python manage.py rebuild_index
+
+== Memcache ==
+    1. In settings.py, incorporate this by adding or modifying:
+        CACHE_BACKEND = 'memcached://127.0.0.1:11211/?timeout=300'
+    2. Install memcached and cmemcache(memcache API)
+    3. Run:
+        memcached -m 100 -d
