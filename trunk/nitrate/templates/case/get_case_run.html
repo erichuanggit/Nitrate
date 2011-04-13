@@ -1,21 +1,23 @@
 {% if test_case_runs %}
+<thead>
+	<tr>
+		<th width="18px"></th>
+		<th width="90">Case Run ID</th>
+		<th width="80">Run ID</th>
+		<th>Run Summary</th>
+		<th width="80">Tester</th>
+		<th width="80">Assignee</th>
+		<th width="150">Close date</th>
+		<th width="100">Category</th>
+		<th width="80">Priority</th>
+		<th width="120">Text Version</th>
+		<th width="100">Status</th>
+		<th width="40">Sort</th>
+	</tr>
+</thead>
+{% for plan, test_case_runs in runs_ordered_by_plan %}
+Plan: [{{ plan.pk }}] {{ plan.name }}
 <table class="list" id="id_table_cases" cellspacing="0" cellspan="0">
-	<thead>
-		<tr>
-			<th width="18px"></th>
-			<th width="90">Case Run ID</th>
-			<th width="80">Run ID</th>
-			<th>Run Summary</th>
-			<th width="80">Tester</th>
-			<th width="80">Assignee</th>
-			<th width="150">Close date</th>
-			<th width="100">Category</th>
-			<th width="80">Priority</th>
-			<th width="120">Text Version</th>
-			<th width="100">Status</th>
-			<th width="40">Sort</th>
-		</tr>
-	</thead>
 	<tbody>
 		{% for test_case_run in test_case_runs %}
 		<tr id="id_tr_case_{{ forloop.counter }}" class="case_title {% cycle 'odd' 'even' %}">
@@ -71,6 +73,7 @@
 		{% endfor %}
 	</tbody>
 </table>
+{% endfor %}
 {% else %}
 <div class="list">
 	<span class="prompt-message"><center>No test cases</center></span>

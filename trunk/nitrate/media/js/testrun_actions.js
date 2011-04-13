@@ -863,7 +863,7 @@ function removeRunCC(run_id, user, container)
     constructRunCC(container, run_id, parameters)
 }
 
-function changeCaseRunAssignee(table)
+function changeCaseRunAssignee()
 {
     var p = prompt('Please type new email or username for assignee');
     if(!p)
@@ -873,11 +873,10 @@ function changeCaseRunAssignee(table)
           'info_type': 'users',
           'email__startswith': p,
     }
-    
     getInfoAndUpdateObject(
         parameters,
         'testruns.testcaserun',
-        serializeCaseRunFromInputList(table),
+        serializeCaseRunFromInputList($('id_table_cases')),
         'assignee'
     )
 }
@@ -922,3 +921,114 @@ function showCaseRunsWithSelectedStatus(form, status_id)
     form.case_run_status__pk.value = status_id;
     fireEvent(form.getElementsBySelector('input[type="submit"]')[0], 'click');
 }
+
+/*
+Functions defined below are using jQuery.
+Author: ctang@redhat.com - 22 March 2011 
+*/
+
+function updateBugs(action){
+    var bug_ids = prompt("Specify bug IDs, using comma to seperate multiple IDs.");
+    if(!bug_ids){
+        alert(default_messages.alert.no_bugs_specified);
+        return false;
+    }
+    var runs = serializeCaseRunFromInputList($('id_table_cases'));
+    if(!runs){
+        alert(default_messages.alert.no_case_selected);
+        return false;
+    }
+    jQ.ajax({
+        url: '/caserun/update-bugs-for-many/',
+        dataType: 'json',
+        success: function(res){
+            if(res.rc==0){
+                reloadWindow();
+            }else{
+                alert(res.response);
+                return false;
+            }
+        },
+        data: {
+            'bugs': bug_ids,
+            'action': action,
+            'runs': runs.join(),
+            'bug_system': 1
+        }
+    });
+}
+
+function showCommentForm(){
+    var dialog = getDialog();
+    var comment_form = '<ul>' +
+                            '<li><b>Comments: </b></li>' +
+                            '<li><textarea name="comments" id="commentText" style="width:100%;height:100px;"></textarea></li>' + 
+                            '<li><button id="btnComment">Confirm</button> <button id="btnCancelComment">Cancel</button>' +
+                            ' <span id="commentsErr"></span>' +
+                        '</ul>';
+    dialog.update(comment_form);
+    var commentText = jQ('#commentText');
+    var commentsErr = jQ('#commentsErr');
+    jQ('#btnComment').live('click', function(){
+        var error;
+        var comments = jQ.trim(commentText.val());
+        var runs = serializeCaseRunFromInputList($('id_table_cases'));
+        if(!comments)
+            error = 'No comments given.';
+        if(!runs)
+            error = default_messages.alert.no_case_selected;
+        if(error){
+            commentsErr.html(error);
+            return false;
+        }
+        jQ.ajax({
+            url: '/caserun/comment-many/',
+            data: {'comment': comments, 'run': runs.join()},
+            dataType: 'json',
+            success: function(res){
+                if(res.rc==0){
+                    reloadWindow();
+                }else{
+                    commentsErr.html(res.response);
+                    return false;
+                }
+            }
+        });
+    });
+    jQ('#btnCancelComment').live('click', function(){
+        dialog.hide();
+        commentText.val('');
+    });
+    dialog.show();
+}
+
+function commentCaseRuns(){
+    // comment multiple caseruns at a time.
+
+    dialog.update();
+    dialog.show();
+    
+}
+
+jQ(document).ready(function(){
+    jQ('.btnBlueCaserun').mouseover(function(){
+        jQ(this).find('ul').show();
+    }).mouseout(function(){
+        jQ(this).find('ul').hide();
+    });
+    jQ('ul.statusOptions a').click(function(){
+        var option = jQ(this).attr('value');
+        var object_pks = serializeCaseRunFromInputList($('id_table_cases'));
+        if(option == '')
+            return false;
+        if(object_pks.length == 0) {
+            alert(default_messages.alert.no_case_selected);
+            return false;
+        };
+        if(!confirm(default_messages.confirm.change_case_status))
+            return false;
+        updateObject('testruns.testcaserun', object_pks, 'case_run_status', option, 'int', reloadWindow);
+    });
+    // URL updating bugs: /caserun/update-bugs-for-many/
+    // URL commenting bugs: /caserun/comment-many/
+});

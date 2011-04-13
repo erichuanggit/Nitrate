@@ -323,7 +323,7 @@ def get(request, case_id, template_name = 'case/get.html'):
     """Get the case content"""
     from tcms.testruns.models import TestCaseRunStatus
     from tcms.core.utils.raw_sql import RawSQL
-    
+    from itertools import groupby
     # Get the case
     try:
         tc = TestCase.objects.select_related(
@@ -354,7 +354,10 @@ def get(request, case_id, template_name = 'case/get.html'):
     tcrs = tcrs.extra(select={
         'num_bug': RawSQL.num_case_run_bugs,
     })
-    
+    runs_ordered_by_plan = groupby(tcrs, lambda t: t.run.plan)
+    # FIXME: Just don't know why Django template does not evaluate a generator,
+    # and had to evaluate the groupby generator manually like below.
+    runs_ordered_by_plan = [(k, list(v)) for k, v in runs_ordered_by_plan]
     # Get the specific test case run
     if request.REQUEST.get('case_run_id'):
         tcr = tcrs.get(pk = request.REQUEST['case_run_id'])
@@ -384,6 +387,7 @@ def get(request, case_id, template_name = 'case/get.html'):
         'test_plan': tp,
         'test_plans': tps,
         'test_case_runs': tcrs,
+        'runs_ordered_by_plan': runs_ordered_by_plan,
         'test_case_run': tcr,
         'test_case_text': tc_text,
         'test_case_status': TestCaseStatus.objects.all(),

@@ -9,45 +9,50 @@
 		<label for="id_check_box_highlight">Highlight My Assigned Runs</label>
 	</div>
 	<div class="reorder_case">
-		<select id="id_mass_change_case_run_status" name="case_run_status">
-			<option value="">Set Status</option>
-			{% for tcrs in test_case_run_status %}
-			<option value="{{ tcrs.pk }}">{{ tcrs }}</option>
-			{% endfor %}
-		</select>
-		{% comment %}
-		{% if perms.comments.add_comment %}
-		<input type='button' class='comment_add' value='Add Comment' title="Add comment to these selected cases">
-		{% else%}
-		<input type='button' class='comment_add_disable' value='Add Comment' title="Add comment to these selected cases">
-		{% endif %}
-		{% if perms.testcases.add_testcasebug %}
-		<input type='button' class='bug_add' value='Add Bug' title="Add new bug to these selected cases">
-		{% else %}
-		<input type='button' class='bug_add_disable' value='Add Bug' title="Add new bug to these selected cases">
-		{% endif %}
-		{% endcomment %}
-		{% if perms.testruns.change_testcaserun %}
-		<a class="assignee sprites" href="#" title="Assignee this case(s) to other people" onclick="changeCaseRunAssignee(this.up(2).next());">Assignee</a>
-		{% endif %}
-		{% if perms.testruns.add_testcaserun %}
-		<a href="{% url tcms.testruns.views.assign_case test_run.run_id %}" class="add">Add Case</a>
-		{% else %}
-		<span class="adddisable grey sprites" >Add Case</span>
-		{% endif %}
-		{% if perms.testruns.delete_testcaserun %}
-		<a class="deletelink" href="#" title="Remove selected cases form this test run" onclick="delCaseRun('{{ test_run.run_id }}');">Remove Case</a>
-		{% else %}
-		<span class="actions"><input type="button" disabled="true" class="delete" value="Remove case"/></span>
-		{% endif %}
-		{% if perms.testruns.change_testcaserun %}
-		<a id="id_sort" class="sortlink" title="Click me,then Drag and drop the rows to adjust the order,and click 'Done Sorting' link to submit your changes">Re-order Cases</a>
-		<a title="Update the IDLE case runs to newest case text" href="javascript:void(0)" class="updatelink" onclick="postToURL('{% url tcms.testruns.views.update_case_run_text test_run.pk %}', serializeCaseRunFromInputList(this.up(2).next(), 'case_run'))">Update</a>
-		{% else %}
-		<span class="sortlink grey" >Re-order Cases</span>
-		<span class="updategrey">Update</span>
-		{% endif %}
-		<a title="Click to show filter case-run options" class="btn_filter filtercase" id='filter_case_run'>Show filter options</a>
+		<div class="btnBlueCaserun">
+			<span>Cases</span>
+			<ul>
+				{% if perms.testruns.add_testcaserun %}
+				<li><a href="{% url tcms.testruns.views.assign_case test_run.run_id %}">Add</a></li>
+				{% endif %}
+				{% if perms.testruns.delete_testcaserun %}
+				<li><a href="#" title="Remove selected cases form this test run" onclick="delCaseRun('{{ test_run.run_id }}');">Remove</a></li>
+				{% endif %}
+				{% if perms.testruns.change_testcaserun %}
+				<li><a id="id_sort" title="Click me,then Drag and drop the rows to adjust the order,and click 'Done Sorting' link to submit your changes" href="#">Re-order</a></li>
+				<li><a href="#" title="Update the IDLE case runs to newest case text" href="javascript:void(0)" onclick="postToURL('{% url tcms.testruns.views.update_case_run_text test_run.pk %}', serializeCaseRunFromInputList(this.up(2).next(), 'case_run'))">Update</a></li>
+				{% endif %}
+				{% if perms.testruns.change_testcaserun %}
+				<li><a href="#" title="Assignee this case(s) to other people" onclick="changeCaseRunAssignee();">Assignee</a></li>
+				{% endif %}
+			</ul>
+		</div>
+		<div class="btnBlueCaserun">
+			<span>Status</span>
+			<ul class="statusOptions">
+				{% for tcrs in test_case_run_status %}
+				<li><a value="{{ tcrs.pk }}" href="#">{{ tcrs }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+		<div class="btnBlueCaserun">
+			<span>Bugs</span>
+			<ul>
+				<li><a href="javascript:_void();" onclick="updateBugs('add')">Add</a></li>
+				<li><a href="javascript:_void();" onclick="updateBugs('remove')">Remove</a></li>
+			</ul>
+		</div>
+		<div class="btnBlueCaserun">
+			<span>Comment</span>
+			<ul>
+				<li><a href="javascript:_void();" onclick="showCommentForm();">Add</a></li>
+			</ul>
+		</div>
+		<ul class="btnBlue btnBlueFilter">
+			<li class="btnBlueL"></li>
+			<li class="btnBlueC"><a title="Click to show filter case-run options" id='filter_case_run'>Show filter options</a></li>
+			<li class="btnBlueR"></li>
+		</ul>
 	</div>
 </div>
 </form>

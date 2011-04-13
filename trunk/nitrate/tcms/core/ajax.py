@@ -27,22 +27,22 @@ from django.http import HttpResponse
 from django.utils import simplejson
 from django.views.generic.simple import direct_to_template
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.models import User
 
 from tcms.testplans.models import TestPlan, TestCasePlan
-from tcms.testcases.models import TestCase, TestCaseTag
+from tcms.testcases.models import TestCase, TestCaseTag, TestCaseBugSystem as BugSystem
 from tcms.testruns.models import TestRun, TestCaseRun, TestRunTag
 from tcms.management.models import TestTag
-
 from tcms.core.utils import get_string_combinations
+from tcms.core.helpers.comments import add_comment
 
-def check_permission(request, perm, response = {}):
-    """Shared function for check permission"""
+import datetime
+
+def check_permission(request, ctype):
+    perm = '%s.change_%s' % tuple(ctype.split('.'))
     if request.user.has_perm(perm):
         return True
-    
-    response['rc'] = 1
-    response['response'] = 'Permission denied'
-    return response
+    return False
 
 def strip_parameters(request, skip_parameters):
     parameters = {}
@@ -290,87 +290,99 @@ def tag(request, template_name="management/get_tag.html"):
     
     return HttpResponse('')
 
-def update(request):
-    """Modify the object attributes"""
-    import datetime
-    from django.utils import simplejson
-    # Initial the response
-    ajax_response = { 'rc': 0, 'response': 'ok' }
-    now = datetime.datetime.now()
-    # Initial the data
-    data = request.REQUEST.copy()
-    ctype = data.get("content_type")
-    vtype = data.get('value_type', 'str')
-    object_pk = data.getlist("object_pk")
-    field = data.get('field')
-    value = data.get('value')
-    
-    if not field or not value or not object_pk or not ctype:
-        ajax_response['rc'] = 1
-        ajax_response['response'] = 'Following fields are required - content_type, object_pk, field and value.'
-        return HttpResponse(simplejson.dumps(ajax_response))
-    
-    # Convert the value type
-    # FIXME: Django bug here: update() keywords must be strings
-    field = str(field)
-    value_types = {
+def get_value_by_type(val, v_type):
+    '''
+    >>> get_value_by_type('True', 'bool')
+    (1, None)
+    >>> get_value_by_type('19860624 123059', 'datetime')
+    (datetime.datetime(1986, 6, 24, 12, 30, 59), None)
+    >>> get_value_by_type('5', 'int')
+    ('5', None)
+    >>> get_value_by_type('string', 'str')
+    ('string', None)
+    >>> get_value_by_type('everything', 'None')
+    (None, None)
+    >>> get_value_by_type('buggy', 'buggy')
+    (None, 'Unsupported value type.')
+    >>> get_value_by_type('string', 'int')
+    (None, "invalid literal for int() with base 10: 'string'")
+    '''
+    value = error = None
+    def get_time(time):
+        DT = datetime.datetime
+        if time == 'NOW': return DT.now()
+        return DT.strptime(time, '%Y%m%d %H%M%S')
+    pipes = {
         # Temporary solution is convert all of data to str
         # 'bool': lambda x: x == 'True',
         'bool': lambda x: x == 'True' and 1 or 0,
-        'datetime': lambda x: x == 'NOW' and str(now) or str(datetime.datetime(x)), # FIXME
+        'datetime': get_time,
         'int': lambda x: str(int(x)),
         'str': lambda x: str(x),
         'None': lambda x: None,
     }
-    try:
-        value = value_types.get(vtype)(value)
-    except TypeError, error:
-        ajax_response['rc'] = 1
-        ajax_response['response'] = 'Value type caused to error - '  + error
-        return HttpResponse(simplejson.dumps(ajax_response))
-    
-    # Check permission
-    no_perms = check_permission(
-        request = request,
-        perm = '%s.change_%s' % tuple(ctype.split('.')),
-        response = ajax_response,
-    )
-    
-    if not isinstance(no_perms, bool) and bool:
-        return HttpResponse(simplejson.dumps(no_perms))
-    
-    # Get object
-    try:
-        model = models.get_model(*ctype.split(".", 1))
-        targets = model._default_manager.filter(pk__in = object_pk)
-    except:
-        raise
-    
-    if not targets:
-        ajax_response['rc'] = 1
-        ajax_response['response'] = 'You specific content(s) is not exist in database.'
-        return HttpResponse(simplejson.dumps(ajax_response))
-    
+    pipe = pipes.get(v_type, None)
+    if pipe is None:
+        error = 'Unsupported value type.'
+    else:
+        try: value = pipe(val)
+        except Exception, e: error = str(e)
+    return value, error
+
+def say_no(error_msg):
+    ajax_response = { 'rc': 1, 'response': error_msg}
+    return HttpResponse(simplejson.dumps(ajax_response))
+
+def say_yes():
+    return HttpResponse(simplejson.dumps({'rc': 0, 'response': 'ok'}))
+
+def update(request):
+    '''
+    Generic approach to update a model,\n
+    based on contenttype.
+    '''
+    error = None
+    now = datetime.datetime.now()
+
+    data    = request.REQUEST.copy()
+    ctype   = data.get("content_type")
+    vtype   = data.get('value_type', 'str')
+    object_pk = data.getlist("object_pk")
+    field     = data.get('field')
+    value     = data.get('value')
+
+    if not field or not value or not object_pk or not ctype:
+        return say_no('Following fields are required - content_type, object_pk, field and value.')
+
+    # Convert the value type
+    # FIXME: Django bug here: update() keywords must be strings
+    field = str(field)
+
+    value, error = get_value_by_type(value, vtype)
+    if error: return say_no(error)
+    has_perms = check_permission(request,ctype)
+    if not has_perms: return say_no('Permission Dinied.')
+
+    model = models.get_model(*ctype.split(".", 1))
+    targets = model._default_manager.filter(pk__in=object_pk)
+
+    if not targets: return say_no('No record found')
     if not hasattr(targets[0], field):
-        ajax_response['rc'] = 1
-        ajax_response['response'] = 'Not field %s for context_type %s' % (
-            field, ctype
-        )
-        return HttpResponse(simplejson.dumps(ajax_response))
-    
+        return say_no('%s has no field %s' % (ctype, field))
+
     if hasattr(targets[0], 'log_action'):
-        try:
-            for t in targets:
+        for t in targets:
+            try:
                 t.log_action(
                     who = request.user,
                     action = 'Field %s changed from %s to %s.' % (
                         field, getattr(t, field), value
                     )
                 )
-        except:
-            raise
+            except (AttributeError, User.DoesNotExist):
+                pass
     targets.update(**{field: value})
-    
+
     if hasattr(model, 'mail_scene'):
         from tcms.core.utils.mailto import mailto
         mail_context = model.mail_scene(
@@ -382,13 +394,13 @@ def update(request):
                 mailto(**mail_context)
             except:
                 pass
-    
+
     # Special hacking for updating test case run status
     # https://bugzilla.redhat.com/show_bug.cgi?id=658160 
     if ctype == 'testruns.testcaserun' and field == 'case_run_status':
         if len(targets) == 1:
             targets[0].set_current()
-        
+
         for t in targets:
             field = 'close_date'
             t.log_action(
@@ -405,19 +417,88 @@ def update(request):
                         field, getattr(t, field), request.user
                     )
                 )
-            
+
             field = 'assignee'
-            if t.assignee != request.user:
-                t.log_action(
-                    who = request.user,
-                    action = 'Field %s changed from %s to %s.' % (
-                        field, getattr(t, field), request.user
+            try:
+                assignee = t.assginee
+                if assignee != request.user:
+                    t.log_action(
+                        who = request.user,
+                        action = 'Field %s changed from %s to %s.' % (
+                            field, getattr(t, field), request.user
+                        )
                     )
-                )
-                #t.assignee = request.user
-            t.save()
+                    #t.assignee = request.user
+                t.save()
+            except (AttributeError, User.DoesNotExist):
+                pass
         targets.update(close_date = now)
         targets.update(tested_by = request.user)
-    
-    del ctype, object_pk, field, value, targets
-    return HttpResponse(simplejson.dumps(ajax_response))
+    return say_yes()
+
+def comment_case_runs(request):
+    '''
+    Add comment to one or more caseruns at a time.
+    '''
+    data    = request.REQUEST.copy()
+    comment = data.get('comment', None)
+    if not comment: return say_no('Comments needed')
+    run_ids = [i for i in data.get('run', '').split(',') if i]
+    if not run_ids: return say_no('No runs selected.');
+    runs    = TestCaseRun.objects.filter(pk__in=run_ids)
+    if not runs: return say_no('No caserun found.')
+    add_comment(runs, comment, request.user)
+    return say_yes()
+
+def clean_bug_form(request):
+    '''
+    Verify the form data, return a tuple\n
+    (None, ERROR_MSG) on failure\n
+    or\n
+    (data_dict, '') on success.\n
+    '''
+    data        = dict(request.REQUEST)
+    bug_ids     = data.get('bugs', '')
+    run_ids     = data.get('runs', '')
+    bug_system  = data.get('bug_system')
+    action      = data.get('action')
+    try:
+        data['bugs']    = map(int, bug_ids.split(','))
+        data['runs']    = map(int, run_ids.split(','))
+        bug_system      = int(bug_system)
+    except (TypeError, ValueError), e:
+        return (None, 'Please specify only integers for bugs, caseruns(using comma to seperate IDs),\
+                and bug_system. (DEBUG INFO: %s)' % str(e))
+    if action not in ('add', 'remove'):
+        return (None, 'Actions only allow "add" and "remove".')
+    try:
+        data['bug_system'] = BugSystem.objects.get(pk=bug_system)
+    except BugSystem.DoesNotExist:
+        return (None, 'Specified bug system does not exist yet.')
+    return (data, '')
+
+def update_bugs_to_caseruns(request):
+    '''
+    Add one or more bugs to or remove that from\n
+    one or more caserun at a time.
+    '''
+    data, error = clean_bug_form(request)
+    if error: return say_no(error)
+    runs    = TestCaseRun.objects.filter(pk__in=data['runs'])
+    bg_sys  = data['bug_system']
+    bugs    = data['bugs']
+    action  = data['action']
+    try:
+        for run in runs:
+            for bug in bugs:
+                if action == 'add':
+                    run.add_bug(bug_id=bug, bug_system=bg_sys)
+                else:
+                    run.remove_bug(bug)
+    except Exception, e:
+        return say_no(str(e))
+    return say_yes()
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
