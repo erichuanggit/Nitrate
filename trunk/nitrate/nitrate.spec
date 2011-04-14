@@ -9,7 +9,7 @@ Summary:        Test Case Management System
 Group:          Development/Languages
 License:        GPLv2+
 URL:            https://fedorahosted.org/nitrate/browser/trunk/nitrate
-Source0:        https://fedorahosted.org/releases/n/i/nitrate/%{name}-%{version}-%{release}.tar.bz2
+Source0:        https://fedorahosted.org/releases/n/i/nitrate/%{name}-%{version}.tar.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:      noarch
@@ -86,7 +86,7 @@ grep -E "^\|error[ ]*\|0[ ]*\|" pylint.log || exit 1
 rm -rf $RPM_BUILD_ROOT
 %{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
 
-# Move static content from 32/64bit-specific python dir to shared data dir:
+# Copy static content from 32/64bit-specific python dir to shared data dir:
 mkdir -p ${RPM_BUILD_ROOT}%{_datadir}/%{name}
 mkdir -p ${RPM_BUILD_ROOT}%{_docdir}/%{name}
 
@@ -112,7 +112,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc docs/INSTALL docs/AUTHORS docs/ChangeLog docs/README docs/RELEASENOTES docs/UPGRADING docs/XMLRPC docs/testopia-dump-blank.sql docs/mysql_initial.sql
 %{python_sitelib}/tcms/
 %{python_sitelib}/Nitrate-%{version}.*-py*.egg-info/
-%{_datadir}/%{name}/*
+%{_datadir}/%{name}
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 
 
