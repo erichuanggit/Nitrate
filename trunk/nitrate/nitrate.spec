@@ -2,8 +2,8 @@
 %define use_pylint 0
 
 Name:           nitrate
-Version:        3.3
-Release:        4%{?dist}
+Version:        3.3.4
+Release:        1%{?dist}
 Summary:        Test Case Management System
 
 Group:          Development/Languages
