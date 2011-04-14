@@ -39,7 +39,7 @@ $(TARBALL): Makefile
 	# RPM version-release:
 	@cd $(SOURCE_DIR); sed --in-place -r 's|NITRATE_VERSION|$(VERSION)|' $(SOURCE_DIR)/nitrate/templates/tcms_base.html
 	@cd $(SOURCE_DIR); mv nitrate nitrate-${VERSION}
-	@cd $(SOURCE_DIR); tar --bzip2 --exclude .git -cSpf $(TARBALL) nitrate-${VERSION}
+	@cd $(SOURCE_DIR); tar --bzip2 --exclude .git -cSpf $(TARBALL) nitrate-${VERSION}-${RELEASE}
 	@cp $(SOURCE_DIR)/$(TARBALL) .
 
 src-rpm: $(SRPM)

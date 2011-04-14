@@ -23,7 +23,7 @@ import tcms
 from setuptools import setup, find_packages
 
 PACKAGE_NAME = 'Nitrate'
-PACKAGE_VER = '3.3.0'
+PACKAGE_VER = '3.3.4'
 PACKAGE_DESC = 'Test Case Management System'
 PACKAGE_URL = 'https://fedorahosted.org/nitrate/browser/trunk/nitrate'
 
@@ -54,7 +54,7 @@ setup(
     packages=find_packages(exclude='tests'),
     # package_data=get_package_data(),
     install_requires=[
-        'Django>=1.1.0',
+        'Django>=1.2.3',
         'MySQLdb',
         'kerberos',
         'memcached',
