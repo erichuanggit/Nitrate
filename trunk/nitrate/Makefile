@@ -7,7 +7,7 @@ NAME=$(shell rpm -q --qf "%{NAME}\n" --specfile $(SPECFILE)|head -n1)
 VERSION=$(shell rpm -q --qf "%{VERSION}\n" --specfile $(SPECFILE)|head -n1)
 RELEASE=$(shell rpm -q --qf "%{RELEASE}\n" --specfile $(SPECFILE)|head -n1)
 
-SRPM=$(NAME)-$(VERSION)-$(RELEASE).src.rpm
+SRPM=$(NAME)-$(VERSION).src.rpm
 TARBALL=nitrate-$(VERSION).tar.bz2
 PWD=$(shell pwd)
 RPMBUILD_OPTIONS=--nodeps --define "_sourcedir $(PWD)" --define "_srcrpmdir $(PWD)"
