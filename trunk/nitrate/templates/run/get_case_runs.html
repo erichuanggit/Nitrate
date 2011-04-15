@@ -2,28 +2,33 @@
 <form id="id_form_case_runs">
 <div class="mixbar"> 
 	<span class="tit" style='float:left'>Cases: {{ test_case_runs.count }}</span>
-	<div class='mixbar_left'>
+	<ul class="btnBlue btnBlueFilter" id="showFilterBtn">
+		<li class="btnBlueL"></li>
+		<li class="btnBlueC"><a title="Click to show filter case-run options" id='filter_case_run'>Show filter options</a></li>
+		<li class="btnBlueR"></li>
+	</ul>
+	<div class='right_float tit'>
 		<input id="id_check_box_auto_blinddown" type="checkbox" checked="true" />
-		<label for="id_check_box_auto_blinddown">Automatically display next test case</label>
+		<label for="id_check_box_auto_blinddown" title="Automatically display next text case">Automatically</label>
 		<input id="id_check_box_highlight" type="checkbox" />
-		<label for="id_check_box_highlight">Highlight My Assigned Runs</label>
+		<label for="id_check_box_highlight" title="Highlight my assigned runs">Highlight</label>
 	</div>
-	<div class="reorder_case">
+	<div>
 		<div class="btnBlueCaserun">
 			<span>Cases</span>
 			<ul>
 				{% if perms.testruns.add_testcaserun %}
-				<li><a href="{% url tcms.testruns.views.assign_case test_run.run_id %}">Add</a></li>
+				<li><a href="{% url tcms.testruns.views.assign_case test_run.run_id %}" class="addBlue9">Add</a></li>
 				{% endif %}
 				{% if perms.testruns.delete_testcaserun %}
-				<li><a href="#" title="Remove selected cases form this test run" onclick="delCaseRun('{{ test_run.run_id }}');">Remove</a></li>
+				<li><a href="#" title="Remove selected cases form this test run" onclick="delCaseRun('{{ test_run.run_id }}');" class="removeBlue9">Remove</a></li>
 				{% endif %}
 				{% if perms.testruns.change_testcaserun %}
-				<li><a id="id_sort" title="Click me,then Drag and drop the rows to adjust the order,and click 'Done Sorting' link to submit your changes" href="#">Re-order</a></li>
-				<li><a href="#" title="Update the IDLE case runs to newest case text" href="javascript:void(0)" onclick="postToURL('{% url tcms.testruns.views.update_case_run_text test_run.pk %}', serializeCaseRunFromInputList(this.up(2).next(), 'case_run'))">Update</a></li>
+				<li><a id="id_sort" title="Click me,then Drag and drop the rows to adjust the order,and click 'Done Sorting' link to submit your changes" href="#" class="reorderBlue9">Re-order</a></li>
+				<li><a href="#" title="Update the IDLE case runs to newest case text" href="javascript:void(0)" onclick="postToURL('{% url tcms.testruns.views.update_case_run_text test_run.pk %}', serializeCaseRunFromInputList(this.up(2).next(), 'case_run'))" class="updateBlue9">Update</a></li>
 				{% endif %}
 				{% if perms.testruns.change_testcaserun %}
-				<li><a href="#" title="Assignee this case(s) to other people" onclick="changeCaseRunAssignee();">Assignee</a></li>
+				<li><a href="#" title="Assignee this case(s) to other people" onclick="changeCaseRunAssignee(this.up(2).next());" class="assigneeBlue9">Assignee</a></li>
 				{% endif %}
 			</ul>
 		</div>
@@ -31,76 +36,75 @@
 			<span>Status</span>
 			<ul class="statusOptions">
 				{% for tcrs in test_case_run_status %}
-				<li><a value="{{ tcrs.pk }}" href="#">{{ tcrs }}</a></li>
+				<li><a value="{{ tcrs.pk }}" href="#" class="{{ tcrs|lower }}Blue9">{{ tcrs }}</a></li>
 				{% endfor %}
 			</ul>
 		</div>
 		<div class="btnBlueCaserun">
 			<span>Bugs</span>
 			<ul>
-				<li><a href="javascript:_void();" onclick="updateBugs('add')">Add</a></li>
-				<li><a href="javascript:_void();" onclick="updateBugs('remove')">Remove</a></li>
+				<li><a href="javascript:_void();" onclick="updateBugs('add')" class="addBlue9">Add</a></li>
+				<li><a href="javascript:_void();" onclick="updateBugs('remove')" class="removeBlue9">Remove</a></li>
 			</ul>
 		</div>
 		<div class="btnBlueCaserun">
 			<span>Comment</span>
 			<ul>
-				<li><a href="javascript:_void();" onclick="showCommentForm();">Add</a></li>
+				<li><a href="#" class="addBlue9">Add</a></li>
+				<li><a href="#" class="removeBlue9">Remove</a></li>	
 			</ul>
 		</div>
-		<ul class="btnBlue btnBlueFilter">
-			<li class="btnBlueL"></li>
-			<li class="btnBlueC"><a title="Click to show filter case-run options" id='filter_case_run'>Show filter options</a></li>
-			<li class="btnBlueR"></li>
-		</ul>
 	</div>
+	<div class="clear"></div>
 </div>
 </form>
 <form id="id_filter" action="." method="get" style='display:none'>
-	<input type="hidden" name="order_by" value="{{ REQUEST_CONTENTS.order_by }}" />
-	<div class="leftlistinfo">
-		<div class="listinfo">
-			<span class="title"><label for="id_summary">Summary</label></span>
-			<input id="id_summary" type="text" name="case__summary__icontains" value="{{ REQUEST_CONTENTS.case__summary__icontains }}" />
+	<div style="border:1px solid #235D9F; margin:2px; padding:8px; background:#DEEAF7;">
+		<input type="hidden" name="order_by" value="{{ REQUEST_CONTENTS.order_by }}" />
+		<div class="leftlistinfo">
+			<div class="listinfo">
+				<span class="title"><label for="id_summary">Summary&nbsp;:</label></span>
+				<input id="id_summary" type="text" name="case__summary__icontains" value="{{ REQUEST_CONTENTS.case__summary__icontains }}" />
+			</div>
+			<div class="listinfo">
+				<span class="title"><label for="id_default_tester">Default tester&nbsp;:</label></span>
+				<input id="id_default_tester" type="text" name="tested_by__email__startswith" value="{{ REQUEST_CONTENTS.tested_by__email__startswith }}" />
+			</div>
+			<div class="listinfo">
+				<span class="title"><label for="id_assignee">Assignee&nbsp;:</label></span>
+				<input id="id_assignee" type="text" name="assignee__email__startswith" value="{{ REQUEST_CONTENTS.assignee__email__startswith }}" />
+			</div>
 		</div>
-		<div class="listinfo">
-			<span class="title"><label for="id_default_tester">Default tester</label></span>
-			<input id="id_default_tester" type="text" name="tested_by__email__startswith" value="{{ REQUEST_CONTENTS.tested_by__email__startswith }}" />
+		<div class="rightlistinfo">
+			<div class="listinfo">
+				<span class="title"><label for="id_bug">Bug&nbsp;:</label></span>
+				<input id="id_bug" type="text" name="case_run_bug__bug_id__in" value="{{ REQUEST_CONTENTS.case_run_bug__bug_id__in }}" />
+				<span class='grey'>You can type multiple bugs by comma.</span>
+			</div>
+			<div class="listinfo">
+				<span class="title"><label for="id_case_run_status">Status&nbsp;:</label></span>
+				<select id="id_case_run_status" name="case_run_status__pk">
+					<option value="">--------</option>
+					{% for case_run_status in test_case_run_status %}
+					<option value="{{ case_run_status.pk }}" {% ifequal case_run_status.pk REQUEST_CONTENTS.case_run_status__pk|smart_int %}selected="selected"{% endifequal %}>{{ case_run_status }}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<div class="listinfo">
+				<span class="title"><label for="id_priority">Priority&nbsp;:</label></span>
+				<select id="id_priority" name="case__priority__pk">
+					<option value="">--------</option>
+					{% for priority in priorities %}
+					<option value="{{ priority.pk }}" {% ifequal priority.pk REQUEST_CONTENTS.case__priority__pk|smart_int %}selected="selected"{% endifequal %}>{{ priority }}</option>
+					{% endfor %}
+				</select>
+			</div>
 		</div>
-		<div class="listinfo">
-			<span class="title"><label for="id_assignee">Assignee</label></span>
-			<input id="id_assignee" type="text" name="assignee__email__startswith" value="{{ REQUEST_CONTENTS.assignee__email__startswith }}" />
-		</div>
+		<div class='clear'></div>
+		<div class='button_box2'>
+		<input type="submit" value='Search' />
+		<input type="reset" value='Reset' />
 	</div>
-	<div class="rightlistinfo">
-		<div class="listinfo">
-			<span class="title"><label for="id_bug">Bug</label></span>
-			<input id="id_bug" type="text" name="case_run_bug__bug_id__in" value="{{ REQUEST_CONTENTS.case_run_bug__bug_id__in }}" />
-			<span class='grey'>You can type multiple bugs by comma.</span>
-		</div>
-		<div class="listinfo">
-			<span class="title"><label for="id_case_run_status">Status</label></span>
-			<select id="id_case_run_status" name="case_run_status__pk">
-				<option value="">--------</option>
-				{% for case_run_status in test_case_run_status %}
-				<option value="{{ case_run_status.pk }}" {% ifequal case_run_status.pk REQUEST_CONTENTS.case_run_status__pk|smart_int %}selected="selected"{% endifequal %}>{{ case_run_status }}</option>
-				{% endfor %}
-			</select>
-		</div>
-		<div class="listinfo">
-			<span class="title"><label for="id_priority">Priority</label></span>
-			<select id="id_priority" name="case__priority__pk">
-				<option value="">--------</option>
-				{% for priority in priorities %}
-				<option value="{{ priority.pk }}" {% ifequal priority.pk REQUEST_CONTENTS.case__priority__pk|smart_int %}selected="selected"{% endifequal %}>{{ priority }}</option>
-				{% endfor %}
-			</select>
-		</div>
-	</div>
-	<div class='clear'></div>
-	<div class='button_box2'>
-	<input type="submit" value='Search' />
-	<input type="reset" value='Reset' />
 	</div>
 </form>
 
@@ -147,13 +151,13 @@
 				<input type="hidden" name="case" value="{{ test_case_run.case.pk }}" />
 				<input type="hidden" name="case_text_version" value="{{ test_case_run.case_text_version }}" />
 			</td>
-			<td title="expand test case" class="expandable center vmiddle case_title">
+			<td title="expand test case" class="expandable vmiddle case_title">
 				<img class="blind_icon expand" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="" />
 			</td>
-			<td class="case_title center expandable">
+			<td class="case_title expandable">
 				<a href="#caserun_{{ test_case_run.pk }}">#{{ test_case_run.pk }}</a>
 			</td>
-			<td class="case_title expandable center">
+			<td class="case_title expandable">
 				<a href="{% url tcms.testcases.views.get test_case_run.case_id %}?from_plan={{ test_case_run.run.plan_id }}">{{ test_case_run.case_id }}</a>
 			</td>
 			
@@ -174,13 +178,13 @@
 				None
 				{% endif %}
 			</td>
-			<td class="expandable center">{{ test_case_run.case.category }}</td>
-			<td class="expandable center">{{ test_case_run.case.priority }}</td>
-			<td class="expandable center"><span {% if test_case_run.num_bug %}class="have_bug"{% endif %}>{{ test_case_run.num_bug }}</span></td>
+			<td class="expandable">{{ test_case_run.case.category }}</td>
+			<td class="expandable">{{ test_case_run.case.priority }}</td>
+			<td class="expandable"><span {% if test_case_run.num_bug %}class="have_bug"{% endif %}>{{ test_case_run.num_bug }}</span></td>
 			<td class="expandable center">
 				<img border="0" alt="" class="icon_status btn_{{ test_case_run.case_run_status.name.lower }}" />
 			</td>
-			<td class="expandable center">
+			<td class="expandable">
 				<span class="mark">
 					<a href="#" onclick="changeCaseRunOrder('{{ test_case_run.run_id }}', '{{ test_case_run.pk }}', '{{ test_case_run.sortkey }}')">{{ test_case_run.sortkey }}</a>
 				</span>
@@ -198,3 +202,13 @@
 		{% endfor %}
 	</tbody>
 </table>
+<!--
+<div class="popTextarea">
+	<h4>Add Comment</h4>
+	<p>Specify bug IDs, using comma to seperate multiple IDs.</p>
+	<textarea cols="50" rows="10"></textarea>
+	<div class="btnBottom"><input type="button" value="Submit"><input type="button" value="Cancel"></div>
+</div>
+-->
+
+
