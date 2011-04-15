@@ -99,8 +99,8 @@ class QueryCriteria(object):
             'cs_status', 'cs_auto', 'cs_proposed', 'cs_priority', 'cs_created_since',
             'cs_created_before', 'p_version', 'p_component', 'p_category'),
         'run': (
-            'r_id','r_summary', 'r_manager', 'r_tester', 'r_running',
-            'r_tags', 'r_created_since', 'r_created_before', 'p_product',)
+            'r_id','r_summary', 'r_manager', 'r_tester', 'r_real_tester', 'r_running',
+            'r_tags', 'r_created_since', 'r_created_before', 'p_product', 'p_build')
     }
 
     RULES = {
@@ -114,6 +114,7 @@ class QueryCriteria(object):
             'pl_created_since': 'create_date__gte',
             'pl_created_before': 'create_date__lte',
             'p_product': 'product__in',
+            'p_component': 'component__in'
         },
         'case': {
             'cs_id': 'case_id',
@@ -138,11 +139,13 @@ class QueryCriteria(object):
             'r_summary': 'summary__startswith',
             'r_manager': 'manager__in',
             'r_tester': 'tester__in',
-            'r_running': 'is_finished',
+            'r_running': 'is_finished__in',
             'r_tags': 'tags__in',
             'r_created_since': 'start_date__gte',
             'r_created_before': 'start_date__lte',
+            'r_real_tester': 'real_tester__in',
             'p_product': 'product__in',
+            'p_build': 'build__in',
         }
     }
 
@@ -159,7 +162,8 @@ class QueryCriteria(object):
                 continue
             value   = self.queries.get(key, None)
             if value:
-                print 'applying filter %s : %s' % (key, value)
+                if settings.DEBUG:
+                    print 'applying filter %s : %s' % (key, value)
                 qs = queryset or self.queryset
                 if key in ('pl_tags', 'r_tags', 'cs_tags') and \
                 self.queries[key+'_exclude']:
@@ -227,61 +231,76 @@ class CaseForm(forms.Form):
         return get_choice(self.cleaned_data['cs_tags'])
 
 class RunForm(forms.Form):
+    STATUS_CHOICE = (
+        (True, 'running'),
+        (False, 'finished')
+    )
     r_id        = forms.IntegerField(required=False)
     r_summary   = LooseCF(max_length=100)
     r_manager   = LooseCF(max_length=30)
     r_tester    = LooseCF(max_length=30)
     r_tags      = LooseCF(max_length=10)
-    r_running   = forms.BooleanField(required=False)
+    r_running   = forms.MultipleChoiceField(
+                    required=False,
+                    choices=STATUS_CHOICE)
     r_begin     = LooseDF()
     r_finished  = LooseDF()
     r_created_since  = LooseDF()
     r_created_before = LooseDF()
     r_tags_exclude   = forms.BooleanField(required=False)
+    r_real_tester    = LooseCF(max_length=30)
+
+    def clean_r_tags(self):
+        return get_choice(self.cleaned_data['r_tags'])
+
+    def clean_r_real_tester(self):
+        return get_choice(self.cleaned_data['r_real_tester'])
 
 def get_prod_queries(data):
+    if not data: return {}
     def _get(key):
         values = data.getlist(key)
-        return [v for v in values if v]
+        return [int(v) for v in values if v]
     p_product   = _get('p_product')
     p_version   = _get('p_version')
     p_component = _get('p_component')
     p_build     = _get('p_build')
     p_category  = _get('p_category')
-    return locals()
+    results = locals()
+    results.pop('data')
+    results.pop('_get')
+    return results
 
 def advance_search(request, tmpl='search/advanced_search.html'):
+    errors      = None
     data        = request.GET
     target      = data.get('target')
+    if target not in ('plan', 'case', 'run'):
+        errors  = 'Unsupported search type.'
     prod_query  = get_prod_queries(data)
     plan_form   = PlanForm(data)
     case_form   = CaseForm(data)
     run_form    = RunForm(data)
-    if not data:
+    all_forms   = (plan_form, case_form, run_form)
+    errors      = [f.errors for f in all_forms if not f.is_valid()]
+
+    if errors or not data:
         PRODUCT_CHOICE = [
             (p.pk, p.name) for p in cached_entities('product')
         ]
         return direct_to_template(request, tmpl, locals())
-    # DEBUG:
-    if settings.DEBUG:
-        print 'plan_form valid?', plan_form.is_valid() and plan_form.cleaned_data
-        print 'case_form valid?', case_form.is_valid() and case_form.cleaned_data
-        print 'run_form valid?', run_form.is_valid() and run_form.cleaned_data
-    all_forms   = (plan_form, case_form, run_form)
-    form_err    = [f.errors for f in all_forms if not f.is_valid()]
-    if form_err:
-        print 'Ooops'
-        return HttpResponse(str(form_err))
 
     plans   = build_queryset(plan_form.cleaned_data, target, 'plan', prod_query)
     runs    = build_queryset(run_form.cleaned_data, target, 'run', prod_query)
     cases   = build_queryset(case_form.cleaned_data, target, 'case', prod_query)
 
     start = time.time()
-    results = sum_queried_results(plans, runs, cases, target)
+    results = retrieve_results(request, plans, runs, cases, target)
     end = time.time()
     timecost = round(end - start, 3)
-    return render_results(request, results, timecost)
+    queries  = fmt_queries(prod_query, plan_form.cleaned_data,
+            case_form.cleaned_data, run_form.cleaned_data)
+    return render_results(request, results, timecost, queries)
 
 def build_queryset(target_queries, target, result_kls, prod_queries=None):
     klasses = {
@@ -313,7 +332,6 @@ def evaluate_queryset(queryset, target, ctype):
         }
     }
     attr = attr_map[ctype][target]
-    print 'getting %s from %s and attr is: %s' % (target, ctype, attr)
     for hit in queryset:
         val = getattr(hit, attr)
         yield val
@@ -328,20 +346,27 @@ def serialize_queries(docs):
         else:
             yield key
 
+def retrieve_results(request, plans, runs, cases, target):
+    from hashlib import md5
+    key     = remove_from_request_path(request, 'page')
+    key     = md5(key).hexdigest()
+    results = cache.get(key)
+    if not results:
+        results = sum_queried_results(plans, runs, cases, target)
+        cache.set(key, results)
+    return results
+
 def sum_queried_results(plans, runs, cases, target):
     result = []
     if plans is not None:
-        print 'plans count:', plans.count()
         keys = evaluate_queryset(plans, target, 'testplan')
         result.append(set(serialize_queries(keys)))
 
     if runs is not None:
-        print 'runs count:', runs.count()
         keys = evaluate_queryset(runs, target, 'testrun')
         result.append(set(serialize_queries(keys)))
 
     if cases is not None:
-        print 'cases count:', cases.count()
         keys = evaluate_queryset(cases, target, 'testcase')
         result.append(set(serialize_queries(keys)))
 
@@ -350,44 +375,42 @@ def sum_queried_results(plans, runs, cases, target):
     else:
         return None
 
-def render_results(request, results, time_cost, tmpl='search/results.html'):
+def render_results(request, results, time_cost, queries, tmpl='search/results.html'):
     klasses = {
         'plan': {'class': TestPlan, 'result_key': 'test_plans'},
         'case': {'class': TestCase, 'result_key': 'test_cases'},
         'run': {'class': TestRun, 'result_key': 'test_runs'}
     }
-    page    = request.GET.get('page_num', 1)
-    qs      = klasses[request.GET['target']]['class']._default_manager.filter(pk__in=results)
-    pager   = Paginator(qs, settings.SEARCH_PAGING)
-    try:
-        page = pager.page(page)
-        objects = page.object_list
-    except (EmptyPage, InvalidPage):
-        objects = page = None
+    if results is None:
+        qs      = klasses[request.GET['target']]['class']._default_manager.none()
+    else:
+        qs      = klasses[request.GET['target']]['class']._default_manager.filter(pk__in=results)
     return direct_to_template(request, tmpl,
         {
-            klasses[request.GET['target']]['result_key']: objects,
-            'pager': pager,
-            'page': page,
-            'total': len(results),
+            klasses[request.GET['target']]['result_key']: qs,
             'time_cost': time_cost,
-            'results': json.dumps(list(results)),
-            'queries': fmt_queries(request),
+            'queries': queries,
         }
     )
 
-def fmt_queries(request):
+def remove_from_request_path(request, name):
+    path = request.get_full_path().split('&')
+    path = [p for p in path if not p.startswith(name)]
+    return '&'.join(path)
+
+def fmt_queries(*queries):
     '''
     Format the queries string.
     '''
-    queries     = request.get_full_path().split('?')[1].split('&')
-    queries     = [q.split('=') for q in queries]
-    queries     = [q for q in queries if q[1]]
-    queries     = [
-        (k.replace('cs_', 'Case ').replace('pl_', 'plan ').replace('r_', 'Run ').replace('_', ' '), v)
-        for k, v in queries
-    ]
-    return queries
+    results = {}
+    for query in queries:
+        for k, v in query.iteritems():
+            k = k.replace('p_product', 'product').replace('p_', 'product ').replace('cs_', 'case ')\
+            .replace('pl_', 'plan ').replace('r_', 'run ').replace('_', ' ')
+            if v:
+                if isinstance(v, list): v = ','.join((str(_v) for _v in v))
+                results[k] = v
+    return results
 
 if __name__ == '__main__':
     import doctest

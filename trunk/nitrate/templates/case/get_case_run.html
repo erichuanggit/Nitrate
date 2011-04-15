@@ -1,4 +1,5 @@
 {% if test_case_runs %}
+<table class="list" id="id_table_cases" cellspacing="0" cellspan="0">
 <thead>
 	<tr>
 		<th width="18px"></th>
@@ -14,11 +15,12 @@
 		<th width="100">Status</th>
 		<th width="40">Sort</th>
 	</tr>
-</thead>
+</thead><tbody>
 {% for plan, test_case_runs in runs_ordered_by_plan %}
-Plan: [{{ plan.pk }}] {{ plan.name }}
-<table class="list" id="id_table_cases" cellspacing="0" cellspan="0">
-	<tbody>
+
+<tr><td colspan="12" class="listGroupBlue">Plan:<span style="padding:0 0 0 6px;">[{{ plan.pk }}] {{ plan.name }}</span></td></tr>
+
+	
 		{% for test_case_run in test_case_runs %}
 		<tr id="id_tr_case_{{ forloop.counter }}" class="case_title {% cycle 'odd' 'even' %}">
 			<td class="expandable">
@@ -34,8 +36,8 @@ Plan: [{{ plan.pk }}] {{ plan.name }}
 				<a href="{% url tcms.testruns.views.get test_case_run.run_id %}">{{ test_case_run.run_id }}</a>
 			</td>
 			<td class="expandable">
-				{# <a id="link_{{ forloop.counter }}" href="{% url tcms.testruns.views.get test_case_run.run_id %}#caserun_{{ test_case_run.case_run_id }}" >{{ test_case_run.run.summary }}</a> #}
-				{{ test_case_run.run.summary }}
+				<p>{# <a id="link_{{ forloop.counter }}" href="{% url tcms.testruns.views.get test_case_run.run_id %}#caserun_{{ test_case_run.case_run_id }}" >{{ test_case_run.run.summary }}</a> #}
+				{{ test_case_run.run.summary }}</p>
 			</td>
 			<td>
 				{% if test_case_run.tested_by %}
@@ -56,8 +58,8 @@ Plan: [{{ plan.pk }}] {{ plan.name }}
 			<td class="expandable">{{ test_case_run.case.priority.value }}</td>
 			<td class="expandable">{{ test_case_run.case_text_version }}</td>
 			<td>
-				<img src="{{ MEDIA_URL }}/images/{{ test_case_run.case_run_status.name|lower }}.png" sborder="0" alt="" />
-				<label>{{ test_case_run.case_run_status.name|upper }}</label>
+				<img src="{{ MEDIA_URL }}/images/{{ test_case_run.case_run_status.name|lower }}.png" sborder="0" alt="" class="left_float" />
+				<label class="left_float">{{ test_case_run.case_run_status.name|upper }}</label>
 			</td>
 			<td>
 				<span class="mark">
@@ -70,10 +72,10 @@ Plan: [{{ plan.pk }}] {{ plan.name }}
 				<div id="id_loading_{{ test_case_run.case.pk }}" class="ajax_loading"></div>
 			</td>
 		</tr>
-		{% endfor %}
+		{% endfor %}{% endfor %}
 	</tbody>
 </table>
-{% endfor %}
+
 {% else %}
 <div class="list">
 	<span class="prompt-message"><center>No test cases</center></span>

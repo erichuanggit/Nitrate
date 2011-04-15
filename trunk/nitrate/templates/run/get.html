@@ -75,7 +75,166 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 	</div>
 	<h2 id="display_title">{{ test_run.summary }}</h2>
 	<div>
-	<div class="statu" style="float:right;">
+	
+	<div class="listinfo_content" style="float:left; width:auto;">
+		<div ></div>
+		<div class="leftlistinfo">
+			<div class="listinfo">
+				<div class="title grey">Test Plan&nbsp;:</div>
+				<div class="name">
+					<a href="{% url tcms.testplans.views.get test_run.plan.pk %}">[{{ test_run.plan.pk }}] {{ test_run.plan.name }}</a>
+			
+				</div>
+			</div>
+			<div class="listinfo">
+				<div class="title grey">Product Version&nbsp;:</div>
+				<div class="name">
+					<a href="{% url tcms.testruns.views.all %}?product={{ test_run.build.product_id }}&product_version={{ test_run.get_version_id }}" title="Search test runs of {{ test_run.product_version }}">{{ test_run.product_version }}</a>
+			
+				</div>
+			</div>
+			<div class="listinfo">
+				<div class="title grey">Manager&nbsp;:</div>
+				<div class="name">
+					<a href="{% url tcms.profiles.views.profile test_run.manager.username %}">{{ test_run.manager.email }}</a>
+			
+				</div>
+			</div>
+			<div class="listinfo">
+				<div class="title grey">Estimated Time&nbsp;:</div>
+				<div class="name">
+				{{ test_run.estimated_time }}
+				</div>
+			</div>
+			<div class="listinfo">
+				<div class="title grey">Started at&nbsp;:</div>
+				<div class="name">
+				{{ test_run.start_date }}
+				</div>
+			</div>
+			<div class="listinfo" >
+				<div class="title grey">Tags&nbsp;:</div>
+				<div id="id_tag_container" class="name linotype">
+					<ul>
+						{% for tag in test_run.tag.all %}
+						<li>
+						{{ tag }}
+						{% if perms.testruns.delete_testruntag %}
+						<a href="javascript:void(0)" onclick="removeRuntag('id_tag_container', '{{ test_run.run_id }}', '{{ tag }}')"><img src="{{ MEDIA_URL }}/images/remove_small.png" width="9" height="9" title="remove this tag" /></a>
+						{% endif %}
+					</li>
+					{% empty %}
+					</ul>
+					{% endfor %}
+					{% if perms.testruns.add_testruntag %}
+					<div><a class="addlink" href="javascript:void(0)" onclick="addRunTag('id_tag_container', '{{ test_run.run_id }}')">Add Tag</a></div>
+					{% endif %}
+				</div>
+			</div>
+			<div class="listinfo">
+				<div class="title grey">Environment&nbsp;:</div>
+				<div class="linotype name">
+					{% include 'run/get_environment.html' %}
+				</div>
+			</div>
+		</div>
+		<div class="rightlistinfo">
+			<div class="listinfo">
+				<div class="title grey">Product&nbsp;:</div>
+				<div class="name">
+					<a href="{% url tcms.testruns.views.all %}?product={{ test_run.build.product_id }}" title="Search test runs of {{ test_run.build.product }}">{{ test_run.build.product }}</a>
+				</div>
+			</div>
+			<div class="listinfo">
+				<div class="title grey">Build&nbsp;:</div>
+				<div class="name">
+					<a href="{% url tcms.testruns.views.all %}?build={{ test_run.build_id }}" title="Search test runs of {{ test_run.build_id }}">{{ test_run.build }}</a>
+				</div>
+			</div>
+			<div class="listinfo">
+				<div class="title grey">Default Tester&nbsp;:</div>
+				<div class="name">
+					{% if test_run.default_tester %}
+					<a href="{% url tcms.profiles.views.profile test_run.default_tester.username %}">{{ test_run.default_tester.email }}</a>
+					{% else %}
+					{{ test_run.default_tester }}
+					{% endif %}
+				</div>
+			</div>
+			<div class="listinfo">
+				<div class="title grey">Status&nbsp;:</div>
+				<div class="name">
+					{% if test_run.stop_date %}
+					<span class="pauselink">
+						Finished
+					</span>
+					{% if perms.testruns.change_testrun %}
+					<input type="button"  class="spadelink" value="Set to Running" onclick="window.location.href='{% url tcms.testruns.views.change_status test_run.run_id %}?finished=0'">
+					{% endif %}
+					{% else %}
+					<span class="runninglink">Running</span>
+					{% if perms.testruns.change_testrun %}
+					<input type="button"class="spadelink" value="Set to Finished" onclick="window.location.href='{% url tcms.testruns.views.change_status test_run.run_id %}?finished=1'">
+					{% endif %}
+					{% endif %}
+				</div>
+			</div>
+			<div class="listinfo">
+				<div class="title grey">Finished at&nbsp;:</div>
+				<div class="name">
+					{{ test_run.stop_date }}
+				</div>
+			</div>
+			<div class="listinfo">
+				<div class="title grey">CC&nbsp;:</div>
+				<div class="linotype name">
+					{% include 'run/get_cc.html' %}
+				</div>
+			</div>
+		</div>
+		<div class="listinfo">
+			<div class="title grey">Note&nbsp;:</div>
+			<div class="name" style="width:400px;">{{ test_run.notes|urlize|linebreaksbr }}</div>
+		</div>
+		<div class="clear"></div>
+	</div>
+	
+	<div class="statu" style="float:left;" onCreate="var complete_status = new ProgressBar( new ProgressBar( 'complete_status_{{ test_run.run_id }}', {classProgressBar: 'progressBar4', style: ProgressBar.DETERMINATE, selection: {{ test_run.complete_cases|floatformat:0 }}} );">
+		<div class="progress-bar" style="float:none">
+			<div class="percent">{{ status_counter.complete_percent|floatformat:0 }}.00%</div>
+			<div class="progress-inner" style="width:{{ status_counter.complete_percent|floatformat:"0" }}%;">
+				<div class="progress-failed" style="width:{{ status_counter.failed_percent|floatformat:"0" }}%;"></div>
+			</div>
+		</div>
+		<ul>
+			{% for k, v in status_counter.count_data.items %}
+			<li>
+				<label>{{ k }}</label>
+				{% ifnotequal v 0 %}
+				<span>[</span><a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '{{ k.pk }}')">{{ v }}</a><span>]</span>
+				{% else %}
+				<span>[</span>{{ v }}<span>]</span>
+				{% endifnotequal %}
+			</li>
+			{% endfor %}
+			<li>
+				<label>TOTAL</label>
+				<span>[</span><a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '')">{{ test_case_runs.count }}</a><span>]</span>
+			</li>
+			
+		</ul>
+		<div class="clear"></div>
+		<ul>
+			<li style="background:url(../../media/images/btn_bg_report.png) no-repeat; height:25px; line-height:25px; width:57px; padding-left:30px; margin-right:15px;"><a href="{% url tcms.testruns.views.report test_run.run_id %}" title="report of test caserun">Report</a></li>
+			<li style="background:url(../../media/images/btn_bg_showbug.png) no-repeat; height:25px; line-height:25px; width:133px; padding-left:30px;">
+			{% ifnotequal test_case_run_bugs|length 0 %}	
+				<a href="{% url tcms.testruns.views.report test_run.run_id %}#buglist" title="Show ALl Bugs">Show All Bugs <span>[</span>{{ test_case_run_bugs|length }}<span>]</span></a>
+			{% else %}
+				Show All Bugs <span>[</span>{{ test_case_run_bugs|length }}<span>]</span>
+				{% endifnotequal %}
+			</li>
+		</ul>
+		<!--
 		<table cellpadding="1" cellspacing="1" border="0" onCreate="var complete_status = new ProgressBar( new ProgressBar( 'complete_status_{{ test_run.run_id }}', {classProgressBar: 'progressBar4', style: ProgressBar.DETERMINATE, selection: {{ test_run.complete_cases|floatformat:0 }}} );">
 			<tr>
 				<td colspan="2" align="center">
@@ -91,13 +250,13 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 			</tr>
 			{% for k, v in status_counter.count_data.items %}
 			<tr>
-				<th width="50%;"><a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '{{ k.pk }}')">{{ k }}</a></th>
-				<td>{{ v }}</td>
+				<th width="50%;" style="text-align:right;">{{ k }}</th>
+				<td style="text-align:left;">[<a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '{{ k.pk }}')">{{ v }}</a>]</td>
 			</tr>
 			{% endfor %}
 			<tr>
-				<th><a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '')">Total</a></th>
-				<td>{{ test_case_runs.count }}</td>
+				<th style="text-align:right;">Total</th>
+				<td style="text-align:left;"><a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '')">{{ test_case_runs.count }}</a></td>
 			</tr>
 			<tr>
 				<th colspan="2">
@@ -110,144 +269,9 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 				</th>
 			</tr>
 		</table>
+		-->
 	</div>
-	<div class="listinfo_content" style="float:left; width:80%">
-		<div class="leftlistinfo">
-			<div class="listinfo">
-				<div class="title">Test Plan:</div>
-				<a href="{% url tcms.testplans.views.get test_run.plan.pk %}">[{{ test_run.plan.pk }}] {{ test_run.plan.name }}</a>
-			</div>
-			<div class="listinfo">
-				<div class="title">Product Version:</div>
-				<a href="{% url tcms.testruns.views.all %}?product={{ test_run.build.product_id }}&product_version={{ test_run.get_version_id }}" title="Search test runs of {{ test_run.product_version }}">{{ test_run.product_version }}</a>
-			</div>
-			<div class="listinfo">
-				<div class="title">Manager:</div>
-				<a href="{% url tcms.profiles.views.profile test_run.manager.username %}">{{ test_run.manager.email }}</a>
-			</div>
-			<div class="listinfo">
-				<div class="title">Estimated Time:</div>
-				{{ test_run.estimated_time }}
-			</div>
-			<div class="listinfo">
-				<div class="title">Started at:</div>
-				{{ test_run.start_date }}
-			</div>
-			<div class="listinfo" >
-				<div class="title">Tags:</div>
-				<div id="id_tag_container">
-				{% for tag in test_run.tag.all %}
-				<span>
-					{{ tag }}
-					{% if perms.testruns.delete_testruntag %}
-					<a href="javascript:void(0)" onclick="removeRuntag('id_tag_container', '{{ test_run.run_id }}', '{{ tag }}')"><img src="{{ MEDIA_URL }}/images/icon_cross.png" width="12" height="12" title="remove this tag" /></a>
-					{% endif %}
-				</span>
-				{% empty %}
-				<span class="grey">No tag.</span>
-				{% endfor %}
-				</div>
-			</div>
-			<div class="listinfo">
-				<div class="title">&nbsp;</div>
-				{% if perms.testruns.add_testruntag %}
-				<a class="addlink" href="javascript:void(0)" onclick="addRunTag('id_tag_container', '{{ test_run.run_id }}')">Add Tag</a> 
-				{% endif %}
-			</div>
-			<div class="listinfo">
-				<div class="title">Environment</div>
-				<div class="linotype">
-				<ul>
-					{% for run_env_value in test_run.env_value.select_related.all %}
-					<li>
-						<form class="" id="id_form_value_{{ run_env_value.pk }}">
-							<span class="lab">
-							<input type="hidden" value="{{ run_env_value.property_id }}" name="env_property_id"/>
-							{{ run_env_value.property }}: 
-							
-							<span id="id_env_value_{{ run_env_value.pk }}" style="display:">{{ run_env_value.value }}</span>
-								
-							<select style="display:none" name="env_value_id" id="id_select_value_{{ run_env_value.pk }}">
-								<option value="{{ run_env_value.pk }}" selected="True"></option>
-							</select>
-							<input type="button" value="Submit" name="submit" id="id_submit_value_{{ run_env_value.pk }}" style="display:none" onclick="submitValue('{{ test_run.run_id }}','{{ run_env_value.pk }}','id_env_value_{{ run_env_value.pk }}',this.previous(),'id_submit_value_{{ run_env_value.pk }}')"/>
-							
-							</span>
-							<span class="action_property">
-								{% if perms.testruns.change_tcmsenvrunvaluemap %}
-								<a href="javascript:void(0)" onclick="editValue(this.up(1),'id_env_value_{{ run_env_value.pk }}','id_select_value_{{ run_env_value.pk }}','id_submit_value_{{ run_env_value.pk }}')"><img src="{{ MEDIA_URL }}/images/icon_changelink.gif" title="Edit this value" /></a>
-								{% endif %}
-								{% if perms.testruns.delete_tcmsenvrunvaluemap %}
-								<a href="javascript:void(0)"><img src="{{ MEDIA_URL }}/images/remove_small.png" title="Remove this property" onclick="removeProperty('{{ test_run.run_id }}','{{ run_env_value.pk }}')"/></a>
-								{% endif %}
-							</span>
-						</form>
-					</li>
-					{% empty %}
-					<li class="grey">No environment.</li>
-					{% endfor %}
-				</ul>
-				</div>
-			</div>
-			<div class="listinfo">
-				<div class="title">&nbsp;</div>
-				{% if perms.testruns.add_tcmsenvrunvaluemap %}
-				<a class="addlink" href="javascript:void(0)" onclick="addProperty('{{ test_run.run_id }}','{{env_group.id}}')">Add Property</a> 
-				{% endif %}
-				{% for env_group in testplan.env_group.all %}
-				<input type="hidden" name="env_group_id" value="{{ env_group.id }}"/>
-				{% endfor%}
-			</div>
-		   
-			
-		
-		</div>
-		<div class="rightlistinfo">
-			<div class="listinfo">
-				<div class="title">Product</div>
-				<a href="{% url tcms.testruns.views.all %}?product={{ test_run.build.product_id }}" title="Search test runs of {{ test_run.build.product }}">{{ test_run.build.product }}</a>
-			</div>
-			<div class="listinfo">
-				<div class="title">Build</div>
-				<a href="{% url tcms.testruns.views.all %}?build={{ test_run.build_id }}" title="Search test runs of {{ test_run.build_id }}">{{ test_run.build }}</a>
-			</div>
-			<div class="listinfo">
-				<div class="title">Default Tester</div>
-				{% if test_run.default_tester %}
-				<a href="{% url tcms.profiles.views.profile test_run.default_tester.username %}">{{ test_run.default_tester.email }}</a>
-				{% else %}
-				{{ test_run.default_tester }}
-				{% endif %}
-			</div>
-			<div class="listinfo">
-				<div class="title">Status</div>
-				{% if test_run.stop_date %}
-				<span class="pauselink">
-					Finished
-				</span>
-				{% if perms.testruns.change_testrun %}
-				<input type="button"  class="spadelink" value="Set to Running" onclick="window.location.href='{% url tcms.testruns.views.change_status test_run.run_id %}?finished=0'">
-				{% endif %}
-				{% else %}
-				<span class="runninglink">Running</span>
-				{% if perms.testruns.change_testrun %}
-				<input type="button"class="spadelink" value="Set to Finished" onclick="window.location.href='{% url tcms.testruns.views.change_status test_run.run_id %}?finished=1'">
-				{% endif %}
-				{% endif %}
-			</div>
-			<div class="listinfo">
-				<div class="title">Finished at:</div>{{ test_run.stop_date }}
-			</div>
-			<div class="listinfo">
-				<div class="title">CC:</div>
-				<div class="linotype">{% include 'run/get_cc.html' %}</div>
-			</div>
-		</div>
-		<div class="listinfo">
-			<div class="title">Note:</div>{{ test_run.notes|urlize|linebreaksbr }}
-		</div>
-		<div class="clear"></div>
-	</div>
+	
 	</div>
 	<div class="Detailform border-1">
 		{% include 'run/get_case_runs.html' %}

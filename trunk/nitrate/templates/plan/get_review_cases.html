@@ -118,14 +118,14 @@
 			{% endcomment %}
 		</div>
 		<div class="mixbar">
-			<div class="tagname">Tags:</div>
-			<div class="taglist">
+			<span class="tagname">Tags:</span>
+			<span>
 				{% for tag in case_own_tags %}
 				<a href="#testcases">{{ tag }}</a>
 				{% empty %}
-				<div class="grey">No tags in cases</div>
+				<span class="grey">No tags in cases</span>
 				{% endfor %}
-			</div>
+			</span>
 		</div>
 	</div>
 	<div class="list_filter" {% ifnotequal REQUEST_CONTENTS.a 'search' %} style="display:none;" {% endifnotequal %}>

@@ -3,13 +3,14 @@
 {% block contents %}
 	<div class="queries">
 		<ul>
-		{% for k, v in queries %}
-			<li>{{ k|title }}: {{ v|safe }}</li>
+		{% for k, v in queries.iteritems %}
+			<li><label>{{ k|title }}:</label>{{ v|safe }};</li>
 		{% endfor %}
+			<li class="clear"></li>
 		</ul>
+		<p></p>
 	</div>
-
-	<p>{{ total }} results in {{ time_cost }} sec(s).</p>
+	<h2 class="clear">Search Results<span style="font-weight:normal; font-size:12px; padding:0 0 0 15px;">Time cost: {{ time_cost }} sec(s).</span></h2>
 
 	{% if test_plans %}
 		{% include "search/plans.html" %}
@@ -23,25 +24,5 @@
 		{% include "search/runs.html" %}
 	{% endif %}
 
-
-	<div class="pagination">
-	{% if page.has_previous %}
-		<a href="#{{ page.previous_page_number }}">Previous Page </a>
-	{% endif %}
-	{% for p in pager.page_range %}
-		{% ifequal page.number p  %}
-			{{ p }}
-		{% else %}
-			<a href="#">{{ p }}</a>
-		{% endifequal %}
-	
-	{% endfor %}
-	{% if page.has_next %}
-		<a href="#{{ page.next_page_number }} ">Next Page</a>
-	{% endif %}
-	</div>
 {% endblock %}
 
-<script>
-	results = {{ results }};
-</script>
