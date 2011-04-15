@@ -1,4 +1,6 @@
-*~
-.DS_Store
+env.sh
 *.pyc
-*.pyo
+tcms/dev.db
+tcms/dev_settings.py
+tcms/run.sh
+.gitignore

@@ -63,8 +63,109 @@ Nitrate.TestCases.Instance = {
 		</span>
 		{% endif %}
 	</div>
+	<h2 id="display_title">{{ test_case.summary }}</h2>
+	
+	<div class="listinfo_content">
+		<fieldset class="no-border">
+			<div class="leftlistinfo">
+				{% comment %}
+				<div class="cell">
+					<div class="sd">Component:</div>
+					<dl class="ul-no-format" style="float:left">
+						{% for component in test_case.component.all %}
+						<dd id="display_category" >{{ component.name }}</dd>
+						{% empty %}
+						<dd class="grey">No component</dd>
+						{% endfor %}
+					</dl>
+				</div>
+				{% endcomment %}
+				<div class="listinfo">
+					<div class="title grey">Default Tester&nbsp;:</div>
+					<div class="name">
+						{% if test_case.default_tester	%}
+						<span id="display_default_tester"><a href="{% url tcms.profiles.views.profile test_case.default_tester.username %}">{{ test_case.default_tester.email }}</a></span>
+						{% else %}
+						<span >No default tester</span>
+						{% endif %}
+					</div>
+				</div>
+				<div class="listinfo">
+					<div class="title grey">Product&nbsp;:</div>
+					<div class="name">
+						<span>{{ test_case.category.product }}</span>
+					</div>
+				</div>
+				<div class="listinfo">
+					<div class="title grey">Category&nbsp;:</div>
+					<div class="name">
+						<span id="display_category" >{{ test_case.category }}</span>
+					</div>
+				</div>
+				<div class="listinfo">
+					<div class="title grey">Estimated Time&nbsp;:</div>
+					<div id="display_estimated_time" class="name">{{ test_case.estimated_time }}</div>
+				</div>
+				<div class="listinfo">
+					<div class="title grey">Priority&nbsp;:</div>
+					<div class="name"><span id="display_priority" >{{ test_case.priority }}</span></div>
+				</div>
+				<div class="listinfo">
+					<div class="title grey">Status&nbsp;:</div>
+					<div class="name"><span id="display_priority" >{{ test_case.case_status }}</span></div>
+				</div>
+				<div class="listinfo">
+					<div class="title grey">Notes&nbsp;:</div>
+					<div class="name"><span id="display_priority" >{{ test_case.notes|urlize|linebreaksbr }}</span></div>
+				</div>
+			</div>
+			<div class="rightlistinfo">
+				<div class="listinfo">
+					<div class="title grey">Author&nbsp;:</div>
+					<span class="name">
+						<a href="{% url tcms.profiles.views.profile test_case.author.username %}">
+							{{ test_case.author.email }}
+						</a>
+					</span>
+				</div>
+				<div class="listinfo">
+					<div class="title grey">Created&nbsp;:</div>
+					<div class="name">{{ test_case.create_date }}</div>
+				</div>	
+				<div class="listinfo">
+					<div class="title grey">Automated&nbsp;:</div>
+					<div class="name">{{ test_case.get_is_automated_status }}</div>
+				</div>
+				<div class="listinfo">
+					<div class="title grey">Requirement&nbsp;:</div>
+					<div class="name {% if not test_case.requirement %}grey{% endif %}">
+						<span id="display_requirement" >{{ test_case.requirement|default:'None' }}</span>
+					</div>
+				</div>
+				<div class="listinfo">
+					<div class="title grey">Script&nbsp;:</div>
+					<div class="name {% if not test_case.script %}grey{% endif %}">
+						<span id="display_script" >{{ test_case.script|default:'None' }}</span>
+					</div>
+				</div>
+				<div class="listinfo">
+					<div class="title grey"><span>Alias&nbsp;:</span></div>
+					<div class="name {% if not test_case.alias %}grey{% endif %}">
+						<span id="display_script" >{{ test_case.alias|default:'None' }}</span>
+					</div>
+				</div>
+				<div class="listinfo">
+					<div class="title grey"><span>Arguments&nbsp;:</span></div>
+					<div class="name {% if not test_case.arguments %}grey{% endif %}">
+						<span id="display_script">{{ test_case.arguments|default:'None' }}</span>
+					</div>
+				</div>
+			</div>
+			<div class="clear"></div>
+		</fieldset>
+	</div>
+	<!--
 	<div class="Detailform">
-		<h2 id="display_title">{{ test_case.summary }}</h2>
 		<fieldset class="no-border">
 			<div class="editor-side">
 				{% comment %}
@@ -80,7 +181,7 @@ Nitrate.TestCases.Instance = {
 				</div>
 				{% endcomment %}
 				<div class="cell">
-					<div class="sd">Default Tester:</div>
+					<div class="sd">Default Tester&nbsp;:</div>
 					<div >
 						{% if test_case.default_tester	%}
 						<span id="display_default_tester"><a href="{% url tcms.profiles.views.profile test_case.default_tester.username %}">{{ test_case.default_tester.email }}</a></span>
@@ -90,37 +191,37 @@ Nitrate.TestCases.Instance = {
 					</div>
 				</div>
 				<div class="cell">
-					<div class="sd">Product</div>
+					<div class="sd">Product&nbsp;:</div>
 					<div>
 						<span>{{ test_case.category.product }}</span>
 					</div>
 				</div>
 				<div class="cell">
-					<div class="sd">Category:</div>
+					<div class="sd">Category&nbsp;:</div>
 					<div>
 						<span id="display_category" >{{ test_case.category }}</span>
 					</div>
 				</div>
 				<div class="cell">
-					<div class="sd">Estimated Time:</div>
+					<div class="sd">Estimated Time&nbsp;:</div>
 					<div id="display_estimated_time">{{ test_case.estimated_time }}</div>
 				</div>
 				<div class="cell">
-					<div class="sd">Priority:</div>
+					<div class="sd">Priority&nbsp;:</div>
 					<div><span id="display_priority" >{{ test_case.priority }}</span></div>
 				</div>
 				<div class="cell">
-					<div class="sd">Status:</div>
+					<div class="sd">Status&nbsp;:</div>
 					<div><span id="display_priority" >{{ test_case.case_status }}</span></div>
 				</div>
 				<div class="cell">
-					<div class="sd">Notes:</div>
+					<div class="sd">Notes&nbsp;:</div>
 					<div><span id="display_priority" >{{ test_case.notes|urlize|linebreaksbr }}</span></div>
 				</div>
 			</div>
 			<div class="editor-side">
 				<div class="cell">
-					<div class="sd">Author:</div>
+					<div class="sd">Author&nbsp;:</div>
 					<span class="name">
 						<a href="{% url tcms.profiles.views.profile test_case.author.username %}">
 							{{ test_case.author.email }}
@@ -128,33 +229,33 @@ Nitrate.TestCases.Instance = {
 					</span>
 				</div>
 				<div class="cell">
-					<div class="sd">Created:</div>
+					<div class="sd">Created&nbsp;:</div>
 					<div><span class="name">{{ test_case.create_date }}</span></div>
 				</div>	
 				<div class="cell">
-					<div class="sd">Automated:</div>
+					<div class="sd">Automated&nbsp;:</div>
 					<div class="name">{{ test_case.get_is_automated_status }}</div>
 				</div>
 				<div class="cell">
-					<div class="sd">Requirement:</div>
+					<div class="sd">Requirement&nbsp;:</div>
 					<div>
 						<span id="display_requirement" class="name {% if not test_case.requirement %}grey{% endif %}" >{{ test_case.requirement|default:'None' }}</span>
 					</div>
 				</div>
 				<div class="cell">
-					<div class="sd">Script:</div>
+					<div class="sd">Script&nbsp;:</div>
 					<div>
 						<span id="display_script" class="name {% if not test_case.script %}grey{% endif %}">{{ test_case.script|default:'None' }}</span>
 					</div>
 				</div>
 				<div class="cell">
-					<div class="sd"><span>Alias:</span></div>
+					<div class="sd"><span>Alias&nbsp;:</span></div>
 					<div>
 						<span id="display_script" class="name {% if not test_case.alias %}grey{% endif %}">{{ test_case.alias|default:'None' }}</span>
 					</div>
 				</div>
 				<div class="cell">
-					<div class="sd"><span>Arguments</span></div>
+					<div class="sd"><span>Arguments&nbsp;:</span></div>
 					<div>
 						<span id="display_script" class="name {% if not test_case.arguments %}grey{% endif %}">{{ test_case.arguments|default:'None' }}</span>
 					</div>
@@ -162,6 +263,8 @@ Nitrate.TestCases.Instance = {
 			</div>
 		</fieldset>
 	</div>
+	-->
+	
 	<div class="Detailform border-1">
 		<ul id="contentTab" class="content_tab" >
 			<li id="tab_document" class="tab tab_focus">
