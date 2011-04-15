@@ -39,8 +39,17 @@ class TestRunIndexer(indexes.SearchIndex):
     start_date  = indexes.DateTimeField(model_attr='start_date', null=True)
     stop_date   = indexes.DateTimeField(model_attr='stop_date', null=True)
     tags        = indexes.MultiValueField(null=True)
+    real_tester = indexes.MultiValueField(null=True)
 
     case_ids    = indexes.CharField(null=True)
+
+
+    def prepare_real_tester(self, obj):
+        key   = 'tested_by__username'
+        names = obj.case_run.values(key)
+        return ' '.join([
+            str(n[key]) for n in names if n
+        ])
 
     def prepare_tags(self, obj):
         return [

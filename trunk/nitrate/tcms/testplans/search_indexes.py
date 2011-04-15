@@ -33,6 +33,8 @@ class PlanIndexer(indexes.SearchIndex):
     is_active       = indexes.BooleanField(model_attr='is_active', null=True)
     product         = indexes.IntegerField(model_attr='product__pk', null=True)
     product_name    = indexes.CharField(model_attr='product__name', null=True)
+    version         = indexes.CharField(null=True)
+    component       = indexes.MultiValueField(null=True)
     tags            = indexes.MultiValueField(null=True)
     # Related models. In haystack, when building indexes on a o2m or m2m field,
     # you need to supply a function to prepare the data.
@@ -40,6 +42,12 @@ class PlanIndexer(indexes.SearchIndex):
 
     case_ids        = indexes.CharField(indexed=False, null=True)
     run_ids          = indexes.CharField(indexed=False, null=True)
+
+    def prepare_component(self, obj):
+        return [c.pk for c in obj.component.all()]
+
+    def prepare_version(self, obj):
+        return obj.get_version_id()
 
     def prepare_tags(self, obj):
         return [
