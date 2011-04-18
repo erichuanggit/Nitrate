@@ -8,7 +8,6 @@ function serializeProd(product_id){
         var key = keys[i];
         var selector = jQ('#id_'+key);
         var options = selector.children('option[selected=true]');
-        console.log(options);
         var texts = new Array();
         if(options!=null){
             for(var j=0;j<options.length;j++){
