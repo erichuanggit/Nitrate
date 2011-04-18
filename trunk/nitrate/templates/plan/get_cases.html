@@ -118,15 +118,15 @@
 			{% endif %}
 			{% endcomment %}
 		</div>
-		<div class="mixbar">
-			<span class="tit">Tags:</span>
-			<span>
+		<div class="mixbar fixed">
+			<div class="tit" style="width: 50px; float: left; height: 100%; margin: 0px; text-align: center;">Tags:</div>
+			<div style="margin-left: 50px; line-height:22px;">
 				{% for tag in case_own_tags %}
 				<a href="#testcases">{{ tag }}</a>&nbsp;&nbsp;<span class="grey">-</span>&nbsp;&nbsp;
 				{% empty %}
 				<span class="grey">No tags in cases</div>
 				{% endfor %}
-			</span>
+			</div>
 		</div>
 	</div>
 	<div class="list_filter" {% ifnotequal REQUEST_CONTENTS.a 'search' %} style="display:none;" {% endifnotequal %}>
@@ -194,7 +194,7 @@
 					Sort
 				</a>
 			</th>
-			<th align="left" width="60px">Actions</th>
+			<th align="left" width="80px">Actions</th>
 		</tr>
 	</thead>
 	<tbody>
