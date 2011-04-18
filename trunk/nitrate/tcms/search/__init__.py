@@ -56,6 +56,13 @@ R           = partial(termcolors.colorize, fg='red') # Red -> warning
 LooseCF     = partial(forms.CharField, required=False)
 LooseIF     = partial(forms.IntegerField, required=False)
 LooseDF     = partial(forms.DateField, required=False)
+# Using a choice field instead of a boolean field is
+# to allow an option of specifying both True and False
+LooseBF     = partial(forms.ChoiceField, required=False, choices=(
+    (True, 'yes'),
+    (False, 'no'),
+))
+
 
 def cached_entities(ctype_name):
     '''
@@ -92,9 +99,9 @@ class QueryCriteria(object):
 
     PRIORITIES = {
         'plan': (
-            'pl_id', 'pl_summary', 'pl_authors',  'p_product',  'p_component', 
+            'pl_id', 'pl_summary', 'pl_authors', 'p_product', 'p_component',
             'p_version', 'pl_type',
-            'pl_active', 'pl_created_since', 'pl_created_before',  'pl_tags'),
+            'pl_active', 'pl_created_since', 'pl_created_before', 'pl_tags'),
         'case': (
             'cs_id', 'cs_summary', 'cs_authors', 'cs_tester', 'cs_tags', 'cs_bugs', 'cs_script',
             'cs_status', 'cs_auto', 'cs_proposed', 'cs_priority', 'cs_created_since',
@@ -162,7 +169,7 @@ class QueryCriteria(object):
             if not rules.has_key(key):
                 continue
             value   = self.queries.get(key, None)
-            if value:
+            if value or isinstance(value, bool):
                 if settings.DEBUG:
                     print 'applying filter %s : %s' % (key, value)
                 qs = queryset or self.queryset
@@ -183,7 +190,7 @@ class PlanForm(forms.Form):
     pl_authors      = LooseCF(max_length=100)
     pl_tags         = LooseCF(max_length=100)
     pl_tags_exclude = forms.BooleanField(required=False)
-    pl_active       = forms.BooleanField(required=False)
+    pl_active       = LooseBF()
     pl_created_since  = LooseDF()
     pl_created_before = LooseDF()
 
@@ -215,8 +222,8 @@ class CaseForm(forms.Form):
     cs_priority = forms.MultipleChoiceField(
                     required=False,
                     choices=PRIORITY_CHOICE)
-    cs_auto     = forms.BooleanField(required=False)
-    cs_proposed = forms.BooleanField(required=False)
+    cs_auto     = LooseBF()
+    cs_proposed = LooseBF()
     cs_script   = LooseCF(max_length=200)
     cs_created_since  = LooseDF()
     cs_created_before = LooseDF()

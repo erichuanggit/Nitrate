@@ -95,10 +95,15 @@
 						<div class="listinfo_input">
 							<ul>
 								<li>
-									<input type="checkbox" name="pl_active" value="checkbox" /><span class="grey">Uncheck will search all</span>
+									<select name="pl_active">
+										<option value="">--</option>
+										<option value="True">Active</option>
+										<option value="False">Inactive</option>
+									</select>
 								</li>
 							</ul>
 						</div>
+						
 					</div>
 					<div class="listinfo">
 						<div class="title"><label>Create Time&nbsp;:</label></div>
@@ -172,7 +177,11 @@
 						<div class="listinfo_input">
 							<ul>
 								<li>
-								<input type="checkbox" name="cs_auto"/>
+									<select name="cs_auto">
+										<option value="">--</option>
+										<option value="True">Automated</option>
+										<option value="False">Manual</option>
+									</select>
 								</li>
 							</ul>
 						</div>
@@ -182,7 +191,11 @@
 						<div class="listinfo_input">
 							<ul>
 								<li>
-								<input type="checkbox" name="cs_proposed"/>
+								<select name="cs_proposed">
+										<option value="">--</option>
+										<option value="True">Auto Proposed</option>
+										<option value="False">Non Auto Proposed</option>
+									</select>
 								</li>
 							</ul>
 						</div>
