@@ -9,6 +9,7 @@
 	<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/progressbar/progressbar.js"></script>
 	<script type="text/javascript" src='{{ MEDIA_URL }}/js/testrun_actions.js'></script>
 	<script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
+	<script type="text/javascript" src="/admin_media/js/admin/RelatedObjectLookups.js"></script>
 	<script type="text/javascript">
 	Nitrate.Utils.after_page_load(Nitrate.TestRuns.Edit.on_load);
 	</script>
@@ -59,11 +60,16 @@
 			</tr>
 			<tr>
 				<td><label>Product Version</label></td>
-				<td>{{ form.product_version }}</td>
+				<td>
+					 {{ form.product_version }}
+					 <a href="{{ ADMIN_PREFIX }}/management/version/add/" class="addlink" onclick="return popupAddAnotherWindow(this, 'product');" id="add_id_product_version">Add Product Version</a>				
+				</td>
 			</tr>
 			<tr>
-				<td><label>Build</label></td>
-				<td>{{ form.build }}</td>
+				<td><label>Build </label></td>
+				<td>
+					{{ form.build }} 
+					<a href="{{ ADMIN_PREFIX }}/management/testbuild/add/" class="addlink" onclick="return popupAddAnotherWindow(this, 'product');" id="add_id_build">Add Build</a></td>
 			</tr>
 			<tr>
 				<td><label>Manager</label></td>

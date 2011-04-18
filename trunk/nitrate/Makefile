@@ -8,11 +8,11 @@ VERSION=$(shell rpm -q --qf "%{VERSION}\n" --specfile $(SPECFILE)|head -n1)
 RELEASE=$(shell rpm -q --qf "%{RELEASE}\n" --specfile $(SPECFILE)|head -n1)
 
 SRPM=$(NAME)-$(VERSION)-$(RELEASE).src.rpm
-TARBALL=nitrate-$(VERSION)-$(RELEASE).tar.bz2
+TARBALL=nitrate-$(VERSION).tar.bz2
 PWD=$(shell pwd)
 RPMBUILD_OPTIONS=--nodeps --define "_sourcedir $(PWD)" --define "_srcrpmdir $(PWD)"
 
-WORK_DIR=/tmp/nitrate-$(VERSION)-$(RELEASE)
+WORK_DIR=/tmp/nitrate-$(VERSION)
 SOURCE_DIR = $(WORK_DIR)/nitrate/trunk/
 
 # Target: build a local RPM
@@ -37,7 +37,7 @@ $(TARBALL): Makefile
 	@cd $(WORK_DIR); git clone git://git.fedorahosted.org/nitrate.git
 	# Fixup the version field in the page footer so that it shows the precise
 	# RPM version-release:
-	@cd $(SOURCE_DIR); sed --in-place -r 's|NITRATE_VERSION|$(VERSION)-$(RELEASE)|' $(SOURCE_DIR)/nitrate/templates/tcms_base.html
+	@cd $(SOURCE_DIR); sed --in-place -r 's|NITRATE_VERSION|$(VERSION)|' $(SOURCE_DIR)/nitrate/templates/tcms_base.html
 	@cd $(SOURCE_DIR); mv nitrate nitrate-${VERSION}
 	@cd $(SOURCE_DIR); tar --bzip2 --exclude .git -cSpf $(TARBALL) nitrate-${VERSION}
 	@cp $(SOURCE_DIR)/$(TARBALL) .
