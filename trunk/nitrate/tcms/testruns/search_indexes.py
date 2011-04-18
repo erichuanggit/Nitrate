@@ -47,9 +47,9 @@ class TestRunIndexer(indexes.SearchIndex):
     def prepare_real_tester(self, obj):
         key   = 'tested_by__username'
         names = obj.case_run.values(key)
-        return ' '.join([
-            str(n[key]) for n in names if n
-        ])
+        return [
+            n[key] for n in names if n
+        ]
 
     def prepare_tags(self, obj):
         return [
