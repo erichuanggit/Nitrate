@@ -149,6 +149,7 @@ urlpatterns = patterns('',
     
     (r'^report/custom/$', 'tcms.report.views.custom_search'),
     (r'^report/custom/details/$', 'tcms.report.views.custom_details'),
+    (r'^advance-search/$', 'tcms.search.advance_search'),
 )
 
 # Debug zone

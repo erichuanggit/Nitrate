@@ -119,18 +119,18 @@
 			{% endcomment %}
 		</div>
 		<div class="mixbar">
-			<div class="tagname">Tags:</div>
-			<div class="taglist">
+			<span class="tit">Tags:</span>
+			<span>
 				{% for tag in case_own_tags %}
-				<a href="#testcases">{{ tag }}</a>
+				<a href="#testcases">{{ tag }}</a>&nbsp;&nbsp;<span class="grey">-</span>&nbsp;&nbsp;
 				{% empty %}
-				<div class="grey">No tags in cases</div>
+				<span class="grey">No tags in cases</div>
 				{% endfor %}
-			</div>
+			</span>
 		</div>
 	</div>
 	<div class="list_filter" {% ifnotequal REQUEST_CONTENTS.a 'search' %} style="display:none;" {% endifnotequal %}>
-		{% include 'case/form/filter.html' %}
+		<div>{% include 'case/form/filter.html' %}</div>
 		<div class="submit-row bottom">
 		<span class="tit">{{ test_cases|length }} Cases</span>
 			<input type="submit" value="Filter cases" />
@@ -150,7 +150,7 @@
 			</th>
 			<th align="left" width="50px">
 				<a title="Sort by case ID" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'case_id')">
-					#
+					ID
 				</a>
 			</th>
 			<th align="left">

@@ -298,7 +298,6 @@ def get(request, run_id, template_name = 'run/get.html'):
         'num_bug': RawSQL.num_case_run_bugs,
     })
     tcrs = tcrs.distinct()
-    
     # Get the test case run bugs summary
     tcr_bugs = TestCaseBug.objects.select_related('bug_system').all()
     tcr_bugs = tcr_bugs.filter(case_run__case_run_id__in = tcrs.values_list('case_run_id', flat=True))
@@ -313,7 +312,7 @@ def get(request, run_id, template_name = 'run/get.html'):
         'status_counter': status_counter,
         'test_case_run_bugs': tcr_bugs,
         'test_case_run_status': TestCaseRunStatus.objects.order_by('pk'),
-        'priorities': Priority.objects.all()
+        'priorities': Priority.objects.all(),
     })
 
 @user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))

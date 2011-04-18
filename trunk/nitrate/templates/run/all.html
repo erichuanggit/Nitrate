@@ -48,9 +48,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 			<div class="bottom">
 				<input type="submit" size="7" value="Search" />
 				<input type="reset" size="7"  value="Reset" />
-				<span class="right-action">
-					<a href="?summary=&plan=&product_id=&env_group_id=&manager=&status=" class="viewall">View All Runs</a>
-				</span>
+				<a href="?summary=&plan=&product_id=&env_group_id=&manager=&status=" class="viewall">View All Runs</a>
 			</div>
 			<div class="clear"></div>
 		</div>
@@ -78,17 +76,17 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 		<thead>
 			<tr >
 				<th class="nosort" width="30"><input id='id_check_all_runs' type="checkbox" title="Select all/Select none" /></th>
-				<th class="number sortasc" width="40">#</th>
-				<th class="text">Summary</th>
-				<th class="text" width="80">Manager</th>
-				<th class="text" width="100">Default Tester</th>
-				<th class="text" style="display:none" id="col_plan_head" >Plan</th>
-				<th class="text" width="130">Product</th>
-				<th class="sortable" width="120">Product version</th>
-				<th class="text" width="100" title='Plan Environment Group'>Environment</th>
-				<th class="number" width="40">Cases</th>
-				<th class="text" width="80">Status</th>
-				<th class="number" width="110">Completed</th>
+				<th class="number" width="40"><span></span>ID</th>
+				<th class="text"><span></span>Summary</th>
+				<th class="text" width="80"><span></span>Manager</th>
+				<th class="text" width="100"><span></span>Default Tester</th>
+				<th class="text" style="display:none" id="col_plan_head" ><span></span>Plan</th>
+				<th class="text" width="130"><span></span>Product</th>
+				<th class="sortable" width="120"><span></span>Product version</th>
+				<th class="text" width="100" title='Plan Environment Group'><span></span>Environment</th>
+				<th class="number" width="40"><span></span>Cases</th>
+				<th class="text" width="80"><span></span>Status</th>
+				<th class="number" width="110"><span></span>Completed</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -113,9 +111,9 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 				</td>
 				<td>
 					<div class="progress-bar">
-						<div class="progress-inner" style="width:{{ test_run.completed_case_run_percent|default:"0" }}px;  margin-right:-50px;text-align:cente">
+						<div class="progress-inner" style="width:{{ test_run.completed_case_run_percent|default:"0" }}%;">
 							<a href="#" title="faild:{{ test_run.failed_case_run_percent|default:"0" }}%">
-								<div class="progress-failed" style="width:{{ test_run.failed_case_run_percent|default:"0" }}px;">
+								<div class="progress-failed" style="width:{{ test_run.failed_case_run_percent|default:"0" }}%;">
 									&nbsp;
 								</div>
 							</a>

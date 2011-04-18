@@ -1,0 +1,296 @@
+{% extends "tcms_base.html" %}
+
+{% block custom_javascript %}
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/advance_search.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/fastinit.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/tablekit.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/testplan_actions.js"></script>
+<script type="text/javascript" src="/admin/jsi18n/"></script>
+<script type="text/javascript" src="{{ ADMIN_MEDIA_PREFIX }}js/core.js"></script>
+<script type="text/javascript" src="{{ ADMIN_MEDIA_PREFIX }}js/calendar.js"></script>
+<script type="text/javascript" src="{{ ADMIN_MEDIA_PREFIX }}js/admin/DateTimeShortcuts.js"></script>
+{% endblock %}
+
+{% block contents %}
+ <h2>Advanced Search</h2>
+	<div class="itemSearch advancedSearch">
+		<form action="/advance-search/" method="get" id="frmSearch">
+		<div id="hiddenArea" style="display:none;"></div>
+		<ul class="product">
+			<li>
+				<h4><span>*</span>Product&nbsp;:</h4>
+				<select name="p_product" id="id_product">
+					<option value="" >--</option>
+					{% for k, v in PRODUCT_CHOICE %}
+					<option value="{{k}}">{{v}}</option>
+					{% endfor %}
+				</select>
+			</li>
+			<li>
+				<h4>Product Version&nbsp;:</h4>
+				<select name="p_version" multiple="multiple" size="4" id="id_version"></select>
+			</li>
+			<li>
+				<h4>Component&nbsp;:</h4>
+				<select name="p_component" multiple="multiple" size="4" id="id_component"></select>
+			</li>
+			<li>
+				<h4>Build&nbsp;:</h4>
+				<select name="p_build" multiple="multiple" size="4" id="id_build"></select>
+			</li>
+			<li>
+				<h4>Category&nbsp;:</h4>
+				<select name="p_category" multiple="multiple" size="4" id="id_category"></select>
+			</li>
+			<li class="btn10">
+				<h4>&nbsp;</h4>
+				<input type="button" value="Add Another" id="btnNewProd">
+			</li>
+		</ul>
+		<div class="clear"></div>
+		<ul class="productSelected fixed" id="historyArea" style="display:none;">
+		</ul>
+		<div class="planCaseRun">
+			<div class="containerTabGrey">
+				<div class="top">
+					<h3>Plan</h3>
+				</div>
+				<div class="content">
+					<div class="listinfo">
+						<div class="title"><label>ID&nbsp;:</label></div>
+						<div class="listinfo_input"><input type="text" name="pl_id"/></div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Summary&nbsp;:</label></div>
+						<div class="listinfo_input"><input type="text" name="pl_summary"/></div>
+					</div>
+					
+					<div class="listinfo">
+						<div class="title"><label>Plan Type&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<select name="pl_type">
+								<option value="">--</option>
+								{% for k, v in plan_form.PLAN_TYPE_CHOICES %}
+								<option value="{{k}}">{{v}}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Author&nbsp;:</label></div>
+						<div class="listinfo_input"><input type="text" name="pl_authors"/></div>
+					</div>
+						<div class="listinfo">
+						<div class="title"><label>Tag&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<input type="text" style="width:130px;" name="pl_tags"/>
+							<select name="pl_tags_exclude" style="width:116px;">
+								<option value="0">Contain</option>
+								<option value="1">Not Contain</option>
+							</select>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Active&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<ul>
+								<li>
+									<input type="checkbox" name="pl_active" value="checkbox" /><span class="grey">Uncheck will search all</span>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Create Time&nbsp;:</label></div>
+						<div class="listinfo_input">
+								<input type="text" name="pl_created_since" style="width:130px;" class="vDateField"/>
+								<a href="javascript:DateTimeShortcuts.openCalendar(0);" id="calendarlink1"></a>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"></div>
+						<div class="listinfo_input">
+								<input type="text" name="pl_created_before" style="width:130px;" class="vDateField"/>
+								<a href="javascript:DateTimeShortcuts.openCalendar(0);" id="calendarlink1"></a>
+						</div>
+					</div>
+					<div class="clear"></div>
+				</div>
+				<div class="clear"></div>
+			</div>
+			<div class="containerTabGrey">
+				<div class="top">
+					<h3>Case</h3>
+				</div>
+				<div class="content">
+					<div class="listinfo">
+						<div class="title"><label>ID&nbsp;:</label></div>
+						<div class="listinfo_input"><input type="text" name="cs_id"/></div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Summary&nbsp;:</label></div>
+						<div class="listinfo_input"><input type="text" name="cs_summary"/></div>
+					</div>
+					
+					<div class="listinfo">
+						<div class="title"><label>Author&nbsp;:</label></div>
+						<div class="listinfo_input"><input type="text" name="cs_authors"/></div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Default Tester&nbsp;:</label></div>
+						<div class="listinfo_input"><input type="text" name="cs_tester"/></div>
+					</div>
+						<div class="listinfo">
+						<div class="title"><label>Tag&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<input type="text" style="width:130px;" name="cs_tags"/>
+							<select name="cs_tags_exclude" style="width:116px;">
+								<option value="0">Contain</option>
+								<option value="1">Not Contain</option>
+							</select>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Bug ID&nbsp;:</label></div>
+						<div class="listinfo_input"><input type="text" name="cs_bugs"/></div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Status&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<ul>
+								<li><input type="checkbox" name="cs_status" value="1" /><span>Proposed</span></li>
+								<li><input type="checkbox" name="cs_status" value="2" /><span>Comfirmed</span></li>
+							</ul>
+							<ul>
+								<li><input type="checkbox" name="cs_status" value="3" /><span>Disabled</span></li>
+								<li><input type="checkbox" name="cs_status" value="4" /><span>Need_update</span></li>
+							</ul>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Automated&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<ul>
+								<li>
+								<input type="checkbox" name="cs_auto"/>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Auto Proposed&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<ul>
+								<li>
+								<input type="checkbox" name="cs_proposed"/>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Priority&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<ul>
+								<li><input type="checkbox" name="cs_priority" value="1" /><span>P1</span></li>
+								<li><input type="checkbox" name="cs_priority" value="2" /><span>P2</span></li>
+								<li><input type="checkbox" name="cs_priority" value="3" /><span>P3</span></li>
+								<li><input type="checkbox" name="cs_priority" value="4" /><span>P4</span></li>
+								<li><input type="checkbox" name="cs_priority" value="5" /><span>P5</span></li>
+							</ul>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Script&nbsp;:</label></div>
+						<div class="listinfo_input"><input type="text" name="cs_script"/></div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Create Time&nbsp;:</label></div>
+						<div class="listinfo_input">
+								<input type="text" name="cs_created_since" style="width:130px;" class="vDateField"/>
+								<a href="javascript:DateTimeShortcuts.openCalendar(1);" id="calendarlink1"></a>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"></div>
+						<div class="listinfo_input">
+								<input type="text" name="cs_created_before" style="width:130px;" class="vDateField"/>
+								<a href="javascript:DateTimeShortcuts.openCalendar(1);" id="calendarlink1"></a>
+						</div>
+					</div>
+					<div class="clear"></div>
+				</div>
+				<div class="clear"></div>
+			</div>
+			<div class="containerTabGrey">
+				<div class="top">
+					<h3>Run</h3>
+				</div>
+				<div class="content">
+					<div class="listinfo">
+						<div class="title"><label>ID&nbsp;:</label></div>
+						<div class="listinfo_input"><input type="text" name="r_id"/></div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Summary&nbsp;:</label></div>
+						<div class="listinfo_input"><input type="text" name="r_summary"/></div>
+					</div>
+					
+					<div class="listinfo">
+						<div class="title"><label>Manager&nbsp;:</label></div>
+						<div class="listinfo_input"><input type="text" name="r_manager"/></div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Default Tester&nbsp;:</label></div>
+						<div class="listinfo_input"><input type="text" name="r_tester"/></div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Actual Tester&nbsp;:</label></div>
+						<div class="listinfo_input"><input type="text" name="r_real_tester"/></div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Tag&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<input type="text" style="width:130px;" name="r_tags"/>
+							<select name="r_tags_exclude" style="width:116px;">
+								<option value="0">Contain</option>
+								<option value="1">Not Contain</option>
+							</select>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Status&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<ul>
+								<li><input type="checkbox" name="r_running" value="True" /><span>Finished</span></li>
+								<li><input type="checkbox" name="r_running" value="False" /><span>Running</span></li>
+							</ul>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Run Time&nbsp;:</label></div>
+						<div class="listinfo_input">
+								<input type="text" style="width:130px;" class="vDateField" name="r_created_since" id="id_r_created_since"/>
+								<a href="javascript:DateTimeShortcuts.openCalendar(2);" id="calendarlink1"></a>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"></div>
+						<div class="listinfo_input">
+								<input type="text" style="width:130px;" class="vDateField" name="r_created_before" id="id_r_created_since"/>
+								<a href="javascript:DateTimeShortcuts.openCalendar(2);" id="calendarlink1"></a>
+						</div>
+					</div>
+					<div class="clear"></div>
+				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+		<div class="button_box">
+			<input type="hidden" name="target" value="" id="inpTarget"/>
+			<input type="button" value="Search Plan" id="btnSearchPlan">
+			<input type="button" value="Search Case" id="btnSearchCase">
+			<input type="button" value="Search Run" id="btnSearchRun">
+		</div>
+		</form>
+	</div>
+{% endblock %}

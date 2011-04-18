@@ -33,7 +33,6 @@ from tcms.testplans.models import TestPlan
 
 MODULE_NAME = "testcases"
 
-
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
 def automated(request):
     """
@@ -323,7 +322,10 @@ def get(request, case_id, template_name = 'case/get.html'):
     """Get the case content"""
     from tcms.testruns.models import TestCaseRunStatus
     from tcms.core.utils.raw_sql import RawSQL
-    
+    from itertools import groupby
+    from tcms.core.contrib.logs.models import TCMSLogModel
+   # from tcms.core.models.base import TCMSBaseSharedModel
+
     # Get the case
     try:
         tc = TestCase.objects.select_related(
@@ -335,6 +337,29 @@ def get(request, case_id, template_name = 'case/get.html'):
     
     # Get the test plans
     tps = tc.plan.select_related('author', 'default_product', 'type').all()
+    
+    #log
+    log_id = str(case_id)
+    logs = TCMSLogModel.objects.filter(object_pk=log_id)
+    date = ''
+
+    for log in logs:
+	if log.date == date:
+	    log.date2 = ''
+	    log.who2 = ''
+	else:
+	    log.date2 = log.date
+	    log.who2 = log.who
+	    date = log.date
+
+        if log.action.split()[1] == 'default':
+	    log.name = log.action.split()[2]
+	    log.from2 = log.action.split()[5]
+	    log.to2 = log.action.split()[7]
+        else:
+	    log.name = log.action.split()[1]
+	    log.from2 = log.action.split()[4]
+	    log.to2 = log.action.split()[6]
     
     # Get the specific test plan
     if request.GET.get('from_plan'):
@@ -354,7 +379,10 @@ def get(request, case_id, template_name = 'case/get.html'):
     tcrs = tcrs.extra(select={
         'num_bug': RawSQL.num_case_run_bugs,
     })
-    
+    runs_ordered_by_plan = groupby(tcrs, lambda t: t.run.plan)
+    # FIXME: Just don't know why Django template does not evaluate a generator,
+    # and had to evaluate the groupby generator manually like below.
+    runs_ordered_by_plan = [(k, list(v)) for k, v in runs_ordered_by_plan]
     # Get the specific test case run
     if request.REQUEST.get('case_run_id'):
         tcr = tcrs.get(pk = request.REQUEST['case_run_id'])
@@ -380,10 +408,12 @@ def get(request, case_id, template_name = 'case/get.html'):
     
     # Render the page
     return direct_to_template(request, template_name, {
+        'logs': logs,
         'test_case': tc,
         'test_plan': tp,
         'test_plans': tps,
         'test_case_runs': tcrs,
+        'runs_ordered_by_plan': runs_ordered_by_plan,
         'test_case_run': tcr,
         'test_case_text': tc_text,
         'test_case_status': TestCaseStatus.objects.all(),

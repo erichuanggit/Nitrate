@@ -628,8 +628,9 @@ function checkProductField(product_field)
     
     if($('id_product'))
         return $('id_product')
-    
-    alert('No product field');
+    if(console){
+        console.log('No product field');
+    }
     return false;
 }
 
