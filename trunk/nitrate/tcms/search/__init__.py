@@ -92,7 +92,8 @@ class QueryCriteria(object):
 
     PRIORITIES = {
         'plan': (
-            'pl_id', 'pl_summary', 'pl_authors',  'p_product', 'pl_type',
+            'pl_id', 'pl_summary', 'pl_authors',  'p_product',  'p_component', 
+            'p_version', 'pl_type',
             'pl_active', 'pl_created_since', 'pl_created_before',  'pl_tags'),
         'case': (
             'cs_id', 'cs_summary', 'cs_authors', 'cs_tester', 'cs_tags', 'cs_bugs', 'cs_script',
@@ -114,7 +115,8 @@ class QueryCriteria(object):
             'pl_created_since': 'create_date__gte',
             'pl_created_before': 'create_date__lte',
             'p_product': 'product__in',
-            'p_component': 'component__in'
+            'p_component': 'component__in',
+            'p_version': 'version__in',
         },
         'case': {
             'cs_id': 'case_id',
@@ -130,7 +132,6 @@ class QueryCriteria(object):
             'cs_script': 'script__startswith',
             'cs_created_since': 'create_date__gte',
             'cs_created_before': 'create_date__lte',
-            'p_version': 'version__in',
             'p_component': 'components__in',
             'p_category': 'category__in',
         },
@@ -394,9 +395,14 @@ def render_results(request, results, time_cost, queries, tmpl='search/results.ht
     )
 
 def remove_from_request_path(request, name):
-    path = request.get_full_path().split('&')
+    '''
+    Remove a parameter from request.get_full_path()\n
+    and return the modified path afterwards.
+    '''
+    path = request.get_full_path().split('?')[1].split('&')
     path = [p for p in path if not p.startswith(name)]
-    return '&'.join(path)
+    path = '&'.join(path)
+    return path
 
 def fmt_queries(*queries):
     '''
