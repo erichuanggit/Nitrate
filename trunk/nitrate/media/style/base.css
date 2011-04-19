@@ -533,7 +533,7 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .case_detail{ float:left; width:100%; table-layout:fixed;}
 .case_detail h4{ margin:0px;}
 .case_detail td{ border:1px solid #ccc; background:#fff; vertical-align:top; padding:10px;}
-.case_detail .title{ clear:right; width:90%; float:left; color:#3E5161; padding-bottom:5px; border-bottom:dotted 1px #ccc;}
+.case_detail .title{width:95%; float:left; color:#3E5161; padding-bottom:5px; border-bottom:dotted 1px #ccc;}
 .case_detail .case_list{ width:50%; float:left;}
 .right_pannel{ float:right; margin-left:-265px; width:260px; padding-top:10px;}
 .case_detail .no-border td{ border:0px;}
@@ -933,7 +933,8 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .list .disable { text-decoration:line-through; }
 .list .hide{ background:#F3F8FC; }
 .list .hide h4{ margin:0px; color:#333333; font-size:1.0em; }
-.list .hide li{ margin-left:20px; }
+.list .hide li{ margin-left:12px; }
+.list .hide li td{border:0px; padding:0 4px 0 0; line-height:18px;}
 .list .right_panel{ border:1px solid #ccc; background:#fff; vertical-align:top; padding:10px;}
 .list .listGroupBlue{background:#C2DFFF; padding:0px 5px; color:#000000;}
 

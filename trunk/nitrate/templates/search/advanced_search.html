@@ -12,6 +12,10 @@
 {% endblock %}
 
 {% block contents %}
+	<div class="sprites crumble">
+		<a href="{% url tcms.core.views.index %}">Home</a>
+		>> Advanced Search
+	</div>
  <h2>Advanced Search</h2>
 	<div class="itemSearch advancedSearch">
 		<form action="/advance-search/" method="get" id="frmSearch">
@@ -64,7 +68,6 @@
 						<div class="title"><label>Summary&nbsp;:</label></div>
 						<div class="listinfo_input"><input type="text" name="pl_summary"/></div>
 					</div>
-					
 					<div class="listinfo">
 						<div class="title"><label>Plan Type&nbsp;:</label></div>
 						<div class="listinfo_input">
@@ -170,20 +173,13 @@
 					<div class="listinfo">
 						<div class="title"><label>Automated&nbsp;:</label></div>
 						<div class="listinfo_input">
-							<ul>
-								<li>
-								<input type="checkbox" name="cs_auto"/>
-								</li>
-							</ul>
-						</div>
-					</div>
-					<div class="listinfo">
-						<div class="title"><label>Auto Proposed&nbsp;:</label></div>
-						<div class="listinfo_input">
-							<ul>
-								<li>
-								<input type="checkbox" name="cs_proposed"/>
-								</li>
+							<select name="cs_tags_exclude" style="width:90px; float:left;">
+								<option value="0">Auto</option>
+								<option value="1">Manual</option>
+								<option value="2">Both</option>
+							</select>
+							<ul style="float:left; padding:3px 0 0 0;">
+								<li><input type="checkbox" name="cs_auto"/><input type="checkbox" name="cs_proposed"/>Auto Proposed&nbsp</li>
 							</ul>
 						</div>
 					</div>

@@ -1,6 +1,10 @@
 {% extends "tcms_base.html" %}
 
 {% block contents %}
+	<div class="sprites crumble">
+		<a href="{% url tcms.core.views.index %}">Home</a>
+		>> Search Results
+	</div>
 	<div class="queries">
 		<ul>
 		{% for k, v in queries.iteritems %}
