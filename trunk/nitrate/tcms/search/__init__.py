@@ -96,6 +96,10 @@ def get_choice(value, _type=str, deli=','):
         raise forms.ValidationError(str(e))
 
 class QueryCriteria(object):
+    '''
+    Class mainly wraps the look-up rules and priorities\n
+    of fields that should be applied on haystack queryset.
+    '''
 
     PRIORITIES = {
         'plan': (
@@ -265,6 +269,11 @@ class RunForm(forms.Form):
         return get_choice(self.cleaned_data['r_real_tester'])
 
 def get_prod_queries(data):
+    '''
+    Using request.GET.getlist to get\n
+    multiple values of fields related to\n
+    product.
+    '''
     if not data: return {}
     def _get(key):
         values = data.getlist(key)
@@ -280,6 +289,9 @@ def get_prod_queries(data):
     return results
 
 def advance_search(request, tmpl='search/advanced_search.html'):
+    '''
+    View of /advance-search/
+    '''
     errors      = None
     data        = request.GET
     target      = data.get('target')
@@ -345,6 +357,9 @@ def evaluate_queryset(queryset, target, ctype):
         yield val
 
 def serialize_queries(docs):
+    '''
+    A generator that flattens PKs stored in index Document.
+    '''
     for key in docs:
         if not key: continue
         if isinstance(key, str):
@@ -355,6 +370,10 @@ def serialize_queries(docs):
             yield key
 
 def retrieve_results(request, plans, runs, cases, target):
+    '''
+    Try to hit the cache first\n
+    On empty value it hits index.
+    '''
     from hashlib import md5
     key     = remove_from_request_path(request, 'page')
     key     = md5(key).hexdigest()
@@ -365,6 +384,10 @@ def retrieve_results(request, plans, runs, cases, target):
     return results
 
 def sum_queried_results(plans, runs, cases, target):
+    '''
+    Search indexes of plan, case and run stored flatten\n
+    then calculate their intersection.
+    '''
     result = []
     if plans is not None:
         keys = evaluate_queryset(plans, target, 'testplan')
@@ -384,6 +407,9 @@ def sum_queried_results(plans, runs, cases, target):
         return None
 
 def render_results(request, results, time_cost, queries, tmpl='search/results.html'):
+    '''
+    Using a SQL "in" query and PKs as the arguments.
+    '''
     klasses = {
         'plan': {'class': TestPlan, 'result_key': 'test_plans'},
         'case': {'class': TestCase, 'result_key': 'test_cases'},
