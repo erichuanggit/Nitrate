@@ -172,7 +172,7 @@
 								<input type="hidden" name="value" value="" />
 								{% if perms.testruns.change_testcaserun %}
 								{% for crs in test_case_run_status %}
-								<input type="submit" class="btn btn_{{ crs.name.lower }}" title="{{ crs.name }}" value="" {% ifequal crs test_case_run.case_run_status %}disabled="True"{% endifequal %} onclick="this.form.value.value={{ crs.pk }}" />
+								<input type="submit" class="btn btn_{{ crs.name.lower }} btn_status" title="{{ crs.name }}" value="" {% ifequal crs test_case_run.case_run_status %}disabled="True"{% endifequal %} onclick="this.form.value.value={{ crs.pk }}" />
 								{% endfor %}
 								{% endif %}
 								<input type="submit" class="submit-post" value="Submit">

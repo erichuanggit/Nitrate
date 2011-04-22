@@ -58,7 +58,7 @@
 			<td class="expandable">{{ test_case_run.case.priority.value }}</td>
 			<td class="expandable">{{ test_case_run.case_text_version }}</td>
 			<td>
-				<img src="{{ MEDIA_URL }}/images/{{ test_case_run.case_run_status.name|lower }}.png" sborder="0" alt="" class="left_float" />
+				<img sborder="0" alt="" class="icon_status left_float btn_{{ test_case_run.case_run_status.name|lower }}" />
 				<label class="left_float">{{ test_case_run.case_run_status.name|upper }}</label>
 			</td>
 			<td>
