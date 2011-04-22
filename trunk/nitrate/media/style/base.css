@@ -416,25 +416,8 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 #down{ width:20px;  height:20px; float:left; }
 #down:hover{background:url(../images/down_hover.png) no-repeat;}
 .req { height: 28px; }
-.icon_status {display:inline-block;padding-left:26px; height:25px; line-height:25px;  }
 
-.btn {height:25px; width:25px; border:0;}
-.btn_passed{ background:url(../images/pass.png) no-repeat; }
-.btn_passed[disabled="True"]{ background:url(../images/pass_ban.png) no-repeat;}
-.btn_failed { background:url(../images/failed.png) no-repeat; }
-.btn_failed[disabled="True"]{ border:0; background:url(../images/failed_ban.png) no-repeat;}
-.btn_blocked{ background:url(../images/blocked.png) no-repeat;}
-.btn_blocked[disabled="True"]{ background:url(../images/blocked_ban.png) no-repeat;}
-.btn_idle{ background:url(../images/idle.png) no-repeat;}
-.btn_idle[disabled="True"]{ background:url(../images/idle_ban.png) no-repeat;}
-.btn_paused{ background:url(../images/paused.png) no-repeat;}
-.btn_paused[disabled="True"]{ background:url(../images/paused_ban.png) no-repeat;}
-.btn_error{ background:url(../images/error.png) no-repeat;}
-.btn_error[disabled="True"]{ background:url(../images/error_ban.png) no-repeat;}
-.btn_running{ background:url(../images/running.png) no-repeat;}
-.btn_running[disabled="True"]{ background:url(../images/running_ban.png) no-repeat;}
-.btn_waived{ background:url(../images/waived.png) no-repeat;}
-.btn_waived[disabled="True"]{ background:url(../images/waived_ban.png) no-repeat;}
+
 
 .case_run{ width:100%; border-left:1px solid #ccc; border-right:1px solid #ccc; border-bottom:1px solid #ccc; float:left; padding:1px;}
 .run_evenRow{ background:#f1f1f1; width:100%; clear:both; padding:3px 0px; float:left;}
@@ -443,12 +426,12 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .highlight{ background: #ffffca !important;}
 .caes_run label{ margin-right:10px; width:120px;}
 .case_run .row{ float:left; clear:both; width:98%; margin-left:1%; padding-top:5px;}
-.case_run .exist_comments ,.case_run .new_comment{ float:left; width:100%; margin:5px 0; }
+.case_run .exist_comments,.case_run .new_comment{ float:left; width:100%; margin:5px 0; }
 .case_run .exist_comments li{}
 .new_comment textarea[name='comment']{ width:600px;}
 .new_comment .submit-post{ margin:5px 0; cursor:pointer}
 .case_run .collapse-control{ width:30px; padding:2px; float:left; color:#333;}
-.case_run .buglink{background:transparent url(../images/bug_fire.png) no-repeat;padding: 0px 15px;text-decoration:none; }
+.case_run .buglink{background:transparent url(../images/bug_fire.png) no-repeat; padding:0px 15px; text-decoration:none; }
 .case_run .hiddenRow{ height:auto; float:left; width:100%;}
 .textbox{ border: #7F9DB9 1px solid;overflow:auto; width:60%;}
 /***********************Run End***************************/
@@ -974,6 +957,26 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .containerTabGrey .top{height:16px; background:url(../images/containerTab_bg_grey.png) repeat-x 0px 15px;}
 .containerTabGrey .top h3{height:16px; line-height:18px; width:70px; margin:0px; background:url(../images/containerTab_bg_grey.png) no-repeat; text-align:center; color:#0E5A99; font-size:12px;}
 .containerTabGrey .content{border:1px solid #CCCCCC; border-top-width:0px; background:#FFFFFF;}
+
+/* caserun stutas icon */
+.icon_status {display:inline-block; padding-left:23px; height:23px; line-height:23px; background:url(../images/ico_status.png) no-repeat;}
+.btn_status {display:inline-block; width:23px; height:23px; line-height:23px; background:url(../images/ico_status.png) no-repeat; margin-right:4px; border:0px; float:left; cursor:pointer;}
+.btn_passed{background-position:0px -207px;}
+.btn_passed[disabled="True"]{background-position:0px -253px;}
+.btn_failed{background-position:0px -345px;}
+.btn_failed[disabled="True"]{background-position:0px -391px;}
+.btn_blocked{background-position:0px -483px;}
+.btn_blocked[disabled="True"]{background-position:0px -529px;}
+.btn_idle{background-position:0px -276px;}
+.btn_idle[disabled="True"]{background-position:0px -322px;}
+.btn_paused{background-position:0px -138px;}
+.btn_paused[disabled="True"]{background-position:0px -184px;}
+.btn_error{background-position:0px -414px;}
+.btn_error[disabled="True"]{background-position:0px -460px;}
+.btn_running{background-position:0px -69px;}
+.btn_running[disabled="True"]{background-position:0px -115px;}
+.btn_waived{background-position:0px 0px;}
+.btn_waived[disabled="True"]{background-position:0px -46px;}
 
 .popTextarea{width:400px; height:260px; padding:12px 8px;}
 .popTextarea textarea{width:393px;}
