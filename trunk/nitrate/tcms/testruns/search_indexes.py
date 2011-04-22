@@ -32,7 +32,8 @@ class TestRunIndexer(indexes.SearchIndex):
     is_finished = indexes.BooleanField(null=True)
     plan        = indexes.IntegerField(model_attr='plan__pk', null=True)
     build       = indexes.IntegerField(model_attr='build_id', null=True)
-    product     = indexes.IntegerField(model_attr='build__product_id', null=True)
+    product     = indexes.IntegerField(null=True)
+    version     = indexes.IntegerField(model_attr='get_version_id', null=True)
 
     # NOTE: is_finished attr on testrun is determined on existence of stop_date
     finished    = indexes.BooleanField(null=True)
@@ -41,8 +42,10 @@ class TestRunIndexer(indexes.SearchIndex):
     tags        = indexes.MultiValueField(null=True)
     real_tester = indexes.MultiValueField(null=True)
 
-    case_ids    = indexes.CharField(null=True)
+    case_ids    = indexes.MultiValueField(null=True, indexed=False)
 
+    def prepare_product(self, obj):
+        return [obj.build.product_id]
 
     def prepare_real_tester(self, obj):
         key   = 'tested_by__username'
@@ -58,9 +61,7 @@ class TestRunIndexer(indexes.SearchIndex):
 
     def prepare_case_ids(self, obj):
         cases   = obj.case_run.values('case')
-        return ' '.join([
-            str(c['case']) for c in cases
-        ])
+        return [c['case'] for c in cases]
 
     def prepare_is_finished(self, obj):
         return bool(obj.stop_date)

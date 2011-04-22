@@ -38,11 +38,19 @@ class TestCaseIndexer(indexes.SearchIndex):
     create_date     = indexes.DateTimeField(model_attr='create_date', null=True)
     category        = indexes.IntegerField(model_attr='category__id', null=True)
 
-    plan_ids        = indexes.CharField(indexed=False, null=True)
-    run_ids         = indexes.CharField(indexed=False, null=True)
+    plan_ids        = indexes.MultiValueField(null=True, indexed=False)
+    run_ids         = indexes.MultiValueField(null=True, indexed=False)
     tags            = indexes.MultiValueField(null=True)
     bugs            = indexes.MultiValueField(null=True)
     components      = indexes.MultiValueField(null=True)
+    product         = indexes.MultiValueField(null=True)
+
+    def prepare_product(self, obj):
+        products = [o['product_id']
+            for o in obj.component.values('product_id')
+        ]
+        products.append(obj.category.product_id)
+        return products
 
     def prepare_components(self, obj):
         return [
@@ -67,14 +75,10 @@ class TestCaseIndexer(indexes.SearchIndex):
         return tester
 
     def prepare_plan_ids(self, obj):
-        return ' '.join([
-            str(p.pk) for p in obj.plan.all()
-        ])
+        return [p.pk for p in obj.plan.all()]
 
     def prepare_run_ids(self, obj):
         runs = obj.case_run.values('run')
-        return ' '.join([
-            str(r['run']) for r in runs
-        ])
+        return [r['run'] for r in runs]
 
 site.register(TestCase, TestCaseIndexer)
