@@ -190,6 +190,8 @@ def fmt_queries(*queries):
             if v:
                 if isinstance(v, QuerySet):
                     v = ', '.join([o.name for o in v])
+                if isinstance(v, list):
+                    v = ', '.join(map(str, v))
                 results[k] = v
     return results
 

@@ -61,7 +61,7 @@ class SmartHaystackQuery(object):
 
     RULES = {
         'plan': {
-            'pl_id': 'plan_id',
+            'pl_id': 'plan_id__in',
             'pl_summary': 'summary__startswith',
             'pl_type': 'plan_type__in',
             'pl_authors': 'author__in',
