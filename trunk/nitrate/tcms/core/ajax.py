@@ -28,6 +28,7 @@ from django.utils import simplejson
 from django.views.generic.simple import direct_to_template
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
+from django.core.cache import cache
 
 from tcms.testplans.models import TestPlan, TestCasePlan
 from tcms.testcases.models import TestCase, TestCaseTag, TestCaseBugSystem as BugSystem
@@ -35,6 +36,9 @@ from tcms.testruns.models import TestRun, TestCaseRun, TestRunTag
 from tcms.management.models import TestTag
 from tcms.core.utils import get_string_combinations
 from tcms.core.helpers.comments import add_comment
+
+from tcms.testcases.models import TestCaseCategory
+from tcms.management.models import Component, TestBuild, Version
 
 import datetime
 
@@ -498,6 +502,40 @@ def update_bugs_to_caseruns(request):
     except Exception, e:
         return say_no(str(e))
     return say_yes()
+
+def get_prod_related_objs(p_pks, target):
+    '''
+    Get Component, Version, Category, and Build\n
+    Return [(id, name), (id, name)]
+    '''
+    ctypes  = {
+        'component': (Component, 'name'),
+        'version': (Version, 'value'),
+        'build': (TestBuild, 'name'),
+        'category': (TestCaseCategory, 'name'),
+    }
+    results = ctypes[target][0]._default_manager.filter(product__in=p_pks)
+    attr = ctypes[target][1]
+    results = [(r.pk, getattr(r, attr)) for r in results]
+    return results
+
+def get_prod_related_obj_json(request):
+    '''
+    View for updating product drop-down\n
+    in a Ajax way.
+    '''
+    data    = request.GET.copy()
+    target  = data.get('target', None)
+    p_pks   = data.get('p_ids', None)
+    sep     = data.get('sep', None)
+    # py2.6: all(*values) => boolean ANDs
+    if target and p_pks and sep:
+        p_pks = [k for k in p_pks.split(sep) if k]
+        print p_pks
+        res   = get_prod_related_objs(p_pks, target);
+    else:
+        res = []
+    return HttpResponse(simplejson.dumps(res))
 
 if __name__ == '__main__':
     import doctest
