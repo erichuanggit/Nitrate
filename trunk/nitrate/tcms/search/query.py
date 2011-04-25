@@ -55,8 +55,8 @@ class SmartHaystackQuery(object):
             'cs_status', 'cs_auto', 'cs_proposed', 'cs_priority', 'cs_created_since',
             'cs_created_before', 'cs_product', 'cs_component', 'cs_category'),
         'run': (
-            'r_id','r_summary', 'r_manager', 'r_tester', 'r_real_tester', 'r_running',
-            'r_tags', 'r_created_since', 'r_created_before', 'r_product', 'r_build')
+            'r_id','r_manager', 'r_tester', 'r_real_tester', 'r_product', 'r_build', 'r_version',
+            'r_running', 'r_tags', 'r_created_since', 'r_created_before', 'r_summary',)
     }
 
     RULES = {
