@@ -3,27 +3,19 @@
 		<tr class="{% cycle 'even' 'odd'%}">
 			<td width="20%">Date</td>
 			<td width="10%">People</td>
-			<td width="20%">Field Type</td>
-			<td width="20%">From</td>
-			<td width="20%">To</td>
+			<td width="60%">Field Type</td>
 		</tr>
-		{% for log in logs %}
 
-		<tr class="{% cycle 'even' 'odd'%}">
-		    {% if log.date2 %}
-			<td width="20%">{{ log.date2|date:"Y-m-d H:i:s" }}</td>
-			<td width="10%">{{ log.who2 }}</td>
-			<td width="20%">{{ log.name }}</td>
-			<td width="20%">{{ log.from2 }}</td>
-			<td width="20%">{{ log.to2 }}</td>
-		    {% else %}
-			<td width="20%">{{ log.date2 }}</td>
-			<td width="10%">{{ log.who2 }}</td>
-			<td width="20%">{{ log.name }}</td>
-			<td width="20%">{{ log.from2 }}</td>
-			<td width="20%">{{ log.to2 }}</td>
-		    {% endif %}
-		</tr>
+		{% for day, actions in logs %}
+			{% for action in actions %}
+			<tr class="{% cycle 'even' 'odd'%}">
+				{% ifequal forloop.counter 1  %}
+				<td width="20%" rowspan={{actions|length}}>{{ day|date:"Y-m-d H:i:s" }}</td>
+				<td width="10%" rowspan={{actions|length}}>{{ action.who }}</td>
+				{% endifequal %}
+				<td width="60%">{{ action }}</td>
+			</tr>
+			{% endfor %}
 		{% endfor %}
 	</tbody>
 </table>

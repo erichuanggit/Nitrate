@@ -341,26 +341,9 @@ def get(request, case_id, template_name = 'case/get.html'):
     #log
     log_id = str(case_id)
     logs = TCMSLogModel.objects.filter(object_pk=log_id)
-    date = ''
 
-    for log in logs:
-	if log.date == date:
-	    log.date2 = ''
-	    log.who2 = ''
-	else:
-	    log.date2 = log.date
-	    log.who2 = log.who
-	    date = log.date
-
-        if log.action.split()[1] == 'default':
-	    log.name = log.action.split()[2]
-	    log.from2 = log.action.split()[5]
-	    log.to2 = log.action.split()[7]
-        else:
-	    log.name = log.action.split()[1]
-	    log.from2 = log.action.split()[4]
-	    log.to2 = log.action.split()[6]
-    
+    logs = groupby(logs, lambda l: l.date)
+    logs = [(day, list(actions)) for day, actions in logs]
     # Get the specific test plan
     if request.GET.get('from_plan'):
         try:
