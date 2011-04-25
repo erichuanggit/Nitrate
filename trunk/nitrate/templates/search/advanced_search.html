@@ -14,52 +14,42 @@
 {% block contents %}
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
-		>> Advanced Search
 	</div>
  <h2>Advanced Search</h2>
 	<div class="itemSearch advancedSearch">
 		<form action="/advance-search/" method="get" id="frmSearch">
-		<div id="hiddenArea" style="display:none;"></div>
-		<ul class="product">
-			<li>
-				<h4><span>*</span>Product&nbsp;:</h4>
-				<select name="p_product" id="id_product">
-					<option value="" >--</option>
-					{% for k, v in PRODUCT_CHOICE %}
-					<option value="{{k}}">{{v}}</option>
-					{% endfor %}
-				</select>
-			</li>
-			<li>
-				<h4>Product Version&nbsp;:</h4>
-				<select name="p_version" multiple="multiple" size="4" id="id_version"></select>
-			</li>
-			<li>
-				<h4>Component&nbsp;:</h4>
-				<select name="p_component" multiple="multiple" size="4" id="id_component"></select>
-			</li>
-			<li>
-				<h4>Build&nbsp;:</h4>
-				<select name="p_build" multiple="multiple" size="4" id="id_build"></select>
-			</li>
-			<li>
-				<h4>Category&nbsp;:</h4>
-				<select name="p_category" multiple="multiple" size="4" id="id_category"></select>
-			</li>
-			<li class="btn10">
-				<h4>&nbsp;</h4>
-				<input type="button" value="Add Another" id="btnNewProd">
-			</li>
-		</ul>
-		<div class="clear"></div>
-		<ul class="productSelected fixed" id="historyArea" style="display:none;">
-		</ul>
+		{% if errors %}
+			{{ errors }}
+		{% endif %}
 		<div class="planCaseRun">
 			<div class="containerTabGrey">
 				<div class="top">
 					<h3>Plan</h3>
 				</div>
 				<div class="content">
+					<div class="listinfo">
+						<div class="title"><label>Product&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<select name="pl_product" id="pl_product" multiple="multiple">
+								<option value="">--</option>
+								{% for k, v in PRODUCT_CHOICE %}
+								<option value="{{k}}">{{v}}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Component&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<select name="pl_component" id="pl_component" multiple="multiple"></select>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Version&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<select name="pl_version" id="pl_version" multiple="multiple"></select>
+						</div>
+					</div>
 					<div class="listinfo">
 						<div class="title"><label>ID&nbsp;:</label></div>
 						<div class="listinfo_input"><input type="text" name="pl_id"/></div>
@@ -71,10 +61,10 @@
 					<div class="listinfo">
 						<div class="title"><label>Plan Type&nbsp;:</label></div>
 						<div class="listinfo_input">
-							<select name="pl_type">
+							<select name="pl_type" multiple="multiple">
 								<option value="">--</option>
-								{% for k, v in plan_form.PLAN_TYPE_CHOICES %}
-								<option value="{{k}}">{{v}}</option>
+								{% for t in PLAN_TYPE_CHOICES %}
+								<option value="{{t.pk}}">{{t.name}}</option>
 								{% endfor %}
 							</select>
 						</div>
@@ -98,10 +88,15 @@
 						<div class="listinfo_input">
 							<ul>
 								<li>
-									<input type="checkbox" name="pl_active" value="checkbox" /><span class="grey">Uncheck will search all</span>
+									<select name="pl_active">
+										<option value="">--</option>
+										<option value="yes">Active</option>
+										<option value="no">Inactive</option>
+									</select>
 								</li>
 							</ul>
 						</div>
+						
 					</div>
 					<div class="listinfo">
 						<div class="title"><label>Create Time&nbsp;:</label></div>
@@ -126,6 +121,29 @@
 					<h3>Case</h3>
 				</div>
 				<div class="content">
+					<div class="listinfo">
+						<div class="title"><label>Product&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<select name="cs_product" id="cs_product" multiple="multiple">
+								<option value="">--</option>
+								{% for k, v in PRODUCT_CHOICE %}
+								<option value="{{k}}">{{v}}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Component&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<select name="cs_component" id="cs_component" multiple="multiple"></select>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Category&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<select name="cs_category" id="cs_category" multiple="multiple"></select>
+						</div>
+					</div>
 					<div class="listinfo">
 						<div class="title"><label>ID&nbsp;:</label></div>
 						<div class="listinfo_input"><input type="text" name="cs_id"/></div>
@@ -173,13 +191,28 @@
 					<div class="listinfo">
 						<div class="title"><label>Automated&nbsp;:</label></div>
 						<div class="listinfo_input">
-							<select name="cs_tags_exclude" style="width:90px; float:left;">
-								<option value="0">Auto</option>
-								<option value="1">Manual</option>
-								<option value="2">Both</option>
-							</select>
-							<ul style="float:left; padding:3px 0 0 0;">
-								<li><input type="checkbox" name="cs_auto"/><input type="checkbox" name="cs_proposed"/>Auto Proposed&nbsp</li>
+							<ul>
+								<li>
+									<select name="cs_auto">
+										<option value="">--</option>
+										<option value="yes">Automated</option>
+										<option value="no">Manual</option>
+									</select>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Auto Proposed&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<ul>
+								<li>
+								<select name="cs_proposed">
+										<option value="">--</option>
+										<option value="yes">Auto Proposed</option>
+										<option value="no">Non Auto Proposed</option>
+									</select>
+								</li>
 							</ul>
 						</div>
 					</div>
@@ -223,6 +256,29 @@
 				</div>
 				<div class="content">
 					<div class="listinfo">
+						<div class="title"><label>Product&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<select name="r_product" id="r_product" multiple="multiple">
+								<option value="">--</option>
+								{% for k, v in PRODUCT_CHOICE %}
+								<option value="{{k}}">{{v}}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Version&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<select name="r_version" id="r_version" multiple="multiple"></select>
+						</div>
+					</div>
+					<div class="listinfo">
+						<div class="title"><label>Build&nbsp;:</label></div>
+						<div class="listinfo_input">
+							<select name="r_build" id="r_build" multiple="multiple"></select>
+						</div>
+					</div>
+					<div class="listinfo">
 						<div class="title"><label>ID&nbsp;:</label></div>
 						<div class="listinfo_input"><input type="text" name="r_id"/></div>
 					</div>
@@ -257,8 +313,8 @@
 						<div class="title"><label>Status&nbsp;:</label></div>
 						<div class="listinfo_input">
 							<ul>
-								<li><input type="checkbox" name="r_running" value="True" /><span>Finished</span></li>
-								<li><input type="checkbox" name="r_running" value="False" /><span>Running</span></li>
+								<li><input type="checkbox" name="r_running" value="yes" /><span>Finished</span></li>
+								<li><input type="checkbox" name="r_running" value="no" /><span>Running</span></li>
 							</ul>
 						</div>
 					</div>

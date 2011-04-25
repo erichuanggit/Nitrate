@@ -46,6 +46,7 @@ urlpatterns = patterns('',
     # Ajax call responder
     (r'^ajax/update/$', 'tcms.core.ajax.update'),
     (r'^ajax/form/$', 'tcms.core.ajax.form'),
+    (r'^ajax/get-prod-relate-obj/$', 'tcms.core.ajax.get_prod_related_obj_json'),
     (r'^management/getinfo/$', 'tcms.core.ajax.info'),
     (r'^management/tags/$', 'tcms.core.ajax.tag'), 
     

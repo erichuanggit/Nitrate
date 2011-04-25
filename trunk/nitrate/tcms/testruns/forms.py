@@ -82,7 +82,7 @@ class RunModelForm(forms.ModelForm):
 # =========== Forms for create/update ==============
 
 class BaseRunForm(forms.Form):
-    summary = forms.CharField(label='Summary')
+    summary = forms.CharField(label='Summary', max_length=255)
     manager = UserField(label='Manager')
     default_tester = UserField(
         label='Default Tester', 
