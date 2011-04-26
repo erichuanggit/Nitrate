@@ -13,75 +13,75 @@
 			<ul>
 				<li>
 					{% if perms.testcases.add_testcase %}
-					<span class='sprites toolbar_case' onclick="window.location.href='{% url tcms.testcases.views.new %}?from_plan={{ test_plan.plan_id }}';">Case</span>
+					<span class='sprites toolbar_case icon_plan' onclick="window.location.href='{% url tcms.testcases.views.new %}?from_plan={{ test_plan.plan_id }}';">Case</span>
 					{% else %}
-					<span class='sprites toolbar_case'>Case</span>
+					<span class='sprites toolbar_case icon_plan'>Case</span>
 					{% endif %}
 					<ul>
 						{% if perms.testcases.add_testcase %}
-						<li><input class="add_new" type="button" value="Write new case" onclick="window.location.href='{% url tcms.testcases.views.new %}?from_plan={{ test_plan.plan_id }}';"/></li>
-						<li><input type="button" class="import" value="Import cases from XML" onclick="$('id_import_case_zone').toggle();" /></li>
-						<li><input type="button" class="search" value="Add cases from other plans" onclick="window.location.href='{% url tcms.testplans.views.cases test_plan.plan_id %}?a=link_cases'" /></li>
+						<li><input class="add_new icon_plan" type="button" value="Write new case" onclick="window.location.href='{% url tcms.testcases.views.new %}?from_plan={{ test_plan.plan_id }}';"/></li>
+						<li><input type="button" class="import icon_plan" value="Import cases from XML" onclick="$('id_import_case_zone').toggle();" /></li>
+						<li><input type="button" class="search icon_plan" value="Add cases from other plans" onclick="window.location.href='{% url tcms.testplans.views.cases test_plan.plan_id %}?a=link_cases'" /></li>
 						{% else %}
-						<li><input class="add_new" type="button" disabled="true" value="Write new case"/></li>
-						<li><input type="button" class="import" disabled="true" value="Import cases from XML"	/></li>
-						<li><input type="button" class="search" disabled="true" value="Add cases from other plans"	 /></li>
+						<li><input class="add_new icon_plan" type="button" disabled="true" value="Write new case"/></li>
+						<li><input type="button" class="import icon_plan" disabled="true" value="Import cases from XML"	/></li>
+						<li><input type="button" class="search icon_plan" disabled="true" value="Add cases from other plans"	 /></li>
 						{% endif %}
-						<li><input type="button" class="export" title="Export selected cases into XML file" value="Export" onclick="postToURL('{% url tcms.testcases.views.export %}', serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
-						<li><input type="button" class="print_view" value="Print"  title="print view of selected cases" onclick="postToURL('{% url tcms.testcases.views.printable %}', serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
+						<li><input type="button" class="export icon_plan" title="Export selected cases into XML file" value="Export" onclick="postToURL('{% url tcms.testcases.views.export %}', serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
+						<li><input type="button" class="print_view icon_plan" value="Print"  title="print view of selected cases" onclick="postToURL('{% url tcms.testcases.views.printable %}', serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
 						{% if perms.testcases.add_testcase %}
-						<li><input type="button" class="clone" value="Clone" title="Clone selected cases to another test plan" onclick="postToURL('{% url tcms.testcases.views.clone %}', serialzeCaseForm(this.up(6), this.up(6).next()), 'get');" /></li>
+						<li><input type="button" class="clone icon_plan" value="Clone" title="Clone selected cases to another test plan" onclick="postToURL('{% url tcms.testcases.views.clone %}', serialzeCaseForm(this.up(6), this.up(6).next()), 'get');" /></li>
 						{% else %}
-						<li><input type="button" class="clone" value="Clone" title="Clone selected cases to another test plan" disabled="true"/></li>
+						<li><input type="button" class="clone icon_plan" value="Clone" title="Clone selected cases to another test plan" disabled="true"/></li>
 						{% endif %}
 						{% if perms.testcases.delete_testcaseplan %}
-						<li><input type="button" class="delete" value="Remove" title="Remove selected cases from this plan" onclick="unlinkCasePlan(this.up(7), serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
+						<li><input type="button" class="delete icon_plan" value="Remove" title="Remove selected cases from this plan" onclick="unlinkCasePlan(this.up(7), serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
 						{% else %}
-						<li><input type="button" class="delete" value="Remove" title="Remove selected cases from this plan" disabled="true"/></li>
+						<li><input type="button" class="delete icon_plan" value="Remove" title="Remove selected cases from this plan" disabled="true"/></li>
 						{% endif %}
 					</ul>
 				</li>
 				<li>
 					{% if perms.testcases.add_testcasetag %}
-					<span class='sprites toolbar_tag'>Tag</span>
+					<span class='sprites toolbar_tag icon_plan'>Tag</span>
 					{% else %}
-					<span class='sprites toolbar_tag_disabled'>Tag</span>
+					<span class='sprites toolbar_tag_disabled icon_plan'>Tag</span>
 					{% endif %}
 					<ul>
 						{% if perms.testcases.add_testcasetag %}
-						<li><input type="button" value="Add Tag" class="tag_add sprites" /></li>
+						<li><input type="button" value="Add Tag" class="tag_add sprites icon_plan" /></li>
 						{% else %} 
-						<li><input type="button" value="Add Tag" class="tag_add_disabled sprites" disabled="disabled" /></li>
+						<li><input type="button" value="Add Tag" class="tag_add_disabled sprites icon_plan" disabled="disabled" /></li>
 						{% endif %}
 						{% if perms.testcases.delete_testcasetag %}
-						<li><input type="button" value="Remove Tag" class="tag_delete sprites" /></li>
+						<li><input type="button" value="Remove Tag" class="tag_delete sprites icon_plan" /></li>
 						{% else %}
-						<li><input type="button" value="Remove Tag" class="tag_delete_disabled sprites" disabled="disabled" /></li>
+						<li><input type="button" value="Remove Tag" class="tag_delete_disabled sprites icon_plan" disabled="disabled" /></li>
 						{% endif %}
 					</ul>
 				</li>
 				{% if perms.testcases.change_testcase %}
-				<li><input type="button" value="Automated" title="change automated" class="btn_automated automated sprites" /></li>
-				<li><input type="button" value="Reviewer" title="change reviewer" class="btn_reviewer assignee sprites" /></li>
-				<li><input type="button" value="Component" class="btn_component sprites component" /></li>
-				<li><span class='sprites toolbar_status'>Status</span>
+				<li><input type="button" value="Automated" title="change automated" class="btn_automated automated sprites icon_plan" /></li>
+				<li><input type="button" value="Reviewer" title="change reviewer" class="btn_reviewer assignee sprites icon_plan" /></li>
+				<li><input type="button" value="Component" class="btn_component sprites component icon_plan" /></li>
+				<li><span class='sprites toolbar_status icon_plan'>Status</span>
 					<ul>
 						{% for cs in case_status %}
-						<li><input type='button' value='Set {{ cs }}' class='btn_case_status {{ cs|lower }}' onclick="this.form.new_case_status_id.value={{ cs.pk }}; fireEvent(form.new_case_status_id, 'change')"　/></li>
+						<li><input type='button' value='Set {{ cs }}' class='btn_case_status {{ cs|lower }} icon_plan' onclick="this.form.new_case_status_id.value={{ cs.pk }}; fireEvent(form.new_case_status_id, 'change')"　/></li>
 						{% endfor %}
 					</ul>
 				</li>
-				<li><span class='sprites toolbar_priority'>Priority</span>
+				<li><span class='sprites toolbar_priority icon_plan'>Priority</span>
 					<ul>
 						{% for priority in priorities %}
-						<li><input type='button' value='Set {{ priority }}' class='btn_case_priority {{ priority|lower }}' onclick="this.form.new_priority_id.value={{ priority.pk }}; fireEvent(form.new_priority_id, 'change')" /></li>
+						<li><input type='button' value='Set {{ priority }}' class='btn_case_priority {{ priority|lower }} icon_plan' onclick="this.form.new_priority_id.value={{ priority.pk }}; fireEvent(form.new_priority_id, 'change')" /></li>
 						{% endfor %}
 					</ul>
 				</li>
 				{% else %}
-				<li><input type="button" value="Automated" title="change automated" class="btn_automated automated_disabled sprites" disabled="Trues" /></li>
-				<li><input type="button" value="Reviewer" title="change reviewer" class="btn_reviewer assigneedisable sprites" disabled /></li>
-				<li><input id="id_batch_component" type="button" value="Component" class="btn_component sprites component_disabled" disabled="disabled"/></li>
+				<li><input type="button" value="Automated" title="change automated" class="btn_automated automated_disabled sprites icon_plan" disabled="Trues" /></li>
+				<li><input type="button" value="Reviewer" title="change reviewer" class="btn_reviewer assigneedisable sprites icon_plan" disabled /></li>
+				<li><input id="id_batch_component" type="button" value="Component" class="btn_component sprites component_disabled icon_plan" disabled="disabled"/></li>
 				{% endif %}
 			</ul>
 			
@@ -117,15 +117,15 @@
 			{% endif %}
 			{% endcomment %}
 		</div>
-		<div class="mixbar">
-			<span class="tagname">Tags:</span>
-			<span>
+		<div class="mixbar fixed">
+			<div class="tit" style="width: 50px; float: left; height: 100%; margin: 0px; text-align: center;">Tags:</div >
+			<div  style="margin-left: 50px; line-height:22px;">
 				{% for tag in case_own_tags %}
-				<a href="#testcases">{{ tag }}</a>
+				<a href="#testcases">{{ tag }}</a>&nbsp;&nbsp;<span class="grey">-</span>&nbsp;&nbsp;
 				{% empty %}
 				<span class="grey">No tags in cases</span>
 				{% endfor %}
-			</span>
+			</div >
 		</div>
 	</div>
 	<div class="list_filter" {% ifnotequal REQUEST_CONTENTS.a 'search' %} style="display:none;" {% endifnotequal %}>
