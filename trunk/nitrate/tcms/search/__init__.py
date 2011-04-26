@@ -59,7 +59,6 @@ def advance_search(request, tmpl='search/advanced_search.html'):
     run_form.populate(data)
     all_forms   = (plan_form, case_form, run_form)
     errors      = [f.errors for f in all_forms if not f.is_valid()]
-    plan_form   = PlanForm(data)
     if errors or not data:
         PRODUCT_CHOICE = [
             (p.pk, p.name) for p in cached_entities('product')
