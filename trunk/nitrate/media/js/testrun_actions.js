@@ -324,7 +324,7 @@ var updateCaseRunStatus = function(e)
         if ($('id_check_box_auto_blinddown').checked && parameters['value'] != '') {
             var next_title = parent.next();
             if(!next_title) {
-                alert(default_messages.alert.last_case_run);
+                //alert(default_messages.alert.last_case_run);
                 return false;
             }
             if(next_title.next().getStyle('display') == 'none')

@@ -189,7 +189,12 @@ def fmt_queries(*queries):
             .replace('pl_', 'plan ').replace('r_', 'run ').replace('_', ' ')
             if v:
                 if isinstance(v, QuerySet):
-                    v = ', '.join([o.name for o in v])
+                    try:
+                        v = ', '.join([o.name for o in v])
+                    except AttributeError:
+                        v = ', '.join([o.value for o in v])
+                if isinstance(v, list):
+                    v = ', '.join(map(str, v))
                 results[k] = v
     return results
 

@@ -32,7 +32,7 @@ LooseIF     = partial(forms.IntegerField, required=False)
 LooseDF     = partial(forms.DateField, required=False)
 LooseBF     = partial(forms.BooleanField, required=False)
 LooseMF     = partial(forms.MultipleChoiceField, required=False, choices=())
-PlanTypeF   = partial(forms.ModelMultipleChoiceField, required=False, queryset=TestPlanType.objects.none())
+PlanTypeF   = partial(forms.ModelMultipleChoiceField, required=False, queryset=TestPlanType.objects.all())
 ProductF    = partial(forms.ModelMultipleChoiceField, required=False, queryset=Product.objects.none())
 BuildF      = partial(forms.ModelMultipleChoiceField, required=False, queryset=TestBuild.objects.none())
 CategoryF   = partial(forms.ModelMultipleChoiceField, required=False, queryset=TestCaseCategory.objects.none())
@@ -189,6 +189,9 @@ class RunForm(forms.Form):
 
     def clean_r_real_tester(self):
         return get_choice(self.cleaned_data['r_real_tester'])
+
+    def clean_r_manager(self):
+        return get_choice(self.cleaned_data['r_manager'])
 
     def populate(self, data):
         prod_pks = data.getlist('r_product')

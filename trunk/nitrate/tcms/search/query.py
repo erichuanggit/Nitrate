@@ -26,9 +26,9 @@ from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.conf import settings
 # from tcms
-from testruns.models import TestRun
-from testplans.models import TestPlan
-from testcases.models import TestCase
+from tcms.testruns.models import TestRun
+from tcms.testplans.models import TestPlan
+from tcms.testcases.models import TestCase
 # from stdlib
 from types import FunctionType
 from haystack.query import SearchQuerySet
@@ -55,13 +55,13 @@ class SmartHaystackQuery(object):
             'cs_status', 'cs_auto', 'cs_proposed', 'cs_priority', 'cs_created_since',
             'cs_created_before', 'cs_product', 'cs_component', 'cs_category'),
         'run': (
-            'r_id','r_summary', 'r_manager', 'r_tester', 'r_real_tester', 'r_running',
-            'r_tags', 'r_created_since', 'r_created_before', 'r_product', 'r_build')
+            'r_id','r_manager', 'r_tester', 'r_real_tester', 'r_product', 'r_build', 'r_version',
+            'r_running', 'r_tags', 'r_created_since', 'r_created_before', 'r_summary',)
     }
 
     RULES = {
         'plan': {
-            'pl_id': 'plan_id',
+            'pl_id': 'plan_id__in',
             'pl_summary': 'summary__startswith',
             'pl_type': 'plan_type__in',
             'pl_authors': 'author__in',

@@ -531,7 +531,6 @@ def get_prod_related_obj_json(request):
     # py2.6: all(*values) => boolean ANDs
     if target and p_pks and sep:
         p_pks = [k for k in p_pks.split(sep) if k]
-        print p_pks
         res   = get_prod_related_objs(p_pks, target);
     else:
         res = []
