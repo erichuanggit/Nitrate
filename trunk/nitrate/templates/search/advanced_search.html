@@ -19,7 +19,12 @@
 	<div class="itemSearch advancedSearch">
 		<form action="/advance-search/" method="get" id="frmSearch">
 		{% if errors %}
-			{{ errors }}
+			<ul>
+				<li>Errors -</li>
+				{% for k, v in errors %}
+				<li>{{k|title}}: {{v}}</li>
+				{% endfor %}
+			</ul>
 		{% endif %}
 		<div class="planCaseRun">
 			<div class="containerTabGrey">

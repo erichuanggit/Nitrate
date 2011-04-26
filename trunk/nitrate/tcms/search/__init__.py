@@ -50,8 +50,6 @@ def advance_search(request, tmpl='search/advanced_search.html'):
     errors      = None
     data        = request.GET
     target      = data.get('target')
-    if target not in ('plan', 'case', 'run'):
-        errors  = 'Unsupported search type.'
     plan_form   = PlanForm(data)
     case_form   = CaseForm(data)
     run_form    = RunForm(data)
@@ -61,12 +59,14 @@ def advance_search(request, tmpl='search/advanced_search.html'):
     run_form.populate(data)
     all_forms   = (plan_form, case_form, run_form)
     errors      = [f.errors for f in all_forms if not f.is_valid()]
-
+    plan_form   = PlanForm(data)
     if errors or not data:
         PRODUCT_CHOICE = [
             (p.pk, p.name) for p in cached_entities('product')
         ]
         PLAN_TYPE_CHOICES = cached_entities('testplantype')
+        print errors
+        errors = fmt_errors(errors)
         return direct_to_template(request, tmpl, locals())
 
     start = time.time()
@@ -177,6 +177,21 @@ def remove_from_request_path(request, name):
     path = [p for p in path if not p.startswith(name)]
     path = '&'.join(path)
     return path
+
+def fmt_errors(form_errors):
+    '''
+    Format errors collected in a Django Form
+    for a better appearance.
+    '''
+    errors = []
+    for error in form_errors:
+        for k, v in error.iteritems():
+            k = k.replace('p_product', 'product').replace('p_', 'product ').replace('cs_', 'case ')\
+            .replace('pl_', 'plan ').replace('r_', 'run ').replace('_', ' ')
+            if isinstance(v, list):
+                v = ', '.join(map(str, v))
+            errors.append((k, v))
+    return errors
 
 def fmt_queries(*queries):
     '''
