@@ -26,9 +26,9 @@ from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.conf import settings
 # from tcms
-from testruns.models import TestRun
-from testplans.models import TestPlan
-from testcases.models import TestCase
+from tcms.testruns.models import TestRun
+from tcms.testplans.models import TestPlan
+from tcms.testcases.models import TestCase
 # from stdlib
 from types import FunctionType
 from haystack.query import SearchQuerySet
