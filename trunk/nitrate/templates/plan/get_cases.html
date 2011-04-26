@@ -66,19 +66,19 @@
 				</li>
 				{% if perms.testcases.change_testcase %}
 				<li><input type="button" value="Automated" title="change automated" class="btn_automated automated sprites icon_plan" /></li>
-				<li><input type="button" value="Default tester" title="change default tester" class="btn_default_tester assignee sprites icon_plan" /></li>
+				<li><input type="button" value="Default Tester" title="change default tester" class="btn_default_tester assignee sprites icon_plan" /></li>
 				<li><input type="button" value="Component" class="btn_component sprites component icon_plan" /></li>
 				<li><span class='sprites toolbar_status icon_plan'>Status</span>
 					<ul>
 						{% for cs in case_status %}
-						<li><input type='button' value='Set {{ cs }}' class='btn_case_status {{ cs|lower }}' onclick="this.form.new_case_status_id.value={{ cs.pk }}; fireEvent(form.new_case_status_id, 'change')"　/></li>
+						<li><input type='button' value='Set {{ cs }}' class='btn_case_status {{ cs|lower }} icon_plan' onclick="this.form.new_case_status_id.value={{ cs.pk }}; fireEvent(form.new_case_status_id, 'change')"　/></li>
 						{% endfor %}
 					</ul>
 				</li>
 				<li><span class='sprites toolbar_priority icon_plan'>Priority</span>
 					<ul>
 						{% for priority in priorities %}
-						<li><input type='button' value='Set {{ priority }}' class='btn_case_priority {{ priority|lower }}' onclick="this.form.new_priority_id.value={{ priority.pk }}; fireEvent(form.new_priority_id, 'change')" /></li>
+						<li><input type='button' value='Set {{ priority }}' class='btn_case_priority {{ priority|lower }} icon_plan' onclick="this.form.new_priority_id.value={{ priority.pk }}; fireEvent(form.new_priority_id, 'change')" /></li>
 						{% endfor %}
 					</ul>
 				</li>

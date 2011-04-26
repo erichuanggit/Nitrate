@@ -30,7 +30,7 @@
 					<div class="listinfo">
 						<div class="title"><label>Product&nbsp;:</label></div>
 						<div class="listinfo_input">
-							<select name="pl_product" id="pl_product" multiple="multiple">
+							<select name="pl_product" id="pl_product" multiple="multiple" size="5">
 								<option value="">--</option>
 								{% for k, v in PRODUCT_CHOICE %}
 								<option value="{{k}}">{{v}}</option>
@@ -41,13 +41,13 @@
 					<div class="listinfo">
 						<div class="title"><label>Component&nbsp;:</label></div>
 						<div class="listinfo_input">
-							<select name="pl_component" id="pl_component" multiple="multiple"></select>
+							<select name="pl_component" id="pl_component" multiple="multiple" size="5"></select>
 						</div>
 					</div>
 					<div class="listinfo">
 						<div class="title"><label>Version&nbsp;:</label></div>
 						<div class="listinfo_input">
-							<select name="pl_version" id="pl_version" multiple="multiple"></select>
+							<select name="pl_version" id="pl_version" multiple="multiple" size="5"></select>
 						</div>
 					</div>
 					<div class="listinfo">
@@ -61,7 +61,7 @@
 					<div class="listinfo">
 						<div class="title"><label>Plan Type&nbsp;:</label></div>
 						<div class="listinfo_input">
-							<select name="pl_type" multiple="multiple">
+							<select name="pl_type" multiple="multiple" size="5">
 								<option value="">--</option>
 								{% for t in PLAN_TYPE_CHOICES %}
 								<option value="{{t.pk}}">{{t.name}}</option>
@@ -124,7 +124,7 @@
 					<div class="listinfo">
 						<div class="title"><label>Product&nbsp;:</label></div>
 						<div class="listinfo_input">
-							<select name="cs_product" id="cs_product" multiple="multiple">
+							<select name="cs_product" id="cs_product" multiple="multiple" size="5">
 								<option value="">--</option>
 								{% for k, v in PRODUCT_CHOICE %}
 								<option value="{{k}}">{{v}}</option>
@@ -135,13 +135,13 @@
 					<div class="listinfo">
 						<div class="title"><label>Component&nbsp;:</label></div>
 						<div class="listinfo_input">
-							<select name="cs_component" id="cs_component" multiple="multiple"></select>
+							<select name="cs_component" id="cs_component" multiple="multiple" size="5"></select>
 						</div>
 					</div>
 					<div class="listinfo">
 						<div class="title"><label>Category&nbsp;:</label></div>
 						<div class="listinfo_input">
-							<select name="cs_category" id="cs_category" multiple="multiple"></select>
+							<select name="cs_category" id="cs_category" multiple="multiple" size="5"></select>
 						</div>
 					</div>
 					<div class="listinfo">
@@ -258,7 +258,7 @@
 					<div class="listinfo">
 						<div class="title"><label>Product&nbsp;:</label></div>
 						<div class="listinfo_input">
-							<select name="r_product" id="r_product" multiple="multiple">
+							<select name="r_product" id="r_product" multiple="multiple" size="5">
 								<option value="">--</option>
 								{% for k, v in PRODUCT_CHOICE %}
 								<option value="{{k}}">{{v}}</option>
@@ -269,13 +269,13 @@
 					<div class="listinfo">
 						<div class="title"><label>Version&nbsp;:</label></div>
 						<div class="listinfo_input">
-							<select name="r_version" id="r_version" multiple="multiple"></select>
+							<select name="r_version" id="r_version" multiple="multiple" size="5"></select>
 						</div>
 					</div>
 					<div class="listinfo">
 						<div class="title"><label>Build&nbsp;:</label></div>
 						<div class="listinfo_input">
-							<select name="r_build" id="r_build" multiple="multiple"></select>
+							<select name="r_build" id="r_build" multiple="multiple" size="5"></select>
 						</div>
 					</div>
 					<div class="listinfo">

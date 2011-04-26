@@ -1,9 +1,9 @@
-<div class="treeview_toolbar">
-	<div class="treeview_tools">
-		<input class="node_edit sprites" type="button" value="Change parent node for plan {{ test_plan.pk }}" onclick="changePlanParent(this.up(2), {{ test_plan.pk }})" />
-		<input class="node_add sprites" type="button" value="Add child node to current plan {{ test_plan.pk }}" onclick="addPlanChildren(this.up(2), {{ test_plan.pk }})" />
-		<input class="node_delete sprites" type="button" value="Remove child node from current plan {{ test_plan.pk }}" onclick="removePlanChildren(this.up(2), {{ test_plan.pk }})" />
-    </div>
+<div class="mixbar">
+	<div class="marginLeft fixed">
+		<input class="edit_node icon_plan left_float" type="button" value="Change parent node for plan {{ test_plan.pk }}" onclick="changePlanParent(this.up(2), {{ test_plan.pk }})" />
+		<input class="add_node icon_plan left_float" type="button" value="Add child node to current plan {{ test_plan.pk }}" onclick="addPlanChildren(this.up(2), {{ test_plan.pk }})" />
+		<input class="remove_node icon_plan left_float" type="button" value="Remove child node from current plan {{ test_plan.pk }}" onclick="removePlanChildren(this.up(2), {{ test_plan.pk }})" />
+	</div>
 	<div class="treeview_toolbar_text">
 		Only displayed following items in the tree
 		<ul>
