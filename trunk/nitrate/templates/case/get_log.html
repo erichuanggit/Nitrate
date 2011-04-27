@@ -7,15 +7,20 @@
 		</tr>
 
 		{% for day, actions in logs %}
-			{% for action in actions %}
+			
 			<tr class="{% cycle 'odd' 'even'%}">
-				{% ifequal forloop.counter 1  %}
-				<td rowspan={{actions|length}}>{{ day|date:"Y-m-d H:i:s" }}</td>
-				<td rowspan={{actions|length}}>{{ action.who }}</td>
-				{% endifequal %}
-				<td>{{ action }}</td>
+				<td>{{ day|date:"Y-m-d H:i:s" }}</td>
+				<td>
+					{% for action in actions %}
+						{{ action.who }}<br/>
+					{% endfor %}
+				</td>
+				<td>
+					{% for action in actions %}
+						{{ action }}<br/>
+					{% endfor %}
+				</td>
 			</tr>
-			{% endfor %}
 		{% endfor %}
 	</tbody>
 </table>
