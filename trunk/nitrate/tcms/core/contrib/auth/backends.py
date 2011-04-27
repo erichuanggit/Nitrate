@@ -27,6 +27,9 @@ except ImportError: # Django 1.1.1 compatible
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.backends import ModelBackend, RemoteUserBackend
 
+# from tcms
+from tcms.core.contrib.auth import initiate_user_with_default_setups
+
 class DBModelBackend(ModelBackend):
     can_login = True
     can_register = True
@@ -146,7 +149,8 @@ class KerberosBackend(ModelBackend):
                 username = username,
                 email = '%s@%s' % (username, settings.KRB5_REALM.lower())
             )
-        
+            # add default permission and other default setups
+            initiate_user_with_default_setups(user)
         user.set_unusable_password()
         user.save()
         return user
