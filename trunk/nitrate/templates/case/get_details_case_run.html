@@ -66,23 +66,25 @@
 					{% endfor %}
 					{% endcomment %}
 
-					{% for bug in test_case_run.case.get_bugs %}
+					{% for bug_id, bugs in grouped_case_bugs %}
 					<li>
 						<table cellpadding="0" cellspacing="0" border="0">
 							<tr>
-								<td><a href="{{ bug.get_absolute_url }}">{{ bug }}</a></td>
+								<td><a href="{{ bug_id }}">{{ bug_id }}</a></td>
 								<td>
-									{% if bug.case_run_id %}
-									<span class="grey"> - From Run</span>
-									<a href="{% url tcms.testruns.views.get bug.case_run.run_id %}">{{ bug.case_run.run_id }}</a>
-									<a href="javascript:void(0);" title="Remove this bug" onclick="removeCaseRunBug(this.up(7).previous(), this.up(7), this.previous(2).innerHTML, {{ test_case_run.case_id }}, {{ test_case_run.pk }})"><img width="9" height="9" title="remove this tag" src="/media/images/remove_small.png"></a>
-									, 12312, 12312, 12312, 12312,
-									{% else %}
-									<span class="grey"> - From Case</span>
-									<a href="{% url tcms.testcases.views.get bug.case_id %}">{{ bug.case_id }}</a>
-									{% endif %}
+									{% for bug in bugs %}
+										{% if bug.case_run_id %}
+										<span class="grey">Run </span>
+										<a href="{% url tcms.testruns.views.get bug.case_run.run_id %}">{{ bug.case_run.run_id }}</a>
+											{% ifequal bug.case_run_id test_case_run.pk %}
+												<a href="javascript:void(0);" title="Remove this bug" onclick="removeCaseRunBug(this.up(11).previous(), this.up(11), {{ bug.bug_id }}, {{ test_case_run.case_id }}, {{ test_case_run.pk }})"><img width="9" height="9" title="remove this tag" src="/media/images/remove_small.png"></a>
+											{% endifequal %}
+										{% else %}
+										<span class="grey">Case </span>
+										<a href="{% url tcms.testcases.views.get bug.case_id %}">{{ bug.case_id }}</a>
+										{% endif %}
+									{% endfor %}
 								</td>
-								
 							</tr>
 						</table>
 					</li>

@@ -30,6 +30,7 @@ from tcms.core.utils import Prompt
 
 from models import TestCase, TestCaseStatus, TestCaseAttachment
 from tcms.testplans.models import TestPlan
+from itertools import groupby
 
 MODULE_NAME = "testcases"
 
@@ -322,7 +323,6 @@ def get(request, case_id, template_name = 'case/get.html'):
     """Get the case content"""
     from tcms.testruns.models import TestCaseRunStatus
     from tcms.core.utils.raw_sql import RawSQL
-    from itertools import groupby
     from tcms.core.contrib.logs.models import TCMSLogModel
    # from tcms.core.models.base import TCMSBaseSharedModel
 
@@ -388,7 +388,7 @@ def get(request, case_id, template_name = 'case/get.html'):
         template_name = template_types.get(
             request.REQUEST['template_type'], 'case'
         )
-    
+    grouped_case_bugs = tcr and group_case_bugs(tcr.case.get_bugs())
     # Render the page
     return direct_to_template(request, template_name, {
         'logs': logs,
@@ -398,11 +398,21 @@ def get(request, case_id, template_name = 'case/get.html'):
         'test_case_runs': tcrs,
         'runs_ordered_by_plan': runs_ordered_by_plan,
         'test_case_run': tcr,
+        'grouped_case_bugs': grouped_case_bugs,
         'test_case_text': tc_text,
         'test_case_status': TestCaseStatus.objects.all(),
         'test_case_run_status': TestCaseRunStatus.objects.all(),
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
     })
+
+def group_case_bugs(bugs):
+    '''
+    Group bugs using bug_id
+    '''
+    bugs = sorted(bugs, key=lambda b: b.bug_id)
+    bugs = groupby(bugs, lambda b: b.bug_id)
+    bugs = [(pk, list(_bugs)) for pk, _bugs in bugs]
+    return bugs
 
 def printable(request, template_name = 'case/printable.html'):
     """Create the printable copy for plan/case"""

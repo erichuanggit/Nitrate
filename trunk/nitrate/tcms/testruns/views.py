@@ -405,7 +405,7 @@ def bug(request, case_run_id, template_name = 'run/execute_case_run.html'):
     from tcms.testcases.forms import CaseBugForm
     
     class CaseRunBugActions(object):
-        __all__ = ['add', 'file', 'remove', 'render', 'render_form']
+        __all__ = ['add', 'file', 'remove', 'render_form']
         
         def __init__(self, request, case_run, template_name):
             self.request = request
@@ -456,8 +456,8 @@ def bug(request, case_run_id, template_name = 'run/execute_case_run.html'):
             try:
                 self.case_run.remove_bug(self.request.REQUEST.get('bug_id'))
             except ObjectDoesNotExist, error:
-                response = {'rc': 1, 'response': error}
-                return self.render(response = response)
+                response = {'rc': 1, 'response': str(error)}
+                return self.ajax_response(response=response)
             
             # self.case_run.set_current()
             
