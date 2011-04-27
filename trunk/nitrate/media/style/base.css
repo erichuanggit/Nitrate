@@ -183,7 +183,8 @@ table.noborder,table.noborder td{border:none;background:transparent;}
 .notice .coverage .pass{ background:#fff url(../images/pass-cov.png) repeat-x; float:left; height:20px; margin:0; }
 .notice .coverage .failed{ background:#fff url(../images/failed-cov.png) repeat-x; float:left; height:20px; margin:0; }
 .notice .coverage .none{ background:#fff; margin:0; float:left; height:20px; }
-.prompt-message{ color:#235d9f; }
+.prompt-message{color:#235d9f; }
+
 /*****************************single sign on****************/
 .login{ width:440px; margin:50px auto;padding:5px; border:1px solid #e7e7e7; color:#666; background:url(../images/login_bg.png) repeat-x left top #e7e7e7;}
 .login h3{ font-size:1.2em; padding:5px 0px; margin:0px; text-align:center; color:#659acc; }
@@ -825,7 +826,6 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .system_help{background:url("../images/icon_system_help.png") 5px 2px no-repeat; padding:0 0 5px 25px;color:#52677A;}
 .system_alert{background:url("../images/icon_system_alert.png") top left no-repeat; padding-left:20px;color:#bd7f04;}
 .have_bug{background:url("../images/bug_fire.png") left center no-repeat; padding: 1px 0px 1px 20px;}
-.prompt-message{text-align:center;}
 .alert{background:url("../images/icon_system_help.png") top left no-repeat; padding-left:20px;color:#891b05;width:500px;margin:10px 0;}
 .system_info{background: url("../images/tip_bg.png") 5px 5px no-repeat; width:500px;margin:0 auto;padding:5px 5px 5px 25px;margin:10px 0px;-moz-box-shadow:1px 1px 1px #ccc;}
 .text-center{text-align:center;}
@@ -888,6 +888,8 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .list_filter .priority_filter ul,.list_filter td ul{ list-style-type:none; margin:0px; padding:0px;}
 .list_filter .priority_filter ul li{ float:left; padding:0px; margin:0px;}
 .list_filter td  input[ type="text" ]{ width:100%;}
+
+/* advancedSearch */
 
 .advancedSearch{padding:10px; width:1200px;}
 .advancedSearch .selectM{height:70px;}
@@ -984,6 +986,8 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .add_node{background-position:0px -966px; padding-left:16px;}
 .edit_node{background-position:0px -23px; padding-left:16px;}
 .remove_node{background-position:0px -989px; padding-left:16px;}
+
+.noContentOrange{text-align:center; color:#FF6600; padding:15px 0 20px 0;}
 
 /* pop */
 .popTextarea{width:400px; height:260px; padding:12px 8px;}
