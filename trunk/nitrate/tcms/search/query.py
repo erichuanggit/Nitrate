@@ -51,8 +51,8 @@ class SmartHaystackQuery(object):
             'pl_version', 'pl_type', 'pl_active', 'pl_created_since',
             'pl_created_before', 'pl_tags'),
         'case': (
-            'cs_id', 'cs_summary', 'cs_authors', 'cs_tester', 'cs_tags', 'cs_bugs', 'cs_script',
-            'cs_status', 'cs_auto', 'cs_proposed', 'cs_priority', 'cs_created_since',
+            'cs_id', 'cs_authors', 'cs_tester', 'cs_script', 'cs_summary', 'cs_tags',
+            'cs_bugs', 'cs_status', 'cs_auto', 'cs_proposed', 'cs_priority', 'cs_created_since',
             'cs_created_before', 'cs_product', 'cs_component', 'cs_category'),
         'run': (
             'r_id','r_manager', 'r_tester', 'r_real_tester', 'r_product', 'r_build', 'r_version',
@@ -146,7 +146,8 @@ class SmartHaystackQuery(object):
             if isinstance(value, bool) or value:
                 if settings.DEBUG:
                     print 'applying filter %s : %s' % (key, value)
-                queryset = queryset or self.queryset
+                if queryset is None:
+                    queryset = self.queryset
                 if isinstance(value, QuerySet):
                     value = [v.pk for v in value]
                 if self.queries.get(key+'_exclude', False):
@@ -258,7 +259,8 @@ class SmartDjangoQuery(object):
             if isinstance(value, int) or isinstance(value, bool) or value:
                 if settings.DEBUG:
                     print 'applying filter %s : %s' % (key, value)
-                queryset = queryset or self.queryset
+                if queryset is None:
+                    queryset = self.queryset
                 if self.queries.get(key+'_exclude', False):
                     # for complicated Q filtering
                     if isinstance(lookup, FunctionType):
