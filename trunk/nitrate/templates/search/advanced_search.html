@@ -14,9 +14,22 @@
 {% block contents %}
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
+		>> Advanced Search
 	</div>
- <h2>Advanced Search</h2>
+	<div class="advancedSearchTip advancedSearch">
+		<h3>Use the form below as your advanced search :</h3>
+		<ul>
+		<li>Reverse searching in tag : in tag field, select 'contain' or 'not contain' to make the result include or exclude the search terms.</li>
+		<li>Actual Tester : 'Actual Tester' represent who testing the case in test run, may different from 'default tester' of test run.</li>
+		<li>Relationship Query :</li>
+		</ul>
+		<p>You can set some restrictions on the run or case when search plan to filter the result.</p>
+		<p>e.g. Select product 'RHEL6' in plan form,  and set 'Tom' as test run's manager, then search test plan .The result will be the plans under 'RHEL6' and have runs managed by 'Tom'.</p>
+		<p>Same with the run and case searching.</p>
+		
+	</div>
 	<div class="itemSearch advancedSearch">
+
 		<form action="/advance-search/" method="get" id="frmSearch">
 		{% if errors %}
 			<ul>
@@ -345,7 +358,7 @@
 			<input type="button" value="Search Plan" id="btnSearchPlan">
 			<input type="button" value="Search Case" id="btnSearchCase">
 			<input type="button" value="Search Run" id="btnSearchRun">
-			<input type="reset" value="Clear">
+			<input type="reset" value="Reset">
 		</div>
 		</form>
 	</div>
