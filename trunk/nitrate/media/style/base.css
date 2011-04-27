@@ -183,7 +183,8 @@ table.noborder,table.noborder td{border:none;background:transparent;}
 .notice .coverage .pass{ background:#fff url(../images/pass-cov.png) repeat-x; float:left; height:20px; margin:0; }
 .notice .coverage .failed{ background:#fff url(../images/failed-cov.png) repeat-x; float:left; height:20px; margin:0; }
 .notice .coverage .none{ background:#fff; margin:0; float:left; height:20px; }
-.prompt-message{ color:#235d9f; }
+.prompt-message{color:#235d9f; }
+
 /*****************************single sign on****************/
 .login{ width:440px; margin:50px auto;padding:5px; border:1px solid #e7e7e7; color:#666; background:url(../images/login_bg.png) repeat-x left top #e7e7e7;}
 .login h3{ font-size:1.2em; padding:5px 0px; margin:0px; text-align:center; color:#659acc; }
@@ -616,6 +617,7 @@ a:link.edit,a:visited.edit{ color:#333;}
 .report_pass{ background:#A4D047;}
 .report_cover{ background:#96bae5;}
 .button_box{ width:100%; text-align:center; margin:10px 0 0px 0; padding:5px 0; }
+.button_box input{cursor:pointer;}
 .button_box2{ width:100%; text-align:center; margin:5px 0 0px 0;border-top:dotted 1px #ccc;padding-top:5px;}
 .table_style{ border:solid 1px #a2a2a2;border-collapse:collapse; width:99%; margin:10px auto;}
 .table_style th{background:url(../images/table_header_bg.png) repeat-x left -1px #cdcdcd; height:26px; line-height:26px; font-size:12px; font-weight:bold;border:solid 1px #a2a2a2;border-collapse:collapse; padding:3px 0 0 5px; text-align:left}
@@ -767,7 +769,9 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .itemSearch .name { float:left;}
 .itemSearch .name_short input[type="text"]{ width:106px; float:left;}
 .itemSearch .name_short select{width:144px; float:left;}
-.itemSearch .bottom{height:30px; line-height:30px; padding:20px 0 10px 400px;}
+.itemSearch .bottom{height:26px; padding:20px 0 10px 400px; line-height:26px;}
+.itemSearch .bottom .allSearch{float:left; padding:0 0 0 15px;}
+.itemSearch .bottom .allSearch span{padding:0 6px; color:#AAAAAA;}
 
 .mixbar{background:url("../images/action_bg.png") repeat-x left top #e6e6e6;width:100%;clear:both;border-bottom:1px solid #ccc; padding:4px 0 2px 0; position:relative;}
 .mixbar_left{float:left; height:22px;line-height:22px; padding-left:5px;}
@@ -825,7 +829,6 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .system_help{background:url("../images/icon_system_help.png") 5px 2px no-repeat; padding:0 0 5px 25px;color:#52677A;}
 .system_alert{background:url("../images/icon_system_alert.png") top left no-repeat; padding-left:20px;color:#bd7f04;}
 .have_bug{background:url("../images/bug_fire.png") left center no-repeat; padding: 1px 0px 1px 20px;}
-.prompt-message{text-align:center;}
 .alert{background:url("../images/icon_system_help.png") top left no-repeat; padding-left:20px;color:#891b05;width:500px;margin:10px 0;}
 .system_info{background: url("../images/tip_bg.png") 5px 5px no-repeat; width:500px;margin:0 auto;padding:5px 5px 5px 25px;margin:10px 0px;-moz-box-shadow:1px 1px 1px #ccc;}
 .text-center{text-align:center;}
@@ -889,7 +892,10 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .list_filter .priority_filter ul li{ float:left; padding:0px; margin:0px;}
 .list_filter td  input[ type="text" ]{ width:100%;}
 
-.advancedSearch{padding:10px; width:1200px;}
+/* advancedSearch */
+
+.advancedSearch{padding:10px; width:1200px; margin:0px auto;}
+.advancedSearch h2{margin:0px; padding:0 0 0 8px;}
 .advancedSearch .selectM{height:70px;}
 .advancedSearch .product li{float:left; width:18%;}
 .advancedSearch .product li.btn10{width:10%;}
@@ -904,6 +910,10 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .advancedSearch .planCaseRun .containerTabGrey .content{padding:10px 5px 20px 0;}
 .advancedSearch .planCaseRun .title{width:100px;}
 .advancedSearch .planCaseRun .listinfo{padding:5px 0;}
+.advancedSearchTip h3{margin-left:0px; margin-top:0px;}
+.advancedSearchTip ul{margin-left:10px;}
+.advancedSearchTip li{color:#FF6600; list-style: disc; margin-left:10px;}
+.advancedSearchTip p{margin:0 0 0 20px; color:#333333;}
 .queries{border:1px solid #FFE4B5; background:#FFF8E9; float:left; margin:10px; padding:5px 10px;}
 .queries li{float:left; padding:0 15px 0 0;}
 .queries li label{padding:0 3px 0 0; color:#999999;}
@@ -984,6 +994,8 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .add_node{background-position:0px -966px; padding-left:16px;}
 .edit_node{background-position:0px -23px; padding-left:16px;}
 .remove_node{background-position:0px -989px; padding-left:16px;}
+
+.noContentOrange{text-align:center; color:#FF6600; padding:15px 0 20px 0;}
 
 /* pop */
 .popTextarea{width:400px; height:260px; padding:12px 8px;}
