@@ -28,7 +28,7 @@ from models import TestRun, TestCaseRun, TestCaseRunStatus, TCMSEnvRunValueMap
 
 MODULE_NAME = "testruns"
 
-#@user_passes_test(lambda u: u.has_perm('testruns.add_testrun'))
+@user_passes_test(lambda u: u.has_perm('testruns.add_testrun'))
 def new(request, template_name = 'run/new.html'):
     """
     Display the create test run page
@@ -315,7 +315,7 @@ def get(request, run_id, template_name = 'run/get.html'):
         'priorities': Priority.objects.all(),
     })
 
-#@user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
+@user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
 def edit(request, run_id, template_name = 'run/edit.html'):
     """
     Edit test plan view
@@ -377,7 +377,7 @@ def edit(request, run_id, template_name = 'run/edit.html'):
         'form': form,
     })
 
-#@user_passes_test(lambda u: u.has_perm('testruns.change_testcaserun'))
+@user_passes_test(lambda u: u.has_perm('testruns.change_testcaserun'))
 def execute(request, run_id, template_name = 'run/execute.html'):
     """Execute test run"""
     return get(request, run_id, template_name)
@@ -385,7 +385,7 @@ def execute(request, run_id, template_name = 'run/execute.html'):
 def report(request, run_id, template_name = 'run/report.html'):
     return get(request, run_id, template_name)
 
-#@user_passes_test(lambda u: u.has_perm('testruns.change_testcaserun'))
+@user_passes_test(lambda u: u.has_perm('testruns.change_testcaserun'))
 def set_current(request, case_run_id):
     """Set the case to be current"""
     from django.utils import simplejson
@@ -396,7 +396,7 @@ def set_current(request, case_run_id):
         
     return HttpResponse(simplejson.dumps({'rc': 0, 'response': 'ok'}))
 
-#@user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
+@user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
 def bug(request, case_run_id, template_name = 'run/execute_case_run.html'):
     """
     Process the bugs for case runs
@@ -645,7 +645,7 @@ def order_case(request, run_id):
         reverse('tcms.testruns.views.get', args=[run_id, ])
     )
 
-#@user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
+@user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
 def change_status(request, run_id):
     """Change test run finished or running"""
     from datetime import datetime
