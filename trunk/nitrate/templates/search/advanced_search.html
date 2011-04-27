@@ -36,7 +36,6 @@
 						<div class="title"><label>Product&nbsp;:</label></div>
 						<div class="listinfo_input">
 							<select name="pl_product" id="pl_product" multiple="multiple" size="5">
-								<option value="">--</option>
 								{% for k, v in PRODUCT_CHOICE %}
 								<option value="{{k}}">{{v}}</option>
 								{% endfor %}
@@ -212,7 +211,7 @@
 						<div class="listinfo_input">
 							<ul>
 								<li>
-								<select name="cs_proposed">
+									<select name="cs_proposed">
 										<option value="">--</option>
 										<option value="yes">Auto Proposed</option>
 										<option value="no">Non Auto Proposed</option>
@@ -317,10 +316,11 @@
 					<div class="listinfo">
 						<div class="title"><label>Status&nbsp;:</label></div>
 						<div class="listinfo_input">
-							<ul>
-								<li><input type="checkbox" name="r_running" value="yes" /><span>Finished</span></li>
-								<li><input type="checkbox" name="r_running" value="no" /><span>Running</span></li>
-							</ul>
+							<select name="r_running">
+								<option value="">All</option>
+								<option value="yes">Finished</option>
+								<option value="no">Running</option>
+							</select>
 						</div>
 					</div>
 					<div class="listinfo">

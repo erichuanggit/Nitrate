@@ -255,21 +255,21 @@ class SmartDjangoQuery(object):
                 continue
             lookup  = rules[key]
             value   = self.queries.get(key, None)
-            if isinstance(value, bool) or value:
+            if isinstance(value, int) or isinstance(value, bool) or value:
                 if settings.DEBUG:
                     print 'applying filter %s : %s' % (key, value)
-                qs = queryset or self.queryset
+                queryset = queryset or self.queryset
                 if self.queries.get(key+'_exclude', False):
                     # for complicated Q filtering
                     if isinstance(lookup, FunctionType):
-                        queryset = qs.exclude(lookup(value))
+                        queryset = queryset.exclude(lookup(value))
                     else:
-                        queryset = qs.exclude(**{lookup: value})
+                        queryset = queryset.exclude(**{lookup: value})
                 else:
                     if isinstance(lookup, FunctionType):
-                        queryset = qs.filter(lookup(value))
+                        queryset = queryset.filter(lookup(value))
                     else:
-                        queryset = qs.filter(**{lookup: value})
+                        queryset = queryset.filter(**{lookup: value})
         self.queryset = queryset
 
     def evaluate(self):

@@ -45,6 +45,10 @@ class TestCaseIndexer(indexes.SearchIndex):
     components      = indexes.MultiValueField(null=True)
     product         = indexes.MultiValueField(null=True)
 
+    def prepare_is_automated(self, obj):
+        s = obj.is_automated
+        return bool(s)
+
     def prepare_product(self, obj):
         products = [o['product_id']
             for o in obj.component.values('product_id')
