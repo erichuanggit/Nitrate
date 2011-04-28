@@ -25,6 +25,7 @@ Based on http://code.google.com/p/modwsgi/wiki/IntegrationWithDjango
 import os
 import django.core.handlers.wsgi
 
+os.environ['PYTHON_EGG_CACHE'] = '/tmp/.python-eggs/'
 os.environ['DJANGO_SETTINGS_MODULE'] = 'tcms.product_settings'
 
 _application = django.core.handlers.wsgi.WSGIHandler()
