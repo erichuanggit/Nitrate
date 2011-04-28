@@ -141,7 +141,7 @@ def sum_haystack_queries(plans, cases, runs, target):
         keys = [key for key in keys if key]
         if keys: result.append(set(keys))
     if result:
-        return set.intersection(*result)
+        return reduce(set.intersection, result)
     else:
         return None
 
