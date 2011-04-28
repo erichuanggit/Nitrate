@@ -144,8 +144,8 @@ class SmartHaystackQuery(object):
             # boolean type is a valid value, integer zero considered
             # invalid here.
             if isinstance(value, bool) or value:
-                if settings.DEBUG:
-                    print 'applying filter %s : %s' % (key, value)
+                #if settings.DEBUG:
+                #    print 'applying filter %s : %s' % (key, value)
                 if queryset is None:
                     queryset = self.queryset
                 if isinstance(value, QuerySet):
@@ -257,8 +257,8 @@ class SmartDjangoQuery(object):
             lookup  = rules[key]
             value   = self.queries.get(key, None)
             if isinstance(value, int) or isinstance(value, bool) or value:
-                if settings.DEBUG:
-                    print 'applying filter %s : %s' % (key, value)
+                #if settings.DEBUG:
+                #    print 'applying filter %s : %s' % (key, value)
                 if queryset is None:
                     queryset = self.queryset
                 if self.queries.get(key+'_exclude', False):
