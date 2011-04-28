@@ -24,7 +24,14 @@ from tcms.testcases.models import TestCaseCategory
 from tcms.testplans.models import TestPlanType
 from tcms.search.utils import cached_entities
 # from stdlib
-from functools import partial
+#from functools import partial
+
+# temporary fix to the problem that python2.4 does not ship with a partial in functools
+def partial(func, **kwargs):
+    def call(**xkwargs):
+        kwargs.update(xkwargs)
+        return func(**kwargs)
+    return call
 
 # template-functions creating form field with required = False
 LooseCF     = partial(forms.CharField, required=False, max_length=200)
