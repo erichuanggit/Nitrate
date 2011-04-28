@@ -64,7 +64,6 @@ def advance_search(request, tmpl='search/advanced_search.html'):
             (p.pk, p.name) for p in cached_entities('product')
         ]
         PLAN_TYPE_CHOICES = cached_entities('testplantype')
-        print errors
         errors = fmt_errors(errors)
         return direct_to_template(request, tmpl, locals())
 
