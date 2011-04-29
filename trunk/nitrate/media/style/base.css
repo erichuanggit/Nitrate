@@ -67,7 +67,7 @@ a.banner_login{ color:red;}
 .menu ul li:hover{height:37px; font-weight:bold;}
 .menu .current a{font-weight:bold;color:#F3F8FD;}
 .submenu{background:#3E3E3F;width:100%;}
-.menu .linkAdvancedSearch{width:110px; display: inline-block;}
+.menu .linkAdvancedSearch{width:115px; display: inline-block;}
 .menu .linkAdvancedSearch a:link,.menu .linkAdvancedSearch a:visited{text-decoration:underline;}
 .menu .linkAdvancedSearch a:hover{text-decoration:none; font-weight:normal;}
 #nav{list-style-type:none; overflow:hidden;float:left;padding:0px;margin:0px;}
