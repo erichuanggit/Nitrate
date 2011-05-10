@@ -22,7 +22,7 @@
 						<li><input type="button" class="import icon_plan" value="Import cases from XML" onclick="$('id_import_case_zone').toggle();" /></li>
 						<li><input type="button" class="search icon_plan" value="Add cases from other plans" onclick="window.location.href='{% url tcms.testplans.views.cases test_plan.plan_id %}?a=link_cases'" /></li>
 						{% else %}
-						<li><input class="add_new icon_plan" type="button" disabled="true" value="Write new case"/></li>
+						<li><input type="button" class="add_new icon_plan" disabled="true" value="Write new case"/></li>
 						<li><input type="button" class="import icon_plan" disabled="true" value="Import cases from XML"	/></li>
 						<li><input type="button" class="search icon_plan" disabled="true" value="Add cases from other plans" /></li>
 						{% endif %}
@@ -83,9 +83,9 @@
 					</ul>
 				</li>
 				{% else %}
-				<li><input type="button" value="Automated" title="change automated" class="btn_automated automated_disabled sprites" disabled="Trues" /></li>
-				<li><input type="button" value="Default tester" title="change default tester" class="btn_default_tester assigneedisable sprites" disabled /></li>
-				<li><input id="id_batch_component" type="button" value="Component" class="btn_component sprites component_disabled" disabled="disabled"/></li>
+				<li><input type="button" value="Automated" title="change automated" class="btn_automated automated_disabled sprites icon_plan" disabled="Trues" /></li>
+				<li><input type="button" value="Default tester" title="change default tester" class="btn_default_tester assigneedisable sprites icon_plan" disabled /></li>
+				<li><input id="id_batch_component" type="button" value="Component" class="btn_component sprites component_disabled icon_plan" disabled="disabled"/></li>
 				{% endif %}
 			</ul>
 			<span class="reorder_case">

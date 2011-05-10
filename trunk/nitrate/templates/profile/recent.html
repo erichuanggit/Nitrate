@@ -33,8 +33,8 @@
 					<td class="sprites home_table_bar" width="120" align="center">
 						<div class="progress-bar" style="float:none">
 							<div class="percent">{{ test_run.completed_case_run_percent|default:"0" }}%</div>
-							<div class="progress-inner" style="width:{{ test_run.completed_case_run_percent|default:"0" }}px; ">
-								<div class="progress-failed" style="width:{{ test_run.failed_case_run_percent|default:"0" }}px; ">
+							<div class="progress-inner" style="width:{{ test_run.completed_case_run_percent|default:"0" }}%; ">
+								<div class="progress-failed" style="width:{{ test_run.failed_case_run_percent|default:"0" }}%; ">
 								</div>
 							</div>
 						</div>

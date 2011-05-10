@@ -55,17 +55,17 @@ Nitrate.TestPlans.Instance = {
 	<input id="id_plan_id" type="hidden" name="plan_id" value="{{ test_plan.plan_id }}">
 	<div class="control">
 		<span id="id_buttons" class="button">
-			<input id="btn_edit" type="button" value="Edit plan " title="Edit test plan" onclick="window.location.href='{% url tcms.testplans.views.edit test_plan.plan_id %}'" {% if perms.testplans.change_testplan %}{% else%}disabled{% endif %}>
-			<input id="btn_clone" type="button" value="Clone plan" title="Clone this plan to other product" onclick="window.location.href='{% url tcms.testplans.views.clone %}?plan={{ test_plan.plan_id }}'" {% if perms.testplans.add_testplan %}{% else %}disabled{% endif %}>
+			<input id="btn_edit" type="button" value="Edit Plan " title="Edit test plan" onclick="window.location.href='{% url tcms.testplans.views.edit test_plan.plan_id %}'" {% if perms.testplans.change_testplan %}{% else%}disabled{% endif %}>
+			<input id="btn_clone" type="button" value="Clone Plan" title="Clone this plan to other product" onclick="window.location.href='{% url tcms.testplans.views.clone %}?plan={{ test_plan.plan_id }}'" {% if perms.testplans.add_testplan %}{% else %}disabled{% endif %}>
 			{% if test_plan.is_active %}
-			<input id="btn_disable" type="button" value="Disable plan " title="Disabled this plan" {% if not perms.testplans.change_testplan %}disabled="true"{% endif %}>
+			<input id="btn_disable" type="button" value="Disable Plan " title="Disabled this plan" {% if not perms.testplans.change_testplan %}disabled="true"{% endif %}>
 			{% else %}
-			<input id="btn_enable" type="button" value="Enable plan " title="Enabled this plan" {% if not perms.testplans.change_testplan %}disabled="true"{% endif %}>
+			<input id="btn_enable" type="button" value="Enable Plan " title="Enabled this plan" {% if not perms.testplans.change_testplan %}disabled="true"{% endif %}>
 			{% endif %}
 			{% comment %}
 			<input id="btn_report" type="button" value="Report " title="" onclick="window.location.href='{% url tcms.testplans.views.report test_plan.plan_id %}'">
 			{% endcomment %}
-			<input id="btn_export" type="button" value="Export all cases " title="Export all cases to XML file" onclick="window.location.href='{% url tcms.testcases.views.export %}?plan={{ test_plan.pk }}'">
+			<input id="btn_export" type="button" value="Export All Cases " title="Export all cases to XML file" onclick="window.location.href='{% url tcms.testcases.views.export %}?plan={{ test_plan.pk }}'">
 			<input id="btn_print" type="button" value="Print Plan " title="Print Plan" onclick="window.location.href='{% url tcms.testcases.views.printable %}?plan={{ test_plan.pk }}'">	
 			<!--
 			<span class="right-action">
@@ -222,7 +222,7 @@ Nitrate.TestPlans.Instance = {
 			<div  class="right-bar" >
 				<label class="errors" id="import-error">{{ xml_form.xml_file.errors }}</label>	
 				{{ xml_form.a }}
-				<label><b>Import XML file:</b></label>
+				<label><b>Import XML File:</b></label>
 				{{ xml_form.xml_file }}
 				<input type="submit" value="Import" />
 				<br/>

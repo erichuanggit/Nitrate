@@ -86,9 +86,9 @@
 			</ul>
 			
 			<span class="reorder_case">
-				<a class="btn_filter filtercase" title="Click to show filter options">Show filter options</a>
+				<a class="btn_filter filtercase" title="Click to show filter options">Show Filter Options</a>
 				{% if perms.testcases.change_testcase %}
-				<a class="btn_sort sortlink" title="Click me,then Drag and drop the rows to adjust the order,and click 'Done Sorting' link to submit your changes">Re-order cases</a>
+				<a class="btn_sort sortlink" title="Click me,then Drag and drop the rows to adjust the order,and click 'Done Sorting' link to submit your changes">Re-order Cases</a>
 				{% endif %}
 			</span>
 
@@ -150,7 +150,7 @@
 			</th>
 			<th align="left" width="50px">
 				<a title="Sort by case ID" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'case_id')">
-					#
+					ID
 				</a>
 			</th>
 			<th align="left">
@@ -194,7 +194,7 @@
 					Sort
 				</a>
 			</th>
-			<th align="left" width="60px">Actions</th>
+			<th align="left" width="80px">Actions</th>
 		</tr>
 	</thead>
 	<tbody>

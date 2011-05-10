@@ -33,7 +33,7 @@ body { font-size:12px; width:100%; min-width:1200px; line-height:150%; font-fami
 
 
 .clear{ clear:both!important; float:none!important;}
-.absoluteright{position:absolute; right:5px; top:0px;}
+.absoluteright{position:absolute; right:10px; top:3px;}
 .sprites{border:none;background:url("../images/sprites.png") no-repeat; /*height:16px; line-height:16px;font-size:12px;*/}
 .radius{box-shadow: 2px 2px 2px #c5c3c3;-moz-box-shadow: 5px 5px 5px #c5c3c3;-webkit-box-shadow: 5px 5px 5px #c5c3c3;-moz-border-radius: 5px;-khtml-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px; border:solid 1px #CCC }
 .red{color:red;}
@@ -686,7 +686,7 @@ a:link.edit,a:visited.edit{ color:#333;}
 .table_watchlist_toolbar span{ margin-left:20px;}
 .table_watchlist_toolbar span a{ margin-right:10px;}
 
-.bookmark{ position:absolute; right:5px; top:60px; background-position:0 -806px; padding-left:18px;cursor:pointer;}
+.bookmark{ position:absolute; right:10px; top:57px; background-position:0 -804px; padding-left:18px; cursor:pointer; height:18px;}
 .button_area{ width:60%; margin:10px;}
 .button_area input[type='button']{-moz-border-radius: 3px;-khtml-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px; border:solid 1px #bdbcbd; padding:5px 15px;background: -moz-linear-gradient(top, #fff,#efefef); cursor:pointer;  }
 
@@ -732,7 +732,7 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .btnBlueC{float:left; height:21px; line-height:21px; padding:0 5px; color:#FFFFFF;}
 .btnBlueR{float:left; width:2px; height:21px; background:url(../images/btn_blue.png) no-repeat 0px -42px;}
 .btnBlue a{text-decoration:none; color:#FFFFFF; height:21px; cursor:pointer;}
-.btnBlueFilter{position:absolute; right:0px; margin-right:190px;}
+.btnBlueFilter{position:absolute; right:0px; margin-right:220px;}
 .btnBlueFilterOver{position:absolute; right:0px; margin-right:190px; height:28px; background:url(../images/btn_blue.png) repeat-x 0px -91px;}
 .btnBlueFilterOver .btnBlueL{height:28px; background:url(../images/btn_blue.png) no-repeat 0px -63px;}
 .btnBlueFilterOver .btnBlueC{height:28px; line-height:28px;}
@@ -802,7 +802,6 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .updatelink{ padding-left:16px; cursor:pointer; background-position:0px -984px;}
 .updategrey{ padding-left:16px; cursor:pointer; background-position:0px -1000px; color:graytext}
 .editlink{padding:0px 18px;background-position: 0 -124px;}
-.editlink{text-decoration:underline;}
 .deletelink{padding-left:18px;background-position: 0 -159px; }
 .comment_add{padding-left:18px;background-position: 0 -1112px;border:none;}
 .comment_add_disable{padding-left:18px;background-position: 0 -1142px;border:none;color:graytext}
@@ -968,7 +967,7 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .clone{background-position:0px -253px;}
 .clone[disabled='true']{background-position:0px -276px; color:graytext;}
 .add_new{background-position:0px -23px;}
-.add_new[disabled='true']{background-position:0px -887px; color:graytext;}
+.add_new[disabled='true']{background-position:0px -46px; color:graytext;}
 .search{background-position:0px -115px; }
 .search[disabled='true']{background-position:0px -138px; color:graytext;}
 .delete{background-position:0px -299px;}
