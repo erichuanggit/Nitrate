@@ -24,6 +24,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
+from tcms.core.utils.prompt import Prompt
 from models import TestRun, TestCaseRun, TestCaseRunStatus, TCMSEnvRunValueMap
 
 MODULE_NAME = "testruns"
@@ -509,7 +510,12 @@ def clone(request, template_name='run/clone.html'):
     trs = trs.filter(pk__in = request.REQUEST.getlist('run'))
     
     if not trs:
-        raise Http404
+        return HttpResponse(Prompt.render(
+            request = request,
+            info_type = Prompt.Info,
+            info = 'At least one run is required',
+            next = request.META.get('HTTP_REFERER', '/')
+        ))
     
     # Generate the clone run page for one run
     if len(trs) == 1 and not request.REQUEST.get('submit'):
@@ -617,7 +623,6 @@ def order_case(request, run_id):
     # Current we should rewrite all of cases belong to the plan.
     # Because the cases sortkey in database is chaos,
     # Most of them are None.
-    from tcms.core.utils.prompt import Prompt
     
     try:
         tr = TestRun.objects.get(run_id = run_id)
