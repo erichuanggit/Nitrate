@@ -34,13 +34,12 @@ from tcms.testplans.models import TestPlan, TestPlanType
 from tcms.testcases.models import TestCase
 from tcms.testruns.models import TestRun
 from tcms.management.models import Product, Version, Priority
-from tcms.search.query import SmartHaystackQuery, CONTENT_TYPES, SmartDjangoQuery
+from tcms.search.query import CONTENT_TYPES, SmartDjangoQuery
 from tcms.search.forms import CaseForm, RunForm, PlanForm
 from tcms.core.helpers.cache import cached_entities
 
 # from stdlib
 from datetime import datetime
-from haystack.query import SearchQuerySet
 import time
 
 def advance_search(request, tmpl='search/advanced_search.html'):
@@ -90,12 +89,8 @@ def retrieve_results(request, plan_query, run_query, case_query, target):
         cache.set(key, results)
     return results
 
-def query(plan_query, run_query, case_query, target, using='haystack'):
+def query(plan_query, run_query, case_query, target, using='orm'):
     USING = {
-        'haystack': {
-            'query': SmartHaystackQuery,
-            'sum': sum_haystack_queries,
-        },
         'orm': {
             'query': SmartDjangoQuery,
             'sum': sum_orm_queries
@@ -128,22 +123,6 @@ def sum_orm_queries(plans, cases, runs, target):
         if runs:  cases = cases.filter(case_run__run__in=runs)
         if plans: cases = cases.filter(plan__in=plans)
         return cases
-
-def sum_haystack_queries(plans, cases, runs, target):
-    '''
-    Search indexes of plan, case and run stored flatten\n
-    then calculate their intersection.
-    '''
-    result = []
-    for qs in (plans, cases, runs):
-        keys = qs.evaluate()
-        if keys is None: continue
-        keys = [key for key in keys if key]
-        if keys: result.append(set(keys))
-    if result:
-        return reduce(set.intersection, result)
-    else:
-        return None
 
 def render_results(request, results, time_cost, queries, tmpl='search/results.html'):
     '''
