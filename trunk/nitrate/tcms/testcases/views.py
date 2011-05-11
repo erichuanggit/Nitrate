@@ -417,13 +417,12 @@ def group_case_bugs(bugs):
 def printable(request, template_name = 'case/printable.html'):
     """Create the printable copy for plan/case"""
     from tcms.testplans.models import TestPlan
-    
-    if not request.REQUEST.get('plan') and not request.REQUEST.get('case') \
-    and not request.REQUEST.get('case_status'):
+
+    if not request.REQUEST.get('plan') or not request.REQUEST.get('case'):
         return HttpResponse(Prompt.render(
             request = request,
             info_type = Prompt.Info,
-            info = 'At least one plan is required.',
+            info = 'At least one plan/case is required.',
             next = 'javascript:window.history.go(-1)'
         ))
     
@@ -436,19 +435,19 @@ def printable(request, template_name = 'case/printable.html'):
         for tp in tps:
             tp.case_list = tp.case.values_list('pk', flat=True)
     
-    internal_query_maps = [
+    internal_query_maps = (
         # [Web request string, database queryset]
-        ['plan', 'plan__pk__in'],
-        ['case', 'pk__in'],
-        ['case_status', 'case_status__pk__in']
-    ]
+        ('plan', 'plan__pk__in'),
+        ('case', 'pk__in'),
+        ('case_status', 'case_status__pk__in')
+    )
     
     query = {}
     for iqm in internal_query_maps:
         if request.REQUEST.get(iqm[0]):
             query[iqm[1]] = request.REQUEST.getlist(iqm[0])
     
-    # Disabled cases not show by default
+    # Disabled cases ignored in default
     if not query.get('case_status__pk__in'):
         query['case_status__pk__in'] = TestCaseStatus.objects.exclude(
             name = 'DISABLED'
