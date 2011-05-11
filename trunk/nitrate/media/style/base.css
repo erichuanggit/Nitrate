@@ -910,9 +910,10 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .advancedSearch .planCaseRun .title{width:100px;}
 .advancedSearch .planCaseRun .listinfo{padding:5px 0;}
 .advancedSearchTip h3{margin-left:0px; margin-top:0px;}
+.advancedSearchTip h4{margin:0 0 0 20px;}
 .advancedSearchTip ul{margin-left:10px;}
 .advancedSearchTip li{color:#FF6600; list-style: disc; margin-left:10px;}
-.advancedSearchTip p{margin:0 0 0 20px; color:#333333;}
+.advancedSearchTip p{margin:0; color:#333333;}
 .queries{border:1px solid #FFE4B5; background:#FFF8E9; float:left; margin:10px; padding:5px 10px;}
 .queries li{float:left; padding:0 15px 0 0;}
 .queries li label{padding:0 3px 0 0; color:#999999;}
