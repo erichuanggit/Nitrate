@@ -65,7 +65,8 @@ a.banner_login{ color:red;}
 .menu a:hover{text-decoration:none; color:#FFFFFF;}
 .menu ul li{text-align:center;padding:2px 0px;height:37px;}
 .menu ul li:hover{height:37px; font-weight:bold;}
-.menu .current a{font-weight:bold;color:#F3F8FD;}
+.menu li.current{background:url(../images/bg_menu_current.png) no-repeat center;}
+.menu .current a{font-weight:bold; color:#FFFFFF;}
 .submenu{background:#3E3E3F;width:100%;}
 .menu .linkAdvancedSearch{width:115px; display: inline-block;}
 .menu .linkAdvancedSearch a:link,.menu .linkAdvancedSearch a:visited{text-decoration:underline;}
@@ -159,7 +160,8 @@ table.noborder,table.noborder td{border:none;background:transparent;}
 .toolbar ul li{color:#000; list-style:none; padding:8px 10px 4px 10px;; vertical-align:middle; height:18px; position:relative; background:#f7f7f7 url(/media/images/toolbar_bg.png) repeat-x left top; display:inline-block; -moz-border-radius:5px; -khtml-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px; border:solid 1px #f1f0f0; cursor:pointer;z-index:0px;}
 .toolbar ul ul{display:none;}
 .toolbar li:hover ul{display:block;position:absolute;top:27px;left:-2px; padding:5px;min-width:100px;background:#f3f3f3;border:solid 1px #235d9f;border-top:none;-moz-border-radius-bottomright:5px;-moz-border-radius-bottomleft:5px;-webkit-border-bottom-right-radius:5px;-webkit-border-bottom-left-radius:5px;z-index:1000;}
-.toolbar li:hover ul li{display:block; background:none;border:none;margin:0px;padding:0px 5px; height:25px;line-height:25px;}
+.toolbar li ul li{display:block; background:none; border:none; margin:0px; padding:6px 5px 0 5px; height:19px;line-height:25px;}
+.toolbar li ul li:hover{background:#FFF5B3;}
 
 /*********************icons*****************/
 #response {display: none;}
@@ -726,7 +728,7 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .btnBlueCaserun ul{display:none; width:91px; padding:1px; border:1px solid #235D9F; background:#FFFFFF url(../images/btn_blue_caserun.png) -1px -42px repeat-x; border-top:0px; position:absolute; left:0px; top:20px;}
 .btnBlueCaserun ul li{list-style:none;}
 .btnBlueCaserun ul li a:link, .btnBlueCaserun ul li a:visited{display:block; text-decoration:none; color:#333333; padding-left:15px; height:21px; line-height:21px;}
-.btnBlueCaserun ul li a:hover{display:block; background-color:#FFDFA3; color:#000000; padding-left:15px;}
+.btnBlueCaserun ul li a:hover{display:block; background-color:#FFF5B3; color:#000000; padding-left:15px;}
 .btnBlue{height:21px; background:url(../images/btn_blue.png) repeat-x 0px -21px;}
 .btnBlueL{float:left; width:2px; height:21px; background:url(../images/btn_blue.png) no-repeat 0px 0px;}
 .btnBlueC{float:left; height:21px; line-height:21px; padding:0 5px; color:#FFFFFF;}
@@ -857,7 +859,7 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .list .sortdesc span{width:20px; background:url("../images/bg_th_list.png") repeat-x 0px -140px; padding:0 8px;}
 .list .sortasc span{width:20px; background:url("../images/bg_th_list.png") repeat-x 0px -170px; padding:0 8px;}
 .list .sortcol { cursor:pointer; }
-.list .even:hover td ,.list .odd:hover td ,.list .evenRow:hover td ,.list .oddRow:hover td{ background:#FFDFA3; }
+.list .even:hover td ,.list .odd:hover td ,.list .evenRow:hover td ,.list .oddRow:hover td{ background:#FFF5B3; }
 .list th { border-bottom : 0px solid #ccc; color:#000000; text-align:left; background:#235D9F url(../images/bg_th_list.png) repeat-x; padding:0px 0px 0px 5px; height:25px; line-height:25px; font-weight:normal;}
 .list th a{ color:#000; }
 .list td { border-top:1px solid #ccc; padding:3px 5px 2px 5px; height:23px; line-height:23px; word-wrap:break-word; }
@@ -944,7 +946,7 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .btn_waived[disabled="True"]{background-position:0px -46px;}
 
 /* plan icon */
-.icon_plan{background-image:url(../images/ico_plan.png); background-repeat:no-repeat; display:block; border:0px; cursor:pointer; font-size:12px; margin-right:5px; padding-left:16px;}
+.icon_plan{background-image:url(../images/ico_plan.png); background-repeat:no-repeat; background-color:transparent; display:block; border:0px; cursor:pointer; font-size:12px; margin-right:5px; padding-left:16px;}
 
 .toolbar_case{background-position:0px 0px;}
 .toolbar_run{background-position:0px -345px;}
