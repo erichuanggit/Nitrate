@@ -713,8 +713,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             elements.invoke('observe', 'click', function(e) {
                 if(filter.style.display == 'none')
                     fireEvent(form.adjacent('.filtercase')[0], 'click');
-                
-                addItemsToTextBoxAsList(this.innerHTML, form.tag__name__in);
+                form.tag__name__in.value = this.innerHTML;
             })
         }
         
