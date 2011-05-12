@@ -728,8 +728,9 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                         alert(returnobj.response);
                         return false;
                     }
-                    parameters.a = 'initial';
-                    constructPlanDetailsCasesZone(container, plan_id, parameters);
+                    //parameters.a = 'initial';
+                    params.a = 'search';
+                    constructPlanDetailsCasesZone(container, plan_id, params);
                 }
                 resortCasesDragAndDrop(container, this, form, table, params, callback);
             });
