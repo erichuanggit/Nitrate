@@ -258,10 +258,7 @@ class TestCase(TCMSActionModel):
         del plan_str
         
         if query.get('product'):
-            q = q.filter(
-                Q(category__product = query['product'])
-                | Q(component__product = query['product'])
-            )
+            q = q.filter(category__product=query['product'])
         
         if query.get('component'):
             q = q.filter(component = query['component'])
