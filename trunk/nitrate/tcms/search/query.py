@@ -24,8 +24,6 @@ from django.conf import settings
 from tcms.testruns.models import TestRun
 from tcms.testplans.models import TestPlan
 from tcms.testcases.models import TestCase
-# from stdlib
-from types import FunctionType
 
 CONTENT_TYPES = {
     'run': TestRun,
@@ -85,7 +83,7 @@ class SmartDjangoQuery(object):
             'cs_created_before': 'create_date__lte',
             'cs_component': 'component__in',
             'cs_category': 'category__in',
-            'cs_product': lambda p: Q(category__product__in=p)|Q(component__product__in=p),
+            'cs_product': 'category__product__in',
         },
         'run': {
             'r_id': 'pk__in',
@@ -119,21 +117,13 @@ class SmartDjangoQuery(object):
             lookup  = rules[key]
             value   = self.queries.get(key, None)
             if isinstance(value, int) or isinstance(value, bool) or value:
-                if settings.DEBUG:
-                    print 'applying filter %s : %s' % (key, value)
                 if queryset is None:
                     queryset = self.queryset
                 if self.queries.get(key+'_exclude', False):
                     # for complicated Q filtering
-                    if isinstance(lookup, FunctionType):
-                        queryset = queryset.exclude(lookup(value))
-                    else:
-                        queryset = queryset.exclude(**{lookup: value})
+                    queryset = queryset.exclude(**{lookup: value})
                 else:
-                    if isinstance(lookup, FunctionType):
-                        queryset = queryset.filter(lookup(value))
-                    else:
-                        queryset = queryset.filter(**{lookup: value})
+                    queryset = queryset.filter(**{lookup: value})
         self.queryset = queryset
 
     def evaluate(self):
