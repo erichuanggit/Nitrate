@@ -248,7 +248,8 @@ def get(request, plan_id, template_name = 'plan/get.html'):
         select = {
         'total_num_caseruns': RawSQL.total_num_caseruns,
         'completed_case_run_percent': RawSQL.completed_case_run_percent,
-        'failed_case_run_percent':RawSQL.failed_case_run_percent,
+        'failed_case_run_percent': RawSQL.failed_case_run_percent,
+        'passed_case_run_percent': RawSQL.passed_case_run_percent,
         },
     )
     
