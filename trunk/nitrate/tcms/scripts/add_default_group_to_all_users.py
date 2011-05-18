@@ -32,7 +32,7 @@ def verify():
         user = random.choice(users)
         user_groups = set([g['name'] for g in user.groups.values('name')])
         assert default_groups.issubset(user_groups), 'Verification failed.'
-    raise SystemExit("Successfully Update!")
+    raise SystemExit("Successfully Updated!")
 
 if __name__ == '__main__':
     update()
