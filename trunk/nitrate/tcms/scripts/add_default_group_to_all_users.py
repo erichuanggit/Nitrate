@@ -14,7 +14,7 @@ from django.contrib.auth.models import User, Group
 from django.conf import settings
 
 def update():
-    print "Starting to update user's group"
+    print "Starting to update user's group ..."
     users = User.objects.all()
     print "%s users to be updated" % users.count()
     default_groups = Group.objects.filter(name__in=settings.DEFAULT_GROUPS)
@@ -22,15 +22,18 @@ def update():
     for user in users:
         for grp in default_groups:
             user.groups.add(grp)
-    raise SystemExit("Successfully Updated")
+    print "Done Updating"
 
 def verify():
+    print "Starting to verify ..."
     users = User.objects.all()
     default_groups = set(settings.DEFAULT_GROUPS)
     for i in range(10):
         user = random.choice(users)
         user_groups = set([g['name'] for g in user.groups.values('name')])
         assert default_groups.issubset(user_groups), 'Verification failed.'
+    raise SystemExit("Successfully Update!")
 
 if __name__ == '__main__':
     update()
+    verify()
