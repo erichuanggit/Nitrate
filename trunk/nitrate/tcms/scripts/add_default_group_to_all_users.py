@@ -7,7 +7,7 @@ A script that is supposed to run once
 to add default groups defined in product_settings
 to all existing users.
 '''
-import os
+import os, random
 os.environ['DJANGO_SETTINGS_MODULE'] = 'tcms.product_settings'
 
 from django.contrib.auth.models import User, Group
@@ -23,6 +23,14 @@ def update():
         for grp in default_groups:
             user.groups.add(grp)
     raise SystemExit("Successfully Updated")
+
+def verify():
+    users = User.objects.all()
+    default_groups = set(settings.DEFAULT_GROUPS)
+    for i in range(10):
+        user = random.choice(users)
+        user_groups = set([g['name'] for g in user.groups.values('name')])
+        assert default_groups.issubset(user_groups), 'Verification failed.'
 
 if __name__ == '__main__':
     update()
