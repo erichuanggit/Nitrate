@@ -149,8 +149,6 @@ class KerberosBackend(ModelBackend):
                 username = username,
                 email = '%s@%s' % (username, settings.KRB5_REALM.lower())
             )
-            # add default permission and other default setups
-            initiate_user_with_default_setups(user)
         user.set_unusable_password()
         user.save()
         return user
@@ -211,6 +209,7 @@ class ModAuthKerbBackend(RemoteUserBackend):
         user.email = user.username + '@' + settings.KRB5_REALM.lower()
         user.set_unusable_password()
         user.save()
+        initiate_user_with_default_setups(user)
         return user
     
     def clean_username(self, username):

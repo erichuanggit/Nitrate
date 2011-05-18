@@ -54,7 +54,6 @@ def initiate_user_with_default_setups(user):
     '''
     default_groups = Group.objects.filter(name__in=settings.DEFAULT_GROUPS)
     user.is_active = True
-    user.is_staff = True
     for grp in default_groups:
         user.groups.add(grp)
     user.save()
