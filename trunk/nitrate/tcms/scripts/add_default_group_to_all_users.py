@@ -7,9 +7,11 @@ A script that is supposed to run once
 to add default groups defined in product_settings
 to all existing users.
 '''
+import os
+os.environ['DJANGO_SETTINGS_MODULE'] = 'tcms.product_settings'
 
 from django.contrib.auth.models import User, Group
-import tcms.product_settings as settings
+from django.conf import settings
 
 def update():
     print "Starting to update user's group"
