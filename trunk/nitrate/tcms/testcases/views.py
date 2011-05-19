@@ -418,14 +418,14 @@ def printable(request, template_name = 'case/printable.html'):
     """Create the printable copy for plan/case"""
     from tcms.testplans.models import TestPlan
 
-    if not request.REQUEST.get('plan') or not request.REQUEST.get('case'):
+    if not request.REQUEST.get('plan') and not request.REQUEST.get('case')\
+    and not request.REQUEST.get('case_status'):
         return HttpResponse(Prompt.render(
             request = request,
             info_type = Prompt.Info,
-            info = 'At least one plan/case is required.',
-            next = 'javascript:window.history.go(-1)'
+            info = 'At least one plan is required.',
         ))
-    
+
     if request.REQUEST.get('plan'):
         tps = TestPlan.objects.filter(pk__in = request.REQUEST.getlist('plan'))
     else:
@@ -462,6 +462,13 @@ def printable(request, template_name = 'case/printable.html'):
 def export(request, template_name = 'case/export.xml'):
     """Export the plan"""
     from datetime import datetime
+    if not request.REQUEST.get('plan') and not request.REQUEST.get('case')\
+    and not request.REQUEST.get('case_status'):
+        return HttpResponse(Prompt.render(
+            request = request,
+            info_type = Prompt.Info,
+            info = 'At least one plan is required.',
+        ))
     timestamp = datetime.now()
     timestamp_str = '%02i-%02i-%02i' \
         % (timestamp.year, timestamp.month, timestamp.day)
