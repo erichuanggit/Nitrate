@@ -23,7 +23,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.List.on_load);
 		>>{{ product }}
 	</div>
 	{% include 'report/nav.html' %}
-	<div class="Detailform border-1" style="border-top:none;background:#f1f1f1 ;">
+	<div class="Detailform border-1" style="background:#f1f1f1 ;">
 		{% comment %}
 		<span class="right-action tab_shift"> 
 			<label class="select">report</label>
@@ -102,7 +102,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.List.on_load);
 				<td class="variety_3">{{ version.cases_count }}</td>
 				<td class="variety_4">
 					<div class="progress-bar">
-						<div class="progress-inner" style="width:{{ version.case_run_percent|default:'0' }}px">
+						<div class="progress-inner" style="width:{{ version.case_run_percent|default:'0' }}%">
 							<div class="percent">{{ version.case_run_percent|default:'0' }}%</div>
 						</div>
 					</div>
