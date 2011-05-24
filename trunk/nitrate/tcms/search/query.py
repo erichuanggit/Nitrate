@@ -17,7 +17,6 @@
 #   Xuqing Kuang <xkuang@redhat.com>, Chaobin Tang <ctang@redhat.com>
 
 # from django
-from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.conf import settings
 # from tcms
@@ -65,7 +64,7 @@ class SmartDjangoQuery(object):
             'pl_created_before': 'create_date__lte',
             'pl_product': 'product__id__in',
             'pl_component': 'component__in',
-            'pl_version': 'version__in',
+            'pl_version': 'product__version__in',
         },
         'case': {
             'cs_id': 'pk__in',
