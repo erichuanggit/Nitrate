@@ -23,7 +23,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.List.on_load);
 		>>{{ product }}
 	</div>
 	{% include 'report/nav.html' %}
-	<div class="Detailform border-1" style="border-top:none;background:#f1f1f1 ;">
+	<div class="Detailform border-1" style="background:#f1f1f1 ;">
 		{% comment %}
 		<div class="crumb">
 			<span class="right-action"> <label class="select">report</label> | <label class="">dashboard </label></span>
@@ -122,7 +122,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.List.on_load);
 			</table>
 			{% endif %}
 			<!--end data of status of caserun -->
-			<table class="list" border="0" cellspacing="0" cellpadding="0" width="100%">
+			<table class="list report" border="0" cellspacing="0" cellpadding="0" width="100%">
 				<tr>
 					<th width="20%">Component</th>
 					<th width="35%">Testing Cases</th>
@@ -138,7 +138,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.List.on_load);
 					</td>
 					<td class="variety_4">
 						<div class="progress-bar">
-							<div class="progress-inner" style="width:{{ component.finished_case_run_percent|default:'0' }}px">							<div class="percent">{{ component.finished_case_run_percent|default:'0' }}%</div>
+							<div class="progress-inner" style="width:{{ component.finished_case_run_percent|default:'0' }}%">							<div class="percent">{{ component.finished_case_run_percent|default:'0' }}%</div>
 							</div>
 						</div>
 						{% if component.failed_case_run_count %}
