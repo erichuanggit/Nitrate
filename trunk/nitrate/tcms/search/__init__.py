@@ -98,9 +98,9 @@ def query(plan_query, run_query, case_query, target, using='orm'):
     }
     Query   = USING[using]['query']
     Sum     = USING[using]['sum']
-    plans   = Query(plan_query, 'plan', target)
-    runs    = Query(run_query, 'run', target)
-    cases   = Query(case_query, 'case', target)
+    plans   = Query(plan_query, TestPlan.__class__.__name__)
+    runs    = Query(run_query, TestRun.__class__.__name__)
+    cases   = Query(case_query, TestCase.__class__.__name__)
     results = Sum(plans, cases, runs, target)
     return results
 

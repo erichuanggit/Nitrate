@@ -25,9 +25,9 @@ from tcms.testplans.models import TestPlan
 from tcms.testcases.models import TestCase
 
 CONTENT_TYPES = {
-    'run': TestRun,
-    'plan': TestPlan,
-    'case': TestCase,
+    TestRun.__class__.__name__: TestRun,
+    TestPlan.__class__.__name__: TestPlan,
+    TestCase.__class__.__name__: TestCase,
 }
 
 class SmartDjangoQuery(object):
@@ -37,23 +37,27 @@ class SmartDjangoQuery(object):
     Mind the priorities cause they make difference about efficiency.
     '''
 
+    # where in the form, by specifying a fieldname named FIELDNAME_EXCLUDE_POSTFIX,
+    # then this field will be used to exclude the relevant results from queryset
+    EXCLUDE_POSTFIX = 'exclude'
+
     PRIORITIES = {
-        'plan': (
+        TestPlan.__class__.__name__: (
             'pl_id', 'pl_authors', 'pl_product', 'pl_component',
             'pl_type', 'pl_version', 'pl_summary',
             'pl_active', 'pl_created_since', 'pl_created_before', 'pl_tags'),
-        'case': (
+        TestCase.__class__.__name__: (
             'cs_id', 'cs_authors', 'cs_tester', 'cs_product', 'cs_component', 'cs_tags',
             'cs_bugs', 'cs_proposed', 'cs_priority', 'cs_created_since', 'cs_status',
             'cs_auto', 'cs_created_before', 'cs_category', 'cs_summary', 'cs_script',),
-        'run': (
+        TestRun.__class__.__name__: (
             'r_id', 'r_product', 'r_manager', 'r_tester', 'r_real_tester',
             'r_assginee', 'r_build', 'r_version', 'r_running', 'r_tags',
             'r_created_since', 'r_created_before', 'r_summary',)
     }
 
     RULES = {
-        'plan': {
+        TestPlan.__class__.__name__: {
             'pl_id': 'pk__in',
             'pl_summary': 'name__icontains',
             'pl_type': 'type__in',
@@ -66,7 +70,7 @@ class SmartDjangoQuery(object):
             'pl_component': 'component__in',
             'pl_version': 'product__version__in',
         },
-        'case': {
+        TestCase.__class__.__name__: {
             'cs_id': 'pk__in',
             'cs_summary': 'summary__icontains',
             'cs_authors': 'author__username__in',
@@ -84,7 +88,7 @@ class SmartDjangoQuery(object):
             'cs_category': 'category__in',
             'cs_product': 'category__product__in',
         },
-        'run': {
+        TestRun.__class__.__name__: {
             'r_id': 'pk__in',
             'r_summary': 'summary__icontains',
             'r_manager': 'manager__username__in',
@@ -101,11 +105,10 @@ class SmartDjangoQuery(object):
         }
     }
 
-    def __init__(self, queries, result_kls, target):
+    def __init__(self, queries, result_kls):
         self.queryset   = CONTENT_TYPES[result_kls]._default_manager.all()
         self.queries    = queries
         self.result_kls = result_kls
-        self.target     = target
 
     def filter(self):
         queryset = None
@@ -118,7 +121,7 @@ class SmartDjangoQuery(object):
             if isinstance(value, int) or isinstance(value, bool) or value:
                 if queryset is None:
                     queryset = self.queryset
-                if self.queries.get(key+'_exclude', False):
+                if self.queries.get(key+'_'+self.EXCLUDE_POSTFIX, False):
                     # for complicated Q filtering
                     queryset = queryset.exclude(**{lookup: value})
                 else:

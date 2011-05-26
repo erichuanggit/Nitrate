@@ -27,6 +27,7 @@ from tcms.search.utils import cached_entities
 #from functools import partial
 
 # temporary fix to the problem that python2.4 does not ship with a partial in functools
+# seriously? Why the hell we'r still running 2.4?
 def partial(func, **kwargs):
     def call(**xkwargs):
         kwargs.update(xkwargs)
