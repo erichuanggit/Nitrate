@@ -29,7 +29,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
 	{% if next %}
 	<a href="{{ next }}">Continue</a>
 	{% else %}
-	<a href="{% url tcms.core.views.index }">Return to homepage</a>
+	<a href="javascript:history.go(-1)">Return to homepage</a>
 	{% endif %}
 	</div>
 	</div>
