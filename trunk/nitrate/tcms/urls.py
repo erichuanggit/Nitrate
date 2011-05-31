@@ -150,7 +150,9 @@ urlpatterns = patterns('',
     
     (r'^report/custom/$', 'tcms.report.views.custom_search'),
     (r'^report/custom/details/$', 'tcms.report.views.custom_details'),
-    (r'^advance-search/$', 'tcms.search.advance_search'),
+    url(r'^report/targets/testrun/$', 'tcms.report.views.test_run_report', name='testrun_report'),
+
+    url(r'^advance-search/$', 'tcms.search.advance_search', name='advance_search'),
 )
 
 # Debug zone

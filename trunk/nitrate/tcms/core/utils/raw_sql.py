@@ -340,7 +340,12 @@ class ReportSQL(object):
     custom_search_case_runs_count_by_status = 'SELECT COUNT(DISTINCT case_run_id) \
         FROM test_case_runs \
         WHERE test_case_runs.build_id = test_builds.build_id AND test_case_runs.case_run_status_id = %s'
-    
+
+    # added by chaobin
+    case_runs_count_by_status_under_run = 'SELECT COUNT(DISTINCT case_run_id) \
+        FROM test_case_runs \
+        WHERE test_case_runs.run_id = test_runs.run_id AND test_case_runs.case_run_status_id = %s'
+
     custom_details_case_run_count = 'SELECT tcrs.name \
         AS test_case_status, COUNT(tcr.case_id) AS case_run_count \
         FROM test_case_run_status tcrs          \

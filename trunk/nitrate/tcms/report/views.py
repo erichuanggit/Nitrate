@@ -26,6 +26,9 @@ from tcms.management.models import Classification, Product
 from tcms.core.utils import calc_percent
 from tcms.core.utils.counter import CaseRunStatusCounter, RunsCounter
 from tcms.core.utils.raw_sql import ReportSQL as RawSQL
+from tcms.core.helpers.cache import cached_entities
+from tcms.search.forms import RunForm
+from tcms.report.targets.run import search_runs, group_test_run
 
 MODULE_NAME = "report"
 
@@ -420,5 +423,22 @@ def custom_details(request, template_name='report/custom_details.html'):
         'manual_count': manual_count,
         'auto_count': auto_count,
         'both_count': both_count,
-        
     })
+
+def test_run_report(request, tmpl='report/targets/test_run.html'):
+    errors  = None
+    data    = request.GET
+    grouped_runs = None
+    group_by = data.get('group_by', 'tag')
+    PRODUCT_CHOICE = [
+            (p.pk, p.name) for p in cached_entities('product')
+        ]
+    if data:
+        run_form    = RunForm(data)
+        run_form.populate(data)
+        if run_form.is_valid():
+            runs = search_runs(run_form.cleaned_data)
+            grouped_runs = group_test_run(runs, group_by)
+        else:
+            errors = run_form.errors
+    return direct_to_template(request, tmpl, locals())
