@@ -201,6 +201,13 @@ class RunForm(forms.Form):
     def clean_r_manager(self):
         return get_choice(self.cleaned_data['r_manager'])
 
+    def clean_r_version(self):
+        # run.product_version is not a foreignkey
+        versions = self.cleaned_data['r_version']
+        if versions:
+            versions = versions.values_list('value', flat=True)
+        return versions
+
     def populate(self, data):
         prod_pks = data.getlist('r_product')
         prod_pks = [k for k in prod_pks if k]

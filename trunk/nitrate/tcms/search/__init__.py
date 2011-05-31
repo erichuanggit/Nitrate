@@ -34,7 +34,7 @@ from tcms.testplans.models import TestPlan, TestPlanType
 from tcms.testcases.models import TestCase
 from tcms.testruns.models import TestRun
 from tcms.management.models import Product, Version, Priority
-from tcms.search.query import CONTENT_TYPES, SmartDjangoQuery
+from tcms.search.query import SmartDjangoQuery
 from tcms.search.forms import CaseForm, RunForm, PlanForm
 from tcms.core.helpers.cache import cached_entities
 
@@ -98,9 +98,9 @@ def query(plan_query, run_query, case_query, target, using='orm'):
     }
     Query   = USING[using]['query']
     Sum     = USING[using]['sum']
-    plans   = Query(plan_query, TestPlan.__class__.__name__)
-    runs    = Query(run_query, TestRun.__class__.__name__)
-    cases   = Query(case_query, TestCase.__class__.__name__)
+    plans   = Query(plan_query, TestPlan.__name__)
+    runs    = Query(run_query, TestRun.__name__)
+    cases   = Query(case_query, TestCase.__name__)
     results = Sum(plans, cases, runs, target)
     return results
 
@@ -184,7 +184,10 @@ def fmt_queries(*queries):
                     try:
                         v = ', '.join([o.name for o in v])
                     except AttributeError:
-                        v = ', '.join([o.value for o in v])
+                        try:
+                            v = ', '.join([o.value for o in v])
+                        except AttributeError:
+                            v = ', '.join(v)
                 if isinstance(v, list):
                     v = ', '.join(map(str, v))
                 results[k] = v
