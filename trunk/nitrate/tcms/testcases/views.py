@@ -361,7 +361,7 @@ def get(request, case_id, template_name = 'case/get.html'):
     
     tcrs = tcrs.extra(select={
         'num_bug': RawSQL.num_case_run_bugs,
-    })
+    }).order_by('run__plan')
     runs_ordered_by_plan = groupby(tcrs, lambda t: t.run.plan)
     # FIXME: Just don't know why Django template does not evaluate a generator,
     # and had to evaluate the groupby generator manually like below.
