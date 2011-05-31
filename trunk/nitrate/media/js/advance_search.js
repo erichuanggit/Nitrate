@@ -44,6 +44,10 @@ function updateOptionOnProdChange(target, productID, targetID){
         var prodIDs = jQ(this).val();
         getProdRelatedObj(prodIDs, target, targetID);
     });
+    var prodIDs = jQ('#'+productID).val();
+    if(prodIDs){
+        getProdRelatedObj(prodIDs, target, targetID);
+    }
 }
 
 jQ(function(){
