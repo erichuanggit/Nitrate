@@ -150,7 +150,7 @@ urlpatterns = patterns('',
     
     (r'^report/custom/$', 'tcms.report.views.custom_search'),
     (r'^report/custom/details/$', 'tcms.report.views.custom_details'),
-    url(r'^report/targets/testrun/$', 'tcms.report.views.test_run_report', name='testrun_report'),
+    url(r'^report/targets/testrun/$', 'tcms.report.views.view_test_run_report', name='testrun_report'),
 
     url(r'^advance-search/$', 'tcms.search.advance_search', name='advance_search'),
 )

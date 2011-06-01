@@ -28,7 +28,7 @@ from tcms.core.utils.counter import CaseRunStatusCounter, RunsCounter
 from tcms.core.utils.raw_sql import ReportSQL as RawSQL
 from tcms.core.helpers.cache import cached_entities
 from tcms.search.forms import RunForm
-from tcms.report.targets.run import search_runs, group_test_run
+from tcms.report.targets.run import search_runs, test_run_report
 
 MODULE_NAME = "report"
 
@@ -425,11 +425,11 @@ def custom_details(request, template_name='report/custom_details.html'):
         'both_count': both_count,
     })
 
-def test_run_report(request, tmpl='report/targets/test_run.html'):
+def view_test_run_report(request, tmpl='report/targets/test_run.html'):
     errors  = None
     data    = request.GET
-    grouped_runs = None
-    group_by = data.get('group_by', 'tag')
+    report = None
+    report_by = data.get('report_by', 'tester')
     PRODUCT_CHOICE = [
             (p.pk, p.name) for p in cached_entities('product')
         ]
@@ -437,8 +437,7 @@ def test_run_report(request, tmpl='report/targets/test_run.html'):
         run_form    = RunForm(data)
         run_form.populate(data)
         if run_form.is_valid():
-            runs = search_runs(run_form.cleaned_data)
-            grouped_runs = group_test_run(runs, group_by)
+            report = test_run_report(run_form.cleaned_data, report_by)
         else:
             errors = run_form.errors
     return direct_to_template(request, tmpl, locals())
