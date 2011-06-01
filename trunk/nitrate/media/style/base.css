@@ -1018,3 +1018,29 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .popTextarea .btnBottom{padding:10px; text-align:right;}
 .popTextarea .btnBottom input{cursor:pointer; margin:0 5px;}
 
+/*report new style*/
+.listTdReport{font-size:12px; margin:0 auto 20px auto; width:99%;}
+.listTdReport th{ font-weight:normal; overflow:hidden; text-align:left; border-bottom:1px solid #E3E3E3; background:url("../images/bg_th_list.png") repeat-x; height:26px; line-height:26px;  padding:0 5px;}
+.listTdReport .w90{width:100px;}
+.listTdReport .w50{width:50px;}
+.listTdReport .w200{width:200px;}
+.listTdReport .bgRowspan{background:#F5F5F5;}
+.listTdReport tr:hover td{background:#FFF8C7;}
+.listTdReport tr:hover td.bgRowspan{background:#F5F5F5;}
+.listTdReport td{height:30px; line-height:30px; border-bottom:1px solid #E3E3E3; padding:0 5px;}
+.listTdReport .bottomTd td{border-bottom:0px;}
+.bgTotal{backgroundarkorange; color:#FFFFFF; padding:0 4px;}
+.reportSummary{margin:20px auto 12px auto; font-size:12px; clear:both; color:#888888; border-bottom:1px solid #888888;}
+.reportSummary ul{float:left; margin:0 0 -1px 0; padding-right:10px; padding-left:20px;}
+.reportSummary ul span{padding:0 10px 0 3px; color:red;}
+.reportSummary li{float:left;}
+.reportSummary li span{padding:0 10px 0 3px; color:red;}
+.reportSummary li.tagTab{border:1px solid #888888; padding:3px 10px; border-bottom:1px solid #FFFFFF;}
+.reportSummary li.tagTab span{color:#000000; font-weight:bold;}
+.reportSummary01{margin:10px auto 4px auto; font-size:12px; clear:both; color:#888888;}
+.reportSummary01 ul{float:left; margin:0 0 0 0; padding-right:10px; padding-left:20px;}
+.reportSummary01 ul span{padding:0 10px 0 3px; color:red;}
+.reportSummary01 li{float:left;}
+.reportSummary01 li span{padding:0 10px 0 3px; color:red;}
+.reportSummary01 li.tagTab span{color:#000000; font-weight:bold;}
+
