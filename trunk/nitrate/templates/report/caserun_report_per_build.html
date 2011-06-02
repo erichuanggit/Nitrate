@@ -36,7 +36,7 @@
 	<table width="100%" border="0" cellpadding="0" cellspacing="0" class="listTdReport">
 		<tr>
 			{% if builds_selected %}<th class="w200">Build</th>{% endif %}
-			<th class="thRun">Tester By </th>
+			<th class="thRun">Tested By </th>
 			<th class="w90">Run Tested </th>
 			<th class="w90">Case-Run Tested</th>
 			<th class="w50">Idle</th>
@@ -57,7 +57,7 @@
 					{% endifequal %}
 					<td><span>{{ tester }}</span></td>
 					<td><span>{{summed_runs|length}}</span></td>
-					<td>{{caseruns|length}}</td>
+					<td>{{ caseruns|length }}</td>
 					<td>{{ percentages.idle }}</td>
 					<td>{{ percentages.running }}</td>
 					<td>{{ percentages.paused }}</td>
@@ -75,6 +75,7 @@
 					<td><span>{{ tester }}</span></td>
 					<td><span>{{summed_runs|length}}</span></td>
 					<td>{{caseruns|length}}</td>
+					<td>{{ percentages.idle }}</td>
 					<td>{{ percentages.running }}</td>
 					<td>{{ percentages.paused }}</td>
 					<td>{{ percentages.passed }}</td>
