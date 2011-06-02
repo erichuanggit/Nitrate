@@ -29,6 +29,7 @@
 		<tr>
 			<th class="w200">Build</th>
 			<th class="thRun">Priority </th>
+			<th class="w50">Idle</th>
 			<th class="w50">Running</th>
 			<th class="w50">Paused</th>
 			<th class="w50">Passed</th>
@@ -44,6 +45,7 @@
 				<td rowspan="{{runs_report|length}}" class="bgRowspan"><span>{{ build }}</span></td>
 				{% endifequal %}
 				<td><span>{{ priority }}</span></td>
+				<td>{{ percentages.idle }}</td>
 				<td>{{ percentages.running }}</td>
 				<td>{{ percentages.paused }}</td>
 				<td>{{ percentages.passed }}</td>

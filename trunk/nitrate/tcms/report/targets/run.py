@@ -86,7 +86,11 @@ def test_run_report(queries, report_type):
     data['caseruns_count'] = TestCaseRun.objects.filter(run__in=runs).count()
     reports = get_reports(runs, report_type, bool(builds))
     data['reports'] = reports
-    data['builds_selected'] = bool(builds)
+    builds_selected = bool(builds)
+    data['builds_selected'] = builds_selected
+    if not builds_selected:
+        builds = set(r.build.name for r in runs)
+        data['builds'] = builds
     return data
 
 def get_reports(runs, report_type, group_by_builds=False):
@@ -144,8 +148,9 @@ def test_run_report_by_plan_tag(runs):
     report = []
     for tag, _runs in runs_grouped_by_plan_tag.iteritems():
         runs_grouped_by_build = test_run_report_by_build(_runs)
+        plans_count = len(set(r.plan_id for r in _runs))
         caserun_count = TestCaseRun.objects.filter(run__in=_runs).count()
-        report.append((tag, len(_runs), caserun_count, runs_grouped_by_build))
+        report.append((tag, len(_runs), plans_count, caserun_count, runs_grouped_by_build))
     return report
 
 def group_caserun_by_tester(caseruns):

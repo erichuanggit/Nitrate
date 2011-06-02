@@ -8,6 +8,14 @@
 		{% for k, v in queries.iteritems %}
 			<li><label>{{ k|title }}:</label>{{ v|safe }};</li>
 		{% endfor %}
+		{% if not builds_selected %}
+			<li>
+				<label>Builds:</label>
+				{% for b in builds %}
+					{{ b }},
+				{% endfor %}
+			</li>
+		{% endif %}
 			<li class="clear"></li>
 		</ul>
 	</div>
@@ -31,6 +39,7 @@
 			<th class="thRun">Tester By </th>
 			<th class="w90">Run Tested </th>
 			<th class="w90">Case-Run Tested</th>
+			<th class="w50">Idle</th>
 			<th class="w50">Running</th>
 			<th class="w50">Paused</th>
 			<th class="w50">Passed</th>
@@ -49,6 +58,7 @@
 					<td><span>{{ tester }}</span></td>
 					<td><span>{{summed_runs|length}}</span></td>
 					<td>{{caseruns|length}}</td>
+					<td>{{ percentages.idle }}</td>
 					<td>{{ percentages.running }}</td>
 					<td>{{ percentages.paused }}</td>
 					<td>{{ percentages.passed }}</td>
