@@ -17,7 +17,7 @@
 #   Xuqing Kuang <xkuang@redhat.com> Chaobin Tang <ctang@redhat.com>
 
 '''
-Warning, before you attempt to do anything
+Warning. Before you attempt to do anything
 in here, it is well suggested that you read
 PRD 3.4.1 for a reference.
 '''
@@ -104,6 +104,8 @@ def get_reports(runs, report_type, group_by_builds=False):
         report = test_run_report_by_case_priority(runs)
     if report_type == 'per_plan_tag_report':
         report = test_run_report_by_plan_tag(runs)
+    if report_type == 'runs_with_rates_per_plan_tag':
+        report = percentages_on_runs_under_plan_tag
     return report
 
 def test_run_report_by_build(runs, inner_group=None):
@@ -167,6 +169,47 @@ def test_run_report_by_priority_with_percentages(runs):
         percentages = get_caserun_percentages(_caseruns)
         report.append((priority, percentages))
     return report
+
+def percentages_on_runs_under_plan_tag(runs):
+    report = []
+    grouped_runs_by_plan = group_runs_by_plan_tag(runs)
+    for plan_tag, _runs in grouped_runs_by_plan:
+        plans_count = len(set(r.plan_id for r in _runs))
+        runs_count = len(_runs)
+        report.append((plan_tag, plans_count, runs_count, get_runs_rate(_runs)))
+    return report
+
+def get_runs_rate(runs):
+    '''
+    Two Percentages:
+    1. count(runs with all caserun passed)/count(runs)
+    2. count(runs with all caserun failed)/count(runs)
+    '''
+    total_count = float(len(runs))
+    passed_count = 0
+    failed_count = 0
+    PASSED = 2
+    FAILED = 3
+    for run in runs:
+        statuses = run.case_run.values_list('case_run_status_id', flat=True)
+        if member_purified(statuses, lambda i: i==PASSED):
+            passed_count += 1
+        if member_purified(statuses, lambda i: i==FAILED):
+            failed_count += 1
+    return passed_count/total_count, failed_count/total_count
+
+def member_purified(iterable, condition):
+    '''
+    Testing each member in the iterable
+    with condition. Return boolean indicating
+    a perfection indicating all members purified.
+    '''
+    perfection = True
+    for elem in iterable:
+        if not condition(elem):
+            perfection = False
+            break
+    return perfection
 
 def group_runs_by_plan_tag(runs):
     tag_run_map = {'untagged': []}
