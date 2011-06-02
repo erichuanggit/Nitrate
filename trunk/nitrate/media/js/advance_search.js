@@ -7,6 +7,9 @@ function getProdRelatedObj(prodIDs, target, targetID){
     like this:
     [[id, name], [id, name]]
     */
+    if(typeof(prodIDs)=='string'){
+        prodIDs = [prodIDs];
+    }
     var data_api = '/ajax/get-prod-relate-obj/';
     var sep = ','; // used to join/split values
     var params   = {'p_ids': prodIDs.join(sep), 'target': target, 'sep': sep};
@@ -41,7 +44,7 @@ function updateOptionOnProdChange(target, productID, targetID){
     @ target select tag
     */
     jQ('#'+productID).change(function(){
-        var prodIDs = jQ(this).val();
+        var prodIDs = jQ('#'+productID).val();
         getProdRelatedObj(prodIDs, target, targetID);
     });
     var prodIDs = jQ('#'+productID).val();
