@@ -1,0 +1,79 @@
+{% extends "report/common/search_run.html" %}
+
+{% block report %}
+	{% if queries %}
+	<div class="queries">
+		<ul>
+		{% for k, v in queries.iteritems %}
+			<li><label>{{ k|title }}:</label>{{ v|safe }};</li>
+		{% endfor %}
+			<li class="clear"></li>
+		</ul>
+	</div>
+	{% endif %}
+
+	{% for tester, grouped_runs in reports.iteritems %}
+	<div class="reportSummary01">
+		<ul><li class="tagTab">Tester:<span>{{ tester }}</span></li></ul>
+		<ul><li>Run:<span>{{ grouped_runs|length}}</span></li></ul>
+		<div class="clear"></div>
+	</div>
+
+	<table width="100%" border="0" cellpadding="0" cellspacing="0" class="listTdReport">
+		<tr>
+			<th class="w200">Bulid</th>
+			<th class="thRun">Run</th>
+			<th class="w90">Case-run</th>
+			<th class="w50">Idle</th>
+			<th class="w50">Running</th>
+			<th class="w50">Paused</th>
+			<th class="w50">Passed</th>
+			<th class="w50">Failed</th>
+			<th class="w50">Blocked</th>
+			<th class="w50">Error</th>
+			<th class="w50">Waived</th>
+		</tr>
+		{% for build, runs in grouped_runs %}
+		<tr>
+			{% ifequal forloop.counter 1  %}
+				<td rowspan="{[runs|length]}" class="bgRowspan"><span>{{ build }}</span></td>
+			{% endifequal %}
+			<td><span><a href="#">{{ run }}</a></span></td>
+			<td><span>{{ run.idle_count }}</span></td>
+			<td>{{ percentages.running }}</td>
+			<td>{{ percentages.paused }}</td>
+			<td>{{ percentages.passed }}</td>
+			<td>{{ percentages.failed }}</td>
+			<td>{{ percentages.blocked }}</td>
+			<td>{{ percentages.error }}</td>
+			<td>{{ percentages.waived }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+	{% endfor %}
+{% endblock %}
+
+<div class="reportSummary01">
+		<ul><li class="tagTab">Tag:<span>All</span></li></ul>
+		<ul><li>Plan:<span>12</span>Run:<span>12</span></li></ul>
+		<div class="clear"></div>
+	</div>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" class="listTdReport">
+	<tr>
+		<th class="w200">Tag</th>
+		<th class="thRun">plan</th>
+		<th class="w90">Run</th>
+		<th class="w50">Run Passed</th>
+		<th class="w50">Run Failed</th>
+	</tr>
+	
+	<tr>
+		<td><span>Tag Name</span></td>
+		<td>1</td>
+		<td>1</td>
+		<td>1</td>
+		<td>1</td>
+	</tr>
+	
+</table>
