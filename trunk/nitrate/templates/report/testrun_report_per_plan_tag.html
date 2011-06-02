@@ -24,12 +24,12 @@
 		<div class="clear"></div>
 	</div>
 
-	{% for tag, runs_count, caseruns_count, grouped_runs in reports %}
+	{% for tag, runs_count, plans_count, caseruns_count, grouped_runs in reports %}
 	<div class="reportSummary01">
 		<ul><li class="tagTab">Plan Tag: <span>{{ tag }}</span></li></ul>
 		<ul>
 			<li>Run:<span>{{ runs_count }}</span></li>
-			<li>Plan:<span>{{ runs_count }}</span></li>
+			<li>Plan:<span>{{ plans_count }}</span></li>
 			<li>CaseRun:<span>{{ caseruns_count }}</span></li>
 		</ul>
 		<div class="clear"></div>
