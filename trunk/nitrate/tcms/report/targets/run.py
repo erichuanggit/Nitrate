@@ -1,0 +1,179 @@
+# -*- coding: utf-8 -*-
+# 
+# Nitrate is copyright 2010 Red Hat, Inc.
+# 
+# Nitrate is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version. This program is distributed in
+# the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+# even the implied warranties of TITLE, NON-INFRINGEMENT,
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# 
+# The GPL text is available in the file COPYING that accompanies this
+# distribution and at <http://www.gnu.org/licenses>.
+# 
+# Authors:
+#   Xuqing Kuang <xkuang@redhat.com> Chaobin Tang <ctang@redhat.com>
+
+'''
+Warning, before you attempt to do anything
+in here, it is well suggested that you read
+PRD 3.4.1 for a reference.
+'''
+
+
+from tcms.search.forms import RunForm
+from tcms.search.query import SmartDjangoQuery
+from tcms.testruns.models import TestRun, TestCaseRun
+from tcms.testruns.models import TestCaseRunStatus
+from tcms.core.utils.raw_sql import ReportSQL
+from tcms.testplans.models import TestPlan
+
+from itertools import groupby
+
+def annotate_runs_with_case_run_count_by_status(runs):
+    '''
+    Working with a testrun queryset.\n
+    Annotate it with case count of different status\n
+    so that each run in the queryset comes\n
+    with statistics of case of different status.\n
+    Implementation using queryset.extra and\n
+    hand-written SQL.
+    '''
+    run_statuses  = TestCaseRunStatus.objects.all()
+    _sql = ReportSQL.case_runs_count_by_status_under_run
+    _select = {}
+    for status in run_statuses:
+        key     = status.name.lower() + '_count'
+        value   = _sql % status.pk
+        _select[key] = value
+    return runs.extra(select=_select)
+
+def get_caserun_percentages(caseruns):
+    '''
+    calculate percentages of caseruns in defferent status.
+    '''
+    percentages = {}
+    for caserun in caseruns:
+        status = caserun.case_run_status.name.lower()
+        count = percentages.setdefault(status, 0)
+        percentages[status] = count + 1
+    return percentages
+
+def search_runs(queries):
+    runs    = SmartDjangoQuery(queries, TestRun.__name__)
+    runs    = runs.evaluate()
+    if runs is None:
+        return None
+    #runs    = annotate_runs_with_case_run_count_by_status(runs)
+    return runs
+
+def group_test_run(runs, key):
+    grouped_runs = []
+    if not runs:
+        return []
+    _key_func = lambda r: getattr(r, key)
+    return grouped_runs
+
+def test_run_report(queries, report_type):
+    runs    = search_runs(queries)
+    data    = {}
+    reports = []
+    builds  = queries.get('r_build')
+    data['runs_count'] = runs.count()
+    data['plans_count'] = TestPlan.objects.filter(run__in=runs).count()
+    data['caseruns_count'] = TestCaseRun.objects.filter(run__in=runs).count()
+    reports = get_reports(runs, report_type, bool(builds))
+    data['reports'] = reports
+    data['builds_selected'] = bool(builds)
+    return data
+
+def get_reports(runs, report_type, group_by_builds=False):
+    report = []
+    if report_type == 'per_build_report':
+        if group_by_builds:
+            report = test_run_report_by_build(runs, test_run_report_by_tester_with_percentages)
+        else:
+            report = test_run_report_by_tester_with_percentages(runs)
+    if report_type == 'per_priority_report':
+        report = test_run_report_by_case_priority(runs)
+    if report_type == 'per_plan_tag_report':
+        report = test_run_report_by_plan_tag(runs)
+    return report
+
+def test_run_report_by_build(runs, inner_group=None):
+    report = []
+    if hasattr(runs, 'order_by'):
+        runs = runs.order_by('build')
+    else:
+        runs = sorted(runs, key=lambda r: r.build_id)
+    runs    = groupby(runs, lambda r: r.build)
+    for build, _runs in runs:
+        __runs = _runs
+        if inner_group:
+            __runs = inner_group(_runs)
+        report.append((build, list(__runs)))
+    return report
+
+def get_caseruns_from_runs(runs):
+    #caseruns    = (csr for run in runs for csr in run.case_run.all())
+    caseruns    = TestCaseRun.objects.filter(run__in=runs)
+    return caseruns
+
+def test_run_report_by_tester_with_percentages(runs, inner_group=None):
+    report = []
+    caseruns    = get_caseruns_from_runs(runs)
+    caseruns    = group_caserun_by_tester(caseruns)
+    for tester, _caseruns in caseruns:
+        __caseruns = list(_caseruns)
+        summed_runs = set(c.run for c in __caseruns)
+        percentages = get_caserun_percentages(__caseruns)
+        if inner_group:
+            __caseruns = inner_group(__caseruns)
+        report.append((tester, summed_runs, __caseruns, percentages))
+    return report
+
+def test_run_report_by_case_priority(runs):
+    report    = test_run_report_by_build(runs, test_run_report_by_priority_with_percentages)
+    return report
+
+def test_run_report_by_plan_tag(runs):
+    runs    = annotate_runs_with_case_run_count_by_status(runs)
+    runs_grouped_by_plan_tag = group_runs_by_plan_tag(runs)
+    report = []
+    for tag, _runs in runs_grouped_by_plan_tag.iteritems():
+        runs_grouped_by_build = test_run_report_by_build(_runs)
+        caserun_count = TestCaseRun.objects.filter(run__in=_runs).count()
+        report.append((tag, len(_runs), caserun_count, runs_grouped_by_build))
+    return report
+
+def group_caserun_by_tester(caseruns):
+    caseruns    = sorted(caseruns, key=lambda csr: csr.tested_by_id)
+    caseruns    = groupby(caseruns, key=lambda csr: csr.tested_by)
+    return caseruns
+
+def test_run_report_by_priority_with_percentages(runs):
+    report = []
+    caseruns    = get_caseruns_from_runs(runs)
+    caseruns    = sorted(caseruns, key=lambda c: c.case.priority_id)
+    caseruns    = groupby(caseruns, key=lambda c: c.case.priority)
+    for priority, _caseruns in caseruns:
+        percentages = get_caserun_percentages(_caseruns)
+        report.append((priority, percentages))
+    return report
+
+def group_runs_by_plan_tag(runs):
+    tag_run_map = {'untagged': []}
+    un_tagged_runs = tag_run_map['untagged']
+    for run in runs:
+        run_tags = run.plan.tag.values_list('name', flat=True)
+        if not run_tags:
+            un_tagged_runs.append(run)
+            continue
+        map(lambda t: tag_run_map.setdefault(t, []).append(run), run_tags)
+    return tag_run_map
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
