@@ -29,6 +29,7 @@ from tcms.core.utils.raw_sql import ReportSQL as RawSQL
 from tcms.core.helpers.cache import cached_entities
 from tcms.search.forms import RunForm
 from tcms.report.targets.run import search_runs, test_run_report
+from tcms.search import fmt_queries, remove_from_request_path
 
 MODULE_NAME = "report"
 
@@ -425,19 +426,29 @@ def custom_details(request, template_name='report/custom_details.html'):
         'both_count': both_count,
     })
 
-def view_test_run_report(request, tmpl='report/targets/test_run.html'):
+def view_test_run_report(request):
+    templates = {
+        'per_build_report': 'report/caserun_report_per_build.html',
+        'per_tester_report': 'report/caserun_report_per_tester.html',
+        'per_priority_report': 'report/caserun_report_per_priority.html',
+        'per_plan_tag_report': 'report/testrun_report_per_plan_tag.html',
+    }
     errors  = None
-    data    = request.GET
-    report = None
-    report_by = data.get('report_by', 'tester')
+    queries = request.GET
+    data    = {}
+    report_type = queries.get('report_type')
     PRODUCT_CHOICE = [
             (p.pk, p.name) for p in cached_entities('product')
         ]
-    if data:
-        run_form    = RunForm(data)
-        run_form.populate(data)
+    if queries:
+        run_form = RunForm(queries)
+        run_form.populate(queries)
         if run_form.is_valid():
-            report = test_run_report(run_form.cleaned_data, report_by)
+            queries = run_form.cleaned_data
+            data = test_run_report(queries, report_type)
         else:
             errors = run_form.errors
-    return direct_to_template(request, tmpl, locals())
+    tmpl = templates.get(report_type, 'report/common/search_run.html')
+    queries = fmt_queries(queries)
+    data.update(locals())
+    return direct_to_template(request, tmpl, data)
