@@ -10,7 +10,6 @@
 			<li class="clear"></li>
 		</ul>
 	</div>
-	<div><a href="{% url testrun_report %}?{{ request_path }}&report_type=per_plan_tag_report">Per Tag View</a></div>
 	{% endif %}
 	
 	<div class="reportSummary01">
@@ -19,8 +18,9 @@
 				<span>
 				{% for data in reports %}
 					{{ data.0 }},&nbsp;&nbsp;
-				{% endfor %}
+				{% endfor %}<a href="{% url testrun_report %}?{{ request_path }}&report_type=per_plan_tag_report" style="font-weight:normal; text-decoration:underline;">Per Tag View</a>
 				</span>
+				
 			</li>
 		</ul>
 		<ul><li>Plan:<span>{{ plans_count }}</span>Run:<span>{{ runs_count }}</span></li></ul>
