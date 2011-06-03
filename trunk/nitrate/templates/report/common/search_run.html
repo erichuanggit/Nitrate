@@ -15,7 +15,7 @@
 {% block contents %}
 <div class="itemSearch">
 	<form action="{% url testrun_report %}" method="get">
-	<h2>Report</h2>
+	<h2>Testing Report</h2>
 		<div class="leftlistinfo">
 			<div class="listinfo">
 				<div class="title"><label for="id_name">Product&nbsp;:</label></div>
@@ -59,13 +59,13 @@
 		<div class="clear"></div>
 		<div class="leftlistinfo">
 			<div class="listinfo">
-				<div class="title"><label for="id_name">Report By&nbsp;:</label></div>
+				<div class="title"><label for="id_name">Report Type&nbsp;:</label></div>
 			<div class="listinfo_input">
 				<ul>
+					<li><input name="report_type" type="radio" value="per_build_report" checked="checked" /><span> By Case-Run Tester</span></li>
 					<li><input name="report_type" type="radio" value="per_priority_report" /><span>By Case Priority</span></li>
 					{#<li><input name="report_type" type="radio" value="" /><span>By Test Run Manager</span></li>#}
 					{#<li><input name="report_type" type="radio" value="" /><span>By Test Plan</span></li>#}
-					<li><input name="report_type" type="radio" value="per_build_report" /><span> By Build</span></li>
 					<li><input name="report_type" type="radio" value="per_plan_tag_report" /><span>By Plan's Tag</span></li>
 					<li><input name="report_type" type="radio" value="runs_with_rates_per_plan_tag" /><span>By Plan's Tag With Pass/Fail Rates</span></li>
 				</ul>
