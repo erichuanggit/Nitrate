@@ -451,5 +451,6 @@ def view_test_run_report(request):
             errors = run_form.errors
     tmpl = templates.get(report_type, 'report/common/search_run.html')
     queries = fmt_queries(queries)
+    request_path = remove_from_request_path(request, 'report_type')
     data.update(locals())
     return direct_to_template(request, tmpl, data)

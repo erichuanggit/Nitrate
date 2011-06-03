@@ -37,9 +37,10 @@
 			<th class="w50">Blocked</th>
 			<th class="w50">Error</th>
 			<th class="w50">Waived</th>
+			<th class="w50">Total</th>
 		</tr>
 		{% for build, runs_report in reports %}
-			{% for priority, percentages in runs_report %}
+			{% for priority, percentages, total_count in runs_report %}
 			<tr>
 				{% ifequal forloop.counter 1 %}
 				<td rowspan="{{runs_report|length}}" class="bgRowspan"><span>{{ build }}</span></td>
@@ -53,6 +54,7 @@
 				<td>{{ percentages.blocked }}</td>
 				<td>{{ percentages.error }}</td>
 				<td>{{ percentages.waived }}</td>
+				<td>{{ total_count }}</td>
 			</tr>
 			{% endfor %}
 		{% endfor %}

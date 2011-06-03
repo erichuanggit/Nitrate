@@ -166,8 +166,9 @@ def test_run_report_by_priority_with_percentages(runs):
     caseruns    = sorted(caseruns, key=lambda c: c.case.priority_id)
     caseruns    = groupby(caseruns, key=lambda c: c.case.priority)
     for priority, _caseruns in caseruns:
-        percentages = get_caserun_percentages(_caseruns)
-        report.append((priority, percentages))
+        __caseruns = list(_caseruns)
+        percentages = get_caserun_percentages(__caseruns)
+        report.append((priority, percentages, len(__caseruns)))
     return report
 
 def percentages_on_runs_under_plan_tag(runs):

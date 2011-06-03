@@ -150,7 +150,11 @@ def remove_from_request_path(request, name):
     Remove a parameter from request.get_full_path()\n
     and return the modified path afterwards.
     '''
-    path = request.get_full_path().split('?')[1].split('&')
+    path = request.get_full_path().split('?')
+    if len(path) > 1:
+        path = path[1].split('&')
+    else:
+        return None
     path = [p for p in path if not p.startswith(name)]
     path = '&'.join(path)
     return path

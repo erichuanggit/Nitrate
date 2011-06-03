@@ -55,7 +55,7 @@
 				{% ifequal forloop.counter 1 %}
 				<td rowspan="{{runs|length}}" class="bgRowspan"><span>{{ build }}</span></td>
 				{% endifequal %}
-				<td><span><a href="/plan/{{run.plan.pk}}/">{{ run.plan }}</a></span></td>
+				<td><span><a href="/plan/{{run.plan.pk}}/">[{{run.plan.pk}}] {{ run.plan }}</a></span></td>
 				<td><span>{{ run.summary }}</span></td>
 				<td>{{ run.idle_count }}</td>
 				<td>{{ run.running_count }}</td>
