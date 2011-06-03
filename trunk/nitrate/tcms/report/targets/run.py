@@ -182,9 +182,9 @@ def percentages_on_runs_under_plan_tag(runs):
 
 def get_runs_rate(runs):
     '''
-    Two Percentages:
-    1. count(runs with all caserun passed)/count(runs)
-    2. count(runs with all caserun failed)/count(runs)
+    Two counts:
+    1. runs with all caserun passed
+    2. runs with all caserun failed
     '''
     total_count = float(len(runs))
     passed_count = 0
@@ -197,7 +197,7 @@ def get_runs_rate(runs):
             passed_count += 1
         if member_purified(statuses, lambda i: i==FAILED):
             failed_count += 1
-    return round(passed_count/total_count, 3)*100, round(failed_count/total_count, 3)*100
+    return passed_count, failed_count
 
 def member_purified(iterable, condition):
     '''
