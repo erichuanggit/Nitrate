@@ -36,7 +36,7 @@
 	<table width="100%" border="0" cellpadding="0" cellspacing="0" class="listTdReport">
 		<tr>
 			{% if builds_selected %}<th class="w200">Build</th>{% endif %}
-			<th class="thRun">Tested By </th>
+			<th class="w200">Tested By </th>
 			<th class="w90">Run Tested </th>
 			<th class="w90">Case-Run Tested</th>
 			<th class="w50">Idle</th>
@@ -46,7 +46,7 @@
 			<th class="w50">Failed</th>
 			<th class="w50">Blocked</th>
 			<th class="w50">Error</th>
-			<th class="w50">Waived</th>
+			<th>Waived</th>
 		</tr>
 		{% if builds_selected %}
 			{% for build, runs_report in reports %}

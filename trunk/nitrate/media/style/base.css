@@ -713,13 +713,13 @@ ul.data_content_title li{ display:inline-block; margin-left:3px;}
 .data_content ul li{display:inline-block; margin-left:3px; height:inherit;}
 
 /*linan new*/
-li,ul{list-style:none; margin:0px; padding:0px;}
 .btnBlueCaserun{float:left; position:relative; width:85px; padding:0 0 0 10px; margin-right:10px; height:21px; line-height:21px; color:#FFFFFF; text-align:left; background:url(../images/btn_blue_caserun.png) no-repeat 0px 0px; cursor:pointer;}
 .btnBlueCaserun ul{display:none; width:91px; padding:1px; border:1px solid #235D9F; background:#FFFFFF url(../images/btn_blue_caserun.png) -1px -42px repeat-x; border-top:0px; position:absolute; left:0px; top:20px;}
 .btnBlueCaserun ul li{list-style:none;}
 .btnBlueCaserun ul li a:link, .btnBlueCaserun ul li a:visited{display:block; text-decoration:none; color:#333333; padding-left:15px; height:21px; line-height:21px;}
 .btnBlueCaserun ul li a:hover{display:block; background-color:#FFF5B3; color:#000000; padding-left:15px;}
 .btnBlue{height:21px; background:url(../images/btn_blue.png) repeat-x 0px -21px;}
+.btnBlue li{list-style:none;}
 .btnBlueL{float:left; width:2px; height:21px; background:url(../images/btn_blue.png) no-repeat 0px 0px;}
 .btnBlueC{float:left; height:21px; line-height:21px; padding:0 5px; color:#FFFFFF;}
 .btnBlueR{float:left; width:2px; height:21px; background:url(../images/btn_blue.png) no-repeat 0px -42px;}
@@ -773,7 +773,7 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .tit{font-weight:bold; margin:0 10px; height:22px; line-height:22px;}
 
 .statu{ width:270px; height:165px; background:#EEEEEE; border:1px solid #D7D7D7; padding:5px; margin-left:20px;}
-.statu li{float:left; height:22px; line-height:22px; width:120px; color:#BBBBBB;}
+.statu li{float:left; height:22px; line-height:22px; width:120px; color:#BBBBBB; list-style:none;}
 .statu li label{display: block; float: left; padding: 0 5px; text-align: right; width:60px; color:#333333;}
 .statu li span{color:#BBBBBB; padding:0 3px; font-size:11px;}
 .statu table{ margin:0 auto; width:100%; background:#fff; border:1px solid #ddd;border-collapse:collapse; }
@@ -861,7 +861,7 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .list .disable { text-decoration:line-through; }
 .list .hide{ background:#F3F8FC; }
 .list .hide h4{ margin:0px; color:#333333; font-size:1.0em; }
-.list .hide li{ margin-left:12px; }
+.list .hide li{ margin-left:12px; list-style:none;}
 .list .hide li td{border:0px; padding:0 4px 0 0; line-height:18px;}
 .list .right_panel{ border:1px solid #ccc; background:#fff; vertical-align:top; padding:10px;}
 .list .listGroupBlue{background:#C2DFFF; padding:0px 5px; color:#000000;}
@@ -907,7 +907,7 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .advancedSearchTip li{color:#FF6600; list-style: disc; margin-left:10px;}
 .advancedSearchTip p{margin:0; color:#333333;}
 .queries{border:1px solid #FFE4B5; background:#FFF8E9; float:left; margin:10px; padding:5px 10px;}
-.queries li{float:left; padding:0 15px 0 0;}
+.queries li{float:left; padding:0 15px 0 0; list-style:none;}
 .queries li label{padding:0 3px 0 0; color:#999999;}
 .queries p{clear:none; padding:0px; margin:0px;}
 
@@ -1024,7 +1024,9 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .listTdReport .w90{width:100px;}
 .listTdReport .w50{width:50px;}
 .listTdReport .w200{width:200px;}
+.listTdReport .w350{width:350px;}
 .listTdReport .bgRowspan{background:#F5F5F5;}
+.listTdReport td span{line-height:18px;}
 .listTdReport tr:hover td{background:#FFF8C7;}
 .listTdReport tr:hover td.bgRowspan{background:#F5F5F5;}
 .listTdReport td{height:30px; line-height:30px; border-bottom:1px solid #E3E3E3; padding:0 5px;}
@@ -1033,14 +1035,14 @@ li,ul{list-style:none; margin:0px; padding:0px;}
 .reportSummary{margin:20px auto 12px auto; font-size:12px; clear:both; color:#888888; border-bottom:1px solid #888888;}
 .reportSummary ul{float:left; margin:0 0 -1px 0; padding-right:10px; padding-left:20px;}
 .reportSummary ul span{padding:0 10px 0 3px; color:red;}
-.reportSummary li{float:left;}
+.reportSummary li{float:left; list-style:none;}
 .reportSummary li span{padding:0 10px 0 3px; color:red;}
 .reportSummary li.tagTab{border:1px solid #888888; padding:3px 10px; border-bottom:1px solid #FFFFFF;}
 .reportSummary li.tagTab span{color:#000000; font-weight:bold;}
 .reportSummary01{margin:10px auto 4px auto; font-size:12px; clear:both; color:#888888;}
 .reportSummary01 ul{float:left; margin:0 0 0 0; padding-right:10px; padding-left:20px;}
 .reportSummary01 ul span{padding:0 10px 0 3px; color:red;}
-.reportSummary01 li{float:left;}
+.reportSummary01 li{float:left; list-style:none;}
 .reportSummary01 li span{padding:0 10px 0 3px; color:red;}
 .reportSummary01 li.tagTab span{color:#000000; font-weight:bold;}
 

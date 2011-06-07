@@ -27,8 +27,8 @@
 
 	<table width="100%" border="0" cellpadding="0" cellspacing="0" class="listTdReport">
 		<tr>
-			<th class="w200">Build</th>
-			<th class="thRun">Priority </th>
+			<th class="w350">Build</th>
+			<th class="w90">Priority </th>
 			<th class="w50">Idle</th>
 			<th class="w50">Running</th>
 			<th class="w50">Paused</th>
@@ -37,7 +37,7 @@
 			<th class="w50">Blocked</th>
 			<th class="w50">Error</th>
 			<th class="w50">Waived</th>
-			<th class="w50">Total</th>
+			<th>Total</th>
 		</tr>
 		{% for build, runs_report in reports %}
 			{% for priority, percentages, total_count in runs_report %}

@@ -10,7 +10,6 @@
 			<li class="clear"></li>
 		</ul>
 	</div>
-	<div><a href="{% url testrun_report %}?{{ request_path }}&report_type=per_plan_tag_report">Per Tag View</a></div>
 	{% endif %}
 	
 	<div class="reportSummary01">
@@ -18,23 +17,25 @@
 			<li class="tagTab">Tag:
 				<span>
 				{% for data in reports %}
-					{{ data.0 }},
-				{% endfor %}
+					{{ data.0 }},&nbsp;&nbsp;
+				{% endfor %}<a href="{% url testrun_report %}?{{ request_path }}&report_type=per_plan_tag_report" style="font-weight:normal; text-decoration:underline;">Per Tag View</a>
 				</span>
+				
 			</li>
 		</ul>
 		<ul><li>Plan:<span>{{ plans_count }}</span>Run:<span>{{ runs_count }}</span></li></ul>
 		<div class="clear"></div>
 	</div>
-	{% for plan_tag, plans_count, runs_count, passed_rate, failed_rate in reports %}
+	
 	<table width="100%" border="0" cellpadding="0" cellspacing="0" class="listTdReport">
 		<tr>
-			<th class="w200">Tag</th>
-			<th class="thRun">plan</th>
-			<th class="w90">Run</th>
-			<th class="w50">Run Passed</th>
-			<th class="w50">Run Failed</th>
+			<th class="w350">Tag</th>
+			<th class="w50">plan</th>
+			<th class="w50">Run</th>
+			<th class="w90">Run Passed</th>
+			<th>Run Failed</th>
 		</tr>
+		{% for plan_tag, plans_count, runs_count, passed_rate, failed_rate in reports %}
 		<tr>
 			<td><span>{{ plan_tag }}</span></td>
 			<td>{{ plans_count }}</td>
@@ -42,7 +43,8 @@
 			<td>{{ passed_rate }}</td>
 			<td>{{ failed_rate }}</td>
 		</tr>
+		{% endfor %}
 	</table>
-	{% endfor %}
+	
 {% endblock %}
 
