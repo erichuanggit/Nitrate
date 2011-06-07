@@ -26,9 +26,7 @@ function getProdRelatedObj(prodIDs, target, targetID){
 
 function buildOptions(data, target){
     // target should be the ID of a select tag
-    var EmptyLabelOfSelect = '--';
     var options = new Array();
-    options.push('<option value="">'+EmptyLabelOfSelect+'</option>');
     for(var i=0;i<data.length;i++){
         var pair = data[i];
         options.push('<option value="'+pair[0]+'">'+pair[1]+'</option>');
