@@ -37,6 +37,7 @@ from tcms.management.models import Product, Version, Priority
 from tcms.search.query import SmartDjangoQuery
 from tcms.search.forms import CaseForm, RunForm, PlanForm
 from tcms.core.helpers.cache import cached_entities
+from tcms.core.utils.raw_sql import RawSQL
 
 # from stdlib
 from datetime import datetime
@@ -109,9 +110,19 @@ def sum_orm_queries(plans, cases, runs, target):
     cases = cases.evaluate()
     runs  = runs.evaluate()
     if target == 'run':
-        if runs is None: runs = TestRun.objects.all()
+        if runs is None:
+            runs = TestRun.objects.all()
+        runs = runs.extra(
+                select={
+                    'completed_case_run_percent': RawSQL.completed_case_run_percent,
+                    'total_num_caseruns': RawSQL.total_num_caseruns,
+                    'failed_case_run_percent': RawSQL.failed_case_run_percent,
+                    'env_groups': RawSQL.environment_group_for_run,
+                }
+            )
         if cases: runs = runs.filter(case_run__case__in=cases)
         if plans: runs = runs.filter(plan__in=plans)
+        
         return runs
     if target == 'plan':
         if plans is None: plans = TestPlan.objects.all()
@@ -133,13 +144,9 @@ def render_results(request, results, time_cost, queries, tmpl='search/results.ht
         'case': {'class': TestCase, 'result_key': 'test_cases'},
         'run': {'class': TestRun, 'result_key': 'test_runs'}
     }
-    if results is None:
-        qs      = klasses[request.GET['target']]['class']._default_manager.none()
-    else:
-        qs      = klasses[request.GET['target']]['class']._default_manager.filter(pk__in=results)
     return direct_to_template(request, tmpl,
         {
-            klasses[request.GET['target']]['result_key']: qs,
+            klasses[request.GET['target']]['result_key']: results,
             'time_cost': time_cost,
             'queries': queries
         }
