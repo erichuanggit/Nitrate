@@ -137,7 +137,9 @@ Nitrate.TestRuns.Details.on_load = function()
     
     // Auto show the case run contents.
     if(window.location.hash != '') {
-        fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
+        elem = 'a[href=\"' + window.location.hash + '\"]'
+        $$(elem)[0].scrollTo();
+        fireEvent($$(elem)[0], 'click');
     } else {
         if($$('tr.is_current').length != 0) {
             $$('tr.is_current').each(function(e) {
