@@ -18,6 +18,7 @@
 
 import datetime
 
+from django.db.models.fields.related import ForeignKey
 from tcms.core.forms.widgets import SECONDS_PER_MIN, SECONDS_PER_HOUR, SECONDS_PER_DAY
 
 class XMLRPCSerializer(object):
@@ -68,16 +69,13 @@ class XMLRPCSerializer(object):
         
         response = {}
         
-        for k in self.model.__dict__.keys():
-            # Skip the cached object
-            if k.startswith('_'):
-                continue
-            
-            f = getattr(self.model, k)
-            
+        opts = self.model._meta
+        for field in opts.fields:
+            f = getattr(self.model, field.name)
+
             if isinstance(f, datetime.datetime):
                 f = datetime.datetime.strftime(f, "%Y-%m-%d %H:%M:%S")
-            
+
             if isinstance(f, datetime.timedelta):
                 total_seconds = f.seconds + (f.days * SECONDS_PER_DAY)
                 f = '%02i:%02i:%02i' % (
@@ -87,10 +85,15 @@ class XMLRPCSerializer(object):
                     total_seconds % SECONDS_PER_MIN # seconds
                 )
                 del total_seconds
+
+            response[field.name] = str(f)
             
-            response[k] = f
-        
-        del self.model
+            if isinstance(field, ForeignKey):
+                fk_id = "%s_id" % field.name
+                response[fk_id] = getattr(self.model, fk_id)
+
+        #TODO: sort the response dict
+        #response = dict(sorted(response.items(), key=lambda d: d[0]))
         return response
     
     def serialize_queryset(self):
