@@ -444,18 +444,11 @@ class TestCase(TCMSActionModel):
         to = list(set(to))
         mailto(template, subject, to, context, request)
     
-    def remove_bug(self, bug_id):
-        try:
-            bug = self.case_bug.get(bug_id = bug_id)
-            bug.delete()
-        #Backward compatibility, delete duplicate bugs.
-        except MultipleObjectsReturned:
-            try:
-                self.case_bug.filter(bug_id = bug_id).delete()
-            except:
-                raise
-        except:
-            raise
+    def remove_bug(self, bug_id, run_id=None):
+        bugs = self.case_bug.filter(bug_id=bug_id)
+        if run_id:
+            bugs = bugs.filter(case_run=run_id)
+        bugs.delete()
     
     def remove_component(self, component):
         cursor = connection.cursor()

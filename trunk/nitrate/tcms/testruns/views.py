@@ -455,7 +455,9 @@ def bug(request, case_run_id, template_name = 'run/execute_case_run.html'):
                 return self.render(response = response)
             
             try:
-                self.case_run.remove_bug(self.request.REQUEST.get('bug_id'))
+                bug_id = self.request.REQUEST.get('bug_id')
+                run_id = self.request.REQUEST.get('case_run')
+                self.case_run.remove_bug(bug_id, run_id)
             except ObjectDoesNotExist, error:
                 response = {'rc': 1, 'response': str(error)}
                 return self.ajax_response(response=response)

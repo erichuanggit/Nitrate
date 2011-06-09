@@ -458,9 +458,9 @@ class TestCaseRun(TCMSActionModel):
         except:
             raise
     
-    def remove_bug(self, bug_id):
+    def remove_bug(self, bug_id, run_id=None):
         try:
-            self.case.remove_bug(bug_id = bug_id)
+            self.case.remove_bug(bug_id = bug_id, run_id=run_id)
         except:
             raise
     
