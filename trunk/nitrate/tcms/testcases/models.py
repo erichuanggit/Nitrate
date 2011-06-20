@@ -108,9 +108,6 @@ class TestCase(TCMSActionModel):
         db_column='isautomated', default = 0, max_length=4,
     )
     is_automated_proposed = models.BooleanField(default = False)
-    sortkey = models.IntegerField(
-        max_length=11, null=True, blank=True, default=0
-    )
     script = models.TextField(blank=True)
     arguments = models.TextField(blank=True)
     summary = models.CharField(max_length=255, blank=True)
@@ -159,7 +156,7 @@ class TestCase(TCMSActionModel):
     #   'texts' : list of TestCaseTexts (from TestCaseTexts.case)
     class Meta:
         db_table = u'test_cases'
-        ordering = ['sortkey', 'summary', 'case_id']
+        ordering = ['summary', 'case_id',]
     
     def __unicode__(self):
         return self.summary
@@ -173,7 +170,7 @@ class TestCase(TCMSActionModel):
             author = author,
             is_automated = values['is_automated'],
             is_automated_proposed = values['is_automated_proposed'],
-            sortkey = values['sortkey'],
+            # sortkey = values['sortkey'],
             script = values['script'],
             arguments = values['arguments'],
             summary = values['summary'],
@@ -363,14 +360,17 @@ class TestCase(TCMSActionModel):
         return latest_text
     
     def add_to_plan(self, plan):
+
         try:
-            return TestCasePlan.objects.get_or_create(
+            TestCasePlan.objects.get(case = self, plan = plan)
+        except TestCasePlan.DoesNotExist:
+            sortkey = plan.get_case_sortkey()
+            TestCasePlan.objects.create(
                 case = self,
                 plan = plan,
+                sortkey = sortkey,
             )
-        except:
-            pass
-    
+
     def clear_components(self):
         try:
             return TestCaseComponent.objects.filter(
@@ -378,7 +378,7 @@ class TestCase(TCMSActionModel):
             ).delete()
         except:
             raise
-    
+
     def get_bugs(self):
         return TestCaseBug.objects.select_related(
             'case_run', 'bug_system__url_reg_exp'
@@ -517,9 +517,14 @@ class TestCasePlan(models.Model):
     
     plan = models.ForeignKey('testplans.TestPlan', primary_key=True)
     case = models.ForeignKey(TestCase)
+    sortkey = models.IntegerField(
+        max_length=11, null=True, blank=True, default=0
+    )
+
     
     class Meta:
         db_table = u'test_case_plans'
+
 
 class TestCaseAttachment(models.Model):
     attachment = models.ForeignKey(

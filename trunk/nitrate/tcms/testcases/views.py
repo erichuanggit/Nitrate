@@ -31,6 +31,8 @@ from tcms.core.utils import Prompt
 from models import TestCase, TestCaseStatus, TestCaseAttachment
 from tcms.testplans.models import TestPlan
 from itertools import groupby
+from tcms.testcases.models import TestCasePlan
+from macurl2path import tp
 
 MODULE_NAME = "testcases"
 
@@ -709,7 +711,6 @@ def clone(request, template_name='case/clone.html'):
                 if clone_form.cleaned_data['copy_case']:
                     tc_dest = TestCase.objects.create(
                         is_automated = tc_src.is_automated,
-                        sortkey = tc_src.sortkey,
                         script = tc_src.script,
                         arguments = tc_src.arguments,
                         summary = tc_src.summary,
@@ -723,6 +724,9 @@ def clone(request, template_name='case/clone.html'):
                         author = clone_form.cleaned_data['maintain_case_orignal_author'] and tc_src.author or request.user,
                         default_tester = clone_form.cleaned_data['maintain_case_orignal_default_tester'] and tc_src.author or request.user,
                     )
+                    for tp in clone_form.cleaned_data['plan']:
+                        sortkey = tp.get_case_sortkey()
+                        TestCasePlan.objects.create(plan = tp, case = tc_dest, sortkey = sortkey)
                     
                     tc_dest.add_text(
                         author = clone_form.cleaned_data['maintain_case_orignal_author'] and tc_src.author or request.user,

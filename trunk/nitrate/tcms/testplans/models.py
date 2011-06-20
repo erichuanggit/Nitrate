@@ -282,6 +282,16 @@ class TestPlan(TCMSActionModel):
         version = self.get_default_product_version()
         return version and version.id or None
 
+    def get_case_sortkey(self):
+        """
+        Get case sortkey.
+        """
+        if self.case.exists():
+            return TestCasePlan.objects.filter(plan = self,
+                case__in = self.case.all()).values_list('sortkey',
+                flat = True).order_by('sortkey')[-1]
+        else:
+            return 0
 
 class TestPlanText(TCMSActionModel):
     plan = models.ForeignKey(

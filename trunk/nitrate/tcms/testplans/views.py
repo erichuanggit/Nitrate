@@ -32,6 +32,7 @@ from tcms.core.models import TCMSLog
 from tcms.management.models import Product
 
 from models import TestPlan
+from tcms.testcases.models import TestCasePlan
 
 MODULE_NAME = "testplans"
 
@@ -470,7 +471,7 @@ def clone(request, template_name = 'plan/clone.html'):
                             tpcase_dest = TestCase.objects.create(
                                 create_date = tpcase_src.create_date,
                                 is_automated = tpcase_src.is_automated,
-                                sortkey = tpcase_src.sortkey,
+                                # sortkey = tpcase_src.sortkey,
                                 script = tpcase_src.script,
                                 arguments = tpcase_src.arguments,
                                 summary = tpcase_src.summary,
@@ -483,6 +484,16 @@ def clone(request, template_name = 'plan/clone.html'):
                                 author = author,
                                 default_tester = default_tester,
                             )
+                            try:
+                                tcp = TestCasePlan.objects.get(plan = tp_dest, case = tpcase_dest)
+                            except TestCasePlan.DoesNotExist:
+                                pass
+                            else:
+                                tcp_dest = TestCasePlan.objects.create(
+                                    plan = tp_dest,
+                                    case = tpcase_dest,
+                                    sortkey = tcp.sortkey
+                                )
                             
                             for tc_tag_src in tpcase_src.tag.all():
                                 tpcase_dest.add_tag(tag = tc_tag_src)
@@ -615,6 +626,11 @@ def cases(request, plan_id):
     
     ajax_response = { 'rc': 0, 'response': 'ok' }
     
+    try:
+        tp = TestPlan.objects.get(plan_id = plan_id)
+    except TestPlan.DoesNotExist:
+        raise Http404
+
     class CaseActions(object):
         def __init__(self, request, tp):
             self.__all__ = [
@@ -673,10 +689,6 @@ def cases(request, plan_id):
             })
         
         def delete_cases(self):
-            try:
-                tp = TestPlan.objects.get(plan_id = plan_id)
-            except TestPlan.DoesNotExist:
-                raise Http404
             
             if not request.REQUEST.get('case'):
                 ajax_response['rc'] = 1
@@ -710,10 +722,6 @@ def cases(request, plan_id):
             # Current we should rewrite all of cases belong to the plan.
             # Because the cases sortkey in database is chaos,
             # Most of them are None.
-            try:
-                tp = TestPlan.objects.get(plan_id = plan_id)
-            except ObjectDoesNOtExist, error:
-                raise Http404(error)
             
             if not request.REQUEST.get('case'):
                 ajax_response['rc'] = 1
@@ -725,9 +733,7 @@ def cases(request, plan_id):
             
             for tc in tcs:
                 new_sort_key = (tc_pks.index(str(tc.pk)) + 1) * 10
-                if tc.sortkey != new_sort_key:
-                    tc.sortkey = new_sort_key
-                    tc.save()
+                TestCasePlan.objects.update(plan = tp, case = tc, sortkey = new_sort_key)
             
             return HttpResponse(json_dumps(ajax_response))
         
@@ -764,7 +770,6 @@ def cases(request, plan_id):
                         # Start to create the objects
                         tc = TestCase.objects.create(
                             is_automated = case['is_automated'],
-                            sortkey = i * 10,
                             script = None,
                             arguments = None,
                             summary = case['summary'],
@@ -778,6 +783,7 @@ def cases(request, plan_id):
                             default_tester_id = case['default_tester_id'],
                             notes = case['notes'],
                         )
+                        TestCasePlan.objects.create(plan = tp, case = tc, sortkey = i*10)
                         
                         tc.add_text(
                             case_text_version = 1,
