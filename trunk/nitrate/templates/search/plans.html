@@ -44,6 +44,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
 				<th width="50" class="number" title="Sort by plan ID"><span></span>ID</th>
 				<th class="text" title="Sort by plan name"><span></span>Name</th>
 				<th width="100" class="text" title="Sort by author"><span></span>Author</th>
+				<th width="100" class="text" title="Sort by owner"><span></span>Owner</th>
 				<th width="180" class="text" title="Sort by product name" id="col_product_head"><span></span>Product</th>
 				<th width="120" class="sortable" title="Sort by product version" style="display:none" id="col_product_version_head"><span></span>Product Version</th>
 				<th width="140" class="text" title="Sort by plan type"><span></span>Type</th>
@@ -60,6 +61,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
 				<td class="{% if not test_plan.is_active %}underline{% endif %}"><a href="{% url tcms.testplans.views.get test_plan.plan_id %}">{{ test_plan.plan_id }}</a></td>
 				<td class="{% if not test_plan.is_active %}underline{% endif %}"><a href="{% url tcms.testplans.views.get test_plan.plan_id %}" title="Go to {{ test_plan.name }}">{{ test_plan }} </a></td>
 				<td><a href="{% url tcms.profiles.views.profile test_plan.author.username %}">{{ test_plan.author }}</a></td>
+				<td><a href="{% url tcms.profiles.views.profile test_plan.owner.username %}">{{ test_plan.owner }}</a></td>
 				<td class="col_product_content">{{ test_plan.product }}</td>
 				<td style="display:none" class="col_product_version_content">{{ test_plan.default_product_version }}</td>
 				<td>{{ test_plan.type }}</td>

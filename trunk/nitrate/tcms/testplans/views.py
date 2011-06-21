@@ -18,6 +18,7 @@
 
 from datetime import datetime
 
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.views.generic.simple import direct_to_template
 from django.core.urlresolvers import reverse
@@ -320,6 +321,13 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
                 tp.type = form.cleaned_data['type']
                 tp.is_active = form.cleaned_data['is_active']
                 tp.extra_link = form.cleaned_data['extra_link']
+                owner_name = form.cleaned_data['owner']
+                if owner_name:
+                    try:
+                        owner = User.objects.get(username=owner_name)
+                        tp.owner = owner
+                    except:
+                        pass
                 tp.save()
             
             if request.user.has_perm('testplans.add_testplantext'):
@@ -365,6 +373,7 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
             'env_group': env_group_id,
             'is_active': tp.is_active,
             'extra_link': tp.extra_link,
+            'owner': tp.owner,
         })
         form.populate(product_id = tp.product_id)
     

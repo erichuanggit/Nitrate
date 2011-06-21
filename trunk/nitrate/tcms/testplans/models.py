@@ -65,7 +65,8 @@ class TestPlan(TCMSActionModel):
         blank=True,
         null=True
     )
-    
+
+    owner  = models.ForeignKey('auth.User', blank=True, null=True, related_name='myplans')
     parent = models.ForeignKey('self', blank=True, null=True, related_name='child_set')
     author = models.ForeignKey('auth.User')
     product = models.ForeignKey('management.Product', related_name='plan')
