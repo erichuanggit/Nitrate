@@ -173,10 +173,13 @@ class TestPlan(TCMSActionModel):
             raise
     
     def add_case(self, case):
+
+        sk = self.get_case_sortkey()
         try:
             return TestCasePlan.objects.create(
                 plan = self,
                 case = case,
+                sortkey = sk,
             )
         except:
             return False
@@ -287,9 +290,9 @@ class TestPlan(TCMSActionModel):
         Get case sortkey.
         """
         if self.case.exists():
-            return TestCasePlan.objects.filter(plan = self,
+            return max(TestCasePlan.objects.filter(plan = self,
                 case__in = self.case.all()).values_list('sortkey',
-                flat = True).order_by('sortkey')[-1]
+                flat = True)) + 10
         else:
             return 0
 

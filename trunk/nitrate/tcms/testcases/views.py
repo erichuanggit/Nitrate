@@ -28,11 +28,9 @@ from django.utils import simplejson
 from tcms.core import forms
 from tcms.core.utils import Prompt
 
-from models import TestCase, TestCaseStatus, TestCaseAttachment
+from models import TestCase, TestCaseStatus, TestCaseAttachment, TestCasePlan
 from tcms.testplans.models import TestPlan
 from itertools import groupby
-from tcms.testcases.models import TestCasePlan
-from macurl2path import tp
 
 MODULE_NAME = "testcases"
 

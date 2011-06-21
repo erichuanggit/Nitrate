@@ -375,8 +375,8 @@ function changeCaseOrder(parameters, callback)
         return false;
     }
     
-    var ctype = 'testcases.testcase';
-    var object_pk = parameters['case'];
+    var ctype = 'testcases.testcaseplan';
+    var object_pk = parameters['testcaseplan'];
     var field = 'sortkey';
     var value = nsk;
     var vtype = 'int';

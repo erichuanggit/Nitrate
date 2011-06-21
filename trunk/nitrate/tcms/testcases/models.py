@@ -115,7 +115,6 @@ class TestCase(TCMSActionModel):
     alias = models.CharField(max_length=255, blank=True)
     estimated_time = TimedeltaField(null=True, blank=True)
     notes = models.TextField(blank=True)
-    
     case_status = models.ForeignKey(TestCaseStatus)
     category = models.ForeignKey(
         TestCaseCategory, related_name='category_case'
@@ -515,7 +514,7 @@ class TestCasePlan(models.Model):
     # plan_id = models.IntegerField(max_length=11, primary_key=True)
     # case_id = models.IntegerField(max_length=11, primary_key=True)
     
-    plan = models.ForeignKey('testplans.TestPlan', primary_key=True)
+    plan = models.ForeignKey('testplans.TestPlan')
     case = models.ForeignKey(TestCase)
     sortkey = models.IntegerField(
         max_length=11, null=True, blank=True, default=0
