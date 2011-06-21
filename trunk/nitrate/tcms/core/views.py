@@ -62,9 +62,8 @@ def search(request):
     try:
         request_content = int(request_content)
         target = models.get_model(*[app_label, model])._default_manager.get(pk=request_content)
-        url = '%s?search=%s' % (
+        url = '%s' % (
             reverse('tcms.%s.views.get' % app_label, args=[target.pk]),
-            request_content
         )
         
         return HttpResponseRedirect(url)
