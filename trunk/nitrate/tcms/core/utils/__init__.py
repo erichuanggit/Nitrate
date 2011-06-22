@@ -22,9 +22,9 @@ from prompt import *
 def string_to_list(strs, spliter = ','):
     """Convert the string to list"""
     if isinstance(strs, list):
-        str_list = map(lambda t: str(t).strip(), strs)
+        str_list = map(lambda t: unicode(t).strip(), strs)
     elif strs.find(spliter):
-        str_list = map(lambda t: str(t).strip(), strs.split(spliter))
+        str_list = map(lambda t: unicode(t).strip(), strs.split(spliter))
     else:
         str_list = [strs]
     return [s for s in str_list if s]
