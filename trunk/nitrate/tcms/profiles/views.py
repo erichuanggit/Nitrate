@@ -57,7 +57,7 @@ def bookmark(request, username, template_name = 'profile/bookmarks.html'):
             if not form.is_valid():
                 ajax_response = {
                     'rc': 1,
-                    'response': form.errors,
+                    'response': form.errors.as_text(),
                 }
                 return HttpResponse(simplejson.dumps(ajax_response))
             
