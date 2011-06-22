@@ -128,7 +128,10 @@ def upload_file(request):
         except:
             raise
     else:
-        raise Http404('Upload file is required')
+        return HttpResponseRedirect(
+                    reverse('tcms.testplans.views.attachment',
+                    args=[request.REQUEST['to_plan_id']])\
+                )
     
     raise NotImplementedError
 
