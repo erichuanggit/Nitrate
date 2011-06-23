@@ -42,8 +42,8 @@
 				<td valign="top" align='center'>{{ test_run.total_num_caseruns|default:"0" }}</td>
 				<td valign="top">
             
-					<div class="progress-bar">
-						<div class="percent">{{ test_run.completed_case_run_percent|default:"0" }}%</div>
+					<div class="progress-bar" style="width:100px;">
+						<div class="percent">{{ test_run.completed_case_run_percent|default:"0" }}px</div>
 						<div class="progress-inner" style="width:{{ test_run.completed_case_run_percent|default:"0" }}px;">
 							<div class="progress-failed" style="width:{{ test_run.failed_case_run_percent|default:"0" }}px;">
 							</div>
