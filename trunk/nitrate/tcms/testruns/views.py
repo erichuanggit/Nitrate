@@ -26,6 +26,8 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 from tcms.core.utils.prompt import Prompt
 from models import TestRun, TestCaseRun, TestCaseRunStatus, TCMSEnvRunValueMap
+from tcms.search.order import order_run_queryset
+from tcms.search import remove_from_request_path
 
 MODULE_NAME = "testruns"
 
@@ -217,7 +219,8 @@ def all(request, template_name = 'run/all.html'):
     # Initial the values will be use if it's not a search
     query_result = False
     trs = None
-    
+    order_by = request.REQUEST.get('order_by', 'create_date')
+    asc = bool(request.REQUEST.get('asc', None))
     # If it's a search
     if request.REQUEST.items():
         search_form = SearchRunForm(request.REQUEST)
@@ -244,16 +247,23 @@ def all(request, template_name = 'run/all.html'):
                     'env_groups': RawSQL.environment_group_for_run,
                 },
             )
+            trs = order_run_queryset(trs, order_by, asc)
     else:
         search_form = SearchRunForm()
         # search_form.populate()
-    
+    # generating a query_url with order options
+    query_url = remove_from_request_path(request, 'order_by')
+    if asc:
+        query_url = remove_from_request_path(request, 'asc')
+    else:
+        query_url = '%s&asc=True' % query_url
     return direct_to_template(request, template_name, { 
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_runs': trs,
         'query_result': query_result,
         'search_form': search_form,
+        'query_url': query_url,
     })
 
 def get(request, run_id, template_name = 'run/get.html'):
