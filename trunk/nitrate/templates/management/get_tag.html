@@ -14,16 +14,16 @@
 			<tr class="{% cycle 'even' 'odd'%}">
 				<td><span class="tagvalue">{{ tag }}</span></td>
 				<td><a href="{% url tcms.testplans.views.all %}?action=search&tag={{ tag }}" title="{{ tag.num_plans }} plans tagged {{ tag }}">{{ tag.num_plans }}</a></td>
-				<td><a href="{% url tcms.testcases.views.all %}?action=search&tag={{ tag }}"  title="{{ tag.num_cases }} cases tagged {{ tag }}">{{ tag.num_cases }}</a></td>
-				<td><a href="{% url tcms.testruns.views.all %}?action=search&tag={{ tag }}"	 title="{{ tag.num_runs }} runs tagged {{ tag }}">{{ tag.num_runs }}</a></td>
+				<td><a href="{% url tcms.testcases.views.all %}?action=search&tag={{ tag }}" title="{{ tag.num_cases }} cases tagged {{ tag }}">{{ tag.num_cases }}</a></td>
+				<td><a href="{% url tcms.testruns.views.all %}?action=search&tag={{ tag }}" title="{{ tag.num_runs }} runs tagged {{ tag }}">{{ tag.num_runs }}</a></td>
 				{% if object.plan_id and perms.testplans.delete_testplantag %}
 				<td><a href="#tag" class="remove" title="remmove tag from this plan" onclick="removeTag(this.up(5), '{{ tag }}')">Remove</a>
-				<a href="#tag" class="edit" title="remmove tag from this plan" onclick="editTag(this.up(5), '{{ tag }}')">Edit</a>
+				<a href="#tag" class="edit" title="edit tag" onclick="editTag(this.up(5), '{{ tag }}')">Edit</a>
 				</td>
 				{% else %}
 				{% if object.case_id and perms.testcases.delete_testcasetag %}
 				<td><a href="#tag" class="remove" title="remmove tag from this case" onclick="removeTag(this.up(5), '{{ tag }}')">Remove</a>
-				<a href="#tag" class="edit" title="remmove tag from this plan" onclick="editTag(this.up(5), '{{ tag }}')">Edit</a>
+				<a href="#tag" class="edit" title="edit tag" onclick="editTag(this.up(5), '{{ tag }}')">Edit</a>
 				</td>
 				{% else %}
 				<td><span class="disabled grey">Remove</span></td>
