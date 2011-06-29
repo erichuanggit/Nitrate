@@ -383,7 +383,7 @@ def get(request, case_id, template_name = 'case/get.html'):
         tcr = None
     
     # Get the case texts
-    tc_text = tc.get_text_with_version(request.REQUEST.get('case_text_versions'))
+    tc_text = tc.get_text_with_version(request.REQUEST.get('case_text_version'))
     
     # Switch the templates for different module
     template_types = {
