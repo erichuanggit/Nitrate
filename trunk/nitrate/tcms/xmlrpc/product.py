@@ -414,10 +414,10 @@ def add_version(request, values):
     Params:      $product - Integer/String
                             Integer: product_id of the product in the Database
                             String: Product name
-                 $value - String
-                            The name of the version string. e.g.: 'devel', '2.0', etc.
+                 $value   - String
+                            The name of the version string.
 
-    Returns:     Array: Returns the newly added version object, error msg if failed.
+    Returns:     Array: Returns the newly added version object, error info if failed.
 
     Example:
     # Add version for specified product:
