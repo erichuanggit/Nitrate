@@ -1,5 +1,10 @@
 #/usr/bin/python
 
+import os
+
+TCMS_SETTINGS_MODULE = 'tcms.product_settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = TCMS_SETTINGS_MODULE
+
 from tcms.testcases.models import TestCasePlan, TestCase
 from tcms.testplans.models import TestPlan
 

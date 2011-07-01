@@ -55,3 +55,4 @@ ALTER TABLE test_cases ADD reviewer_id int(11) NULL AFTER default_tester_id;
 -- Upgrade to 3.5
 ALTER TABLE test_case_plans ADD COLUMN sortkey int(11) default NULL;
 ALTER TABLE test_case_plans ADD COLUMN id int NOT NULL AUTO_INCREMENT  primary key first;
+ALTER TABLE test_cases DROP COLUMN sortkey;

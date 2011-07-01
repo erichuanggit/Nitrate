@@ -731,11 +731,8 @@ def cases(request, plan_id):
             tc_pks = request.REQUEST.getlist('case')
             tcs = TestCase.objects.filter(pk__in = tc_pks)
             
-            i = 1
             for tc in tcs:
-                # new_sort_key = (tc_pks.index(str(tc.pk)) + 1) * 10
-                new_sort_key = i * 10
-                i = i + 1
+                new_sort_key = (tc_pks.index(str(tc.pk)) + 1) * 10
                 TestCasePlan.objects.filter(plan = tp, case = tc).update(sortkey = new_sort_key)
             
             return HttpResponse(json_dumps(ajax_response))

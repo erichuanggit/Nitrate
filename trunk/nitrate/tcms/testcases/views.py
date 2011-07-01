@@ -294,10 +294,15 @@ def all(request, template_name="case/all.html"):
     tcs = tcs.distinct()
     
     # Resort the order
-    if request.REQUEST.get('case_sort_by'):
-        tcs = tcs.order_by(
-            request.REQUEST.get('case_sort_by')
-        )
+    # if sorted by 'sortkey'(foreign key field)
+    case_sort_by = request.REQUEST.get('case_sort_by')
+    if case_sort_by:
+        if case_sort_by not in  ['sortkey', '-sortkey']:
+            tcs = tcs.order_by(case_sort_by)
+        elif case_sort_by == 'sortkey':
+            tcs = tcs.order_by('testcaseplan__sortkey')
+        else:
+            tcs = tcs.order_by('-testcaseplan__sortkey')
     
     # Initial the case ids
     if request.REQUEST.get('case'):
