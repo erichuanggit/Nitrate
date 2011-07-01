@@ -41,6 +41,7 @@ __all__ = (
     'get_plans',
     'get_runs',
     'get_tag',
+    'add_version',
     'get_versions',
     'lookup_name_by_id',
     'lookup_id_by_name',
@@ -405,6 +406,39 @@ def get_tag(request, id):
     """
     from tcms.management.models import TestTag
     return Component.objects.get(pk = id).serialize()
+
+def add_version(request, values):
+    """
+    Description: Add version to specified product.
+
+    Params:      $product - Integer/String
+                            Integer: product_id of the product in the Database
+                            String: Product name
+                 $value - String
+                            The name of the version string. e.g.: 'devel', '2.0', etc.
+
+    Returns:     Array: Returns the newly added version object, error msg if failed.
+
+    Example:
+    # Add version for specified product:
+    >>> Product.add_version({'value': 'devel', 'product': 272})
+    {'product': 'QE Test Product', 'id': '1106', 'value': 'devel', 'product_id': 272}
+    # Run it again:
+    >>> Product.add_version({'value': 'devel', 'product': 272})
+    [['__all__', 'Version with this Product and Value already exists.']]
+    """
+    from tcms.management.models import Version
+    from tcms.management.forms import VersionForm
+    from tcms.core import forms
+
+    form = VersionForm(values)
+    if form.is_valid():
+        version = form.save()
+        return version.serialize()
+
+    else:
+        return forms.errors_to_list(form)
+
 
 def get_versions(request, product):
     """

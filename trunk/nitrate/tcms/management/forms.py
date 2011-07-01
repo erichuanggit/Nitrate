@@ -12,3 +12,14 @@
 # 
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
+#
+# Authors:
+#   Yuguang Wang <yuwang@redhat.com>
+
+from django import forms
+from tcms.management.models import Version
+
+class VersionForm(forms.ModelForm):
+
+    class Meta:
+        model = Version
