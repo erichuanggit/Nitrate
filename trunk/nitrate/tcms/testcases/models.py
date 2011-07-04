@@ -502,11 +502,12 @@ class TestCaseText(TCMSActionModel):
     
     def get_plain_text(self):
         from tcms.core.utils.html import html2text
+        from django.utils.encoding import smart_str
         
-        self.action = html2text(self.action)
-        self.effect = html2text(self.effect)
-        self.setup = html2text(self.setup)
-        self.breakdown = html2text(self.breakdown)
+        self.action = html2text(smart_str(self.action))
+        self.effect = html2text(smart_str(self.effect))
+        self.setup = html2text(smart_str(self.setup))
+        self.breakdown = html2text(smart_str(self.breakdown))
         
         return self
 

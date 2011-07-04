@@ -23,6 +23,8 @@ try:
 except:
     raise
 
+from tcms.testcases.models import TestCaseText
+
 test_url = "https://bugzilla.redhat.com/enter_bug.cgi?alias=&assigned_to=&attachurl=&blocked=&bug_file_loc=http%3A%2F%2F&bug_severity=medium&bug_status=NEW&cf_build_id=&cf_clone_of=&cf_cust_facing=---&cf_devel_whiteboard=&cf_internal_whiteboard=&cf_issuetracker=&cf_qa_whiteboard=&cf_targetrelease=---&comment=This%20is%20a%20test%20description&component=evolution&contenttypeentry=&contenttypemethod=autodetect&contenttypeselection=text%2Fplain&data=&deadline=&defined_cf_partner=&dependson=&description=&estimated_time=0.0&external_bug_id=&external_id=0&flag_type-10=X&flag_type-11=X&flag_type-15=X&flag_type-16=X&flag_type-160=X&flag_type-180=X&flag_type-186=X&flag_type-188=X&flag_type-24=X&flag_type-60=X&flag_type-9=X&form_name=enter_bug&keywords=&maketemplate=Remember%20values%20as%20bookmarkable%20template&op_sys=Linux&priority=low&product=Red%20Hat%20Enterprise%20Linux%205&qa_contact=&rep_platform=All&short_desc=This%20is%20a%20test%20summary&status_whiteboard=&target_milestone=rc&version=5.4"
 
 class BugTracker(object):
@@ -43,7 +45,7 @@ class Bugzilla(BugTracker):
         
         txt = caserun.get_text_with_version(case_text_version=case_text_version)
         
-        if txt:
+        if txt and isinstance(txt, TestCaseText):
             plain_txt = txt.get_plain_text()
             
             setup = plain_txt.setup
