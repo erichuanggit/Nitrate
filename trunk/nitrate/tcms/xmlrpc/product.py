@@ -407,6 +407,8 @@ def get_tag(request, id):
     from tcms.management.models import TestTag
     return Component.objects.get(pk = id).serialize()
 
+@log_call
+@user_passes_test(lambda u: u.has_perm('management.add_version'))
 def add_version(request, values):
     """
     Description: Add version to specified product.
