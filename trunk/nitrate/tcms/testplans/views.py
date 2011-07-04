@@ -406,7 +406,6 @@ def clone(request, template_name = 'plan/clone.html'):
         clone_form = ClonePlanForm(request.REQUEST)
         clone_form.populate(product_id = request.REQUEST.get('product_id'))
         if clone_form.is_valid():
-            from datetime import datetime
             from urllib import urlencode
             
             # Create new test plan.
@@ -455,6 +454,10 @@ def clone(request, template_name = 'plan/clone.html'):
                 # Link the cases of the plan
                 if clone_form.cleaned_data['link_testcases']:
                     tpcases_src = tp.case.all()
+                    try:
+                        tcp = TestCasePlan.objects.get(plan = tp, case = tpcase_src)
+                    except TestCasePlan.DoesNotExist:
+                        raise
                     
                     if clone_form.cleaned_data['copy_testcases']:
                         for tpcase_src in tpcases_src:
@@ -464,7 +467,10 @@ def clone(request, template_name = 'plan/clone.html'):
                                 author = request.user
                             
                             if clone_form.cleaned_data['keep_case_default_tester']:
-                                default_tester = tpcase_src.default_tester
+                                if hasattr(tpcase_src, 'default_tester'):
+                                    default_tester = getattr(tpcase_src, 'default_tester')
+                                else:
+                                    default_tester = None
                             else:
                                 default_tester = request.user
                             
@@ -484,16 +490,9 @@ def clone(request, template_name = 'plan/clone.html'):
                                 author = author,
                                 default_tester = default_tester,
                             )
-                            try:
-                                tcp = TestCasePlan.objects.get(plan = tp_dest, case = tpcase_dest)
-                            except TestCasePlan.DoesNotExist:
-                                pass
-                            else:
-                                tcp_dest = TestCasePlan.objects.create(
-                                    plan = tp_dest,
-                                    case = tpcase_dest,
-                                    sortkey = tcp.sortkey
-                                )
+
+                            # Add case to plan.
+                            tp_dest.add_case(case = tpcase_dest, sortkey = tcp.sortkey)
                             
                             for tc_tag_src in tpcase_src.tag.all():
                                 tpcase_dest.add_tag(tag = tc_tag_src)
@@ -523,10 +522,9 @@ def clone(request, template_name = 'plan/clone.html'):
                                     create_date = text.create_date,
                                 )
                             
-                            tp_dest.add_case(case = tpcase_dest)
                     else:
                         for tpcase_src in tpcases_src:
-                            tp_dest.add_case(case = tpcase_src)
+                            tp_dest.add_case(case = tpcase_src, sortkey = tcp.sortkey)
             
             if len(tps) == 1:
                 return HttpResponseRedirect(

@@ -126,7 +126,7 @@ class TestCase(TCMSActionModel):
         'auth.User', related_name='cases_as_author'
     )
     default_tester = models.ForeignKey(
-        'auth.User', related_name='cases_as_default_tester', null=True
+        'auth.User', related_name='cases_as_default_tester', blank = True, null=True
     )
     reviewer = models.ForeignKey(
         'auth.User', related_name='cases_as_reviewer', null=True
@@ -363,11 +363,9 @@ class TestCase(TCMSActionModel):
         try:
             TestCasePlan.objects.get(case = self, plan = plan)
         except TestCasePlan.DoesNotExist:
-            sortkey = plan.get_case_sortkey()
-            TestCasePlan.objects.create(
+            TestCasePlan.objects.get_or_create(
                 case = self,
                 plan = plan,
-                sortkey = sortkey,
             )
 
     def clear_components(self):
@@ -517,10 +515,7 @@ class TestCasePlan(models.Model):
     
     plan = models.ForeignKey('testplans.TestPlan')
     case = models.ForeignKey(TestCase)
-    sortkey = models.IntegerField(
-        max_length=11, null=True, blank=True, default=0
-    )
-
+    sortkey = models.IntegerField(max_length=11, null=True, blank=True)
     
     class Meta:
         db_table = u'test_case_plans'
