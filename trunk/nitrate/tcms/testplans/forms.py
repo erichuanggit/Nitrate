@@ -314,7 +314,7 @@ class BasePlanForm(forms.Form):
             if p:
                 return TestPlan.objects.get(pk = p)
         except TestPlan.DoesNotExist, error:
-            raise forms.ValidationError('The plan is not exist in database.')
+            raise forms.ValidationError('The plan does not exist in database.')
     
     def populate(self, product_id = None):
         # We can dynamically set choices for a form field:

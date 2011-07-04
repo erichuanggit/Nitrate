@@ -397,7 +397,7 @@ def clone(request, template_name = 'plan/clone.html'):
         return HttpResponse(Prompt.render(
             request = request,
             info_type = Prompt.Info,
-            info = 'The plan you specific is not exist in database',
+            info = 'The plan you specific does not exist in database',
             next = 'javascript:window.history.go(-1)',
         ))
     
