@@ -404,7 +404,11 @@ class SearchPlanForm(forms.Form):
     )
     def clean_pk__in(self):
         from tcms.core.utils import string_to_list
-        return string_to_list(self.cleaned_data['pk__in'])
+        results = string_to_list(self.cleaned_data['pk__in'])
+        try:
+            return [int(r) for r in results]
+        except Exception, e:
+            raise forms.ValidationError(str(e))
     
     def clean_tag__name__in(self):
         return TestTag.string_to_list(self.cleaned_data['tag__name__in'])
