@@ -110,7 +110,8 @@ var default_messages = {
     'confirm': {
         'change_case_status': 'Are you sure you want to change the status?',
         'change_case_priority': 'Are you sure you want to change the priority?',
-        'remove_case_component': 'Are you sure you want to delete these component(s)?\nThe action will unable to undo.',
+        'remove_case_component': 'Are you sure you want to delete these component(s)?\nYou cannot undo.',
+        'remove_case_component': 'Are you sure you want to delete these component(s)?\nYou cannot undo.',
         'remove_bookmark': 'Are you sure you wish to delete these bookmarks?',
         'remove_comment': 'Are you sure to delete the comment?',
         'remove_tag': 'Are you sure you wish to delete the tag(s)'

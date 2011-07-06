@@ -597,14 +597,14 @@ function renderComponentForm(container, parameters, form_observe)
         
         var h = new Element('input', {'type': 'hidden', 'name': 'a', 'value': 'add'});
         var a = new Element('input', {'type': 'submit', 'value': 'Add'});
-        var r = new Element('input', {'type': 'submit', 'value': 'Remove'});
+        //var r = new Element('input', {'type': 'submit', 'value': 'Remove'});
         var c = new Element('label');
         c.appendChild(h);
         c.appendChild(a);
-        c.appendChild(r);
+        //c.appendChild(r);
         
         a.observe('click', function(e) { h.value = 'add'});
-        r.observe('click', function(e) {h.value = 'remove'});
+        //r.observe('click', function(e) {h.value = 'remove'});
         
         var f = constructForm(d.innerHTML, action, form_observe, notice, c);
         container.update(f);

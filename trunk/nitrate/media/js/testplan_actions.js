@@ -1126,6 +1126,9 @@ function constructPlanComponentsZone(container, parameters, callback)
         });
         
         $$('.link_remove_plan_component').invoke('observe', 'click', function(e) {
+            var c = confirm(default_messages.confirm.remove_case_component);
+            if(!c)
+                return false;
             var links = $$('.link_remove_plan_component');
             var index = links.indexOf(this);
             var component = $$('input[type="checkbox"][name="component"]')[index];

@@ -35,9 +35,9 @@
 						<a href="{% url tcms.testcases.views.attachment test_case.case_id %}?from_plan={{ test_plan.plan_id }}" class="addlink">add</a> 
 						{% endcomment %}
 						{% if perms.testcases.change_testcasecomponent %}
-						<input id="id_update_component" type="button" value="Update Component" />
+						<input id="id_update_component" type="button" value="Add Component" />
 						{% else %}
-						<input id="id_update_component" type="button" value="Update Component" disabled />
+						<input id="id_update_component" type="button" value="Add Component" disabled />
 						{% endif %}
 					
 						{% if perms.testcases.delete_testcasecomponent %}
