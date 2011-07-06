@@ -36,8 +36,12 @@ Nitrate.Profiles.Bookmarks.on_load = function()
             // using location.reload will cause firefox(tested) remember the checking status
             window.location = window.location;
         }
-        
-        removeBookmark(this.action, this.method, this.serialize(true), callback);
+        var parameters = this.serialize(true);
+        if(!parameters['pk']){
+            alert('No bookmark selected.');
+            return false;
+        }
+        removeBookmark(this.action, this.method, parameters, callback);
     })
 }
 
