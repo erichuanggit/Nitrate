@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # @author: chaobin tang <ctang@redhat.com>
-# Added on 18/05/2011
 
 '''
 Refer to https://bugzilla.redhat.com/show_bug.cgi?id=589633
