@@ -73,9 +73,10 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Details.on_load);
 					<input type="hidden" name="to_plan_id" value="{{ test_plan.plan_id }}" />
 					<input type="file" name="upload_file" />
 					<input type="submit" value="Upload" />
+					<input type="button" value="Back" onclick="javascript:history.go(-1)" />
 				
-				<span class="right-action help">
-					* global attachment   *Can't delete attachment  .
+				<span class="right-action">
+					Attachment can't be deleted.
 				</span>
 			</div>
 			</form>
