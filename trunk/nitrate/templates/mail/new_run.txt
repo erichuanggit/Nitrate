@@ -1,4 +1,4 @@
-{% load extra_filters %}New test run has been created for you.
+{% load extra_filters %}A new test run has been created for you.
 
 ### Links ###
 Test run: {{ test_run.get_url }}
