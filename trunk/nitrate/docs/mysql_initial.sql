@@ -56,3 +56,11 @@ ALTER TABLE test_cases ADD reviewer_id int(11) NULL AFTER default_tester_id;
 ALTER TABLE test_case_plans ADD COLUMN sortkey int(11) default NULL;
 ALTER TABLE test_case_plans ADD COLUMN id int NOT NULL AUTO_INCREMENT  primary key first;
 ALTER TABLE test_cases DROP COLUMN sortkey;
+
+-- Character set changes.
+ALTER TABLE `testopia`.`auth_message` CHANGE COLUMN `message` `message` LONGTEXT CHARACTER SET 'utf8' NOT NULL ;
+ALTER TABLE `testopia`.`auth_message` CHARACTER SET = utf8 ;
+ALTER TABLE `testopia`.`test_tags` CHANGE COLUMN `tag_name` `tag_name` VARCHAR(255) CHARACTER SET 'utf8' DEFAULT NULL ;
+
+-- TCMS 3.5, added a new column for test_plans
+ALTER TABLE test_plans ADD column owner_id mediumint(9) DEFAULT null ;
