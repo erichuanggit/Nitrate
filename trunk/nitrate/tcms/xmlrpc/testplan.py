@@ -353,7 +353,7 @@ def lookup_type_name_by_id(request, id):
     return get_plan_type(request = request, id = id)
 
 @log_call
-@user_passes_test(lambda u: u.has_perm('testplans.delet_testplantag'))
+@user_passes_test(lambda u: u.has_perm('testplans.delete_testplantag'))
 def remove_tag(request, plan_ids, tags):
     """
     Description: Remove a tag from a plan.

@@ -51,3 +51,8 @@ ALTER TABLE test_plans ADD COLUMN parent_id int unsigned;
 DROP TABLE IF EXISTS tcms_bookmark_categories;
 DROP TABLE IF EXISTS tcms_bookmarks;
 ALTER TABLE test_cases ADD reviewer_id int(11) NULL AFTER default_tester_id;
+
+-- Upgrade to 3.5
+ALTER TABLE test_case_plans ADD COLUMN sortkey int(11) default NULL;
+ALTER TABLE test_case_plans ADD COLUMN id int NOT NULL AUTO_INCREMENT  primary key first;
+ALTER TABLE test_cases DROP COLUMN sortkey;

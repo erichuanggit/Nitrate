@@ -337,7 +337,7 @@ function getBuildsByProductId(allow_blank, product_field, build_field, is_active
         if($('id_build')) {
             var build_field = new String('id_build');
         } else {
-            alert('Build field is not exist');
+            alert('Build field does not exist');
             return false;
         }
     }
@@ -459,7 +459,7 @@ function getVersionsByProductId(allow_blank, product_field, version_field)
         } else if ($('id_default_product_version')) {
             var version_field = new String('id_default_product_version');
         } else {
-            alert('Version field is not exist');
+            alert('Version field does not exist');
             return false;
         }
     }
@@ -531,7 +531,7 @@ function getComponentsByProductId(allow_blank, product_field, component_field, c
         if($('id_component')) {
             var component_field = new String('id_component');
         } else {
-            alert('Component field is not exist');
+            alert('Component field does not exist');
             return false;
         }
     }
@@ -582,7 +582,7 @@ function getCategorisByProductId(allow_blank, product_field, category_field)
         if($('id_category')) {
             var category_field = new String('id_category');
         } else {
-            alert('Category field is not exist');
+            alert('Category field does not exist');
             return false;
         }
     }

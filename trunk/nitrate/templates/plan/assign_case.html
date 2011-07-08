@@ -120,7 +120,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.AssignCases.on_load);
 						</td>
 						<td align="left">
 							<div class="mark">
-								<a href="#" onclick="changeCaseOrder('{{ testcase.case_id }}', '{{ testcase.sortkey }}')">{{ testcase.sortkey }}</a>
+								<a href="#" onclick="changeCaseOrder('{{ testplan.plan_id }}', '{{ testcase|testcaseplan:testplan }}')">{{ testcase|sortkey:testplan }}</a>
 							</div>
 						</td>
 						<td valign="top"><a href="{% url tcms.testcases.views.get testcase.case_id %}?from_plan={{ testplan.plan_id }}">{{ testcase.summary }}</a></td>

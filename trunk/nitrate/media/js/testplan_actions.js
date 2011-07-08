@@ -1012,9 +1012,9 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         
         // Observe the change sortkey
         table.adjacent('.case_sortkey').invoke('observe', 'click', function(e) {
-            var c = this.up(); // Container
+            var c = this.next(); // Container
             var params = {
-                'case': c.adjacent('input[name="case"]')[0].value,
+                'testcaseplan': c.innerHTML,
                 'sortkey': this.innerHTML,
             };
             var callback = function(t) {

@@ -172,14 +172,16 @@ class TestPlan(TCMSActionModel):
         except:
             raise
     
-    def add_case(self, case):
+    def add_case(self, case, sortkey = None):
+
         try:
-            return TestCasePlan.objects.create(
+            return TestCasePlan.objects.get_or_create(
                 plan = self,
                 case = case,
+                sortkey = sortkey,
             )
         except:
-            return False
+            raise
     
     def add_component(self, component):
         try:
@@ -282,6 +284,20 @@ class TestPlan(TCMSActionModel):
         version = self.get_default_product_version()
         return version and version.id or None
 
+    def get_case_sortkey(self):
+        """
+        Get case sortkey.
+        """
+        if self.case.exists():
+            max_sk = max(TestCasePlan.objects.filter(plan = self,
+                case__in = self.case.all()).values_list('sortkey',
+                flat = True))
+            if max_sk:
+                return max_sk + 10
+            else:
+                return None
+        else:
+            return None
 
 class TestPlanText(TCMSActionModel):
     plan = models.ForeignKey(

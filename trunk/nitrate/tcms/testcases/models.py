@@ -108,9 +108,6 @@ class TestCase(TCMSActionModel):
         db_column='isautomated', default = 0, max_length=4,
     )
     is_automated_proposed = models.BooleanField(default = False)
-    sortkey = models.IntegerField(
-        max_length=11, null=True, blank=True, default=0
-    )
     script = models.TextField(blank=True)
     arguments = models.TextField(blank=True)
     summary = models.CharField(max_length=255, blank=True)
@@ -118,7 +115,6 @@ class TestCase(TCMSActionModel):
     alias = models.CharField(max_length=255, blank=True)
     estimated_time = TimedeltaField(null=True, blank=True)
     notes = models.TextField(blank=True)
-    
     case_status = models.ForeignKey(TestCaseStatus)
     category = models.ForeignKey(
         TestCaseCategory, related_name='category_case'
@@ -130,7 +126,7 @@ class TestCase(TCMSActionModel):
         'auth.User', related_name='cases_as_author'
     )
     default_tester = models.ForeignKey(
-        'auth.User', related_name='cases_as_default_tester', null=True
+        'auth.User', related_name='cases_as_default_tester', blank = True, null=True
     )
     reviewer = models.ForeignKey(
         'auth.User', related_name='cases_as_reviewer', null=True
@@ -159,7 +155,7 @@ class TestCase(TCMSActionModel):
     #   'texts' : list of TestCaseTexts (from TestCaseTexts.case)
     class Meta:
         db_table = u'test_cases'
-        ordering = ['sortkey', 'summary', 'case_id']
+        ordering = ['summary', 'case_id',]
     
     def __unicode__(self):
         return self.summary
@@ -173,7 +169,7 @@ class TestCase(TCMSActionModel):
             author = author,
             is_automated = values['is_automated'],
             is_automated_proposed = values['is_automated_proposed'],
-            sortkey = values['sortkey'],
+            # sortkey = values['sortkey'],
             script = values['script'],
             arguments = values['arguments'],
             summary = values['summary'],
@@ -363,14 +359,15 @@ class TestCase(TCMSActionModel):
         return latest_text
     
     def add_to_plan(self, plan):
+
         try:
-            return TestCasePlan.objects.get_or_create(
+            TestCasePlan.objects.get(case = self, plan = plan)
+        except TestCasePlan.DoesNotExist:
+            TestCasePlan.objects.get_or_create(
                 case = self,
                 plan = plan,
             )
-        except:
-            pass
-    
+
     def clear_components(self):
         try:
             return TestCaseComponent.objects.filter(
@@ -378,7 +375,7 @@ class TestCase(TCMSActionModel):
             ).delete()
         except:
             raise
-    
+
     def get_bugs(self):
         return TestCaseBug.objects.select_related(
             'case_run', 'bug_system__url_reg_exp'
@@ -496,11 +493,12 @@ class TestCaseText(TCMSActionModel):
     
     def get_plain_text(self):
         from tcms.core.utils.html import html2text
+        from django.utils.encoding import smart_str
         
-        self.action = html2text(self.action)
-        self.effect = html2text(self.effect)
-        self.setup = html2text(self.setup)
-        self.breakdown = html2text(self.breakdown)
+        self.action = html2text(smart_str(self.action))
+        self.effect = html2text(smart_str(self.effect))
+        self.setup = html2text(smart_str(self.setup))
+        self.breakdown = html2text(smart_str(self.breakdown))
         
         return self
 
@@ -508,11 +506,13 @@ class TestCasePlan(models.Model):
     # plan_id = models.IntegerField(max_length=11, primary_key=True)
     # case_id = models.IntegerField(max_length=11, primary_key=True)
     
-    plan = models.ForeignKey('testplans.TestPlan', primary_key=True)
+    plan = models.ForeignKey('testplans.TestPlan')
     case = models.ForeignKey(TestCase)
+    sortkey = models.IntegerField(max_length=11, null=True, blank=True)
     
     class Meta:
         db_table = u'test_case_plans'
+
 
 class TestCaseAttachment(models.Model):
     attachment = models.ForeignKey(

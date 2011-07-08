@@ -142,7 +142,7 @@ class BaseCaseForm(forms.Form):
     script = forms.CharField(label = "Script", required = False)
     arguments = forms.CharField(label = "Arguments", required = False)
     alias = forms.CharField(label = "Alias", required = False)
-    sortkey = forms.IntegerField(label = 'Sortkey', required = False)
+    # sortkey = forms.IntegerField(label = 'Sortkey', required = False)
     case_status = forms.ModelChoiceField(
         label = "Case status",
         queryset = TestCaseStatus.objects.all(),

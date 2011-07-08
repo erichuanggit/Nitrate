@@ -42,7 +42,7 @@ def new(request, template_name = 'run/new.html'):
     
     SUB_MODULE_NAME = "new_run"
     
-    # If from_plan is not exist will redirect to plans for select a plan
+    # If from_plan does not exist will redirect to plans for select a plan
     if not request.REQUEST.get('from_plan'):
         return HttpResponseRedirect(reverse('tcms.testplans.views.all'))
     
@@ -766,7 +766,7 @@ def cc(request, run_id):
         except ObjectDoesNotExist, error:
             return direct_to_template(request, 'run/get_cc.html', {
                 'test_run': tr,
-                'message': 'The user you typed is not exist in database'
+                'message': 'The user you typed does not exist in database'
             })        
         if request.REQUEST['do'] == 'add':
             tr.add_cc(user = user)

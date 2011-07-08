@@ -32,6 +32,7 @@ from tcms.core.models import TCMSLog
 from tcms.management.models import Product
 
 from models import TestPlan
+from tcms.testcases.models import TestCasePlan
 
 MODULE_NAME = "testplans"
 
@@ -396,7 +397,7 @@ def clone(request, template_name = 'plan/clone.html'):
         return HttpResponse(Prompt.render(
             request = request,
             info_type = Prompt.Info,
-            info = 'The plan you specific is not exist in database',
+            info = 'The plan you specific does not exist in database',
             next = 'javascript:window.history.go(-1)',
         ))
     
@@ -405,7 +406,6 @@ def clone(request, template_name = 'plan/clone.html'):
         clone_form = ClonePlanForm(request.REQUEST)
         clone_form.populate(product_id = request.REQUEST.get('product_id'))
         if clone_form.is_valid():
-            from datetime import datetime
             from urllib import urlencode
             
             # Create new test plan.
@@ -454,6 +454,10 @@ def clone(request, template_name = 'plan/clone.html'):
                 # Link the cases of the plan
                 if clone_form.cleaned_data['link_testcases']:
                     tpcases_src = tp.case.all()
+                    try:
+                        tcp = TestCasePlan.objects.get(plan = tp, case = tpcase_src)
+                    except TestCasePlan.DoesNotExist:
+                        raise
                     
                     if clone_form.cleaned_data['copy_testcases']:
                         for tpcase_src in tpcases_src:
@@ -463,14 +467,17 @@ def clone(request, template_name = 'plan/clone.html'):
                                 author = request.user
                             
                             if clone_form.cleaned_data['keep_case_default_tester']:
-                                default_tester = tpcase_src.default_tester
+                                if hasattr(tpcase_src, 'default_tester'):
+                                    default_tester = getattr(tpcase_src, 'default_tester')
+                                else:
+                                    default_tester = None
                             else:
                                 default_tester = request.user
                             
                             tpcase_dest = TestCase.objects.create(
                                 create_date = tpcase_src.create_date,
                                 is_automated = tpcase_src.is_automated,
-                                sortkey = tpcase_src.sortkey,
+                                # sortkey = tpcase_src.sortkey,
                                 script = tpcase_src.script,
                                 arguments = tpcase_src.arguments,
                                 summary = tpcase_src.summary,
@@ -483,6 +490,9 @@ def clone(request, template_name = 'plan/clone.html'):
                                 author = author,
                                 default_tester = default_tester,
                             )
+
+                            # Add case to plan.
+                            tp_dest.add_case(case = tpcase_dest, sortkey = tcp.sortkey)
                             
                             for tc_tag_src in tpcase_src.tag.all():
                                 tpcase_dest.add_tag(tag = tc_tag_src)
@@ -512,10 +522,9 @@ def clone(request, template_name = 'plan/clone.html'):
                                     create_date = text.create_date,
                                 )
                             
-                            tp_dest.add_case(case = tpcase_dest)
                     else:
                         for tpcase_src in tpcases_src:
-                            tp_dest.add_case(case = tpcase_src)
+                            tp_dest.add_case(case = tpcase_src, sortkey = tcp.sortkey)
             
             if len(tps) == 1:
                 return HttpResponseRedirect(
@@ -615,6 +624,11 @@ def cases(request, plan_id):
     
     ajax_response = { 'rc': 0, 'response': 'ok' }
     
+    try:
+        tp = TestPlan.objects.get(plan_id = plan_id)
+    except TestPlan.DoesNotExist:
+        raise Http404
+
     class CaseActions(object):
         def __init__(self, request, tp):
             self.__all__ = [
@@ -673,10 +687,6 @@ def cases(request, plan_id):
             })
         
         def delete_cases(self):
-            try:
-                tp = TestPlan.objects.get(plan_id = plan_id)
-            except TestPlan.DoesNotExist:
-                raise Http404
             
             if not request.REQUEST.get('case'):
                 ajax_response['rc'] = 1
@@ -710,10 +720,6 @@ def cases(request, plan_id):
             # Current we should rewrite all of cases belong to the plan.
             # Because the cases sortkey in database is chaos,
             # Most of them are None.
-            try:
-                tp = TestPlan.objects.get(plan_id = plan_id)
-            except ObjectDoesNOtExist, error:
-                raise Http404(error)
             
             if not request.REQUEST.get('case'):
                 ajax_response['rc'] = 1
@@ -725,9 +731,7 @@ def cases(request, plan_id):
             
             for tc in tcs:
                 new_sort_key = (tc_pks.index(str(tc.pk)) + 1) * 10
-                if tc.sortkey != new_sort_key:
-                    tc.sortkey = new_sort_key
-                    tc.save()
+                TestCasePlan.objects.filter(plan = tp, case = tc).update(sortkey = new_sort_key)
             
             return HttpResponse(json_dumps(ajax_response))
         
@@ -764,7 +768,6 @@ def cases(request, plan_id):
                         # Start to create the objects
                         tc = TestCase.objects.create(
                             is_automated = case['is_automated'],
-                            sortkey = i * 10,
                             script = None,
                             arguments = None,
                             summary = case['summary'],
@@ -778,6 +781,7 @@ def cases(request, plan_id):
                             default_tester_id = case['default_tester_id'],
                             notes = case['notes'],
                         )
+                        TestCasePlan.objects.create(plan = tp, case = tc, sortkey = i*10)
                         
                         tc.add_text(
                             case_text_version = 1,

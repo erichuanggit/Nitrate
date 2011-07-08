@@ -144,7 +144,7 @@ def attach_bug(request, values):
         
         try:
             tcr = TestCaseRun.objects.get(case_run_id = value['case_run_id'])
-            trc.add_bug(
+            tcr.add_bug(
                 bug_id = value['bug_id'],
                 bug_system = bug_system,
                 summary = value.get('summary'),

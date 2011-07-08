@@ -28,7 +28,7 @@ from django.utils import simplejson
 from tcms.core import forms
 from tcms.core.utils import Prompt
 
-from models import TestCase, TestCaseStatus, TestCaseAttachment
+from models import TestCase, TestCaseStatus, TestCaseAttachment, TestCasePlan
 from tcms.testplans.models import TestPlan
 from itertools import groupby
 
@@ -294,10 +294,15 @@ def all(request, template_name="case/all.html"):
     tcs = tcs.distinct()
     
     # Resort the order
-    if request.REQUEST.get('case_sort_by'):
-        tcs = tcs.order_by(
-            request.REQUEST.get('case_sort_by')
-        )
+    # if sorted by 'sortkey'(foreign key field)
+    case_sort_by = request.REQUEST.get('case_sort_by')
+    if case_sort_by:
+        if case_sort_by not in  ['sortkey', '-sortkey']:
+            tcs = tcs.order_by(case_sort_by)
+        elif case_sort_by == 'sortkey':
+            tcs = tcs.order_by('testcaseplan__sortkey')
+        else:
+            tcs = tcs.order_by('-testcaseplan__sortkey')
     
     # Initial the case ids
     if request.REQUEST.get('case'):
@@ -709,7 +714,6 @@ def clone(request, template_name='case/clone.html'):
                 if clone_form.cleaned_data['copy_case']:
                     tc_dest = TestCase.objects.create(
                         is_automated = tc_src.is_automated,
-                        sortkey = tc_src.sortkey,
                         script = tc_src.script,
                         arguments = tc_src.arguments,
                         summary = tc_src.summary,
@@ -723,6 +727,9 @@ def clone(request, template_name='case/clone.html'):
                         author = clone_form.cleaned_data['maintain_case_orignal_author'] and tc_src.author or request.user,
                         default_tester = clone_form.cleaned_data['maintain_case_orignal_default_tester'] and tc_src.author or request.user,
                     )
+                    for tp in clone_form.cleaned_data['plan']:
+                        sortkey = tp.get_case_sortkey()
+                        TestCasePlan.objects.create(plan = tp, case = tc_dest, sortkey = sortkey)
                     
                     tc_dest.add_text(
                         author = clone_form.cleaned_data['maintain_case_orignal_author'] and tc_src.author or request.user,
