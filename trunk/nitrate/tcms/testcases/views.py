@@ -467,7 +467,7 @@ def export(request, template_name = 'case/export.xml'):
         return HttpResponse(Prompt.render(
             request = request,
             info_type = Prompt.Info,
-            info = 'At least one plan is required.',
+            info = 'At least one case is required.',
         ))
     timestamp = datetime.now()
     timestamp_str = '%02i-%02i-%02i' \

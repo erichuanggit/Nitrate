@@ -22,15 +22,16 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
 <!--creat plan(button)-->
 <div id="content">
 	<div class="Detailform" >
-	<div class="system_info prompt-message  {{ type }} border-1 " style="width:auto;">
+	<div class="system_info prompt-message  {{ type }} border-1 " style="width:800px; height:260px; background-position:30px 15px; margin:50px auto 30px auto;">
 		
-		<p>{{ info|safe }}</p>
-
-	{% if next %}
-	<a href="{{ next }}">Continue</a>
-	{% else %}
-	<a href="javascript:history.go(-1)">Return to homepage</a>
-	{% endif %}
+		<p style="font-size:24px; font-weight:bold; margin:0; padding: 50px 0 40px 80px;">{{ info|safe }}</p>
+		<div style=" text-align:center; font-size:14px;">
+			{% if next %}
+				<a href="{{ next }}">Continue</a>
+				{% else %}
+				<a href="javascript:history.go(-1)">Return</a>
+			{% endif %}
+		</div>
 	</div>
 	</div>
 </div>
