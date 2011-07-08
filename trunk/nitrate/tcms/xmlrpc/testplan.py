@@ -453,6 +453,7 @@ def update(request, plan_ids, values):
     from tcms.core import forms
     from tcms.testplans.forms import XMLRPCEditPlanForm
     
+    form = XMLRPCEditPlanForm(values)
     if values.get('default_product_version') and not values.get('product'):
         raise ValueError('Product value is required by default product version')
     
@@ -460,7 +461,6 @@ def update(request, plan_ids, values):
         form.populate(product_id = values['product'])
     
     tps = TestPlan.objects.filter(pk__in = pre_process_ids(value = plan_ids))
-    form = XMLRPCEditPlanForm(values)
     
     if form.is_valid():
         if form.cleaned_data['name']:
