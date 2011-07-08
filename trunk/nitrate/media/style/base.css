@@ -141,7 +141,7 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .whitelink a{color:#fff;}
 .option_prefer{-moz-background-clip:border;-moz-background-inline-policy:continuous;-moz-background-origin:padding;background:#f3f8fc none repeat scroll 0 0;border:1px outset #999988;margin:0 1em 1em;padding:0.8em; text-align:left;float:right; margin-right:10px;}
 .option_prefer lable{ margin-left:5px;}
-#id_comment{width:600px;height:200px;}
+#id_comment{width:345px;height:70px;}
 .comment li{margin:5px 10px 5px 0;border-bottom:1px dotted #666;}
 .commentdelete{float:right; display:block; background-position:0 -15px;padding-left:13px; margin:-20px 5px 0 0;cursor:pointer;}
 table.noborder,table.noborder td{border:none;background:transparent;}
@@ -585,6 +585,7 @@ a:link.edit,a:visited.edit{ color:#333;}
 #dialog select[multiple='multiple']{ max-height:150px;}
 #dialog label{width:100px; text-align:right; display:inline-block; padding-right:5px;}
 #dialog p{vertical-align:top;}
+#dialog li{list-style:none;}
 
 .popup_window{ width:500px;height:400px; z-index:1000; position:fixed; left:50%; top:50%; margin-left:-250px; margin-top:-200px; border:solid 4px #CCC; background:#f5f5f5;-moz-border-radius:5px 5px 5px 5px;}
 /*end popup*/
@@ -745,6 +746,7 @@ ul.data_content_title li{ display:inline-block; margin-left:3px;}
 .listinfo .title_h4{margin-left:-160px; float:left; color:#3E5161; padding-left:10px; width:160px;color:#235d9f; font-size:1.0em;}
 .listinfo .listinfo_input ul li{float:left; display:inline; padding:3px 10px 0 0;}
 .listinfo .listinfo_input .automatedlist{float:left; padding:3px 0 0 10px;}
+.listinfo .name li{list-style:none;}
 #id_is_automated{ width:100px;}
 .datetimeshortcuts{display:block; float:left; padding:3px 0 0 0;}
 .datetimeshortcuts #calendarlink0, .datetimeshortcuts #calendarlink1, .datetimeshortcuts #calendarlink2, .datetimeshortcuts #calendarlink3, .datetimeshortcuts #calendarlink4, .datetimeshortcuts #calendarlink5, .datetimeshortcuts #calendarlink6{vertical-align:bottom;}
@@ -1045,4 +1047,25 @@ ul.data_content_title li{ display:inline-block; margin-left:3px;}
 .reportSummary01 li{float:left; list-style:none;}
 .reportSummary01 li span{padding:0 10px 0 3px; color:red;}
 .reportSummary01 li.tagTab span{color:#000000; font-weight:bold;}
+
+/* caserun detail */
+.caserunDetail{}
+.caserunDetail .borderB{border-bottom:1px dotted #CCCCCC; padding-bottom:6px!important;}
+.caserunDetail td{border:0px; vertical-align:top; padding:0px;}
+.caserunDetail h4 span{color:#CCCCCC; margin-left:6px; font-weight:normal;}
+.caserunDetail .caserunInfo{width:375px; margin-left:-375px; float:right;}
+.caserunDetail .caserunInfo .container{background:#FFFFFF; border:1px solid #CCCCCC; margin-bottom:5px; padding:0 9px;}
+.caserunDetail .caserunInfo .container h4{padding:9px 0 9px 9px; line-height:12px;}
+.caserunDetail .caserunInfo ul{padding-top:9px;}
+.caserunDetail .caserunInfo ul li{ line-height:18px; border:0px; padding-bottom:12px; padding-left:21px; margin:0px; background:url(../images/list_style_type01.png) no-repeat 9px 6px;}
+.caserunDetail .caserunInfo ul li span{color:#888888; padding-right:12px;}
+.caserunDetail .caserunInfo ul li.bug{ padding-bottom:6px; padding-left:9px; margin:0px; background:none;}
+.caserunDetail .caserunInfo ul li.bug span{padding-left:6px; padding-right:6px;}
+.caserunDetail .caseInfo{margin-right:390px; padding:7px; background:#EBECED; border:1px solid #CCCCCC; width:auto; overflow:hidden;}
+.caserunDetail .caseInfo .container{background:#FFFFFF; border:1px solid #CCCCCC; margin-bottom:5px; min-height:90px;}
+.caserunDetail .caseInfo .container h4{padding:9px 0 9px 9px; line-height:12px; }
+.caserunDetail .caseInfo .container .content{padding:0 9px 9px 9px; color:#545454;}
+.caserunDetail .caseInfo ul{padding:5px 0 0 0;}
+.caserunDetail .caseInfo ul li{padding:0 0 0 9px; margin:0px; line-height:21px;}
+.caserunDetail .commentdelete{float:none; display:inline; background:url(../images/remove_small.png) 0px 5px no-repeat; padding:0; margin:0; cursor:pointer; width:9px; height:15px;}
 

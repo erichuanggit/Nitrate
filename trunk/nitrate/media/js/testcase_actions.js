@@ -685,3 +685,27 @@ function serialzeCaseForm(form, table, serialized)
     data['case'] = serializeCaseFromInputList(table);
     return data
 }
+
+function showdiv(targetid,objN){
+   
+      var target = document.getElementById(targetid);
+      var clicktext = document.getElementById(objN);
+
+            if (target.style.display == "block"){
+                target.style.display = "none";
+                clicktext.innerText = "Show All";
+  
+
+            } else {
+                target.style.display = "block";
+                clicktext.innerText = "Hide All";
+            }
+   
+}
+
+/*
+jQ('a.add_remove').click(function(){
+    var editing = !$(this).hasClass('done');
+    jQ(this).html(editing ? 'Show All' : 'Hide All').toggleClass('done');
+}
+*/
