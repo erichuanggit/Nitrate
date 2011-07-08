@@ -7,7 +7,10 @@
         <div class="title"><label for="id_author">Author&nbsp;:</label></div>
         <div class="listinfo_input">{{ search_plan_form.author__email__startswith }}</div>
     </div>
-    
+    <div class="listinfo">
+        <div class="title"><label for="id_owner">Owner&nbsp;:</label></div>
+        <div class="listinfo_input">{{ search_plan_form.owner__username__startswith }}</div>
+    </div>
     <div class="listinfo">
         <div class="title"><label for="id_type_id">Plan Type&nbsp;:</label></div>
         <div class="listinfo_input">{{ search_plan_form.type }}</div>

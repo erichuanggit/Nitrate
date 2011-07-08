@@ -450,7 +450,7 @@ function taggleSortCaseRun(event)
             t.checked = true;
             t.disabled = false;
         });
-        postToURL('ordercaserun/', serializeCaseRunFromInputList(element.up(2).next().next(), 'case_run'), 'get');
+        postToURL('ordercaserun/', serializeCaseRunFromInputList('id_table_cases', 'case_run'), 'get');
     }
 }
 function selectcase(){
@@ -564,8 +564,10 @@ function removeCaseRunBug(title_container, container, bug_id, case_id, case_run_
 
 function delCaseRun(run_id)
 {
-    if(confirm('Are you sure to delete case run(s) ?'))
-       postToURL('removecaserun/', serializeCaseRunFromInputList('id_table_cases', 'case_run'));
+    var caseruns = serializeCaseRunFromInputList('id_table_cases', 'case_run');
+    var numCaseRuns = caseruns.case_run.length;
+    if(confirm('You are about to delete ' + numCaseRuns + ' case run(s). Are you sure?'))
+       postToURL('removecaserun/', caseruns);
 }
 
 function editValue(form,hidebox,selectid,submitid)

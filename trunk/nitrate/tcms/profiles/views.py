@@ -57,7 +57,7 @@ def bookmark(request, username, template_name = 'profile/bookmarks.html'):
             if not form.is_valid():
                 ajax_response = {
                     'rc': 1,
-                    'response': form.errors,
+                    'response': form.errors.as_text(),
                 }
                 return HttpResponse(simplejson.dumps(ajax_response))
             
@@ -120,22 +120,17 @@ def profile(request, username, template_name = 'profile/info.html'):
         up = u.get_profile()
     except ObjectDoesNotExist, error:
         up = u.profile.create()
-    
+    message = None
     form = UserProfileForm(instance=up)
     if request.method == 'POST':
         form = UserProfileForm(request.POST, instance=up)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(
-                reverse(
-                    'tcms.profiles.views.profile',
-                    args=[form.cleaned_data['username']]
-                )
-            )
-    
+            message = 'Information successfully updated.'
     return direct_to_template(request, template_name, {
         'user_profile': up,
-        'form': form
+        'form': form,
+        'message': message,
     })
 
 @login_required

@@ -21,7 +21,8 @@
 				<th align="left" width="130" class="number">Build</th>
 				<th align="center" width="70" class="text" >Status</th>
 				<th align="left" width="50" class="number">Cases</th>
-				<th align="left" width="110" class="number" >Completed</th>
+				<th align="left" width="110" class="number" >Failure</th>
+				<th align="left" width="110" class="number" >Success</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -43,10 +44,16 @@
 				<td valign="top">
             
 					<div class="progress-bar">
-						<div class="percent">{{ test_run.completed_case_run_percent|default:"0" }}%</div>
-						<div class="progress-inner" style="width:{{ test_run.completed_case_run_percent|default:"0" }}px;">
-							<div class="progress-failed" style="width:{{ test_run.failed_case_run_percent|default:"0" }}px;">
-							</div>
+						<div class="percent">{{ test_run.failed_case_run_percent|default:"0" }}%</div>
+						<div class="progress-failed" style="width:{{ test_run.failed_case_run_percent|default:"0" }}px;">
+						</div>
+					</div>
+				</td>
+				<td valign="top">
+            
+					<div class="progress-bar">
+						<div class="percent">{{ test_run.passed_case_run_percent|default:"0" }}%</div>
+						<div class="progress-inner" style="width:{{ test_run.passed_case_run_percent|default:"0" }}px;">
 						</div>
 					</div>
 				</td>

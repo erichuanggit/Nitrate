@@ -713,8 +713,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             elements.invoke('observe', 'click', function(e) {
                 if(filter.style.display == 'none')
                     fireEvent(form.adjacent('.filtercase')[0], 'click');
-                
-                addItemsToTextBoxAsList(this.innerHTML, form.tag__name__in);
+                form.tag__name__in.value = this.innerHTML;
             })
         }
         
@@ -729,8 +728,9 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                         alert(returnobj.response);
                         return false;
                     }
-                    parameters.a = 'initial';
-                    constructPlanDetailsCasesZone(container, plan_id, parameters);
+                    //parameters.a = 'initial';
+                    params.a = 'search';
+                    constructPlanDetailsCasesZone(container, plan_id, params);
                 }
                 resortCasesDragAndDrop(container, this, form, table, params, callback);
             });
@@ -1126,6 +1126,9 @@ function constructPlanComponentsZone(container, parameters, callback)
         });
         
         $$('.link_remove_plan_component').invoke('observe', 'click', function(e) {
+            var c = confirm(default_messages.confirm.remove_case_component);
+            if(!c)
+                return false;
             var links = $$('.link_remove_plan_component');
             var index = links.indexOf(this);
             var component = $$('input[type="checkbox"][name="component"]')[index];

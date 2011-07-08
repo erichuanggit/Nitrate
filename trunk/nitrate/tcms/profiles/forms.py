@@ -69,7 +69,7 @@ class UserProfileForm(forms.ModelForm):
         
         try:
             u = User.objects.get(email = email)
-        except ObjectDoesNotExis, error:
+        except ObjectDoesNotExist, error:
             return email
         
         if u == self.instance:

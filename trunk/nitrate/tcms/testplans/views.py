@@ -18,6 +18,7 @@
 
 from datetime import datetime
 
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.views.generic.simple import direct_to_template
 from django.core.urlresolvers import reverse
@@ -30,6 +31,8 @@ from tcms.core.utils.raw_sql import RawSQL
 
 from tcms.core.models import TCMSLog
 from tcms.management.models import Product
+from tcms.search.order import order_plan_queryset
+from tcms.search import remove_from_request_path
 
 from models import TestPlan
 from tcms.testcases.models import TestCasePlan
@@ -153,7 +156,8 @@ def all(request, template_name = 'plan/all.html'):
     # If it's not a search the page will be blank
     tps = TestPlan.objects.none()
     query_result = False
-    
+    order_by = request.REQUEST.get('order_by', 'create_date')
+    asc = bool(request.REQUEST.get('asc', None))
     # if it's a search request the page will be fill
     if request.REQUEST.items():
         search_form = SearchPlanForm(request.REQUEST)
@@ -195,10 +199,11 @@ def all(request, template_name = 'plan/all.html'):
                 'num_runs': RawSQL.num_runs,
                 'num_children': RawSQL.num_plans,
             })
+            tps = order_plan_queryset(tps, order_by, asc)
     else:
         # Set search active plans only by default
         # I wish to use 'default' argument, as the same as in ModelForm
-        # But it looks does not work
+        # But it does not seem to work
         search_form = SearchPlanForm(initial = { 'is_active': True })
     
     if request.REQUEST.get('action') == 'clone_case':
@@ -216,13 +221,19 @@ def all(request, template_name = 'plan/all.html'):
     if request.REQUEST.get('t') == 'html':
         if request.REQUEST.get('f') == 'preview':
             template_name = 'plan/preview.html'
-    
+
+    query_url = remove_from_request_path(request, 'order_by')
+    if asc:
+        query_url = remove_from_request_path(request, 'asc')
+    else:
+        query_url = '%s&asc=True' % query_url
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_plans' : tps,
         'query_result' : query_result,
         'search_plan_form' : search_form,
+        'query_url': query_url,
     })
 
 def get(request, plan_id, template_name = 'plan/get.html'):
@@ -249,7 +260,8 @@ def get(request, plan_id, template_name = 'plan/get.html'):
         select = {
         'total_num_caseruns': RawSQL.total_num_caseruns,
         'completed_case_run_percent': RawSQL.completed_case_run_percent,
-        'failed_case_run_percent':RawSQL.failed_case_run_percent,
+        'failed_case_run_percent': RawSQL.failed_case_run_percent,
+        'passed_case_run_percent': RawSQL.passed_case_run_percent,
         },
     )
     
@@ -320,6 +332,13 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
                 tp.type = form.cleaned_data['type']
                 tp.is_active = form.cleaned_data['is_active']
                 tp.extra_link = form.cleaned_data['extra_link']
+                owner_name = form.cleaned_data['owner']
+                if owner_name:
+                    try:
+                        owner = User.objects.get(username=owner_name)
+                        tp.owner = owner
+                    except:
+                        pass
                 tp.save()
             
             if request.user.has_perm('testplans.add_testplantext'):
@@ -365,6 +384,7 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
             'env_group': env_group_id,
             'is_active': tp.is_active,
             'extra_link': tp.extra_link,
+            'owner': tp.owner,
         })
         form.populate(product_id = tp.product_id)
     

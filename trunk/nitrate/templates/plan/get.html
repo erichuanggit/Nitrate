@@ -81,12 +81,16 @@ Nitrate.TestPlans.Instance = {
 	<div class="listinfo_content">
 		<div class="leftlistinfo">
 			<div class="listinfo">
-				<div class="title grey">Plan Creator&nbsp;:</div>
+				<div class="title grey">Author&nbsp;:</div>
 				<div id="display_author"  class="name " > <a href="{% url tcms.profiles.views.profile test_plan.author.username %}">{{ test_plan.author }}</a></div>
 			</div>
-			<div class="listinfo">
+			<!--<div class="listinfo">
 				<div class="title grey">Doc Author/Manager&nbsp;:</div>
 				<div id="display_author"  class="name" ><a href="{% url tcms.profiles.views.profile test_plan.latest_text.author.username|default:"unknown" %}">{{ test_plan.latest_text.author }}</a></div>
+			</div>-->
+			<div class="listinfo">
+				<div class="title grey">Owner&nbsp;:</div>
+				<div id="display_author"  class="name" ><a href="{% url tcms.profiles.views.profile test_plan.owner.username|default:"unknown" %}">{{ test_plan.owner }}</a></div>
 			</div>
 			<div class="listinfo">
 				<div class="title grey">Product&nbsp;:</div>
@@ -94,7 +98,7 @@ Nitrate.TestPlans.Instance = {
 			</div>
 			<div class="listinfo">
 				<div class="title grey">Version&nbsp;:</div>
-				<div id="display_product_version"  class="name ">{{ test_plan.default_product_version }}</div>
+				<div id="display_product_version"  class="name ">{{ test_plan.get_default_product_version }}</div>
 			</div>
 			<div class="listinfo">
 				<div class="title grey">Plan Type&nbsp;:</div>

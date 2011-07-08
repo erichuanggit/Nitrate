@@ -21,7 +21,7 @@ Advance search implementations
 '''
 
 # from django
-from django.http import HttpResponse, Http404
+from django.http import HttpRequest, HttpResponse, Http404
 from django import template
 from django.shortcuts import render_to_response
 from django.views.generic.simple import direct_to_template
@@ -36,6 +36,7 @@ from tcms.testruns.models import TestRun
 from tcms.management.models import Product, Version, Priority
 from tcms.search.query import SmartDjangoQuery
 from tcms.search.forms import CaseForm, RunForm, PlanForm
+from tcms.search.order import order_targets
 from tcms.core.helpers.cache import cached_entities
 from tcms.core.utils.raw_sql import RawSQL
 
@@ -70,6 +71,7 @@ def advance_search(request, tmpl='search/advanced_search.html'):
     start = time.time()
     results = retrieve_results(request, plan_form.cleaned_data,
         run_form.cleaned_data, case_form.cleaned_data, target)
+    results = order_targets(target, results, data)
     end = time.time()
     timecost = round(end - start, 3)
     queries = fmt_queries(*[f.cleaned_data for f in all_forms])
@@ -112,22 +114,26 @@ def sum_orm_queries(plans, cases, runs, target):
     if target == 'run':
         if runs is None:
             runs = TestRun.objects.all()
-        runs = runs.extra(
-                select={
-                    'completed_case_run_percent': RawSQL.completed_case_run_percent,
-                    'total_num_caseruns': RawSQL.total_num_caseruns,
-                    'failed_case_run_percent': RawSQL.failed_case_run_percent,
-                    'env_groups': RawSQL.environment_group_for_run,
-                }
-            )
         if cases: runs = runs.filter(case_run__case__in=cases)
         if plans: runs = runs.filter(plan__in=plans)
-        
+        runs = runs.extra(
+            select={
+                'completed_case_run_percent': RawSQL.completed_case_run_percent,
+                'total_num_caseruns': RawSQL.total_num_caseruns,
+                'failed_case_run_percent': RawSQL.failed_case_run_percent,
+                'env_groups': RawSQL.environment_group_for_run,
+            }
+        )
         return runs
     if target == 'plan':
         if plans is None: plans = TestPlan.objects.all()
         if cases: plans = plans.filter(case__in=cases)
         if runs:  plans = plans.filter(run__in=runs)
+        plans = plans.extra(select = {
+                'num_cases': RawSQL.num_cases,
+                'num_runs': RawSQL.num_runs,
+                'num_children': RawSQL.num_plans,
+            })
         return plans
     if target == 'case':
         if cases is None: cases = TestCase.objects.all()
@@ -144,11 +150,18 @@ def render_results(request, results, time_cost, queries, tmpl='search/results.ht
         'case': {'class': TestCase, 'result_key': 'test_cases'},
         'run': {'class': TestRun, 'result_key': 'test_runs'}
     }
+    asc = bool(request.REQUEST.get('asc', None))
+    query_url = remove_from_request_path(request, 'order_by')
+    if asc:
+        query_url = remove_from_request_path(query_url, 'asc')
+    else:
+        query_url = '%s&asc=True' % query_url
     return direct_to_template(request, tmpl,
         {
             klasses[request.GET['target']]['result_key']: results,
             'time_cost': time_cost,
-            'queries': queries
+            'queries': queries,
+            'query_url': query_url,
         }
     )
 
@@ -157,14 +170,18 @@ def remove_from_request_path(request, name):
     Remove a parameter from request.get_full_path()\n
     and return the modified path afterwards.
     '''
-    path = request.get_full_path().split('?')
+    if isinstance(request, HttpRequest):
+        path = request.get_full_path()
+    else:
+        path = request
+    path = path.split('?')
     if len(path) > 1:
         path = path[1].split('&')
     else:
         return None
     path = [p for p in path if not p.startswith(name)]
     path = '&'.join(path)
-    return path
+    return '?' + path
 
 def fmt_errors(form_errors):
     '''

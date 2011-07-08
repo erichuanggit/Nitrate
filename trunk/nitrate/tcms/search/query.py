@@ -62,6 +62,7 @@ class SmartDjangoQuery(object):
             'pl_summary': 'name__icontains',
             'pl_type': 'type__in',
             'pl_authors': 'author__username__in',
+            'pl_owners': 'owner__username__in',
             'pl_tags': 'tag__name__in',
             'pl_active': 'is_active',
             'pl_created_since': 'create_date__gte',

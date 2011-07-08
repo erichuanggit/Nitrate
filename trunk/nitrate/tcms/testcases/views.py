@@ -31,6 +31,8 @@ from tcms.core.utils import Prompt
 from models import TestCase, TestCaseStatus, TestCaseAttachment, TestCasePlan
 from tcms.testplans.models import TestPlan
 from itertools import groupby
+from tcms.search.order import order_case_queryset
+from tcms.search import remove_from_request_path
 
 MODULE_NAME = "testcases"
 
@@ -242,7 +244,9 @@ def all(request, template_name="case/all.html"):
     else:
         tp = TestPlan.objects.none()
         SearchForm = SearchCaseForm
-    
+    # sorting
+    order_by = request.REQUEST.get('order_by', 'create_date')
+    asc = bool(request.REQUEST.get('asc', None))
     # Initial the form and template
     if request.REQUEST.get('a') in ('search', 'sort'):
         search_form = SearchForm(request.REQUEST)
@@ -292,7 +296,7 @@ def all(request, template_name="case/all.html"):
     })
     
     tcs = tcs.distinct()
-    
+    tcs = order_case_queryset(tcs, order_by, asc)
     # Resort the order
     # if sorted by 'sortkey'(foreign key field)
     case_sort_by = request.REQUEST.get('case_sort_by')
@@ -312,7 +316,12 @@ def all(request, template_name="case/all.html"):
     
     # Get the tags own by the cases
     ttags = TestTag.objects.filter(testcase__in = tcs).distinct()
-    
+    # generating a query_url with order options
+    query_url = remove_from_request_path(request, 'order_by')
+    if asc:
+        query_url = remove_from_request_path(request, 'asc')
+    else:
+        query_url = '%s&asc=True' % query_url
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'test_cases': tcs,
@@ -322,6 +331,7 @@ def all(request, template_name="case/all.html"):
         'case_status': TestCaseStatus.objects.all(),
         'priorities': Priority.objects.all(),
         'case_own_tags': ttags,
+        'query_url': query_url,
     })
 
 def get(request, case_id, template_name = 'case/get.html'):
@@ -378,7 +388,7 @@ def get(request, case_id, template_name = 'case/get.html'):
         tcr = None
     
     # Get the case texts
-    tc_text = tc.get_text_with_version(request.REQUEST.get('case_text_versions'))
+    tc_text = tc.get_text_with_version(request.REQUEST.get('case_text_version'))
     
     # Switch the templates for different module
     template_types = {
@@ -714,6 +724,8 @@ def clone(request, template_name='case/clone.html'):
                 if clone_form.cleaned_data['copy_case']:
                     tc_dest = TestCase.objects.create(
                         is_automated = tc_src.is_automated,
+                        is_automated_proposed = tc_src.is_automated_proposed,
+                        sortkey = tc_src.sortkey,
                         script = tc_src.script,
                         arguments = tc_src.arguments,
                         summary = tc_src.summary,

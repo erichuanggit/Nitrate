@@ -1,6 +1,9 @@
 env.sh
 *.pyc
+*.swp
 tcms/dev.db
 tcms/dev_settings.py
 tcms/run.sh
+tcms/mysettings.py
+tcms/toys.py
 .gitignore

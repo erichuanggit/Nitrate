@@ -301,7 +301,11 @@ class BasePlanForm(forms.Form):
         required = False
     )
     parent = forms.IntegerField(required = False)
-    
+
+    owner  = forms.CharField(
+        label = "Plan Document",
+        required = False
+    )
     def clean_default_product_version(self):
         if hasattr(self.cleaned_data['default_product_version'], 'value'):
             return self.cleaned_data['default_product_version'].value
@@ -382,6 +386,7 @@ class SearchPlanForm(forms.Form):
     )
     author__username__startswith = forms.CharField(required = False)
     author__email__startswith = forms.CharField(required = False)
+    owner__username__startswith = forms.CharField(required = False)
     case__default_tester__username__startswith = forms.CharField(required = False)
     tag__name__in = forms.CharField(required = False)
     is_active = forms.BooleanField(required = False)
@@ -399,7 +404,11 @@ class SearchPlanForm(forms.Form):
     )
     def clean_pk__in(self):
         from tcms.core.utils import string_to_list
-        return string_to_list(self.cleaned_data['pk__in'])
+        results = string_to_list(self.cleaned_data['pk__in'])
+        try:
+            return [int(r) for r in results]
+        except Exception, e:
+            raise forms.ValidationError(str(e))
     
     def clean_tag__name__in(self):
         return TestTag.string_to_list(self.cleaned_data['tag__name__in'])
