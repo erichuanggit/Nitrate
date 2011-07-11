@@ -1064,7 +1064,7 @@ ul.data_content_title li{ display:inline-block; margin-left:3px;}
 .caserunDetail .caseInfo{margin-right:390px; padding:7px; background:#EBECED; border:1px solid #CCCCCC; width:auto; overflow:hidden;}
 .caserunDetail .caseInfo .container{background:#FFFFFF; border:1px solid #CCCCCC; margin-bottom:5px; min-height:90px;}
 .caserunDetail .caseInfo .container h4{padding:9px 0 9px 9px; line-height:12px; }
-.caserunDetail .caseInfo .container .content{padding:0 9px 9px 9px; color:#545454;}
+.caserunDetail .caseInfo .container .content{padding:0 9px 9px 9px; color:#545454; overflow:auto;}
 .caserunDetail .caseInfo ul{padding:5px 0 0 0;}
 .caserunDetail .caseInfo ul li{padding:0 0 0 9px; margin:0px; line-height:21px;}
 .caserunDetail .commentdelete{float:none; display:inline; background:url(../images/remove_small.png) 0px 5px no-repeat; padding:0; margin:0; cursor:pointer; width:9px; height:15px;}
