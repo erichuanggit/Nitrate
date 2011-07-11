@@ -277,8 +277,7 @@ Nitrate.TestRuns.AssignCase.on_load= function()
 var updateCaseRunStatus = function(e)
 {
     e.stop();
-    
-    var container = this.up(4);
+    var container = this.up(3);
     var parent = container.up();
     var title = parent.previous();
     var link = title.getElementsBySelector('.expandable')[0];
