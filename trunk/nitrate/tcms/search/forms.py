@@ -71,6 +71,7 @@ class PlanForm(forms.Form):
     pl_summary      = LooseCF()
     pl_id           = LooseCF()
     pl_authors      = LooseCF()
+    pl_owners       = LooseCF()
     pl_tags         = LooseCF()
     pl_tags_exclude = LooseBF()
     pl_active       = LooseCF()
@@ -91,6 +92,9 @@ class PlanForm(forms.Form):
 
     def clean_pl_authors(self):
         return get_choice(self.cleaned_data['pl_authors'])
+
+    def clean_pl_owners(self):
+        return get_choice(self.cleaned_data['pl_owners'])
 
     def populate(self, data):
         prod_pks = data.getlist('pl_product')

@@ -118,8 +118,17 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-*Fri Mar 3 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-4
-- Upstream released new version
+
+*Fri Jul 11 2011 Chaobin Tang <ctang@redhat.com> - 3.5
+- Usability Improvements (Refer to ChangeLog)
+
+*Fri Mar 3 2011 Chaobin Tang <ctang@redhat.com> - 3.4.1
+- Testing Report Implementation
+- Several Bug Fixes (Refer to ChangeLog)
+
+*Fri Mar 3 2011 Chaobin Tang <ctang@redhat.com> - 3.4
+- Advance Search Implementation
+- Several Bug Fixes (Refer to ChangeLog)
 
 *Fri Feb 25 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-3
 - Upstream released new version

@@ -43,7 +43,7 @@ class SmartDjangoQuery(object):
 
     PRIORITIES = {
         TestPlan.__name__: (
-            'pl_id', 'pl_authors', 'pl_product', 'pl_component',
+            'pl_id', 'pl_authors', 'pl_owners', 'pl_product', 'pl_component',
             'pl_type', 'pl_version', 'pl_summary',
             'pl_active', 'pl_created_since', 'pl_created_before', 'pl_tags'),
         TestCase.__name__: (
