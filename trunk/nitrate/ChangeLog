@@ -1,3 +1,116 @@
+*Fri Jul 11 2011 Chaobin Tang <ctang@redhat.com> - 3.5
+- Fixed bug # 545082 - Test case sort order is shared across plans for cloned cases
+- Fixed bug # 589633 - Not able to change author of plan
+- Fixed bug # 646325 - [FEAT]cases link doesn't link to the special cases
+- Fixed bug # 657160 - [TCMS3.2-2][RFE]Add tips after saving the basic information in the home page (Nitrate 3.2-2)
+- Fixed bug # 658339 - [TCMS3.2-2]The "Upload" button is stealing the function of "Create test plan" button when create new test plan
+- Fixed bug # 661613 - [Test Plan]Click "Upload" button without browse the attachment will report 404 error
+- Fixed bug # 664700 - [FEAT] TCMS - NitrateXmlrpc: add method for new Product version creation
+- Fixed bug # 665937 - cancel all the runs you want to clone will turn to the err page
+- Fixed bug # 667584 - There is a Error when exporting Test Plan without choose a plan
+- Fixed bug # 668323 - add build with non-English name succeeds but warning appears
+- Fixed bug # 670996 - Sorting on test plan results page only sorts that page instead of all the results
+- Fixed bug # 671457 - [RFE] removal confirmation dialogs should contain number of removed items
+- Fixed bug # 672415 - Add a child node to a plan, input non-numbers, causing a dead loop
+- Fixed bug # 673421 - Sometimes "file a bug on bugzilla" function doesn't work
+- Fixed bug # 675096 - [RFE] chart showing success rate of test-plan-runs
+- Fixed bug # 678052 - Tag link causes some nonsense text issues
+- Fixed bug # 678203 - [test plan]The product version is not inconsistency in test plan
+- Fixed bug # 678220 - [Basic Information]Can not save chinese name in basic information
+- Fixed bug # 678465 - [Bookmarks]The box also be checked after delete
+- Fixed bug # 678468 - [Bookmarks]There is no warning UI when delete bookmark without any choice
+- Fixed bug # 678513 - [Search Plan]there is UnicodeEncodeError when searching plan via chinese tag
+- Fixed bug # 678962 - [Component]Suggest pop-up the confirm UI when remove component
+- Fixed bug # 678975 - [tag]The link of tag list cause the filter is not correctly
+- Fixed bug # 679242 - [Test Case]Click "Upload" button without browse the attachment will report 404 error
+- Fixed bug # 679243 - [Test Plan][RFE]Suggest to add the back button when add attachment in test plan
+- Fixed bug # 679662 - [Clone Case]The "Autoproposed" can not be clone to the new case
+- Fixed bug # 679663 - [Clone case]Can not select "Use the same Plan" after save the clone case without any plan
+- Fixed bug # 679675 - [Test Run]There is a UnicodeEncodeError when add a chinese tag
+- Fixed bug # 680379 - [Reporting]Click the plan number the result is not correct
+- Fixed bug # 681328 - Filters are reset when cases are reordered
+- Fixed bug # 682077 - [Quick search]quick search run,it goes to a error page.
+- Fixed bug # 690057 - [test run]the test case detail will be auto updated without click update
+- Fixed bug # 691413 - Reporting -> Custom page starts with 'No builds found with search condition.'
+- Fixed bug # 693281 - Web UI: drop down / list fields' values should be sorted alphabetically
+- Fixed bug # 697252 - TCMS - nitrate xmlrpc: failed to attach bug info to TestCaseRun
+- Fixed bug # 701591 - [Test case]Suggest "update component"should be "Add component" in test case and del the "remove" button
+- Fixed bug # 701697 - Email notification has syntactical error (EN version) - new test run created
+- Fixed bug # 703718 - [Usability] improve the layout the test case-run in run
+- Fixed bug # 704101 - [Test Case] export test case without select any one will generate an error XML
+- Fixed bug # 705983 - [report] product overview tab title can't be seen because the font is white.
+- Fixed bug # 706062 - bugs shown in testcase detail
+- Fixed bug # 707455 - [Test run]Can not re-order test cases in test run
+- Fixed bug # 708883 - Click Bug Id could not link to bugzilla
+- Fixed bug # 709764 - caserun link doesn't focus case in run
+- Fixed bug # 710104 - Ordered list function of WYSIWYG: Numbers are not displayed.
+- Fixed bug # 711005 - Return all relevant information in xml-rpc call
+- Fixed bug # 711657 - The printable GUI can't show correctly
+- Fixed bug # 712772 - [Test case]Export testcase without select any one
+- Fixed bug # 712789 - Cannot open attachments
+- Fixed bug # 713662 - [Extremely Urgent] Some test plans lost all|most|some test cases this afternoon.
+- Fixed bug # 715209 - 100% Completion graphical progress bar does not look 100%, it has still a gap to be filled.
+- Fixed bug # 716499 - TestPlan.update() unable to update product version
+- Fixed bug # 717521 - [test plan]spelling mistake on mouse over show
+- Fixed bug # 717683 - XMLRPC: Unable to remove tag from plan
+- Fixed bug # 717870 - problem to clone plan no. 3486
+- Fixed bug # 719253 - [UI]UI problem of the input box for adding comment
+
+*Fri Jun 10 2011 Chaobin Tang <ctang@redhat.com> - 3.4.1
+- Fixed bug # 590817 - Build reports include incorrect values
+- Fixed bug # 642246 - Custom build report is incomplete
+- Fixed bug # 653919 - [FEAT] filtering case-runs according to test-plan
+- Fixed bug # 691412 - [TCMS] [Reporting] : no way to search according to case priority or plan tags 
+- Fixed bug # 691695 - [TCMS] [Reporting] : generate reports per user
+- Fixed bug # 691696 - [TCMS] [Reporting] : generate reports for few build [multi selection] 
+- Fixed bug # 706839 - [Advanced search]When click link "Return to homepage", come out warning "Bad Request" 
+- Fixed bug # 707243 - bug links don't work 
+
+*Fri May 24 2011 Chaobin Tang <ctang@redhat.com> - 3.4
+- Fixed bug #690423 - [xmlrpc] - xmlrpc loses connection to the server after a short timeout 
+- Fixed bug #593760 - xmlrpc doc doesn't match actual behavior: TestRun.update 
+- Fixed bug #593805 - xmlrpc Testcase.update fails when using certain arguments 
+- Fixed bug #662885 - Product version update failed for run 15325. 
+- Fixed bug #656098 - [FEAT] Relationship query 
+- Fixed bug #699311 - [New Plan]There aren't permissions to add "classification", "products", "versions" 
+- Fixed bug #705975 - [Printable copy]Can not printable copy one/more/all plan(s) in search list 
+- Fixed bug #705974 - [Export plan]Can not export one/more/all plan(s) in search list 
+- Fixed bug #697577 - pattern ID pointing to wrong place 
+- Fixed bug #682081 - [Test Case]Create a case with all fields,The UI is mess. 
+- Fixed bug #603622 - TestCase.add_component: adding already attached component results in traceback 
+- Fixed bug #637715 - TestCaseRun.update() should set tester to authenticated user 
+- Fixed bug #634295 - [FEAT]Bulk status change. 
+- Fixed bug #683844 - Update TinyMCE editor to recent version 
+- Fixed bug #683074 - One bug listed many times 
+- Fixed bug #669049 - [RFE] Editing a testrun - add a build. 
+- Fixed bug #644748 - Nitrate XML-RPC Service: failed to create new TestRun using the 'TestRun.create' verb. 
+- Fixed bug #587716 - FEAT - Need a new API call - to return a user object based on user ID's - such as tested_by_id 
+- Fixed bug #593091 - Programmatic access to TCMS via API requires user's Kerberos username/password 
+- Fixed bug #583136 - testplan.filter() returns plan objects that lack complete information 
+- Fixed bug #696047 - Default font size is too small in editor. 
+- Fixed bug #672124 - Default tester does not have permission to execute test run. 
+- Fixed bug #678184 - [Test Run]There are error info sorting test case in test run 
+- Fixed bug #680064 - [Test Run]The product version will be added to build list when Create New Test Run 
+- Fixed bug #690741 - [test run]Suggest can not remove the bug from other run 
+- Fixed bug #680032 - [Clone case][RFE]Add "cancel" button in mulitple clone page 
+- Fixed bug #680317 - [Test Run]The update function is invalid in test case run 
+- Fixed bug #680318 - [Create run]There is Warning about Data truncated when create run with more than 255 in summary 
+- Fixed bug #680380 - [Reporting]The warning UI is jumbled after select without choose product 
+- Fixed bug #679638 - [Test case]Print test case without choose any one is the same to choose all 
+- Fixed bug #698035 - [Sentmail]the reviewer received the TCMS mail rather than stage 
+- Fixed bug #593818 - Setting status=1 in TestRun.update should leave it in STOPPED state, but UI shows RUNNING 
+- Fixed bug #598882 - Changing status icon to 'start' or 'in progress' ("play" icon) jumps to next test case 
+- Fixed bug #663364 - [FEAT]Unable to search for multiple authors. 
+- Fixed bug #665052 - [FEAT] add test-case/test-run creation/completion date search criteria 
+- Fixed bug #671454 - [FEAT] search test-case by script 
+- Fixed bug #684804 - service error when accessing test-case from plan it is not a member of 
+- Fixed bug #615914 - [FEAT] searches with multiple products selected 
+- Fixed bug #670759 - [FEAT]Add a search item "Case Id" 
+- Fixed bug #680430 - [FEAT] search for test-cases from different products 
+- Fixed bug #653919 - [FEAT] filtering case-runs according to test-plan 
+- Fixed bug #542968 - [FEAT]Nitrate doesn't allow group operations on test case runs 
+- Fixed bug #564316 - [FEAT] tag searching - bugzilla-like categories or negative searching & regexps 
+
 *Fri Mar 3 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-4
 - Fixed bug 681156 - [Test Plan]Can not expand all the test case in test plan.
 - Fixed Bug 679677 - [Test Run]The button should be "cancel" in Property page.
