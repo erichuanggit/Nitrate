@@ -731,6 +731,10 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     //parameters.a = 'initial';
                     params.a = 'search';
                     constructPlanDetailsCasesZone(container, plan_id, params);
+                    //sort cases by sortkey after drag and drop.
+                    $$('a.sort_by_sortkey').each(function(e){
+						fireEvent(e, 'click');
+                    })
                 }
                 resortCasesDragAndDrop(container, this, form, table, params, callback);
             });
