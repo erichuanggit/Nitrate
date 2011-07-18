@@ -725,7 +725,6 @@ def clone(request, template_name='case/clone.html'):
                     tc_dest = TestCase.objects.create(
                         is_automated = tc_src.is_automated,
                         is_automated_proposed = tc_src.is_automated_proposed,
-                        sortkey = tc_src.sortkey,
                         script = tc_src.script,
                         arguments = tc_src.arguments,
                         summary = tc_src.summary,
