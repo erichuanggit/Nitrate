@@ -88,7 +88,7 @@
 						<span class="grey"> - From Run</span>
 						<a href="{% url tcms.testruns.views.get bug.case_run.run_id %}">{{ bug.case_run.run_id }}</a>
 						{% ifequal bug.case_run_id test_case_run.pk %}
-							<a href="javascript:void(0);" title="Remove This Bug" onclick="removeCaseRunBug(this.up(11).previous(), this.up(11), {{ bug.bug_id }}, {{ test_case_run.case_id }}, {{ test_case_run.pk }})"><img width="9" height="9" title="remove this tag" src="/media/images/remove_small.png"></a>
+							<a href="javascript:void(0);" title="Remove This Bug" onclick="removeCaseRunBug(this.up(6).previous(), this.up(6), {{ bug.bug_id }}, {{ test_case_run.case_id }}, {{ test_case_run.pk }})"><img width="9" height="9" title="remove this tag" src="/media/images/remove_small.png"></a>
 						{% endifequal %}
 						{% endif %}
 					</li>
