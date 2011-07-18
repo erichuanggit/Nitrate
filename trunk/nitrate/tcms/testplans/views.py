@@ -25,6 +25,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import simplejson
+from django.shortcuts import get_object_or_404
 
 from tcms.core.utils import Prompt
 from tcms.core.utils.raw_sql import RawSQL
@@ -475,13 +476,10 @@ def clone(request, template_name = 'plan/clone.html'):
                 # Link the cases of the plan
                 if clone_form.cleaned_data['link_testcases']:
                     tpcases_src = tp.case.all()
-                    try:
-                        tcp = TestCasePlan.objects.get(plan = tp, case = tpcase_src)
-                    except TestCasePlan.DoesNotExist:
-                        raise
                     
                     if clone_form.cleaned_data['copy_testcases']:
                         for tpcase_src in tpcases_src:
+                            tcp = get_object_or_404(TestCasePlan, plan = tp, case = tpcase_src)
                             if clone_form.cleaned_data['maintain_case_orignal_author']:
                                 author = tpcase_src.author
                             else:
@@ -545,6 +543,7 @@ def clone(request, template_name = 'plan/clone.html'):
                             
                     else:
                         for tpcase_src in tpcases_src:
+                            tcp = get_object_or_404(TestCasePlan, plan = tp, case = tpcase_src)
                             tp_dest.add_case(case = tpcase_src, sortkey = tcp.sortkey)
             
             if len(tps) == 1:
