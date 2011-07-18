@@ -73,6 +73,7 @@ def new(request, template_name = 'plan/new.html'):
             tp = TestPlan.objects.create(
                 product = form.cleaned_data['product'],
                 author = request.user,
+                owner = request.user,
                 default_product_version = form.cleaned_data['default_product_version'],
                 type = form.cleaned_data['type'],
                 name = form.cleaned_data['name'],
