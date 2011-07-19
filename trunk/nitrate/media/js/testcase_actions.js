@@ -686,21 +686,18 @@ function serialzeCaseForm(form, table, serialized)
     return data
 }
 
-function showdiv(targetid,objN){
-   
-      var target = document.getElementById(targetid);
-      var clicktext = document.getElementById(objN);
-
-            if (target.style.display == "block"){
-                target.style.display = "none";
-                clicktext.innerText = "Show All";
-  
-
-            } else {
-                target.style.display = "block";
-                clicktext.innerText = "Hide All";
-            }
-   
+function toggleDiv(link, divId){
+    var link = jQ(link);
+    var div = jQ('#'+divId);
+    var show = 'Show All';
+    var hide = 'Hide All';
+    div.toggle();
+    var text = link.html();
+    if(text!=show){
+        link.html(show);
+    }else{
+        link.html(hide);
+    }
 }
 
 /*

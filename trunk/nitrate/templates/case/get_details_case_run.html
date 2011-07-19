@@ -42,7 +42,7 @@
 					</table>
 				</form>
 				{% endif %}
-				<h4 class="borderB">Comments History:<span>[ <a id="showText" onClick="showdiv('content01','showText')" href="javascript:void(0);">Show All</a> ]</span></h4>
+				<h4 class="borderB">Comments History:<span>[ <a id="showText" onClick="toggleDiv(this, 'content01');" href="javascript:void(0);">Show All</a> ]</span></h4>
 				<ul class="comment" id="content01" style="display:none;">
 					{% for comment in case_run_comments %}
 					<li>
@@ -99,7 +99,7 @@
 			</div>
 			<div class="container" style="min-height:50px;">
 				{% if test_case_run.log %}
-				<h4 class="borderB">Change Log:<span>[ <a href="javascript:void(0);" onClick="showdiv('content02','showText')">Show All</a> ]</span></h4>
+				<h4 class="borderB">Change Log:<span>[ <a href="javascript:void(0);" onClick="toggleDiv(this, 'content02');">Show All</a> ]</span></h4>
 				<ul id="content02" style="display:none;">
 					{% for log in test_case_run.log %}
 					<li><span>{{ log.date }}</span><span>{{ log.who }}</span><br />{{ log.action }}</li>
