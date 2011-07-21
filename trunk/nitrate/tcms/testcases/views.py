@@ -740,7 +740,7 @@ def clone(request, template_name='case/clone.html'):
                     )
                     for tp in clone_form.cleaned_data['plan']:
                         sortkey = tp.get_case_sortkey()
-                        TestCasePlan.objects.create(plan = tp, case = tc_dest, sortkey = sortkey)
+                        tp.add_case(tc_dest, sortkey = sortkey)
                     
                     tc_dest.add_text(
                         author = clone_form.cleaned_data['maintain_case_orignal_author'] and tc_src.author or request.user,
@@ -765,7 +765,7 @@ def clone(request, template_name='case/clone.html'):
                 
                 # Add the cases to plan
                 for tp in clone_form.cleaned_data['plan']:
-                    tp.add_case(case = tc_dest)
+                    # tp.add_case(case = tc_dest)
                     
                     # Clone the categories to new product
                     if clone_form.cleaned_data['copy_case']:

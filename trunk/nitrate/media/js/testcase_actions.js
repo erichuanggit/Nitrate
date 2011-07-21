@@ -219,13 +219,15 @@ Nitrate.TestCases.Clone.on_load = function()
         $('id_plan_id').name = '';
     });
     
+    if($('id_use_sameplan')){
     $('id_use_sameplan').observe('click', function(e) {
         $('id_form_search_plan').disable();
         $('id_plan_id').value = $F('value_plan_id');
         $('id_plan_id').name = 'plan';
         $('id_plan_container').update('<div class="ajax_loading"></div>');
         $('id_plan_container').hide();
-    });
+    })
+    };
 }
 
 function toggleTestCaseContents(template_type, container, content_container, object_pk, case_text_version, case_run_id, callback)
