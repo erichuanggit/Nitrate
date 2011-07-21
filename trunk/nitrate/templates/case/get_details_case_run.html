@@ -49,10 +49,9 @@
 						<span>#{{ forloop.counter }}</span>
 						<span>{{ comment.user.email }}</span>
 						<span>{{ comment.submit_date }}</span>
-						<br />
+						{{ comment.comment|linebreaksbr }}
 						{% ifequal comment.user user %}
-						<form action="{% url tcms.core.contrib.comments.views.delete %}" method="get" class="form_comment">
-							{{ comment.comment|linebreaksbr }}
+						<form action="{% url tcms.core.contrib.comments.views.delete %}" method="get" class="form_comment" style="display:inline;">
 							<input type="hidden" name="comment_id" value="{{ comment.pk }}" />
 							<input type="hidden" name="object_pk" value="{{ test_case_run.case.pk }}" />
 							<input class='commentdelete sprites' value='' type='submit' title="Remove Comment" /> 
