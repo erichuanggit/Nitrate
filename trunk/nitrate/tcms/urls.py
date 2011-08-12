@@ -53,6 +53,7 @@ urlpatterns = patterns('',
     # Attached file zone
     (r'^management/uploadfile/$', 'tcms.core.files.upload_file'),
     (r'^management/checkfile/(?P<file_id>\d+)/$', 'tcms.core.files.check_file'),
+    (r'^management/deletefile/(?P<file_id>\d+)/$', 'tcms.core.files.delete_file'),
     
     (r'^comments/post/', 'tcms.core.contrib.comments.views.post'),
     (r'^comments/list/', 'tcms.core.contrib.comments.views.all'),
