@@ -181,3 +181,41 @@ def check_file(request, file_id):
     response = HttpResponse(contents, mimetype=str(attachment.mime_type))
     response['Content-Disposition'] = 'attachment; filename=%s' % attachment.file_name
     return response
+
+def delete_file(request,file_id):
+    import os
+    from urllib import unquote
+    from django.conf import settings
+    from django.utils.http import urlquote
+    from django.utils import simplejson 
+
+    ajax_response={'rc':0,'response':'ok'} 
+    #response=HttpResponse()
+    if request.REQUEST.get('from_plan'):
+        from tcms.testplans.models import TestPlanAttachment
+        try:
+            attachment=TestPlanAttachment.objects.get(attachment=file_id)
+            plan_id=int(request.REQUEST['from_plan'])#attachment.plan.plan_id
+            attachment.delete()
+        except TestPlanAttachment.DoesNotExist:
+            raise Http404
+            ajax_response['rc']=1
+            ajax_response['response']='failure'
+        return HttpResponse(simplejson.dumps(ajax_response))
+    
+    elif request.REQUEST.get('from_case'):
+        from tcms.testcases.models import TestCaseAttachment
+        try:
+            attachment=TestCaseAttachment.objects.get(attachment=file_id)
+            case_id=int(request.REQUEST['from_case'])
+            attachment.delete()
+        except TestCaseAttachment.DoesNotExist:
+            raise Http404
+            ajax_response['rc']=1
+            ajax_response['response']='failure'
+        return HttpResponse(simplejson.dumps(ajax_response))
+        #return HttpResponseRedirect(
+         #       reverse('tcms.testcases.views.attachment',args=[case_id])\
+        #)
+    #response= HttpResponse(simplejson.dumps(ajax_response))
+    #return response

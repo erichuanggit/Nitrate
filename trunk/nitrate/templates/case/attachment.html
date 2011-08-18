@@ -16,6 +16,7 @@
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/prototype.ajax_upload.js'></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}/js/testplan_actions.js"></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
+<script type="text/javascript" src='{{ MEDIA_URL }}/js/deleconfirm.js'></script>
 <script type="text/javascript">
 Nitrate.Utils.after_page_load(Nitrate.TestPlans.Details.on_load);
 </script>
@@ -60,12 +61,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Details.on_load);
 			</thead>
 			<tbody>
 				{% for attachment in testcase.attachment.all %}
-				<tr class="{% cycle 'odd' 'even' %}">
+				<tr id="{{ attachment.attachment_id }}" class="{% cycle 'odd' 'even' %}">
 					<td><a href="{% url tcms.core.files.check_file attachment.attachment_id %}">{{ attachment.file_name }}</a></td>
 					<td>{{ attachment.submitter }}</td>
 					<td>{{ attachment.create_date }}</td>
 					<td>{{ attachment.mime_type }}</td>
-					<td><a href="{% url tcms.core.files.check_file attachment.attachment_id %}">View</a></td>
+					<td><a href="{% url tcms.core.files.check_file attachment.attachment_id %}">View</a> | <a onclick="deleConfirm({{attachment.attachment_id }} ,'from_case',{{testcase.case_id}})">Delete</a></td>
 				</tr>
 				{% endfor %}
 			</tbody>
