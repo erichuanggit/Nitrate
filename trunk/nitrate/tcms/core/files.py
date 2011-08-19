@@ -182,15 +182,61 @@ def check_file(request, file_id):
     response['Content-Disposition'] = 'attachment; filename=%s' % attachment.file_name
     return response
 
+def delete_auth(request,file_id):
+    from django.contrib.auth.models import User
+    from tcms.management.models import TestAttachment
+
+    user=request.user
+    if user.is_superuser:
+        return True
+    attach=TestAttachment.objects.all().get(attachment_id=file_id)
+    submit_id=attach.submitter_id
+    if user.id==submit_id:
+        return True
+    if request.REQUEST.get('from_plan'):
+        from tcms.testplans.models import TestPlan
+        
+        try:
+            planid=int(request.REQUEST['from_plan'])
+            testplan=TestPlan.objects.all().get(plan_id=planid)
+            ownerid=testplan.owner_id
+            authorid=testplan.author_id
+            if user.id==ownerid or user.id==authorid:
+                return True
+        except KeyError, TestPlan.DoesNotExist:
+            raise
+             
+    
+    elif request.REQUEST.get('from_case'):
+        from tcms.testcases.models import TestCase
+       
+        try: 
+            caseid=int(request.REQUEST['from_case'])
+            ownerid=TestCase.objects.all().get(case_id=caseid).author_id
+            if user.id==ownerid:
+                return True
+        except KeyError:
+            raise
+    
+    return False
+        
+                
+
 def delete_file(request,file_id):
     import os
     from urllib import unquote
     from django.conf import settings
     from django.utils.http import urlquote
     from django.utils import simplejson 
-
+    
     ajax_response={'rc':0,'response':'ok'} 
-    #response=HttpResponse()
+
+    state=delete_auth(request,file_id)
+    if not state:
+        ajax_response['rc']=2
+        ajax_response['response']='auth_failure'
+        return HttpResponse(simplejson.dumps(ajax_response))
+     
     if request.REQUEST.get('from_plan'):
         from tcms.testplans.models import TestPlanAttachment
         try:

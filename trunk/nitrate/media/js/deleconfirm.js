@@ -14,6 +14,12 @@ new Ajax.Request(url,{
     returnobj=response.responseText.evalJSON(true);
     if(returnobj.rc==0){
     $(""+attachment_id).remove();
+    }   
+     else if (returnobj.response='auth_failure'){
+    alert("Permission denied!");
+}
+    else {
+    alert ("Server Exception");
 }
 }
 });
