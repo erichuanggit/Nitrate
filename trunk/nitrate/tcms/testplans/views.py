@@ -341,6 +341,11 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
                         tp.owner = owner
                     except:
                         pass
+                # IMPORTANT! tp.current_user is an instance attribute,
+                # added so that in post_save, current logged-in user info
+                # can be accessed.
+                # Instance attribute is usually not a desirable solution.
+                tp.current_user = request.user
                 tp.save()
             
             if request.user.has_perm('testplans.add_testplantext'):
@@ -362,7 +367,15 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
                         tp.add_env_group(
                             env_group = env_group
                         )
-            
+            # Update plan email settings
+            tp.emailing.notify_on_plan_update = form.cleaned_data['notify_on_plan_update']
+            tp.emailing.notify_on_plan_delete = form.cleaned_data['notify_on_plan_delete']
+            tp.emailing.notify_on_case_update = form.cleaned_data['notify_on_case_update']
+            tp.emailing.auto_to_plan_owner = form.cleaned_data['auto_to_plan_owner']
+            tp.emailing.auto_to_plan_author = form.cleaned_data['auto_to_plan_author']
+            tp.emailing.auto_to_case_owner = form.cleaned_data['auto_to_case_owner']
+            tp.emailing.auto_to_case_default_tester = form.cleaned_data['auto_to_case_default_tester']
+            tp.emailing.save()
             return HttpResponseRedirect(
                 reverse('tcms.testplans.views.get', args = [plan_id, ])
             )
@@ -387,6 +400,13 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
             'is_active': tp.is_active,
             'extra_link': tp.extra_link,
             'owner': tp.owner,
+            'auto_to_plan_owner': tp.emailing.auto_to_plan_owner,
+            'auto_to_plan_author': tp.emailing.auto_to_plan_author,
+            'auto_to_case_owner': tp.emailing.auto_to_case_owner,
+            'auto_to_case_default_tester': tp.emailing.auto_to_case_default_tester,
+            'notify_on_plan_update': tp.emailing.notify_on_plan_update,
+            'notify_on_case_update': tp.emailing.notify_on_case_update,
+            'notify_on_plan_delete': tp.emailing.notify_on_plan_delete,
         })
         form.populate(product_id = tp.product_id)
     
