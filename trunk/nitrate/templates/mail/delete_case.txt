@@ -1,3 +1,1 @@
-Test Case {{ case.pk}} has been deleted.
-
-...
+Test Case [{{ case.summary}}] has been deleted.

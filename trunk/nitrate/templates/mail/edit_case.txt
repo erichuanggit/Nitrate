@@ -1,3 +1,4 @@
-TestCase {{ test_case.pk }} has been updated by {{ test_case.current_user.username|default:"unknown people" }}
+TestCase [{{ test_case.summary }}] has been updated by {{ test_case.current_user.username|default:"someone" }}
 
+Case - 
 {{ test_case.get_url }}?#log
