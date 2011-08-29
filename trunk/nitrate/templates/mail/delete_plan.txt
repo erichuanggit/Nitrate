@@ -1,0 +1,3 @@
+TestPlan {{plan.pk}} has been deleted.
+
+...

@@ -1,0 +1,3 @@
+Test Case {{ case.pk}} has been deleted.
+
+...

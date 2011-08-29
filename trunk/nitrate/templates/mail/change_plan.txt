@@ -1,0 +1,3 @@
+TestPlan {{plan.pk}} has been updated by {{ plan.current_user.username|default:"unknown people" }}
+
+...
