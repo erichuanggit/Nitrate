@@ -16,10 +16,17 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-from datetime import datetime
+# from django
 from django.core.urlresolvers import reverse
 from django.core.exceptions import MultipleObjectsReturned
+from django.conf import settings
 from django.db import models, connection, transaction
+from django.db.models import ObjectDoesNotExist
+
+# from stdlib
+from datetime import datetime
+
+# from tcms
 from tcms.core.models import TCMSActionModel, TimedeltaField
 
 try:
@@ -473,6 +480,13 @@ class TestCase(TCMSActionModel):
     def get_url_path(self, request = None):
         return reverse('tcms.testcases.views.get', args=[self.pk, ])
 
+    def _get_email_conf(self):
+        try:
+            return self.email_settings
+        except ObjectDoesNotExist:
+            return TestCaseEmailSettings.objects.create(case=self)
+    emailing = property(_get_email_conf)
+
 class TestCaseText(TCMSActionModel):
     case = models.ForeignKey(TestCase, related_name='text')
     case_text_version = models.IntegerField(
@@ -597,6 +611,28 @@ class TestCaseBug(TCMSActionModel):
     
     def get_url(self):
         return self.bug_system.url_reg_exp % self.bug_id
+
+class TestCaseEmailSettings(models.Model):
+    case = models.OneToOneField(TestCase, related_name='email_settings')
+    notify_on_case_update = models.BooleanField(default=False)
+    notify_on_case_delete = models.BooleanField(default=False)
+    auto_to_case_author = models.BooleanField(default=False)
+    auto_to_case_tester = models.BooleanField(default=False)
+    auto_to_run_manager = models.BooleanField(default=False)
+    auto_to_run_tester  = models.BooleanField(default=False)
+    auto_to_case_run_assignee = models.BooleanField(default=False)
+
+    class Meta:
+        pass
+
+def _listen():
+    from django.db.models.signals import post_save, post_delete
+    from tcms.testcases import watchers as case_watchers
+    post_save.connect(case_watchers.on_case_save, TestCase)
+    post_delete.connect(case_watchers.on_case_delete, TestCase)
+
+if settings.LISTENING_MODEL_SIGNAL:
+    _listen()
 
 if register_model:
     register_model(TestCase)
