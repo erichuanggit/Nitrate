@@ -511,6 +511,44 @@ def bug(request, case_run_id, template_name = 'run/execute_case_run.html'):
     func = getattr(crba, request.REQUEST['a'])
     return func()
 
+def clone_with_filteredCaseRun(request,run_id,template_name='run/clone.html'):
+    import urllib
+    from tcms.testruns.forms import RunCloneForm
+    
+    SUB_MODULE_NAME = "runs"
+    try:
+        tr=TestRun.objects.get(run_id = run_id)
+    except ObjectDoesNotExist, error:
+        raise Http404(error)
+
+    if request.REQUEST.get('case_run'):
+        tcrs=tr.case_run.filter(pk__in = request.REQUEST.getlist('case_run'))
+    else:
+        tcrs=[]
+    
+    if not request.REQUEST.get('submit'):
+        form=RunCloneForm(initial={
+            'summary':tr.summary,
+            'notes':tr.notes,
+            'manager':tr.manager.email,
+            'product':tr.plan.product_id,
+            'product_version':tr.get_version_id(),
+            'build':tr.build_id,
+            'default_tester':tr.default_tester_id and tr.default_tester.email or '',
+            'use_newest_case_text':True,
+        })
+
+        form.populate(product_id=tr.plan.product_id)
+        
+        return direct_to_template(request,template_name,{
+            'module':MODULE_NAME,
+            'sub_module':SUB_MODULE_NAME,
+            'clone_form':form,
+            'test_run':tr,
+            'cases_run':tcrs,
+        })
+
+
 def clone(request, template_name='run/clone.html'):
     """Clone test run to another build"""
     import urllib

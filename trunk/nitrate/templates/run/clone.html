@@ -145,7 +145,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Clone.on_load);
 					</tr>
 				</thead>
 				<tbody>
-					{% for case_run in test_run.case_run.all %}
+					{% for case_run in cases_run.all %}
 					<tr class="{% cycle 'odd' 'even' %}" id="row_{{ forloop.counter }}">
 						<td>
 							<a id="blind_link_{{ forloop.counter }}" class="blind_link" href="javascript:toggleTestCaseContents('{{ forloop.counter }}')">
