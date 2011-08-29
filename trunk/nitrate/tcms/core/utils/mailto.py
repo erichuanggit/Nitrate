@@ -14,7 +14,15 @@
 # distribution and at <http://www.gnu.org/licenses>.
 # 
 # Authors:
-#   Xuqing Kuang <xkuang@redhat.com>
+#   Xuqing Kuang <xkuang@redhat.com> Chaobin Tang <ctang@redhat.com>
+
+# from django
+from django.conf import settings
+from django.core.mail import send_mail
+from django.template import loader, Context, RequestContext
+
+# from stdlib
+import threading
 
 def mailto(template_name, subject, to_mail, context = None, request = None, from_mail = None):
     """
@@ -26,10 +34,6 @@ def mailto(template_name, subject, to_mail, context = None, request = None, from
         subject = define the subject of the mail
         context = Context to render the mail content
     """
-    from django.conf import settings
-    from django.core.mail import send_mail
-    from django.template import loader, Context, RequestContext
-    
     try:
         t = loader.get_template(template_name)
         if request:
@@ -45,5 +49,16 @@ def mailto(template_name, subject, to_mail, context = None, request = None, from
     except:
         if settings.DEBUG:
             raise
-        
-        pass
+
+def send_email_using_threading(template_name, subject, context=None, recipients=None, sender=settings.EMAIL_FROM):
+    t = loader.get_template(template_name)
+    body = t.render(Context(context))
+    if settings.DEBUG:
+        recipients = settings.EMAILS_FOR_DEBUG
+        print body
+    email_thread = threading.Thread(target=send_mail, 
+        args=[subject, body, sender, recipients],
+        kwargs={'fail_silently': True})
+    # This is to tell Python not to wait for the thread to return
+    email_thread.setDaemon(True)
+    email_thread.start()

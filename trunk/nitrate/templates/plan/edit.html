@@ -163,6 +163,55 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Edit.on_load);
 						<div class="errors">{{ form.extra_link.errors }}</div>
 					</td>
 				</tr>
+				<tr>
+					<td><label class="lab">{{ form.auto_to_plan_owner.label }}</label></td>
+					<td>
+						<div class="name summary">{{ form.auto_to_plan_owner }}</div>
+						<div class="errors">{{ form.auto_to_plan_owner.errors }}</div>
+					</td>
+				</tr>
+				<tr>
+					<td><label class="lab">{{ form.auto_to_plan_author.label }}</label></td>
+					<td>
+						<div class="name summary">{{ form.auto_to_plan_author }}</div>
+						<div class="errors">{{ form.auto_to_plan_author.errors }}</div>
+					</td>
+				</tr>
+				<tr>
+					<td><label class="lab">{{ form.auto_to_case_owner.label }}</label></td>
+					<td>
+						<div class="name summary">{{ form.auto_to_case_owner }}</div>
+						<div class="errors">{{ form.auto_to_case_owner.errors }}</div>
+					</td>
+				</tr>
+				<tr>
+					<td><label class="lab">{{ form.auto_to_case_default_tester.label }}</label></td>
+					<td>
+						<div class="name summary">{{ form.auto_to_case_default_tester }}</div>
+						<div class="errors">{{ form.auto_to_case_default_tester.errors }}</div>
+					</td>
+				</tr>
+				<tr>
+					<td><label class="lab">{{ form.notify_on_plan_update.label }}</label></td>
+					<td>
+						<div class="name summary">{{ form.notify_on_plan_update }}</div>
+						<div class="errors">{{ form.notify_on_plan_update.errors }}</div>
+					</td>
+				</tr>
+				<tr>
+					<td><label class="lab">{{ form.notify_on_plan_delete.label }}</label></td>
+					<td>
+						<div class="name summary">{{ form.notify_on_plan_delete }}</div>
+						<div class="errors">{{ form.notify_on_plan_delete.errors }}</div>
+					</td>
+				</tr>
+				<tr>
+					<td><label class="lab">{{ form.notify_on_case_update.label }}</label></td>
+					<td>
+						<div class="name summary">{{ form.notify_on_case_update }}</div>
+						<div class="errors">{{ form.notify_on_case_update.errors }}</div>
+					</td>
+				</tr>
 			</table>
 			<div class="submit-row" id="control_box">
 				<input type="submit" value="Save" />

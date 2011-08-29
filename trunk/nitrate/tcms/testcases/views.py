@@ -548,6 +548,11 @@ def edit(request, case_id, template_name = 'case/edit.html'):
             #        tc.estimated_time, form.cleaned_data['estimated_time']
             #    ))
             tc.estimated_time = form.cleaned_data['estimated_time']
+            # IMPORTANT! tc.current_user is an instance attribute,
+            # added so that in post_save, current logged-in user info
+            # can be accessed.
+            # Instance attribute is usually not a desirable solution.
+            tc.current_user = request.user
             tc.save()
             
             tc.add_text(
@@ -564,49 +569,7 @@ def edit(request, case_id, template_name = 'case/edit.html'):
             #    tc.add_component(component = component)
             
             # Notification
-            n_form = CaseNotifyForm(request.REQUEST)    # Notification form
-            if n_form.is_valid():
-                n_to = [request.user.email, tc.author.email]                # Initial Notification to
-                
-                if n_form.cleaned_data['default_tester_of_case'] and tc.default_tester_id:
-                    n_to.append(tc.default_tester.email)
-                
-                if n_form.cleaned_data['authors_of_plans']:
-                    n_to.extend(
-                        tc.plan.values_list('author__email', flat=True)
-                    )
-                
-                if n_form.cleaned_data['managers_of_runs']:
-                    n_to.extend(
-                        tc.case_run.values_list('run__manager__email', flat=True)
-                    )
-                
-                if n_form.cleaned_data['default_testers_of_runs']:
-                    n_to.extend(
-                        tc.case_run.values_list('run__default_tester__email', flat=True)
-                    )
-                
-                if n_form.cleaned_data['assignees_of_case_runs']:
-                    n_to.extend(
-                        tc.case_run.values_list('assignee__email', flat=True)
-                    )
-                
-                if n_form.cleaned_data['specific_person']:
-                    n_to.extend(n_form.cleaned_data['specific_person'])
-                
-                n_to = list(set(n_to))
-                
-                if not n_form.cleaned_data['editor']:
-                    n_to.remove(request.user.email)
-                
-                # Sending the mail with threading
-                EditCaseNotifyThread(
-                    instance = tc,
-                    cleaned_data = form.cleaned_data,
-                    request = request,
-                    to = n_to
-                ).start()
-            
+            update_case_email_settings(tc, request)
             # Returns
             if request.REQUEST.get('_continue'):
                 return HttpResponseRedirect('%s?from_plan=%s' % (
@@ -635,7 +598,15 @@ def edit(request, case_id, template_name = 'case/edit.html'):
             ))
     else:
         tctxt = tc.latest_text()
-        n_form = CaseNotifyForm(request.REQUEST)    # Notification form
+        n_form = CaseNotifyForm(initial= {
+            'notify_on_case_delete': tc.emailing.notify_on_case_delete,
+            'notify_on_case_update': tc.emailing.notify_on_case_update,
+            'author': tc.emailing.auto_to_case_author,
+            'default_tester_of_case': tc.emailing.auto_to_case_tester,
+            'managers_of_runs': tc.emailing.auto_to_run_manager,
+            'default_testers_of_runs': tc.emailing.auto_to_run_tester,
+            'assignees_of_case_runs': tc.emailing.auto_to_case_run_assignee,
+        })    # Notification form
         form = EditCaseForm(initial={
             'summary': tc.summary,
             'default_tester': tc.default_tester_id and tc.default_tester.email or None,
@@ -659,7 +630,6 @@ def edit(request, case_id, template_name = 'case/edit.html'):
         })
         
         form.populate(product_id = tc.category.product_id)
-    
     return direct_to_template(request, template_name, {
         'test_case': tc,
         'test_plan': tp,
@@ -667,6 +637,37 @@ def edit(request, case_id, template_name = 'case/edit.html'):
         'notify_form': n_form,
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
     })
+
+def update_case_email_settings(tc, request):
+    from forms import CaseNotifyForm
+    n_form = CaseNotifyForm(request.REQUEST)
+    if n_form.is_valid():
+        n_to = [request.user.email, tc.author.email]
+        if n_form.cleaned_data['default_tester_of_case'] and tc.default_tester_id:
+            tc.emailing.auto_to_case_tester = True
+            # n_to.append(tc.default_tester.email)
+        if n_form.cleaned_data['managers_of_runs']:
+            tc.emailing.auto_to_run_manager = True
+            #n_to.extend(
+            #    tc.case_run.values_list('run__manager__email', flat=True)
+            #)
+        if n_form.cleaned_data['default_testers_of_runs']:
+            tc.emailing.auto_to_run_tester = True
+            #n_to.extend(
+            #    tc.case_run.values_list('run__default_tester__email', flat=True)
+            #)
+        if n_form.cleaned_data['assignees_of_case_runs']:
+            tc.emailing.auto_to_case_run_assignee = True
+            #n_to.extend(
+            #    tc.case_run.values_list('assignee__email', flat=True)
+            #)
+        if n_form.cleaned_data['author']:
+            tc.emailing.auto_to_case_author = True
+        if n_form.cleaned_data['notify_on_case_update']:
+            tc.emailing.notify_on_case_update = True
+        if n_form.cleaned_data['notify_on_case_delete']:
+            tc.emailing.notify_on_case_delete = True
+        tc.emailing.save()
 
 def text_history(request, case_id, template_name='case/history.html'):
     """View test plan text history"""

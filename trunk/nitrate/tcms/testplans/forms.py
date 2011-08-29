@@ -335,6 +335,36 @@ class NewPlanForm(BasePlanForm):
         label="Tag",
         required=False
     )
+
+    #Display radio buttons instead of checkboxes
+    auto_to_plan_owner = forms.BooleanField(
+        label='Include plan\'s owner as the notification receiver',
+        required=False
+    )
+    auto_to_plan_author = forms.BooleanField(
+        label='Include plan\'s author as the notification receiver',
+        required=False
+    )
+    auto_to_case_owner = forms.BooleanField(
+        label='Include the author of the case under a plan as the notification receiver',
+        required=False
+    )
+    auto_to_case_default_tester = forms.BooleanField(
+        label='Include the default tester of the case under a plan as the notification receiver',
+        required=False
+    )
+    notify_on_plan_update = forms.BooleanField(
+        label='Send notification when plan is updated',
+        required=False
+    )
+    notify_on_case_update = forms.BooleanField(
+        label='Send notification email when cases of a plan are updated',
+        required=False
+    )
+    notify_on_plan_delete = forms.BooleanField(
+        label='Send notification email when plan is deleted',
+        required=False
+    )
     
     def clean_tag(self):
         return TestTag.objects.filter(
