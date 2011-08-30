@@ -299,6 +299,9 @@ SET_ADMIN_AS_SUPERUSER = False
 BUGZILLA3_RPC_SERVER = ''
 BUGZILLA_URL = ''
 
+# Turn on/off listening signals sent by models.
+LISTENING_MODEL_SIGNAL = True
+
 # Kerberos settings
 # Required by kerberos authentication backend
 KRB5_REALM = ''
