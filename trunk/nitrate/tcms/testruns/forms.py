@@ -108,6 +108,14 @@ class BaseRunForm(forms.Form):
         widget=forms.Textarea, 
         required=False
     )
+    keep_status = forms.BooleanField(
+        label = 'Reserve Status', widget = forms.CheckboxInput(),
+        required = False
+    )
+    keep_assignee = forms.BooleanField(
+        label = 'Reserve Assignee', widget = forms.CheckboxInput(),
+        required = False
+    )
     def populate(self, product_id):
         # We can dynamically set choices for a form field:
         # Seen at: http://my.opera.com/jacob7908/blog/2009/06/19/django-choicefield-queryset (Chinese)
