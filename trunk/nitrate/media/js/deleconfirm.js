@@ -3,7 +3,7 @@ function deleConfirm(attachment_id,home,plan_id){
 //var xmlHttp=new XMLHttpRequest();
 //var url = "/management/deletefile/(?P<file_id>\d+)/$";
 var url="/management/deletefile/"+attachment_id+"?"+home+"="+plan_id;
-var answer=confirm("Arey you sure to delete the attachment?","Yes","No");
+var answer=confirm("Arey you sure to delete the attachment?");
 if(!answer)
     return false;
 

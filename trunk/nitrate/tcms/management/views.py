@@ -80,14 +80,14 @@ def environment_groups(request, template_name = 'environment/groups.html'):
     # Del action
     if request.REQUEST.get('action') == 'del':
         if not request.user.has_perm('management.delete_tcmsenvgroup'):
-            ajax_response['response']='Permission denied.'
+            ajax_response['response'] = 'Permission denied.'
             return HttpResponse(json_dumps(ajax_response))
         
             
         if request.REQUEST.get('id'):
             try:
                 env = env_groups.get(id = request.REQUEST['id'])
-                manager_id=env.manager_id
+                manager_id = env.manager_id
                 if (request.user.id !=  manager_id):
                     ajax_response['response']='Permission denied.'
                     return HttpResponse(json_dumps(ajax_response))

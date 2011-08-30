@@ -66,7 +66,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Details.on_load);
 					<td>{{ attachment.submitter }}</td>
 					<td>{{ attachment.create_date }}</td>
 					<td>{{ attachment.mime_type }}</td>
-					<td><a href="{% url tcms.core.files.check_file attachment.attachment_id %}">View</a> | <a onclick="deleConfirm({{attachment.attachment_id }} ,'from_case',{{testcase.case_id}})">Delete</a></td>
+					<td><a href="{% url tcms.core.files.check_file attachment.attachment_id %}">View</a> | <a onclick="deleConfirm({{attachment.attachment_id }} ,'from_case',{{testcase.case_id}})" href="#">Delete</a></td>
 				</tr>
 				{% endfor %}
 			</tbody>

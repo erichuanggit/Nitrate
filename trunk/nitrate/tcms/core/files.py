@@ -182,38 +182,37 @@ def check_file(request, file_id):
     response['Content-Disposition'] = 'attachment; filename=%s' % attachment.file_name
     return response
 
-def delete_auth(request,file_id):
+def able_to_delete_attachment(request,file_id):
     from django.contrib.auth.models import User
     from tcms.management.models import TestAttachment
+    from tcms.testplans.models import TestPlan
+    from tcms.testcases.models import TestCase
 
-    user=request.user
+    user = request.user
     if user.is_superuser:
         return True
-    attach=TestAttachment.objects.all().get(attachment_id=file_id)
-    submit_id=attach.submitter_id
-    if user.id==submit_id:
+    attach = TestAttachment.objects.all().get(attachment_id = file_id)
+    submit_id = attach.submitter_id
+    if user.id == submit_id:
         return True
+
     if request.REQUEST.get('from_plan'):
-        from tcms.testplans.models import TestPlan
-        
         try:
-            planid=int(request.REQUEST['from_plan'])
-            testplan=TestPlan.objects.all().get(plan_id=planid)
-            ownerid=testplan.owner_id
-            authorid=testplan.author_id
-            if user.id==ownerid or user.id==authorid:
+            planid = int(request.REQUEST['from_plan'])
+            testplan = TestPlan.objects.all().get(plan_id=planid)
+            ownerid = testplan.owner_id
+            authorid = testplan.author_id
+            if user.id == ownerid or user.id == authorid:
                 return True
         except KeyError, TestPlan.DoesNotExist:
             raise
              
     
     elif request.REQUEST.get('from_case'):
-        from tcms.testcases.models import TestCase
-       
         try: 
-            caseid=int(request.REQUEST['from_case'])
-            ownerid=TestCase.objects.all().get(case_id=caseid).author_id
-            if user.id==ownerid:
+            caseid = int(request.REQUEST['from_case'])
+            ownerid = TestCase.objects.all().get(case_id=caseid).author_id
+            if user.id == ownerid:
                 return True
         except KeyError:
             raise
@@ -221,7 +220,7 @@ def delete_auth(request,file_id):
     return False
         
                 
-
+# Delete Attachment
 def delete_file(request,file_id):
     import os
     from urllib import unquote
@@ -229,39 +228,37 @@ def delete_file(request,file_id):
     from django.utils.http import urlquote
     from django.utils import simplejson 
     
-    ajax_response={'rc':0,'response':'ok'} 
+    ajax_response = {'rc':0,'response':'ok'} 
+    DELEFAILURE = 1
+    AUTHUNSUCCESS = 2
 
-    state=delete_auth(request,file_id)
+    state = able_to_delete_attachment(request,file_id)
     if not state:
-        ajax_response['rc']=2
-        ajax_response['response']='auth_failure'
+        ajax_response['rc'] = AUTHUNSUCCESS
+        ajax_response['response'] = 'auth_failure'
         return HttpResponse(simplejson.dumps(ajax_response))
      
+    # Delete plan's attachment
     if request.REQUEST.get('from_plan'):
         from tcms.testplans.models import TestPlanAttachment
         try:
-            attachment=TestPlanAttachment.objects.get(attachment=file_id)
-            plan_id=int(request.REQUEST['from_plan'])#attachment.plan.plan_id
+            attachment = TestPlanAttachment.objects.get(attachment=file_id)
             attachment.delete()
         except TestPlanAttachment.DoesNotExist:
-            raise Http404
-            ajax_response['rc']=1
-            ajax_response['response']='failure'
+            ajax_response['rc'] = DELEFAILURE
+            ajax_response['response'] = 'failure'
         return HttpResponse(simplejson.dumps(ajax_response))
     
+    # Delete cases' attachment
     elif request.REQUEST.get('from_case'):
         from tcms.testcases.models import TestCaseAttachment
         try:
-            attachment=TestCaseAttachment.objects.get(attachment=file_id)
-            case_id=int(request.REQUEST['from_case'])
+            attachment = TestCaseAttachment.objects.get(attachment=file_id)
             attachment.delete()
         except TestCaseAttachment.DoesNotExist:
-            raise Http404
-            ajax_response['rc']=1
-            ajax_response['response']='failure'
+            ajax_response['rc'] = DELEFAILURE
+            ajax_response['response'] = 'failure'
         return HttpResponse(simplejson.dumps(ajax_response))
         #return HttpResponseRedirect(
          #       reverse('tcms.testcases.views.attachment',args=[case_id])\
         #)
-    #response= HttpResponse(simplejson.dumps(ajax_response))
-    #return response
