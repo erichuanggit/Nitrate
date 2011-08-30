@@ -37,11 +37,12 @@ def new(request, template_name = 'run/new.html'):
     Display the create test run page
     """
     from tcms.testruns.forms import NewRunForm
+    from tcms.testruns.models import TestCaseRun
     from tcms.testplans.models import TestPlan
     from tcms.testcases.models import TestCase
     from tcms.management.models import Version
     from tcms.core.utils.prompt import Prompt
-    
+       
     SUB_MODULE_NAME = "new_run"
     
     # If from_plan does not exist will redirect to plans for select a plan
@@ -62,7 +63,8 @@ def new(request, template_name = 'run/new.html'):
     # Ready to write cases to test plan
     tcs = TestCase.objects.filter(case_id__in = request.REQUEST.getlist('case'))
     tp = TestPlan.objects.select_related().get(plan_id = plan_id)
-        
+    tcrs = TestCaseRun.objects.filter(case_run_id__in = request.REQUEST.getlist('case_run_id'))
+    
     num_unconfirmed_cases = 0
     for tc in tcs:
         # Hardcode here, the case_status_id is CONFIRMED
@@ -93,15 +95,46 @@ def new(request, template_name = 'run/new.html'):
                 estimated_time = form.cleaned_data['estimated_time'],
             )
             
-            # Add case to the run
+            keep_status = form.cleaned_data['keep_status']
+            keep_assign= form.cleaned_data['keep_assignee']
+
             loop = 1
-            for case in form.cleaned_data['case']:
-                tr.add_case_run(
-                    case = case,
-                    sortkey = loop * 10
-                )
-                loop += 1
-            
+
+            # not reserve assignee and status
+            if not keep_assign and not keep_status:
+                for case in form.cleaned_data['case']:
+                    tr.add_case_run(
+                        case = case,
+                        sortkey = loop * 10
+                    )
+                    loop += 1
+
+            # Add case to the run
+            for tcr in tcrs:
+                if (keep_status and keep_assign):
+                    tr.add_case_run(
+                        case = tcr.case,
+                        assignee = tcr.assignee,
+                        case_run_status = tcr.case_run_status,
+                        sortkey = loop * 10
+                    )
+                    loop += 1
+                elif keep_status and not keep_assign:
+                    tr.add_case_run(
+                        case = tcr.case,
+                        case_run_status = tcr.case_run_status,
+                        sortkey = loop * 10
+                    )
+                    loop += 1
+                elif keep_assign and not keep_status:
+                    tr.add_case_run(
+                        case = tcr.case,
+                        assignee = tcr.assignee,
+                        sortkey = loop * 10
+                    )
+                    loop += 1                       
+
+     
             # Write the values into tcms_env_run_value_map table
             for key, value in request.REQUEST.items():
                 if key.startswith('select_property_id_'):

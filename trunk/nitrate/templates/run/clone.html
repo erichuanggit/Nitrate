@@ -116,6 +116,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Clone.on_load);
 						{% endfor %}
 					</td>
 				</tr>
+            <tr>
+                <div>
+                <td>{{ clone_form.keep_status }} {{ clone_form.keep_status.label }}</td>
+                <td>{{ clone_form.keep_assignee }} {{ clone_form.keep_assignee.label }}</td>
+                </div>
+            </tr>
 			</table>
 			<div class="submit-row ">
 				{{ clone_form.errors }}
@@ -155,6 +161,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Clone.on_load);
 						<td>
 							<a href="{% url tcms.testcases.views.get case_run.case_id %}">{{ case_run.case_id }}</a>
 							<input type="hidden" name="case" value="{{ case_run.case_id }}">
+                            <input type="hidden" name="case_run_id" value="{{ case_run.case_run_id }}">
 						</td>
 						<td>
 							<a id="link_{{ forloop.counter }}" class="blind_title_link" href="javascript:toggleTestCaseContents('{{ forloop.counter }}')">
