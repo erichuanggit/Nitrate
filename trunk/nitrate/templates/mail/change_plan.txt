@@ -1,0 +1,4 @@
+TestPlan [{{plan.name}}] has been updated by {{ plan.current_user.username|default:"someone" }}
+
+Plan -
+{{ plan.get_url }}

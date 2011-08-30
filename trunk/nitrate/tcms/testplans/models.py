@@ -23,6 +23,7 @@ from django.db import models, connection, transaction
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.cache import cache
 from django.utils.safestring import mark_safe, SafeData
+from django.conf import settings
 
 from tcms.management.models import TCMSEnvPlanMap
 from tcms.testcases.models import TestCasePlan
@@ -300,6 +301,13 @@ class TestPlan(TCMSActionModel):
         else:
             return None
 
+    def _get_email_conf(self):
+        try:
+            return self.email_settings
+        except ObjectDoesNotExist:
+            return TestPlanEmailSettings.objects.create(plan=self)
+    emailing = property(_get_email_conf)
+
 class TestPlanText(TCMSActionModel):
     plan = models.ForeignKey(
         TestPlan,
@@ -377,9 +385,32 @@ class TestPlanComponent(models.Model):
         db_table = u'test_plan_components'
         unique_together = ('plan', 'component')
 
+class TestPlanEmailSettings(models.Model):
+    plan = models.OneToOneField(TestPlan, related_name='email_settings')
+    is_active = models.BooleanField(default=False)
+    auto_to_plan_owner = models.BooleanField(default=False)
+    auto_to_plan_author = models.BooleanField(default=False)
+    auto_to_case_owner = models.BooleanField(default=False)
+    auto_to_case_default_tester = models.BooleanField(default=False)
+    notify_on_plan_update = models.BooleanField(default=False)
+    notify_on_plan_delete = models.BooleanField(default=False)
+    notify_on_case_update = models.BooleanField(default=False)
+
+    class Meta:
+        pass
+
 if register_model:
     register_model(TestPlan)
     register_model(TestPlanText)
     register_model(TestPlanType)
     register_model(TestPlanTag)
     register_model(TestPlanComponent)
+
+def _listen():
+    from django.db.models.signals import post_save, post_delete
+    from tcms.testplans import watchers as plan_watchers
+    post_save.connect(plan_watchers.on_plan_save, TestPlan)
+    post_delete.connect(plan_watchers.on_plan_delete, TestPlan)
+
+if settings.LISTENING_MODEL_SIGNAL:
+    _listen()

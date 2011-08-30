@@ -232,6 +232,14 @@ EMAIL_PORT = 25
 EMAIL_FROM = 'noreply@foo.com'
 EMAIL_SUBJECT_PREFIX = '[TCMS] '
 
+EMAILS_FOR_DEBUG = ['ctang@redhat.com',]
+
+# TCMS email behavior settings
+PLAN_EMAIL_TEMPLATE = 'mail/change_plan.txt'
+PLAN_DELELE_EMAIL_TEMPLATE = 'mail/delete_plan.txt'
+CASE_EMAIL_TEMPLATE = 'mail/edit_case.txt'
+CASE_DELETE_EMAIL_TEMPLATE = 'mail/delete_case.txt'
+
 # Maximum upload file size, default set to 5MB.
 # 2.5MB - 2621440
 # 5MB - 5242880

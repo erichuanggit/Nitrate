@@ -238,16 +238,13 @@ class EditCaseForm(BaseCaseForm):
     pass
 
 class CaseNotifyForm(forms.Form):
-    editor = forms.BooleanField(required = False)
+    author = forms.BooleanField(required = False)
     default_tester_of_case = forms.BooleanField(required = False)
-    authors_of_plans = forms.BooleanField(required = False)
     managers_of_runs = forms.BooleanField(required = False)
     default_testers_of_runs = forms.BooleanField(required = False)
     assignees_of_case_runs = forms.BooleanField(required = False)
-    specific_person = MultipleEmailField(
-        help_text = 'Multiple types are split with comma.',
-        required = False
-    )
+    notify_on_case_update = forms.BooleanField(required=False)
+    notify_on_case_delete = forms.BooleanField(required=False)
 
 # =========== Forms for  XML-RPC functions ==============
 
