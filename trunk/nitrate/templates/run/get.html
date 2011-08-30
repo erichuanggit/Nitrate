@@ -50,7 +50,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 		{% endif %}
 		
 		{% if perms.testruns.add_testrun %}
-		<input type="button" value="Clone" title="Clone test run to other test build" onclick="window.location.href='{% url tcms.testruns.views.clone %}?run={{ test_run.pk }}'"/>
+		<input type="button" value="Clone" title="Clone test run to other test build" onclick="postToURL('{% url tcms.testruns.views.clone_with_filteredCaseRun test_run.pk %}', serializeCaseRunFromInputList('id_table_cases','case_run'))" />
 		{% else %}
 		<input type="button" value="Clone" disabled="true"/>
 		{% endif %}

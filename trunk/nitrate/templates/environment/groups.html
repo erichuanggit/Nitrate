@@ -59,7 +59,7 @@ Nitrate.Utils.after_page_load(Nitrate.Management.Environment.on_load);
 		</thead>
 		<tbody>
 			{% for env in environments %}
-			<tr class="{% cycle odd even %}">
+			<tr class="{% cycle odd even %}" id="{{ env.id }}" >
 				<th align="center" height="26px">
 					<label class=" {% if env.is_active %}{% else %}disable{% endif %}">
 						{% if perms.management.change_tcmsenvgroup %}
@@ -89,7 +89,8 @@ Nitrate.Utils.after_page_load(Nitrate.Management.Environment.on_load);
 					<a href="{% url tcms.management.views.environment_group_edit %}?id={{ env.id }}" class="editlink">Edit</a>
 					<a href="?id={{ env.id }}&action=modify&status=0" class="disablelink {% if env.is_active %}{% else %}hidden{% endif %}">Disable</a>
 					<a href="?id={{ env.id }}&action=modify&status=1" class="enablelink {% if env.is_active %}hidden{% endif %} ">Enable</a>
-                    <a href="#viewhistroy{{ env.id }}" class="loglink" name="viewhistroy{{ env.id }}">View edit histroy</a>
+					<a href="#" onClick="deleteEnvGroup({{ env.id }}, '{{ env.name }}')" class="editlink">Delete</a>
+                    <a href="#viewhistroy{{ env.id }}" class="loglink" name="viewhistroy{{ env.id }}">View edit history</a>
 					{% else %}
 					{% endif %}
 				</td>

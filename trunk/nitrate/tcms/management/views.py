@@ -80,12 +80,20 @@ def environment_groups(request, template_name = 'environment/groups.html'):
     # Del action
     if request.REQUEST.get('action') == 'del':
         if not request.user.has_perm('management.delete_tcmsenvgroup'):
-            return HttpResponse('Permission denied')
+            ajax_response['response']='Permission denied.'
+            return HttpResponse(json_dumps(ajax_response))
+        
             
         if request.REQUEST.get('id'):
             try:
                 env = env_groups.get(id = request.REQUEST['id'])
-                env.delete()
+                manager_id=env.manager_id
+                if (request.user.id !=  manager_id):
+                    ajax_response['response']='Permission denied.'
+                    return HttpResponse(json_dumps(ajax_response))
+                else :
+                    env.delete()
+                    ajax_response['response']='ok'
             except TCMSEnvGroup.DoesNotExist, error:
                 raise Http404(error)
             
@@ -96,6 +104,7 @@ def environment_groups(request, template_name = 'environment/groups.html'):
                 env_group_property_map.delete()
             except:
                 pass
+            return HttpResponse(json_dumps(ajax_response))
         else:
             pass
     
@@ -127,7 +136,7 @@ def environment_groups(request, template_name = 'environment/groups.html'):
         else:
             env_groups = env_groups.all()
     else:
-        env_groups = env_groups.all()
+        env_groups = env_groups.all().order_by('is_active')
     
     return direct_to_template(request, template_name, {
         'environments': env_groups

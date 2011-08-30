@@ -40,5 +40,5 @@ class TestCaseBugSystemAdmin(admin.ModelAdmin):
 
 #admin.site.register(TestCaseStatus, TestCaseStatusAdmin)
 admin.site.register(TestCaseCategory, TestCaseCategoryAdmin)
-#admin.site.register(TestCase, TestCaseAdmin)
+admin.site.register(TestCase, TestCaseAdmin)
 admin.site.register(TestCaseBugSystem, TestCaseBugSystemAdmin)

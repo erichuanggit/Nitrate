@@ -46,10 +46,25 @@ function deleteEnvGroup(id, env_group_name)
 {
 	var answer = confirm("Are you sure you wish to remove environment group - " + env_group_name, "Yes", "No");
 	
-	if(answer) {
-		window.location.href=getEnvURLParams().delete_group + '?action=del&id=' + id
+	if(!answer) {
+        return false;
 	}
-}
+
+	//window.location.href=getEnvURLParams().delete_group + '?action=del&id=' + id
+    var url=getEnvURLParams().delete_group + '?action=del&id=' + id;
+    new Ajax.Request(url,{
+    method:'get',
+    onComplete:function(response){
+        returnobj=response.responseText.evalJSON(true);
+        if(returnobj.response=='Permission denied.'){
+            alert(returnobj.response);    
+            }
+        else if(returnobj.response=='ok'){
+        $(""+id).remove();
+        }
+        }
+    })
+ }
 
 function selectEnvProperty(property_id)
 {
