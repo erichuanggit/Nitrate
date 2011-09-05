@@ -57,8 +57,8 @@
 					{% endifequal %}
 					<td><span>{{ tester }}</span></td>
 					<td><span>{{summed_runs|length}}</span></td>
-					<td>{{ caseruns|length }}</td>
-					<td>{{ percentages.idle }}</td>
+					<td><a href="/caseruns/{{ request_path }}&tested_by={{tester.pk}}">{{ caseruns|length }}</a></td>
+					<td><a href="{{ request_path }}">{{ percentages.idle }}</a></td>
 					<td>{{ percentages.running }}</td>
 					<td>{{ percentages.paused }}</td>
 					<td>{{ percentages.passed }}</td>
@@ -74,7 +74,7 @@
 				<tr>
 					<td><span>{{ tester }}</span></td>
 					<td><span>{{summed_runs|length}}</span></td>
-					<td>{{caseruns|length}}</td>
+					<td><a href="/caseruns/{{ request_path }}&tested_by={{tester.pk}}">{{caseruns|length}}</a></td>
 					<td>{{ percentages.idle }}</td>
 					<td>{{ percentages.running }}</td>
 					<td>{{ percentages.paused }}</td>

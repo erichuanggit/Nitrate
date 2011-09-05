@@ -122,7 +122,8 @@ urlpatterns = patterns('',
     (r'^run/(?P<run_id>\d+)/cc/$', 'tcms.testruns.views.cc'),
     (r'^run/(?P<run_id>\d+)/update/$', 'tcms.testruns.views.update_case_run_text'),
     (r'^run/(?P<run_id>\d+)/export/$', 'tcms.testruns.views.export'),
-    
+
+    (r'^caseruns/$', 'tcms.testruns.views.caseruns'),
     (r'^caserun/(?P<case_run_id>\d+)/current/$', 'tcms.testruns.views.set_current'),
     (r'^caserun/(?P<case_run_id>\d+)/bug/$', 'tcms.testruns.views.bug'),
     (r'^caserun/comment-many/', 'tcms.core.ajax.comment_case_runs'),

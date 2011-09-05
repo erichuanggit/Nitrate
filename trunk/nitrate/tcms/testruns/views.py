@@ -1043,3 +1043,25 @@ def env_value(request):
         return func()
     except:
         raise
+
+def caseruns(request):
+    '''
+    View that search caseruns.
+    '''
+    from tcms.search.forms import RunForm
+    from tcms.search.query import SmartDjangoQuery
+    from tcms.testruns.models import TestRun
+    queries = request.GET
+    r_form = RunForm(queries)
+    r_form.populate(queries)
+    if r_form.is_valid():
+        runs = SmartDjangoQuery(r_form.cleaned_data, TestRun.__name__)
+        runs = runs.evaluate()
+        caseruns = get_caseruns_of_runs(runs， queries)
+        return HttpResponse('runs count --- %s, caseruns count --- %s' % (runs.count(), caseruns.count()))
+    return HttpResponse(r_form.errors)
+
+def get_caseruns_of_runs(runs, kwargs=None):
+    from tcms.testruns.models import TestCaseRun
+    caseruns = TestCaseRun.objects.filter(run__in=runs)
+    return caseruns
