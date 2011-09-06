@@ -504,3 +504,27 @@ class CaseComponentForm(forms.Form):
         else:
             #self.fields['category'].queryset = TestCaseCategory.objects.all()
             self.fields['o_component'].queryset = Component.objects.all()
+   
+class CaseCategoryForm(forms.Form):
+    product = forms.ModelChoiceField(
+        queryset = Product.objects.all(),
+        empty_label = None,
+        required = False,
+    )
+    #category = forms.ModelChoiceField(
+    #    queryset = TestCaseCategory.objects.none(),
+    #    empty_label = None,
+    #    required = False,
+    #)
+    o_category = forms.ModelMultipleChoiceField(
+        label = "Categorys",
+        queryset = TestCaseCategory.objects.none(),
+        required = False,
+    )
+    def populate(self, product_id = None):
+        if product_id:
+            #self.fields['category'].queryset = TestCaseCategory.objects.filter(product__id = product_id)
+            self.fields['o_category'].queryset = TestCaseCategory.objects.filter(product__id = product_id)
+        else:
+            #self.fields['category'].queryset = TestCaseCategory.objects.all()
+            self.fields['o_category'].queryset = TestCaseCategory.objects.all()
