@@ -1044,7 +1044,7 @@ def env_value(request):
     except:
         raise
 
-def caseruns(request):
+def caseruns(request, templ='report/caseruns.html'):
     '''
     View that search caseruns.
     '''
@@ -1054,14 +1054,36 @@ def caseruns(request):
     queries = request.GET
     r_form = RunForm(queries)
     r_form.populate(queries)
+    context = {}
     if r_form.is_valid():
         runs = SmartDjangoQuery(r_form.cleaned_data, TestRun.__name__)
         runs = runs.evaluate()
-        caseruns = get_caseruns_of_runs(runs， queries)
-        return HttpResponse('runs count --- %s, caseruns count --- %s' % (runs.count(), caseruns.count()))
-    return HttpResponse(r_form.errors)
+        caseruns = get_caseruns_of_runs(runs, queries)
+        context['test_case_runs'] = caseruns
+        context['runs'] = runs
+    response = direct_to_template(request, templ, context)
+    return response
 
 def get_caseruns_of_runs(runs, kwargs=None):
+    '''
+    Filtering argument -
+        priority
+        tester
+        plan tag
+    '''
     from tcms.testruns.models import TestCaseRun
+    if kwargs is None: kwargs = {}
+    plan_tag = kwargs.get('plan_tag', None)
+    if plan_tag:
+        runs = runs.filter(plan__tag__name=plan_tag)
     caseruns = TestCaseRun.objects.filter(run__in=runs)
+    priority = kwargs.get('priority', None)
+    if priority:
+        caseruns = caseruns.filter(case__priority__pk=priority)
+    tester = kwargs.get('tester', None)
+    if tester:
+        caseruns = caseruns.filter(tested_by__pk=tester)
+    status = kwargs.get('status', None)
+    if status:
+        caseruns = caseruns.filter(case_run_status__name__iexact=status)
     return caseruns
