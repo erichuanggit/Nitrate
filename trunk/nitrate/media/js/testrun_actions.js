@@ -5,6 +5,7 @@ Nitrate.TestRuns.New = {};
 Nitrate.TestRuns.Edit = {};
 Nitrate.TestRuns.Execute = {}
 Nitrate.TestRuns.Clone = {};
+Nitrate.TestRuns.ChooseRuns={};
 Nitrate.TestRuns.AssignCase = {}
 
 Nitrate.TestRuns.List.on_load = function()
@@ -253,6 +254,16 @@ Nitrate.TestRuns.Clone.on_load = function()
 {
     bind_version_selector_to_product(false);
     bind_build_selector_to_product(false);
+}
+
+Nitrate.TestRuns.ChooseRuns.on_load = function()
+{
+     if($('id_check_all_button')) {
+        $('id_check_all_button').observe('click', function(m) {
+            toggleAllCheckBoxes(this, 'id_table_runs', 'run')
+        })
+    }
+    
 }
 
 Nitrate.TestRuns.AssignCase.on_load= function()
@@ -925,6 +936,40 @@ function showCaseRunsWithSelectedStatus(form, status_id)
     fireEvent(form.getElementsBySelector('input[type="submit"]')[0], 'click');
 }
 
+//Added for choose runs and add cases to those runs
+function serializeRunsFromInputList(table)
+{
+    var elements = $(table).adjacent('input[name="run"]:checked');
+    var case_ids = new Array();
+    for (i in elements) {
+        if (typeof(elements[i].value) == 'string')
+        case_ids.push(elements[i].value);
+    };
+    return case_ids
+}
+
+function insertCasesIntoTestRun(){
+    var answer=confirm("Are you sure to add cases to the run?");
+    if(!answer)
+        return false;
+
+    var trs = serializeRunsFromInputList("id_table_runs");	
+    
+    var elements = document.getElementsByName("case");
+    var case_ids = new Array();
+    var i=0;
+    for (;i <elements.length;i++) {
+        case_ids.push(elements[i].value);
+    };
+    
+    var data_to_post = {};
+    data_to_post['testrun_ids'] = trs;
+    data_to_post['case_ids'] = case_ids;
+
+    var url = "../chooseruns/";
+    postToURL(url, data_to_post, 'POST');
+}
+
 /*
 Functions defined below are using jQuery.
 Author: ctang@redhat.com - 22 March 2011 
@@ -1012,6 +1057,8 @@ function commentCaseRuns(){
     dialog.show();
     
 }
+
+
 
 jQ(document).ready(function(){
     jQ('.btnBlueCaserun').mouseover(function(){

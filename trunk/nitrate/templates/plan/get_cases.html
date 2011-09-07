@@ -41,11 +41,20 @@
 						{% endif %}
 					</ul>
 				</li>
+                <li>
 				{% if perms.testruns.add_testrun %}
-				<li onclick="var p = serialzeCaseForm(this.up(3), this.up(3).next()); postToURL('{% url tcms.testruns.views.new %}', p, 'get');"><span class="new_run icon_plan" title="Make new test run from selected cases">Run</span></li>
-				{% else %}
-				<li><input type="button" class="new_run icon_plan" title="Make new test run from selected cases" value="Run" disabled="true" /></li>
-				{% endif %}
+                <span class='sprites toolbar_run icon_plan'>Run</span>
+                {% endif %}
+                    <ul>
+				        {% if perms.testruns.add_testrun %}
+                        <li><input class="new_run icon_plan" type="button" value="Write new run" onclick="var p = serialzeCaseForm(this.up(6), this.up(6).next()); postToURL('{% url tcms.testruns.views.new %}', p, 'get');"/></li>
+                        <li><input type= "button" class="search icon_plan" value="Add cases to run" onclick="var p = serialzeCaseForm(this.up(6), this.up(6).next()); postToURL('{% url tcms.testplans.views.choose_run test_plan.plan_id %}', p, 'get');" /></li>
+			    	    {% else %}
+				        <li><input type="button" class="new_run icon_plan" title="Make new test run from selected cases" value="Write new run" disabled="true" /></li>
+                        <li><input type="button" class="search icon_plan" value="Add cases to run" disabled="true"></li>
+				        {% endif %}
+                    </ul>
+                </li>
 				<li>
 					{% if perms.testcases.add_testcasetag %}
 					<span class='sprites toolbar_tag icon_plan'>Tag</span>
@@ -96,29 +105,6 @@
 				{% endif %}
 			</span>
 			
-			{% comment %}
-			{% if perms.testcases.change_testcase %}
-			<select name="new_case_status_id" id="new_case_set_status">
-				<option title="please choose a status" value="">Set status</option>
-				{% for case_stat in case_status %}
-				<option value="{{ case_stat.id }}" title="Set selected test cases {{ case_stat.name }}">{{ case_stat.name }}</option>
-				{% endfor %}
-			</select>
-			<select name="new_priority_id">
-				<option title="please choose a priority" value="">Set priority</option>
-				{% for priority in priorities %}
-				<option value="{{ priority.id }}">{{ priority.value }}</option>
-				{% endfor %}
-			</select>
-			{% else %}
-			<select name="new_case_status_id" disabled>
-				<option title="please choose a status" value="">Set status</option>
-			</select>
-			<select name="new_priority_id" disabled>
-				<option title="please choose a priority" value="">Set priority</option>
-			</select>
-			{% endif %}
-			{% endcomment %}
 		</div>
 		<div class="mixbar fixed">
 			<div class="tit" style="width: 50px; float: left; height: 100%; margin: 0px; text-align: center;">Tags:</div>
@@ -126,13 +112,13 @@
 				{% for tag in case_own_tags %}
 				<a href="#testcases">{{ tag }}</a>&nbsp;&nbsp;<span class="grey">-</span>&nbsp;&nbsp;
 				{% empty %}
-				<span class="grey">No tags in cases</div>
+				<span class="grey">No tags in cases</span>
 				{% endfor %}
 			</div>
 		</div>
 	</div>
 	<div class="list_filter" {% ifnotequal REQUEST_CONTENTS.a 'search' %} style="display:none;" {% endifnotequal %}>
-		<div>{% include 'case/form/filter.html' %}</div>
+		{% include 'case/form/filter.html' %}
 		<div class="submit-row bottom">
 		<span class="tit">{{ test_cases|length }} Cases</span>
 			<input type="submit" value="Filter cases" />
@@ -192,7 +178,7 @@
 			</th>
 			<th align="left" width="80px" style="display:none">Text version</th>
 			<th align="left" width="40px">
-				<a class="sort_by_sortkey" "title="Sort by sortkey" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'sortkey')">
+				<a class="sort_by_sortkey" title="Sort by sortkey" href="#testcases" onclick="sortCase(this.up(4), '{{ test_plan.plan_id }}', 'sortkey')">
 					Sort
 				</a>
 			</th>

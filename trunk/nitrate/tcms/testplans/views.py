@@ -288,6 +288,89 @@ def get(request, plan_id, template_name = 'plan/get.html'):
         'xml_form': ImportCasesViaXMLForm(initial = {'a': 'import_cases'}),
     })
 
+@user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
+def choose_run(request, plan_id, template_name = 'plan/choose_testrun.html'):
+    """
+    Choose one run to add cases
+    """   
+    from tcms.testruns.models import TestRun,TestCaseRun 
+    from tcms.testcases.models import TestCase
+    from django.utils import simplejson
+    
+    # Define the default sub module
+
+    SUB_MODULE_NAME = 'runs'
+    if request.method == 'GET':
+        try:
+            testruns = TestRun.objects.all().filter(plan = plan_id)
+            tp = TestPlan.objects.all().get(plan_id = plan_id)
+        except ObjectDoesNotExist, error:
+            raise Http404
+    
+        # Make sure there exists at least one testrun
+        if len(testruns) == 0:
+            return HttpResponse( Prompt.render (
+                request = request,
+                info_type = Prompt.Info,
+                info = 'At least one test run is required for assigning the cases.',
+                next = reverse ('tcms.testplans.views.get', args=[plan_id, ]),
+            ))
+
+        #case is required by a test run
+        if not request.REQUEST.get('case'):
+            return HttpResponse(Prompt.render(
+                request = request,
+                info_type = Prompt.Info,
+                info = 'At least one case is required by a run.',
+                next = reverse('tcms.testplans.views.get', args=[plan_id, ]),
+            ))
+
+        # Ready to write cases to test plan
+        tcs_id = request.REQUEST.getlist('case')
+        tcs = TestCase.objects.filter(case_id__in = request.REQUEST.getlist('case'))
+
+        return direct_to_template(request, template_name, {
+            'module': MODULE_NAME,
+            'sub_module': SUB_MODULE_NAME,
+            'plan_id': plan_id,
+            'plan': tp,
+            'test_run_list': testruns,
+            'test_cases': tcs,
+            'tcids': tcs_id,
+        })
+
+    #Add cases to runs 
+    if request.method == 'POST':
+        choosed_testrun_ids = request.REQUEST.getlist('testrun_ids')  
+        to_be_added_cases = TestCase.objects.all().filter(pk__in = request.REQUEST.getlist('case_ids'))
+
+        # cases and runs are required in this process
+        if len(choosed_testrun_ids) == 0 or len(to_be_added_cases) == 0:
+            return HttpResponse(Prompt.render(
+                request = request,
+                info_type = Prompt.Info,
+                info = 'At least one test run and one case is required to add cases to runs.',
+                next = reverse('tcms.testplans.views.get', args = [plan_id, ]),
+            ))
+    
+        # Adding cases to runs by recursion
+        for tr_id in choosed_testrun_ids:
+            try:
+                cases = TestCaseRun.objects.all().filter(run = tr_id)
+                exist_cases_id = cases.values_list ('case', flat = True)
+                testrun = TestRun.objects.all().get(run_id = tr_id)
+            except ObjectDoesNotExist, error:
+                raise Http404
+            for testcase in to_be_added_cases:
+                if testcase.case_id not in exist_cases_id:
+                    testrun.add_case_run(
+                        case = testcase,
+                    )
+
+        return HttpResponseRedirect ( 
+            reverse ( 'tcms.testplans.views.get', args = [plan_id, ])
+        )
+        
 @user_passes_test(lambda u: u.has_perm('testplans.change_testplan'))
 def edit(request, plan_id, template_name = 'plan/edit.html'):
     """
