@@ -452,5 +452,7 @@ def view_test_run_report(request):
     tmpl = templates.get(report_type, 'report/common/search_run.html')
     queries = fmt_queries(queries)
     request_path = remove_from_request_path(request, 'report_type')
+    if request_path:
+        path_without_build = remove_from_request_path(request_path, 'r_build')
     data.update(locals())
     return direct_to_template(request, tmpl, data)
