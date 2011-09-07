@@ -18,7 +18,7 @@
 				<span>
 				{% for data in reports %}
 					{{ data.0 }},&nbsp;&nbsp;
-				{% endfor %}<a href="{% url testrun_report %}?{{ request_path }}&report_type=per_plan_tag_report" style="font-weight:normal; text-decoration:underline;">Per Tag View</a>
+				{% endfor %}<a href="{% url testrun_report %}{{ request_path }}&report_type=per_plan_tag_report" style="font-weight:normal; text-decoration:underline;">Per Tag View</a>
 				</span>
 				
 			</li>

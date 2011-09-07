@@ -57,15 +57,15 @@
 					{% endifequal %}
 					<td><span>{{ tester }}</span></td>
 					<td><span>{{summed_runs|length}}</span></td>
-					<td><a href="/caseruns/{{ request_path }}&tested_by={{tester.pk}}">{{ caseruns|length }}</a></td>
-					<td><a href="{{ request_path }}">{{ percentages.idle }}</a></td>
-					<td>{{ percentages.running }}</td>
-					<td>{{ percentages.paused }}</td>
-					<td>{{ percentages.passed }}</td>
-					<td>{{ percentages.failed }}</td>
-					<td>{{ percentages.blocked }}</td>
-					<td>{{ percentages.error }}</td>
-					<td>{{ percentages.waived }}</td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}">{{ caseruns|length }}</a></td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}&status=idle">{{ percentages.idle }}</a></td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}&status=running">{{ percentages.running }}</a></td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}&status=paused">{{ percentages.paused }}</a></td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}&status=passed">{{ percentages.passed }}</a></td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}&status=failed">{{ percentages.failed }}</a></td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}&status=blocked">{{ percentages.blocked }}</a></td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}&status=error">{{ percentages.error }}</a></td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}&status=waived">{{ percentages.waived }}</a></td>
 				</tr>
 				{% endfor %}
 			{% endfor %}
@@ -74,15 +74,15 @@
 				<tr>
 					<td><span>{{ tester }}</span></td>
 					<td><span>{{summed_runs|length}}</span></td>
-					<td><a href="/caseruns/{{ request_path }}&tested_by={{tester.pk}}">{{caseruns|length}}</a></td>
-					<td>{{ percentages.idle }}</td>
-					<td>{{ percentages.running }}</td>
-					<td>{{ percentages.paused }}</td>
-					<td>{{ percentages.passed }}</td>
-					<td>{{ percentages.failed }}</td>
-					<td>{{ percentages.blocked }}</td>
-					<td>{{ percentages.error }}</td>
-					<td>{{ percentages.waived }}</td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}">{{ caseruns|length }}</a></td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}&status=idle">{{ percentages.idle }}</a></td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}&status=running">{{ percentages.running }}</a></td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}&status=running">{{ percentages.paused }}</a></td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}&status=passed">{{ percentages.passed }}</a></td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}&status=failed">{{ percentages.failed }}</a></td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}&status=blocked">{{ percentages.blocked }}</a></td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}&status=error">{{ percentages.error }}</a></td>
+					<td><a href="/caseruns/{{ request_path }}&tester={{tester.pk}}&status=waived">{{ percentages.waived }}</a></td>
 				</tr>
 			{% endfor %}
 		{% endif %}

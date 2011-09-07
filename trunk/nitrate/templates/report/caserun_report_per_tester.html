@@ -39,14 +39,14 @@
 				<td rowspan="{[runs|length]}" class="bgRowspan"><span>{{ build }}</span></td>
 			{% endifequal %}
 			<td><span><a href="#">{{ run }}</a></span></td>
-			<td><span>{{ run.idle_count }}</span></td>
-			<td>{{ percentages.running }}</td>
-			<td>{{ percentages.paused }}</td>
-			<td>{{ percentages.passed }}</td>
-			<td>{{ percentages.failed }}</td>
-			<td>{{ percentages.blocked }}</td>
-			<td>{{ percentages.error }}</td>
-			<td>{{ percentages.waived }}</td>
+			<td><span><a href="/caseruns/{{path_without_build}}&r_build={{build.pk}}&tester={{tester.pk}}&status=idle">{{ run.idle_count }}</a></span></td>
+			<td><a href="/caseruns/{{path_without_build}}&r_build={{build.pk}}&tester={{tester.pk}}&status=running">{{ percentages.running }}</td>
+			<td><a href="/caseruns/{{path_without_build}}&r_build={{build.pk}}&tester={{tester.pk}}&status=paused">{{ percentages.paused }}</td>
+			<td><a href="/caseruns/{{path_without_build}}&r_build={{build.pk}}&tester={{tester.pk}}&status=passed">{{ percentages.passed }}</td>
+			<td><a href="/caseruns/{{path_without_build}}&r_build={{build.pk}}&tester={{tester.pk}}&status=failed">{{ percentages.failed }}</td>
+			<td><a href="/caseruns/{{path_without_build}}&r_build={{build.pk}}&tester={{tester.pk}}&status=blocked">{{ percentages.blocked }}</td>
+			<td><a href="/caseruns/{{path_without_build}}&r_build={{build.pk}}&tester={{tester.pk}}&status=error">{{ percentages.error }}</td>
+			<td><a href="/caseruns/{{path_without_build}}&r_build={{build.pk}}&tester={{tester.pk}}&status=waived">{{ percentages.waived }}</td>
 		</tr>
 		{% endfor %}
 	</table>
