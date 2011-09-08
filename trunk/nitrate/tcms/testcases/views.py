@@ -979,7 +979,8 @@ def category(request):
     # We may disconnect the component from case product in future.
     from tcms.core import forms
     from forms import CaseCategoryForm
-    
+    from testcases.models import TestCase, TestCaseCategory
+
     class CategoryActions(object):
         """Category actions"""
         def __init__(self, request, tcs):
@@ -1001,49 +1002,13 @@ def category(request):
             return 1, form
         
         def __check_perms(self, perm):
-            if not self.request.user.has_perm('testcases.' + perm + '_testcasecomponent'):
+            if not self.request.user.has_perm('testcases.' + perm + '_testcasecateory'):
                 self.ajax_response['rc'] = 1
                 self.ajax_response['response'] = 'Permission denied - ' + perm
                
                 return 0, self.render_ajax(self.ajax_response)
                 
             return 1, True
-       
-        def add(self):
-            is_valid, perm = self.__check_perms('add')
-            if not is_valid:
-                return perm
-            
-            is_valid, form = self.__check_form_validation()
-            if not is_valid:
-                return form
-            
-            for tc in self.tcs:
-                for c in form.cleaned_data['o_category']:
-                    try:
-                        tc.add_category(category = c)
-                    except:
-                        self.ajax_response['errors_list'].append({'case': tc.pk, 'category': c.pk})
-            
-            return self.render_ajax(self.ajax_response)
-        
-        def remove(self):
-            is_valid, perm = self.__check_perms('delete')
-            if not is_valid:
-                return perm
-            
-            is_valid, form = self.__check_form_validation()
-            if not is_valid:
-                return form
-            
-            for tc in self.tcs:
-                for c in form.cleaned_data['o_category']:
-                    try:
-                        tc.remove_category(category = c)
-                    except:
-                        self.ajax_response['errors_list'].append({'case': tc.pk, 'category': c.pk})
-            
-            return self.render_ajax(self.ajax_response)
         
         def update(self):
             is_valid, perm = self.__check_perms('change')
@@ -1054,12 +1019,10 @@ def category(request):
             if not is_valid:
                 return form
             
-            #self.tcs.update(category = self.form.cleaned_data['category'])
+            categorys = TestCaseCategory.objects.get(pk = request.REQUEST.get('o_category'))
             for tc in self.tcs:
-                tc.clear_categorys()
-                for c in form.cleaned_data['o_category']:
-                    tc.add_category(category = c)
-            
+                 tc.category = categorys
+                 tc.save()
             return self.render_ajax(self.ajax_response)
         
         def render_ajax(self, response):
@@ -1068,7 +1031,6 @@ def category(request):
         def render_form(self):
             form = CaseCategoryForm(initial={
                 'product': self.product_id,
-                #'category': self.request.REQUEST.get('category'),
                 'category': self.request.REQUEST.get('o_category'),
             })
             form.populate(product_id = self.product_id)
@@ -1078,7 +1040,7 @@ def category(request):
     tcs = TestCase.objects.filter(pk__in = request.REQUEST.getlist('case'))
     if not tcs:
         raise Http404
-    
+
     cas = CategoryActions(request = request, tcs = tcs)
     func = getattr(cas, request.REQUEST.get('a', 'render_form').lower())
     return func()

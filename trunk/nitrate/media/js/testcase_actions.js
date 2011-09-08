@@ -638,14 +638,14 @@ function renderCategoryForm(container, parameters, form_observe)
         var notice = 'Select Category';
         
         var h = new Element('input', {'type': 'hidden', 'name': 'a', 'value': 'add'});
-        var a = new Element('input', {'type': 'submit', 'value': 'Add'});
+        var a = new Element('input', {'type': 'submit', 'value': 'Select'});
         //var r = new Element('input', {'type': 'submit', 'value': 'Remove'});
         var c = new Element('label');
         c.appendChild(h);
         c.appendChild(a);
         //c.appendChild(r);
         
-        a.observe('click', function(e) { h.value = 'add'});
+        a.observe('click', function(e) { h.value = 'update'});
         //r.observe('click', function(e) {h.value = 'remove'});
         
         var f = constructForm(d.innerHTML, action, form_observe, notice, c);
