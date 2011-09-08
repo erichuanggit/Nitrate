@@ -970,6 +970,81 @@ def component(request):
     func = getattr(cas, request.REQUEST.get('a', 'render_form').lower())
     return func()
 
+@user_passes_test(lambda u: u.has_perm('testcases.add_testcasecomponent'))
+def category(request):
+    """
+    Management test case categorys
+    """
+    # FIXME: It will update product/category/component at one time so far.
+    # We may disconnect the component from case product in future.
+    from tcms.core import forms
+    from forms import CaseCategoryForm
+    from testcases.models import TestCase, TestCaseCategory
+
+    class CategoryActions(object):
+        """Category actions"""
+        def __init__(self, request, tcs):
+            self.ajax_response = {'rc': 0, 'response': 'ok', 'errors_list': []}
+            self.request = request
+            self.tcs = tcs
+            self.product_id = request.REQUEST.get('product')
+        
+        def __get_form(self):
+            self.form = CaseCategoryForm(request.REQUEST)
+            self.form.populate(product_id = self.product_id)
+            return self.form
+        
+        def __check_form_validation(self):
+            form = self.__get_form()
+            if not form.is_valid():
+                return 0, self.render_ajax(forms.errors_to_list(form))
+            
+            return 1, form
+        
+        def __check_perms(self, perm):
+            if not self.request.user.has_perm('testcases.' + perm + '_testcasecateory'):
+                self.ajax_response['rc'] = 1
+                self.ajax_response['response'] = 'Permission denied - ' + perm
+               
+                return 0, self.render_ajax(self.ajax_response)
+                
+            return 1, True
+        
+        def update(self):
+            is_valid, perm = self.__check_perms('change')
+            if not is_valid:
+                return perm
+            
+            is_valid, form = self.__check_form_validation()
+            if not is_valid:
+                return form
+            
+            categorys = TestCaseCategory.objects.get(pk = request.REQUEST.get('o_category'))
+            for tc in self.tcs:
+                 tc.category = categorys
+                 tc.save()
+            return self.render_ajax(self.ajax_response)
+        
+        def render_ajax(self, response):
+            return HttpResponse(simplejson.dumps(self.ajax_response))
+        
+        def render_form(self):
+            form = CaseCategoryForm(initial={
+                'product': self.product_id,
+                'category': self.request.REQUEST.get('o_category'),
+            })
+            form.populate(product_id = self.product_id)
+            
+            return HttpResponse(form.as_p())
+    
+    tcs = TestCase.objects.filter(pk__in = request.REQUEST.getlist('case'))
+    if not tcs:
+        raise Http404
+
+    cas = CategoryActions(request = request, tcs = tcs)
+    func = getattr(cas, request.REQUEST.get('a', 'render_form').lower())
+    return func()
+
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcaseattachment'))
 def attachment(request, case_id, template_name='case/attachment.html'):
     """Manage test case attachments"""

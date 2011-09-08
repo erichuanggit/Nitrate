@@ -880,6 +880,49 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             })
         };
         
+        if(form.adjacent('input.btn_category').length > 0) {
+            var element = form.adjacent('input.btn_category')[0];
+            element.observe('click', function(e) {
+                if(this.diabled)
+                    return false;
+                var c = getDialog();
+                var params = {
+                    'case': serializeCaseFromInputList(table),
+                    'product': Nitrate.TestPlans.Instance.fields.product_id
+                };
+                if(params['case'] && params['case'].length == 0){
+                    alert(default_messages.alert.no_case_selected);
+                    return false;
+                }
+                var form_observe = function(e) {
+                    e.stop();
+                    
+                    var params = this.serialize(true);
+                    params['case'] = serializeCaseFromInputList(table);
+                    if(params['case'].length == 0){
+                        alert(default_messages.alert.no_case_selected);
+                        return false;
+                    }
+                    
+                    var url = getURLParam().url_cases_category;
+                    var callback = function(t) {
+                        returnobj = t.responseText.evalJSON(true);
+                        
+                        if (returnobj.rc != 0) {
+                            alert(returnobj.response);
+                            return false;
+                        }
+                        parameters['case'] = params['case']
+                        constructPlanDetailsCasesZone(container, plan_id, parameters);
+                        clearDialog(c);
+                    }
+                    
+                    updateCaseCategory(url, params, callback);
+                }
+                renderCategoryForm(c, params, form_observe);
+            })
+        };
+
         if(form.adjacent('input.btn_default_tester').length != 0) {
             var element = form.adjacent('input.btn_default_tester')[0];
             element.observe('click', function(e) {
