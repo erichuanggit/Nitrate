@@ -5,7 +5,7 @@ Nitrate.TestRuns.New = {};
 Nitrate.TestRuns.Edit = {};
 Nitrate.TestRuns.Execute = {}
 Nitrate.TestRuns.Clone = {};
-Nitrate.TestRuns.ChooseRuns={};
+Nitrate.TestRuns.ChooseRuns = {};
 Nitrate.TestRuns.AssignCase = {}
 
 Nitrate.TestRuns.List.on_load = function()

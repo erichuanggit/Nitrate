@@ -308,7 +308,7 @@ def choose_run(request, plan_id, template_name = 'plan/choose_testrun.html'):
             raise Http404
     
         # Make sure there exists at least one testrun
-        if len(testruns) == 0:
+        if not len(testruns):
             return HttpResponse( Prompt.render (
                 request = request,
                 info_type = Prompt.Info,
@@ -345,7 +345,7 @@ def choose_run(request, plan_id, template_name = 'plan/choose_testrun.html'):
         to_be_added_cases = TestCase.objects.all().filter(pk__in = request.REQUEST.getlist('case_ids'))
 
         # cases and runs are required in this process
-        if len(choosed_testrun_ids) == 0 or len(to_be_added_cases) == 0:
+        if not len(choosed_testrun_ids) or not len(to_be_added_cases):
             return HttpResponse(Prompt.render(
                 request = request,
                 info_type = Prompt.Info,
