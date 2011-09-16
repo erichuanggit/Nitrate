@@ -164,6 +164,7 @@ function getURLParam()
     param.url_create_case = '/case/create/';
     param.url_cases_automated = '/cases/automated/';
     param.url_cases_component = '/cases/component/';
+    param.url_cases_category = '/cases/category/';
     param.url_case_details = '/case/' + id + '/';
     param.url_case_plan = '/case/' + id + '/plan/';
     param.url_modify_case = '/case/' + id + '/modify/';

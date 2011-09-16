@@ -121,6 +121,7 @@ Nitrate.TestCases.Details.on_load = function()
         };
         
         renderComponentForm(getDialog(), params, form_observe);
+		renderCategoryForm(getDialog(), garams, form_observe);
     });
     
     $('id_form_case_component').observe('submit', function(e) {
@@ -624,7 +625,56 @@ function renderComponentForm(container, parameters, form_observe)
     })
 }
 
+
+function renderCategoryForm(container, parameters, form_observe)
+{
+    var d = new Element('div');
+    if(!container)
+    var container = getDialog();
+    container.show();
+    
+    var callback = function(t) {
+        var action = getURLParam().url_cases_category;
+        var notice = 'Select Category';
+        
+        var h = new Element('input', {'type': 'hidden', 'name': 'a', 'value': 'add'});
+        var a = new Element('input', {'type': 'submit', 'value': 'Select'});
+        //var r = new Element('input', {'type': 'submit', 'value': 'Remove'});
+        var c = new Element('label');
+        c.appendChild(h);
+        c.appendChild(a);
+        //c.appendChild(r);
+        
+        a.observe('click', function(e) { h.value = 'update'});
+        //r.observe('click', function(e) {h.value = 'remove'});
+        
+        var f = constructForm(d.innerHTML, action, form_observe, notice, c);
+        container.update(f);
+        
+        bind_category_selector_to_product(false, false, $('id_product'), $('id_o_category'));
+    }
+    
+    var url = getURLParam().url_cases_category;
+    
+    new Ajax.Updater(d, url, {
+        method: 'get',
+        parameters: parameters,
+        onComplete: callback,
+        onFailure: html_failure,
+    })
+}
+
 function updateCaseComponent(url, parameters, callback)
+{
+    new Ajax.Request(url, {
+        method: 'post',
+        parameters: parameters,
+        onSuccess: callback,
+        onFailure: json_failure
+    })
+}
+
+function updateCaseCategory(url, parameters, callback)
 {
     new Ajax.Request(url, {
         method: 'post',
