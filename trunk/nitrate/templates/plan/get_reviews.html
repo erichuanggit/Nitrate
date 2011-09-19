@@ -20,7 +20,7 @@
 	</thead>
 	<tbody>
 		{% for test_review in test_reviews %}
-		<tr class="{% cycle 'odd' 'even' %}">
+		<tr class="{% cycle 'odd' 'even' %}">	
 			<td valign="top">
 				<a href="{% url tcms.testreviews.views.get test_review.id %}">{{ test_review.id }}</a>
 			</td>
