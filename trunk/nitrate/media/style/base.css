@@ -863,7 +863,7 @@ ul.data_content_title li{ display:inline-block; margin-left:3px;}
 .list .disable { text-decoration:line-through; }
 .list .hide{ background:#F3F8FC; }
 .list .hide h4{ margin:0px; color:#333333; font-size:1.0em; }
-.list .hide li{ margin-left:12px; list-style:none;}
+.list .hide li{ margin-left:12px;}
 .list .hide li td{border:0px; padding:0 4px 0 0; line-height:18px;}
 .list .right_panel{ border:1px solid #ccc; background:#fff; vertical-align:top; padding:10px;}
 .list .listGroupBlue{background:#C2DFFF; padding:0px 5px; color:#000000;}
@@ -1057,7 +1057,7 @@ ul.data_content_title li{ display:inline-block; margin-left:3px;}
 .caserunDetail .caserunInfo .container{background:#FFFFFF; border:1px solid #CCCCCC; margin-bottom:5px; padding:0 9px;}
 .caserunDetail .caserunInfo .container h4{padding:9px 0 9px 9px; line-height:12px;}
 .caserunDetail .caserunInfo ul{padding-top:9px;}
-.caserunDetail .caserunInfo ul li{ line-height:18px; border:0px; padding-bottom:12px; padding-left:21px; margin:0px; background:url(../images/list_style_type01.png) no-repeat 9px 6px;}
+.caserunDetail .caserunInfo ul li{ line-height:18px; border:0px; padding-bottom:12px; padding-left:21px; margin:0px; background:url(../images/list_style_type01.png) no-repeat 9px 6px; list-style:none;}
 .caserunDetail .caserunInfo ul li span{color:#888888; padding-right:12px;}
 .caserunDetail .caserunInfo ul li.bug{ padding-bottom:6px; padding-left:9px; margin:0px; background:none;}
 .caserunDetail .caserunInfo ul li.bug span{padding-left:6px; padding-right:6px;}
@@ -1065,6 +1065,9 @@ ul.data_content_title li{ display:inline-block; margin-left:3px;}
 .caserunDetail .caseInfo .container{background:#FFFFFF; border:1px solid #CCCCCC; margin-bottom:5px; min-height:90px;}
 .caserunDetail .caseInfo .container h4{padding:9px 0 9px 9px; line-height:12px; }
 .caserunDetail .caseInfo .container .content{padding:0 9px 9px 9px; color:#545454; overflow:auto;}
+.caserunDetail .caseInfo .container .content ul{padding-left:20px;}
+.caserunDetail .caseInfo .container .content ol{padding-left:20px;}
+.caserunDetail .caseInfo .container .content li{padding-left:0px; margin-left:0px;}
 .caserunDetail .caseInfo ul{padding:5px 0 0 0;}
 .caserunDetail .caseInfo ul li{padding:0 0 0 9px; margin:0px; line-height:21px;}
 .caserunDetail .commentdelete{float:none; display:inline; background:url(../images/remove_small.png) 0px 5px no-repeat; padding:0; margin:0; cursor:pointer; width:9px; height:15px;}
