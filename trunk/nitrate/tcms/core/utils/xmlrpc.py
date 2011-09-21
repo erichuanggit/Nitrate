@@ -18,7 +18,7 @@
 
 import datetime
 
-from django.db.models.fields.related import ForeignKey
+from django.db.models.fields.related import ForeignKey, ManyToManyField
 from tcms.core.forms.widgets import SECONDS_PER_MIN, SECONDS_PER_HOUR, SECONDS_PER_DAY
 
 class XMLRPCSerializer(object):
@@ -66,36 +66,31 @@ class XMLRPCSerializer(object):
         """
         if not hasattr(self.model, '__dict__'):
             raise TypeError("Models or Dictionary is required")
-        
         response = {}
-        
         opts = self.model._meta
-        for field in opts.fields:
-            f = getattr(self.model, field.name)
-
-            if isinstance(f, datetime.datetime):
-                f = datetime.datetime.strftime(f, "%Y-%m-%d %H:%M:%S")
-
-            if isinstance(f, datetime.timedelta):
-                total_seconds = f.seconds + (f.days * SECONDS_PER_DAY)
-                f = '%02i:%02i:%02i' % (
+        for field in opts.local_fields:
+            value = getattr(self.model, field.name)
+            if isinstance(value, datetime.datetime):
+                value = datetime.datetime.strftime(value, "%Y-%m-%d %H:%M:%S")
+            if isinstance(value, datetime.timedelta):
+                total_seconds = value.seconds + (value.days * SECONDS_PER_DAY)
+                value = '%02i:%02i:%02i' % (
                     total_seconds / SECONDS_PER_HOUR, # hours
                     # minutes - Total seconds subtract the used hours
                     total_seconds / SECONDS_PER_MIN - total_seconds / SECONDS_PER_HOUR * 60,
                     total_seconds % SECONDS_PER_MIN # seconds
                 )
-                del total_seconds
-
-            response[field.name] = str(f)
-            
             if isinstance(field, ForeignKey):
                 fk_id = "%s_id" % field.name
                 response[fk_id] = getattr(self.model, fk_id)
-
-        #TODO: sort the response dict
-        #response = dict(sorted(response.items(), key=lambda d: d[0]))
+                value = str(value)
+            response[field.name] = value
+        for field in opts.local_many_to_many:
+            value = getattr(self.model, field.name)
+            value = value.values_list('pk', flat=True)
+            response[field.name] = list(value)
         return response
-    
+
     def serialize_queryset(self):
         """
         Check the fields of QuerySet and convert the data
