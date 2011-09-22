@@ -261,7 +261,8 @@ class NitrateXmlrpc(object):
         self.server = xmlrpclib.ServerProxy(
             url,
             transport = self._transport,
-            verbose = VERBOSE
+            verbose = VERBOSE,
+            allow_none = 1
         )
         
         # Login, get a cookie into our cookie jar:
@@ -460,7 +461,8 @@ class NitrateKerbXmlrpc(NitrateXmlrpc):
         self.server = xmlrpclib.ServerProxy(
             url,
             transport = self._transport,
-            verbose = VERBOSE
+            verbose = VERBOSE,
+            allow_none = 1
         )
         
         # Login, get a cookie into our cookie jar:
