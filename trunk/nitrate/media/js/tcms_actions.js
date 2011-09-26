@@ -1353,3 +1353,11 @@ function popupAddAnotherWindow(triggeringLink, parameters)
     win.focus();
     return false;
 }
+
+function exportCase(url, case_ids){
+    if(case_ids.case.length==0){
+        alert('At least one case is required.');
+        return false;
+    }
+    postToURL(url, case_ids);
+}

@@ -27,7 +27,7 @@
 						<li><input type="button" class="import icon_plan" disabled="true" value="Import cases from XML"	/></li>
 						<li><input type="button" class="search icon_plan" disabled="true" value="Add cases from other plans"	 /></li>
 						{% endif %}
-						<li><input type="button" class="export icon_plan" title="Export selected cases into XML file" value="Export" onclick="postToURL('{% url tcms.testcases.views.export %}', serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
+						<li><input type="button" class="export icon_plan" title="Export selected cases into XML file" value="Export" onclick="exportCase('{% url tcms.testcases.views.export %}', serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
 						<li><input type="button" class="print_view icon_plan" value="Print"  title="print view of selected cases" onclick="postToURL('{% url tcms.testcases.views.printable %}', serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
 						{% if perms.testcases.add_testcase %}
 						<li><input type="button" class="clone icon_plan" value="Clone" title="Clone selected cases to another test plan" onclick="postToURL('{% url tcms.testcases.views.clone %}', serialzeCaseForm(this.up(6), this.up(6).next()), 'get');" /></li>
