@@ -44,6 +44,8 @@
                 <li>
 				{% if perms.testruns.add_testrun %}
                 <span class='sprites toolbar_run icon_plan'>Run</span>
+                {% else %}
+                <span class='sprites toolbar_run_disabled icon_plan'>Run</span>
                 {% endif %}
                     <ul>
 				        {% if perms.testruns.add_testrun %}
