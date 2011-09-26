@@ -114,7 +114,8 @@ class BaseRunForm(forms.Form):
     )
     keep_assignee = forms.BooleanField(
         label = 'Reserve Assignee', widget = forms.CheckboxInput(),
-        required = False
+        required = False,
+        initial = True
     )
     def populate(self, product_id):
         # We can dynamically set choices for a form field:
