@@ -373,7 +373,6 @@ def create(request, values):
       | estimated_time             | String         | Optional  | HH:MM:SS Format             |
       | is_automated               | Integer        | Optional  | 0: Manual, 1: Auto, 2: Both |
       | is_automated_proposed      | Boolean        | Optional  | Default 0                   |
-      | sortkey                    | Integer        | Optional  |                             |
       | script                     | String         | Optional  |                             |
       | arguments                  | String         | Optional  |                             |
       | requirement                | String         | Optional  |                             |
@@ -1016,7 +1015,6 @@ def update(request, case_ids, values):
         | estimated_time        | String         | Optional                                |
         | is_automated          | Integer        | Optional(0 - Manual, 1 - Auto, 2 - Both)|
         | is_automated_proposed | Boolean        | Optional                                |
-        | sortkey               | Integer        | Optional                                |
         | script                | String         | Optional                                |
         | arguments             | String         | Optional                                |
         | summary               | String         | Optional                                |
