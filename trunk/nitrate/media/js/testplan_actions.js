@@ -624,7 +624,7 @@ function unlinkCasePlan(container, parameters)
         return false;
     }
     
-    var c = confirm("Are you sure you want to remove test case(s) from this test plan?");
+    var c = confirm("Are you sure you want to delete test case(s) from this test plan?");
     if (!c)
         return false;
     
