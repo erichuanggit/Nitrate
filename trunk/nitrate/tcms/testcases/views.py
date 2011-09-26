@@ -29,6 +29,7 @@ from tcms.core import forms
 from tcms.core.utils import Prompt
 
 from models import TestCase, TestCaseStatus, TestCaseAttachment, TestCasePlan
+from models import TestCaseCategory
 from tcms.testplans.models import TestPlan
 from itertools import groupby
 from tcms.search.order import order_case_queryset
@@ -979,7 +980,6 @@ def category(request):
     # We may disconnect the component from case product in future.
     from tcms.core import forms
     from forms import CaseCategoryForm
-    from testcases.models import TestCase, TestCaseCategory
 
     class CategoryActions(object):
         """Category actions"""
@@ -1021,8 +1021,8 @@ def category(request):
             
             categorys = TestCaseCategory.objects.get(pk = request.REQUEST.get('o_category'))
             for tc in self.tcs:
-                 tc.category = categorys
-                 tc.save()
+                tc.category = categorys
+                tc.save()
             return self.render_ajax(self.ajax_response)
         
         def render_ajax(self, response):
