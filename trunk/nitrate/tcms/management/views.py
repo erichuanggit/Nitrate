@@ -347,7 +347,7 @@ def environment_properties(request, template_name = 'environment/property.html')
     
     return direct_to_template(request, template_name, {
         'message': message,
-        'properties': TCMSEnvProperty.objects.all()
+        'properties': TCMSEnvProperty.objects.all().order_by('-is_active')
     })
 
 def environment_property_values(request, template_name = 'environment/ajax/property_values.html'):
