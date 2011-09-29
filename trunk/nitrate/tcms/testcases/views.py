@@ -1002,12 +1002,6 @@ def category(request):
             return 1, form
         
         def __check_perms(self, perm):
-            if not self.request.user.has_perm('testcases.' + perm + '_testcasecateory'):
-                self.ajax_response['rc'] = 1
-                self.ajax_response['response'] = 'Permission denied - ' + perm
-               
-                return 0, self.render_ajax(self.ajax_response)
-                
             return 1, True
         
         def update(self):
