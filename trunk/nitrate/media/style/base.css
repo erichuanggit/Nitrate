@@ -115,7 +115,7 @@ a:link.execute,a:visited.execute{ background:url(../images/sprites.png) no-repea
 option{margin-left:3px;}
 .case_detail .ul-no-format{ list-style-type:disc}
 .ul-no-format{margin:0px;padding:0px; list-style:none}
-.ul-no-format li{clear:both;margin-top:0px;}
+.ul-no-format li{clear:both;margin-top:0px; list-style:none;}
 .word-wrap pre{white-space:pre-wrap;word-break:break-all;word-wrap:break-word;width:100%;padding-left:10px;font-family : Verdana,Arial,sans-serif,Helvetica,Georgia;}
 .word-wrap p{ padding-left:10px;}
 pre{white-space:pre-wrap;word-break:break-all;word-wrap:break-word;width:100%;padding-left:10px;font-family : Verdana,Arial,sans-serif,Helvetica,Georgia;}
