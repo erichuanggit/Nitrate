@@ -117,10 +117,13 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Clone.on_load);
 					</td>
 				</tr>
             <tr>
-                <div>
-                <td>{{ clone_form.keep_status }} {{ clone_form.keep_status.label }}</td>
-                <td>{{ clone_form.keep_assignee }} {{ clone_form.keep_assignee.label }}</td>
-                </div>
+                <td>
+                    <label>Clone Setting</label>
+                </td>
+                <td>
+                    {{ clone_form.keep_status }} {{ clone_form.keep_status.label }}&nbsp;&nbsp;&nbsp;&nbsp;
+                    {{ clone_form.keep_assignee }} {{ clone_form.keep_assignee.label }}
+                </td>
             </tr>
 			</table>
 			<div class="submit-row ">
