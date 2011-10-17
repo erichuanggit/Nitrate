@@ -546,11 +546,14 @@ def edit(request, case_id, template_name = 'case/edit.html'):
             try:
                 fields_text = ['action', 'effect', 'setup', 'breakdown']
                 latest_text = tc.latest_text()
-
+                  
                 for field in fields_text:
-                    if (getattr(latest_text, field) != form.cleaned_data[field]):
+                    form_cleaned = form.cleaned_data[field]
+                    if not (getattr(latest_text, field) or form_cleaned):
+                        continue
+                    if (getattr(latest_text, field) != form_cleaned):
                         tc.log_action(request.user, ' Case %s changed from %s to %s in edit page.' % (
-                            field, getattr(latest_text, field), form.cleaned_data[field]
+                            field, getattr(latest_text, field) or None, form_cleaned or None
                         ))
             except ObjectDoesNotExist, error:
                 pass
