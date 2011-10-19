@@ -36,13 +36,11 @@
 				{% endif %}
 			</td>
 			<td>
-				<div class="progress-bar">
+				<div class="progress-bar" title="failed:{{ test_run.failed_case_run_percent|default:"0" }}%">
 					<div class="progress-inner" style="width:{{ test_run.completed_case_run_percent|default:"0" }}%;">
-						<a href="#" title="faild:{{ test_run.failed_case_run_percent|default:"0" }}%">
 							<div class="progress-failed" style="width:{{ test_run.failed_case_run_percent|default:"0" }}%;">
-								&nbsp;
+								
 							</div>
-						</a>
 					</div>
 					<div class="percent">{{ test_run.completed_case_run_percent|default:"0" }}%</div>
 				</div>
