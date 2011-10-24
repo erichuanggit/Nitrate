@@ -117,7 +117,7 @@ Nitrate.TestCases.Instance = {
 				</div>
 				<div class="listinfo">
 					<div class="title grey">Notes&nbsp;:</div>
-					<div class="name"><span id="display_priority" >{{ test_case.notes|urlize|linebreaksbr }}</span></div>
+					<div class="name"><p id="display_priority" >{{ test_case.notes|urlize|linebreaksbr }}</p></div>
 				</div>
 			</div>
 			<div class="rightlistinfo">
@@ -165,106 +165,6 @@ Nitrate.TestCases.Instance = {
 			<div class="clear"></div>
 		</fieldset>
 	</div>
-	<!--
-	<div class="Detailform">
-		<fieldset class="no-border">
-			<div class="editor-side">
-				{% comment %}
-				<div class="cell">
-					<div class="sd">Component:</div>
-					<dl class="ul-no-format" style="float:left">
-						{% for component in test_case.component.all %}
-						<dd id="display_category" >{{ component.name }}</dd>
-						{% empty %}
-						<dd class="grey">No component</dd>
-						{% endfor %}
-					</dl>
-				</div>
-				{% endcomment %}
-				<div class="cell">
-					<div class="sd">Default Tester&nbsp;:</div>
-					<div >
-						{% if test_case.default_tester	%}
-						<span id="display_default_tester"><a href="{% url tcms.profiles.views.profile test_case.default_tester.username %}">{{ test_case.default_tester.email }}</a></span>
-						{% else %}
-						<span >No default tester</span>
-						{% endif %}
-					</div>
-				</div>
-				<div class="cell">
-					<div class="sd">Product&nbsp;:</div>
-					<div>
-						<span>{{ test_case.category.product }}</span>
-					</div>
-				</div>
-				<div class="cell">
-					<div class="sd">Category&nbsp;:</div>
-					<div>
-						<span id="display_category" >{{ test_case.category }}</span>
-					</div>
-				</div>
-				<div class="cell">
-					<div class="sd">Estimated Time&nbsp;:</div>
-					<div id="display_estimated_time">{{ test_case.estimated_time }}</div>
-				</div>
-				<div class="cell">
-					<div class="sd">Priority&nbsp;:</div>
-					<div><span id="display_priority" >{{ test_case.priority }}</span></div>
-				</div>
-				<div class="cell">
-					<div class="sd">Status&nbsp;:</div>
-					<div><span id="display_priority" >{{ test_case.case_status }}</span></div>
-				</div>
-				<div class="cell">
-					<div class="sd">Notes&nbsp;:</div>
-					<div><span id="display_priority" >{{ test_case.notes|urlize|linebreaksbr }}</span></div>
-				</div>
-			</div>
-			<div class="editor-side">
-				<div class="cell">
-					<div class="sd">Author&nbsp;:</div>
-					<span class="name">
-						<a href="{% url tcms.profiles.views.profile test_case.author.username %}">
-							{{ test_case.author.email }}
-						</a>
-					</span>
-				</div>
-				<div class="cell">
-					<div class="sd">Created&nbsp;:</div>
-					<div><span class="name">{{ test_case.create_date }}</span></div>
-				</div>	
-				<div class="cell">
-					<div class="sd">Automated&nbsp;:</div>
-					<div class="name">{{ test_case.get_is_automated_status }}</div>
-				</div>
-				<div class="cell">
-					<div class="sd">Requirement&nbsp;:</div>
-					<div>
-						<span id="display_requirement" class="name {% if not test_case.requirement %}grey{% endif %}" >{{ test_case.requirement|default:'None' }}</span>
-					</div>
-				</div>
-				<div class="cell">
-					<div class="sd">Script&nbsp;:</div>
-					<div>
-						<span id="display_script" class="name {% if not test_case.script %}grey{% endif %}">{{ test_case.script|default:'None' }}</span>
-					</div>
-				</div>
-				<div class="cell">
-					<div class="sd"><span>Alias&nbsp;:</span></div>
-					<div>
-						<span id="display_script" class="name {% if not test_case.alias %}grey{% endif %}">{{ test_case.alias|default:'None' }}</span>
-					</div>
-				</div>
-				<div class="cell">
-					<div class="sd"><span>Arguments&nbsp;:</span></div>
-					<div>
-						<span id="display_script" class="name {% if not test_case.arguments %}grey{% endif %}">{{ test_case.arguments|default:'None' }}</span>
-					</div>
-				</div>
-			</div>
-		</fieldset>
-	</div>
-	-->
 	
 	<div class="Detailform border-1">
 		<ul id="contentTab" class="content_tab" >
