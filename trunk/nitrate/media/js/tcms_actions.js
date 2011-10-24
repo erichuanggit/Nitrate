@@ -1131,14 +1131,14 @@ function updateObject(content_type, object_pk, field, value, value_type, callbac
     
     var parameters = {
         content_type: content_type,
-        object_pk: object_pk,
+        object_pk: object_pk.join(','),
         field: field,
         value: value,
         value_type: value_type,
     }
     
     new Ajax.Request(url, {
-        method: 'get',
+        method: 'post',
         parameters: parameters,
         onSuccess: callback,
         onFailure: json_failure
