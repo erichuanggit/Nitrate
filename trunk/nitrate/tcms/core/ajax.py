@@ -351,9 +351,11 @@ def update(request):
     data    = request.REQUEST.copy()
     ctype   = data.get("content_type")
     vtype   = data.get('value_type', 'str')
-    object_pk = data.getlist("object_pk")
+    object_pk_str = data.get("object_pk")
     field     = data.get('field')
     value     = data.get('value')
+    
+    object_pk = [int(a) for a in object_pk_str.split(',')]
 
     if not field or not value or not object_pk or not ctype:
         return say_no('Following fields are required - content_type, object_pk, field and value.')

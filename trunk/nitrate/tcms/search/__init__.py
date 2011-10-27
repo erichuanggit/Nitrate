@@ -112,10 +112,16 @@ def sum_orm_queries(plans, cases, runs, target):
     cases = cases.evaluate()
     runs  = runs.evaluate()
     if target == 'run':
+        if not plans and not cases:
+            if runs is None:
+                runs = TestRun.objects.none()
+            return runs
         if runs is None:
             runs = TestRun.objects.all()
-        if cases: runs = runs.filter(case_run__case__in=cases)
-        if plans: runs = runs.filter(plan__in=plans)
+        if cases:
+            runs = runs.filter(case_run__case__in=cases)
+        if plans:
+            runs = runs.filter(plan__in=plans)
         runs = runs.extra(
             select={
                 'completed_case_run_percent': RawSQL.completed_case_run_percent,
@@ -126,9 +132,16 @@ def sum_orm_queries(plans, cases, runs, target):
         )
         return runs
     if target == 'plan':
-        if plans is None: plans = TestPlan.objects.all()
-        if cases: plans = plans.filter(case__in=cases)
-        if runs:  plans = plans.filter(run__in=runs)
+        if not cases and not runs:
+            if plans is None:
+                plans = Testplan.objects.none()
+            return plans
+        if plans is None:
+            plans = TestPlan.objects.all()
+        if cases:
+            plans = plans.filter(case__in=cases)
+        if runs:
+            plans = plans.filter(run__in=runs)
         plans = plans.extra(select = {
                 'num_cases': RawSQL.num_cases,
                 'num_runs': RawSQL.num_runs,
@@ -136,9 +149,16 @@ def sum_orm_queries(plans, cases, runs, target):
             })
         return plans
     if target == 'case':
-        if cases is None: cases = TestCase.objects.all()
-        if runs:  cases = cases.filter(case_run__run__in=runs)
-        if plans: cases = cases.filter(plan__in=plans)
+        if not plans and not runs:
+            if cases is None:
+                cases = TestCase.objects.none()
+            return cases
+        if cases is None:
+            cases = TestCase.objects.all()
+        if runs:
+            cases = cases.filter(case_run__run__in=runs)
+        if plans:
+            cases = cases.filter(plan__in=plans)
         return cases
 
 def render_results(request, results, time_cost, queries, tmpl='search/results.html'):

@@ -544,6 +544,7 @@ def clone(request, template_name = 'plan/clone.html'):
                     create_date = tp.create_date,
                     is_active = tp.is_active,
                     extra_link = tp.extra_link,
+                    parent = tp,
                 )
                 
                 # Copy the plan documents
