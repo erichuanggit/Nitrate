@@ -2,7 +2,7 @@
 	<thead>
 		<tr >
 			<th class="nosort" width="30"><input id='id_check_all_runs' type="checkbox" title="Select all/Select none" /></th>
-			<th class="number nosort" width="70"><a href="{{query_url}}&order_by=run_id">ID</a></th>
+			<th class="number nosort widthID"><a href="{{query_url}}&order_by=run_id">ID</a></th>
 			<th class="text nosort"><a href="{{query_url}}&order_by=summary">Summary</a></th>
 			<th class="text nosort" width="80"><a href="{{query_url}}&order_by=manager__username">Manager</a></th>
 			<th class="text nosort" width="100"><a href="{{query_url}}&order_by=default_tester__username">Default Tester</a></th>
@@ -36,13 +36,11 @@
 				{% endif %}
 			</td>
 			<td>
-				<div class="progress-bar">
+				<div class="progress-bar" title="failed:{{ test_run.failed_case_run_percent|default:"0" }}%">
 					<div class="progress-inner" style="width:{{ test_run.completed_case_run_percent|default:"0" }}%;">
-						<a href="#" title="faild:{{ test_run.failed_case_run_percent|default:"0" }}%">
 							<div class="progress-failed" style="width:{{ test_run.failed_case_run_percent|default:"0" }}%;">
-								&nbsp;
+								
 							</div>
-						</a>
 					</div>
 					<div class="percent">{{ test_run.completed_case_run_percent|default:"0" }}%</div>
 				</div>
