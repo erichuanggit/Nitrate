@@ -76,7 +76,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 	<h2 id="display_title">{{ test_run.summary }}</h2>
 	<div>
 	
-	<div class="listinfo_content" style="float:left; width:auto;">
+	<div class="listinfo_content" style="float:left; width:auto; margin-bottom:0px;">
 		<div ></div>
 		<div class="leftlistinfo">
 			<div class="listinfo">
@@ -192,11 +192,9 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 				</div>
 			</div>
 		</div>
-		<div class="listinfo">
-			<div class="title grey">Note&nbsp;:</div>
-			<div class="name" style="width:400px;">{{ test_run.notes|urlize|linebreaksbr }}</div>
-		</div>
+		
 		<div class="clear"></div>
+		
 	</div>
 	
 	<div class="statu" style="float:left;" onCreate="var complete_status = new ProgressBar( new ProgressBar( 'complete_status_{{ test_run.run_id }}', {classProgressBar: 'progressBar4', style: ProgressBar.DETERMINATE, selection: {{ test_run.complete_cases|floatformat:0 }}} );">
@@ -271,7 +269,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 		</table>
 		-->
 	</div>
-	
+        <div class="clear"></div>
+	</div>
+	<div class="listinfo">
+		<div class="title grey">Note&nbsp;:</div>
+		<div class="name" style="max-width:800px;">{{ test_run.notes|urlize|linebreaksbr }}</div>
+		<div class="clear"></div>
 	</div>
 	<div class="Detailform border-1">
 		{% include 'run/get_case_runs.html' %}

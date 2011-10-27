@@ -116,9 +116,12 @@ Nitrate.TestCases.Instance = {
 					<div class="name"><span id="display_priority" >{{ test_case.case_status }}</span></div>
 				</div>
 				<div class="listinfo">
-					<div class="title grey">Notes&nbsp;:</div>
-					<div class="name"><p id="display_priority" >{{ test_case.notes|urlize|linebreaksbr }}</p></div>
+					<div class="title grey"><span>Alias&nbsp;:</span></div>
+					<div class="name {% if not test_case.alias %}grey{% endif %}">
+						<span id="display_script" >{{ test_case.alias|default:'None' }}</span>
+					</div>
 				</div>
+				
 			</div>
 			<div class="rightlistinfo">
 				<div class="listinfo">
@@ -149,12 +152,7 @@ Nitrate.TestCases.Instance = {
 						<span id="display_script" >{{ test_case.script|default:'None' }}</span>
 					</div>
 				</div>
-				<div class="listinfo">
-					<div class="title grey"><span>Alias&nbsp;:</span></div>
-					<div class="name {% if not test_case.alias %}grey{% endif %}">
-						<span id="display_script" >{{ test_case.alias|default:'None' }}</span>
-					</div>
-				</div>
+
 				<div class="listinfo">
 					<div class="title grey"><span>Arguments&nbsp;:</span></div>
 					<div class="name {% if not test_case.arguments %}grey{% endif %}">
@@ -163,6 +161,10 @@ Nitrate.TestCases.Instance = {
 				</div>
 			</div>
 			<div class="clear"></div>
+			<div class="listinfo">
+				<div class="title grey">Notes&nbsp;:</div>
+				<div class="name" style="max-width:800px;"><span id="display_priority" >{{ test_case.notes|urlize|linebreaksbr }}</span></div>
+			</div>
 		</fieldset>
 	</div>
 	
