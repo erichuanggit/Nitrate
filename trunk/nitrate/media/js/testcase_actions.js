@@ -618,7 +618,7 @@ function renderComponentForm(container, parameters, form_observe)
     var url = getURLParam().url_cases_component;
     
     new Ajax.Updater(d, url, {
-        method: 'get',
+        method: 'post',
         parameters: parameters,
         onComplete: callback,
         onFailure: html_failure,
@@ -657,7 +657,7 @@ function renderCategoryForm(container, parameters, form_observe)
     var url = getURLParam().url_cases_category;
     
     new Ajax.Updater(d, url, {
-        method: 'get',
+        method: 'post',
         parameters: parameters,
         onComplete: callback,
         onFailure: html_failure,
