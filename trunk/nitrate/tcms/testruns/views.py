@@ -71,7 +71,7 @@ def new(request, template_name = 'run/new.html'):
         if not tc.case_status.is_confirmed():
             num_unconfirmed_cases += 1
     
-    if request.method == 'POST': # If the form has been submitted...
+    if request.REQUEST.get('POSTING_TO_CREATE'): # Dirty work around here by using argument determination
         form = NewRunForm(request.POST) # A form bound to the POST data
         if request.REQUEST.get('product'):
             form.populate(product_id = request.REQUEST['product'])
