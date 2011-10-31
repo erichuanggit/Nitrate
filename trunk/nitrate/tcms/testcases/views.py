@@ -340,7 +340,7 @@ def get(request, case_id, template_name = 'case/get.html'):
     from tcms.testruns.models import TestCaseRunStatus
     from tcms.core.utils.raw_sql import RawSQL
     from tcms.core.contrib.logs.models import TCMSLogModel
-   # from tcms.core.models.base import TCMSBaseSharedModel
+    # from tcms.core.models.base import TCMSBaseSharedModel
 
     # Get the case
     try:
@@ -354,7 +354,7 @@ def get(request, case_id, template_name = 'case/get.html'):
     # Get the test plans
     tps = tc.plan.select_related('author', 'default_product', 'type').all()
     
-    #log
+    # log
     log_id = str(case_id)
     logs = TCMSLogModel.objects.filter(object_pk=log_id)
 
@@ -365,7 +365,13 @@ def get(request, case_id, template_name = 'case/get.html'):
         try:
             tp = tps.get(pk = request.REQUEST['from_plan'])
         except TestPlan.DoesNotExist:
-            raise Http404
+            return HttpResponse(Prompt.render(
+                request = request,
+                info_type = Prompt.Info,
+                info = '''This case has been removed from the plan, but you
+                          can view the case detail''',
+                next = reverse('tcms.testcases.views.get', args = [case_id,]),
+            ))
     else:
         tp = None
     
