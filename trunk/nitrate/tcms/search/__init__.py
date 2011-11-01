@@ -134,7 +134,7 @@ def sum_orm_queries(plans, cases, runs, target):
     if target == 'plan':
         if not cases and not runs:
             if plans is None:
-                plans = Testplan.objects.none()
+                plans = TestPlan.objects.none()
             return plans
         if plans is None:
             plans = TestPlan.objects.all()
