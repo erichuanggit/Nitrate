@@ -49,7 +49,7 @@
                 {% endif %}
                     <ul>
 				        {% if perms.testruns.add_testrun %}
-                        <li><input class="new_run icon_plan" type="button" value="Write new run" onclick="var p = serialzeCaseForm(this.up(6), this.up(6).next()); postToURL('{% url tcms.testruns.views.new %}', p, 'get');"/></li>
+                        <li><input class="new_run icon_plan" type="button" value="Write new run" onclick="var p = serialzeCaseForm(this.up(6), this.up(6).next()); postToURL('{% url tcms.testruns.views.new %}', p, 'post');"/></li>
                         <li><input type= "button" class="search icon_plan" value="Add cases to run" onclick="var p = serialzeCaseForm(this.up(6), this.up(6).next()); postToURL('{% url tcms.testplans.views.choose_run test_plan.plan_id %}', p, 'get');" /></li>
 			    	    {% else %}
 				        <li><input type="button" class="new_run icon_plan" title="Make new test run from selected cases" value="Write new run" disabled="true" /></li>
