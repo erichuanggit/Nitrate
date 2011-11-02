@@ -1128,10 +1128,14 @@ function updateObject(content_type, object_pk, field, value, value_type, callbac
             return false;
         }
     }
-    
+
+    if (typeof(object_pk) == 'object'){
+		object_pk = object_pk.join(',');
+	}
+
     var parameters = {
         content_type: content_type,
-        object_pk: object_pk.join(','),
+        object_pk: object_pk,
         field: field,
         value: value,
         value_type: value_type,
