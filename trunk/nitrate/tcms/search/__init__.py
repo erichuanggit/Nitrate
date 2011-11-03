@@ -145,7 +145,6 @@ def sum_orm_queries(plans, cases, runs, target):
                 'num_runs': RawSQL.num_runs,
                 'num_children': RawSQL.num_plans,
             })
-        print 'plan searched...'
         return plans
     if target == 'case':
         if not plans and not runs:
