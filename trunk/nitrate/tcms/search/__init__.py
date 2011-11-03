@@ -115,7 +115,6 @@ def sum_orm_queries(plans, cases, runs, target):
         if not plans and not cases:
             if runs is None:
                 runs = TestRun.objects.none()
-            return runs
         if runs is None:
             runs = TestRun.objects.all()
         if cases:
@@ -135,7 +134,6 @@ def sum_orm_queries(plans, cases, runs, target):
         if not cases and not runs:
             if plans is None:
                 plans = TestPlan.objects.none()
-            return plans
         if plans is None:
             plans = TestPlan.objects.all()
         if cases:
@@ -147,12 +145,12 @@ def sum_orm_queries(plans, cases, runs, target):
                 'num_runs': RawSQL.num_runs,
                 'num_children': RawSQL.num_plans,
             })
+        print 'plan searched...'
         return plans
     if target == 'case':
         if not plans and not runs:
             if cases is None:
                 cases = TestCase.objects.none()
-            return cases
         if cases is None:
             cases = TestCase.objects.all()
         if runs:
