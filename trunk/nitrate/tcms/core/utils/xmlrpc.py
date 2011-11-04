@@ -19,6 +19,7 @@
 import datetime
 
 from django.db.models.fields.related import ForeignKey, ManyToManyField
+from django.db.models import ObjectDoesNotExist
 from tcms.core.forms.widgets import SECONDS_PER_MIN, SECONDS_PER_HOUR, SECONDS_PER_DAY
 
 class XMLRPCSerializer(object):
@@ -69,7 +70,12 @@ class XMLRPCSerializer(object):
         response = {}
         opts = self.model._meta
         for field in opts.local_fields:
-            value = getattr(self.model, field.name)
+            # for a django model, retrieving a foreignkey field
+            # will fail when the field value isn't set
+            try:
+                value = getattr(self.model, field.name)
+            except ObjectDoesNotExist:
+                value = None
             if isinstance(value, datetime.datetime):
                 value = datetime.datetime.strftime(value, "%Y-%m-%d %H:%M:%S")
             if isinstance(value, datetime.timedelta):
