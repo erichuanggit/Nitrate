@@ -95,7 +95,7 @@ Nitrate.TestPlans.Instance = {
 			</div>
 			<div class="listinfo">
 				<div class="title grey">Product&nbsp;:</div>
-				<div id="display_product"  class="name "><a href="{% url tcms.testplans.views.all %}?product_id={{ test_plan.product_id }}" title="Search plans of {{ test_plan.product }} ">{{ test_plan.product }}</a></div>
+				<div id="display_product"  class="name "><a href="{% url tcms.testplans.views.all %}?action=search&name__icontains=&author__email__startswith=&owner__username__startswith=&type=&tag__name__in=&case__default_tester__username__startswith=&is_active=on&product={{ test_plan.product_id }}&default_product_version=&env_group=&create_date__gte=&create_date__lte=" title="Search plans of {{ test_plan.product }} ">{{ test_plan.product }}</a></div>
 			</div>
 			<div class="listinfo">
 				<div class="title grey">Version&nbsp;:</div>
@@ -111,7 +111,7 @@ Nitrate.TestPlans.Instance = {
 				<div class="title grey">Environment Group&nbsp;:</div>
 				<div class="name">
 					{% for env_group in test_plan.env_group.all %}
-					<span class="blue strong"><a href="{% url tcms.testplans.views.all %}?env_group_id={{ env_group.id }}" title="Search plans of use {{ env_group.name }} ">{{ env_group.name }}</a></span>
+					<span class="blue strong"><a href="{% url tcms.testplans.views.all %}?action=search&name__icontains=&author__email__startswith=&owner__username__startswith=&type=&tag__name__in=&case__default_tester__username__startswith=&product=&default_product_version=&env_group={{ env_group.id }}&create_date__gte=&create_date__lte=" title="Search plans of use {{ env_group.name }} ">{{ env_group.name }}</a></span>
 					{% endfor %}
 				</div>
 				<div id="display_summary" >
