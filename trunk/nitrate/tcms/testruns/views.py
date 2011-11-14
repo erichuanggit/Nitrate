@@ -773,10 +773,13 @@ def assign_case(request, run_id, template_name="run/assign_case.html"):
     Assign case to run
     """
     SUB_MODULE_NAME = "runs"
-    
+
+    from tcms.testcases.models import TestCasePlan
+
     try:
         tr = TestRun.objects.select_related('plan', 'manager__email', 'build')
         tr = tr.get(run_id = run_id)
+        tp = tr.plan
     except ObjectDoesNotExist, error:
         raise Http404(error)
     
@@ -797,9 +800,14 @@ def assign_case(request, run_id, template_name="run/assign_case.html"):
         
         if request.REQUEST.get('_use_plan_sortkey'):
             for nc in ncs:
+                try:
+                    tcp = TestCasePlan.objects.get(plan=tp, case=nc)
+                    sortkey = tcp.sortkey
+                except ObjectDoesNotExist, error:
+                    sortkey = 0
                 tr.add_case_run(
                     case = nc,
-                    sortkey = nc.sortkey,
+                    sortkey = sortkey,
                 )
         else:
             for nc in ncs:
