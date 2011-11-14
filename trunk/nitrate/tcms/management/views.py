@@ -79,24 +79,20 @@ def environment_groups(request, template_name = 'environment/groups.html'):
     
     # Del action
     if request.REQUEST.get('action') == 'del':
-        if not request.user.has_perm('management.delete_tcmsenvgroup'):
-            ajax_response['response'] = 'Permission denied.'
-            return HttpResponse(json_dumps(ajax_response))
-        
-            
         if request.REQUEST.get('id'):
             try:
                 env = env_groups.get(id = request.REQUEST['id'])
                 manager_id = env.manager_id
                 if (request.user.id !=  manager_id):
-                    ajax_response['response']='Permission denied.'
-                    return HttpResponse(json_dumps(ajax_response))
-                else :
-                    env.delete()
-                    ajax_response['response']='ok'
+                    if not request.user.has_perm('management.delete_tcmsenvgroup'):
+                        ajax_response['response']='Permission denied.'
+                        return HttpResponse(json_dumps(ajax_response))
+
+                env.delete()
+                ajax_response['response']='ok'
             except TCMSEnvGroup.DoesNotExist, error:
                 raise Http404(error)
-            
+        
             try:
                 env_group_property_map = env_groups.filter(
                     group_id = request.REQUEST['id']
@@ -108,6 +104,10 @@ def environment_groups(request, template_name = 'environment/groups.html'):
         else:
             pass
     
+        if not request.user.has_perm('management.delete_tcmsenvgroup'):
+            ajax_response['response'] = 'Permission denied.'
+            return HttpResponse(json_dumps(ajax_response))
+
     # Modify actions
     if request.REQUEST.get('action') == 'modify':
         if not request.user.has_perm('management.change_tcmsenvgroup'):
