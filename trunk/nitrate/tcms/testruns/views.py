@@ -645,8 +645,12 @@ def clone(request, template_name='run/clone.html'):
                 for tcr in tr.case_run.all():
                     n_tr.add_case_run(
                         case = tcr.case,
-                        assignee = form.cleaned_data['update_assignee'] and form.cleaned_data['assignee'] or tcr.assignee,
-                        case_text_version = form.cleaned_data['update_case_text'] and tcr.get_text_versions()[0] or tcr.case_text_version,
+                        #assignee = form.cleaned_data['update_assignee'] and form.cleaned_data['assignee'] or tcr.assignee,
+                        assignee =  tcr.assignee,
+                        case_text_version = (form.cleaned_data['update_case_text'] and 
+                                             bool(tcr.get_text_versions()) and 
+                                             tcr.get_text_versions()[0] or 
+                                             tcr.case_text_version),
                         build = form.cleaned_data['build'],
                         notes = tcr.notes,
                         sortkey = tcr.sortkey,

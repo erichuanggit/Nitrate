@@ -311,7 +311,7 @@ class MulitpleRunsCloneForm(forms.Form):
     )
     manager = UserField(required=False)
     default_tester = UserField(required=False)
-    assignee = UserField(required=False)
+    #assignee = UserField(required=False)
     update_manager = forms.BooleanField(
         help_text='Unchecking will keep the original manager',
         required=False,
@@ -320,10 +320,10 @@ class MulitpleRunsCloneForm(forms.Form):
         help_text='Unchecking will keep the original default tester',
         required=False,
     )
-    update_assignee = forms.BooleanField(
-        help_text='Unchecking will keep the original assignee of case runs',
-        required=False,
-    )
+   # update_assignee = forms.BooleanField(
+   #     help_text='Unchecking will keep the original assignee of case runs',
+   #     required=False,
+   # )
     update_case_text = forms.BooleanField(
         label='Use newest case text(setup/actions/effects/breakdown)',
         help_text='Unchecking will make me the default tester of copied cases',
