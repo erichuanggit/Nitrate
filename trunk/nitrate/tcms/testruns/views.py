@@ -559,6 +559,13 @@ def clone_with_filteredCaseRun(request,run_id,template_name='run/clone.html'):
     else:
         tcrs=[]
     
+    if not tcrs:
+        return HttpResponse(Prompt.render(
+                    request=request,
+                    info_type=Prompt.Info,
+                    info='At least one case is required by a run',
+                    next = request.META.get('HTTP_REFERER', '/')))
+
     if not request.REQUEST.get('submit'):
         form=RunCloneForm(initial={
             'summary':tr.summary,
