@@ -1077,3 +1077,6 @@ ul.data_content_title li{ display:inline-block; margin-left:3px;}
 /* width of column */
 .widthID{width: 80px;}
 
+.linotype{float:left; padding-bottom:12px;}
+.linotype li{list-style:none;}
+
