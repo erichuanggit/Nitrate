@@ -116,21 +116,21 @@ def new(request, template_name = 'run/new.html'):
                         case = tcr.case,
                         assignee = tcr.assignee,
                         case_run_status = tcr.case_run_status,
-                        sortkey = loop * 10
+                        sortkey = tcr.sortkey or loop * 10
                     )
                     loop += 1
                 elif keep_status and not keep_assign:
                     tr.add_case_run(
                         case = tcr.case,
                         case_run_status = tcr.case_run_status,
-                        sortkey = loop * 10
+                        sortkey = tcr.sortkey or loop * 10
                     )
                     loop += 1
                 elif keep_assign and not keep_status:
                     tr.add_case_run(
                         case = tcr.case,
                         assignee = tcr.assignee,
-                        sortkey = loop * 10
+                        sortkey = tcr.sortkey or loop * 10
                     )
                     loop += 1                       
 
