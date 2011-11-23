@@ -42,6 +42,8 @@ def new(request, template_name = 'run/new.html'):
     from tcms.testcases.models import TestCase
     from tcms.management.models import Version
     from tcms.core.utils.prompt import Prompt
+    from tcms.testcases.models import TestCasePlan
+
        
     SUB_MODULE_NAME = "new_run"
     
@@ -103,9 +105,14 @@ def new(request, template_name = 'run/new.html'):
             # not reserve assignee and status
             if not keep_assign and not keep_status:
                 for case in form.cleaned_data['case']:
+                    try:
+                        tcp = TestCasePlan.objects.get(plan=tp, case=case)
+                        sortkey = tcp.sortkey
+                    except ObjectDoesNotExist, error:
+                        sortkey = loop * 10
                     tr.add_case_run(
                         case = case,
-                        sortkey = loop * 10
+                        sortkey = sortkey,
                     )
                     loop += 1
 
