@@ -277,10 +277,10 @@ Nitrate.TestRuns.AssignCase.on_load= function()
     $$('input[name="case"]').invoke('observe', 'click', function(t) {
         if(this.checked) {
             this.up(1).addClassName('selection_row');
-            this.up().next(8).update('<div class="apply_icon"></div>');
+            this.up().next(7).update('<div class="apply_icon"></div>');
         } else {
             this.up(1).removeClassName('selection_row');
-            this.up().next(8).update('');
+            this.up().next(7).update('');
         }
     })
 }
