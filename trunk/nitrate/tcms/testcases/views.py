@@ -720,6 +720,7 @@ def text_history(request, case_id, template_name='case/history.html'):
 def clone(request, template_name='case/clone.html'):
     """Clone one case or multiple case into other plan or plans"""
     from tcms.testplans.models import TestPlan
+    from tcms.testcases.models import TestCasePlan
     from tcms.testplans.forms import SearchPlanForm
     from tcms.management.models import Product
     from forms import CloneCaseForm
@@ -733,7 +734,9 @@ def clone(request, template_name='case/clone.html'):
             info = 'At least one case is required.',
             next = 'javascript:window.history.go(-1)'
         ))
-    
+
+    tp_src_id = request.REQUEST.get('from_plan')
+    tp_src = TestPlan.objects.get(plan_id=tp_src_id)
     tp = None
     search_plan_form = SearchPlanForm()
     
@@ -785,6 +788,17 @@ def clone(request, template_name='case/clone.html'):
                             )
                 else:
                     tc_dest = tc_src
+                    tc_dest.author = clone_form.cleaned_data['maintain_case_orignal_author'] and tc_src.author or request.user
+                    tc_dest.default_tester = clone_form.cleaned_data['maintain_case_orignal_default_tester'] and tc_src.author or request.user
+                    tc_dest.save()
+
+                    for tp in clone_form.cleaned_data['plan']:
+                        try:
+                            tcp = TestCasePlan.objects.get(plan=tp_src, case=tc_dest)
+                            sortkey = tcp.sortkey
+                        except ObjectDoesNotExist, error:
+                            sortkey = tp.get_case_sortkey()
+                        TestCasePlan.objects.create(plan=tp, case=tc_dest, sortkey=sortkey)
                 
                 # Add the cases to plan
                 for tp in clone_form.cleaned_data['plan']:
