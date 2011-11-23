@@ -98,7 +98,8 @@ def post(request, template_name='comments/comments.html'):
         request = request
     )
     
-        # Save the comment and signal that it was saved
+    # Save the comment and signal that it was saved
+    comment.is_removed = False
     comment.save()
     signals.comment_was_posted.send(
         sender  = comment.__class__,
