@@ -42,6 +42,8 @@ def new(request, template_name = 'run/new.html'):
     from tcms.testcases.models import TestCase
     from tcms.management.models import Version
     from tcms.core.utils.prompt import Prompt
+    from tcms.testcases.models import TestCasePlan
+
        
     SUB_MODULE_NAME = "new_run"
     
@@ -103,9 +105,14 @@ def new(request, template_name = 'run/new.html'):
             # not reserve assignee and status
             if not keep_assign and not keep_status:
                 for case in form.cleaned_data['case']:
+                    try:
+                        tcp = TestCasePlan.objects.get(plan=tp, case=case)
+                        sortkey = tcp.sortkey
+                    except ObjectDoesNotExist, error:
+                        sortkey = loop * 10
                     tr.add_case_run(
                         case = case,
-                        sortkey = loop * 10
+                        sortkey = sortkey,
                     )
                     loop += 1
 
@@ -116,21 +123,21 @@ def new(request, template_name = 'run/new.html'):
                         case = tcr.case,
                         assignee = tcr.assignee,
                         case_run_status = tcr.case_run_status,
-                        sortkey = loop * 10
+                        sortkey = tcr.sortkey or loop * 10
                     )
                     loop += 1
                 elif keep_status and not keep_assign:
                     tr.add_case_run(
                         case = tcr.case,
                         case_run_status = tcr.case_run_status,
-                        sortkey = loop * 10
+                        sortkey = tcr.sortkey or loop * 10
                     )
                     loop += 1
                 elif keep_assign and not keep_status:
                     tr.add_case_run(
                         case = tcr.case,
                         assignee = tcr.assignee,
-                        sortkey = loop * 10
+                        sortkey = tcr.sortkey or loop * 10
                     )
                     loop += 1                       
 
@@ -559,6 +566,13 @@ def clone_with_filteredCaseRun(request,run_id,template_name='run/clone.html'):
     else:
         tcrs=[]
     
+    if not tcrs:
+        return HttpResponse(Prompt.render(
+                    request=request,
+                    info_type=Prompt.Info,
+                    info='At least one case is required by a run',
+                    next = request.META.get('HTTP_REFERER', '/')))
+
     if not request.REQUEST.get('submit'):
         form=RunCloneForm(initial={
             'summary':tr.summary,
@@ -645,8 +659,12 @@ def clone(request, template_name='run/clone.html'):
                 for tcr in tr.case_run.all():
                     n_tr.add_case_run(
                         case = tcr.case,
-                        assignee = form.cleaned_data['update_assignee'] and form.cleaned_data['assignee'] or tcr.assignee,
-                        case_text_version = form.cleaned_data['update_case_text'] and tcr.get_text_versions()[0] or tcr.case_text_version,
+                        #assignee = form.cleaned_data['update_assignee'] and form.cleaned_data['assignee'] or tcr.assignee,
+                        assignee =  tcr.assignee,
+                        case_text_version = (form.cleaned_data['update_case_text'] and 
+                                             bool(tcr.get_text_versions()) and 
+                                             tcr.get_text_versions()[0] or 
+                                             tcr.case_text_version),
                         build = form.cleaned_data['build'],
                         notes = tcr.notes,
                         sortkey = tcr.sortkey,
@@ -773,10 +791,13 @@ def assign_case(request, run_id, template_name="run/assign_case.html"):
     Assign case to run
     """
     SUB_MODULE_NAME = "runs"
-    
+
+    from tcms.testcases.models import TestCasePlan
+
     try:
         tr = TestRun.objects.select_related('plan', 'manager__email', 'build')
         tr = tr.get(run_id = run_id)
+        tp = tr.plan
     except ObjectDoesNotExist, error:
         raise Http404(error)
     
@@ -797,9 +818,14 @@ def assign_case(request, run_id, template_name="run/assign_case.html"):
         
         if request.REQUEST.get('_use_plan_sortkey'):
             for nc in ncs:
+                try:
+                    tcp = TestCasePlan.objects.get(plan=tp, case=nc)
+                    sortkey = tcp.sortkey
+                except ObjectDoesNotExist, error:
+                    sortkey = 0
                 tr.add_case_run(
                     case = nc,
-                    sortkey = nc.sortkey,
+                    sortkey = sortkey,
                 )
         else:
             for nc in ncs:
