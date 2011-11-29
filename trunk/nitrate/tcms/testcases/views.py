@@ -734,9 +734,16 @@ def clone(request, template_name='case/clone.html'):
             info = 'At least one case is required.',
             next = 'javascript:window.history.go(-1)'
         ))
-
+    
     tp_src_id = request.REQUEST.get('from_plan')
-    tp_src = TestPlan.objects.get(plan_id=tp_src_id)
+    if tp_src_id:
+        try:
+            tp_src = TestPlan.objects.get(plan_id=tp_src_id)
+        except ObjectDoesNotExist, error:
+            tp_src = None
+    else:
+        tp_src = None
+
     tp = None
     search_plan_form = SearchPlanForm()
     
@@ -747,6 +754,7 @@ def clone(request, template_name='case/clone.html'):
         
         if clone_form.is_valid():
             for tc_src in clone_form.cleaned_data['case']:
+                
                 if clone_form.cleaned_data['copy_case']:
                     tc_dest = TestCase.objects.create(
                         is_automated = tc_src.is_automated,
@@ -764,10 +772,20 @@ def clone(request, template_name='case/clone.html'):
                         author = clone_form.cleaned_data['maintain_case_orignal_author'] and tc_src.author or request.user,
                         default_tester = clone_form.cleaned_data['maintain_case_orignal_default_tester'] and tc_src.author or request.user,
                     )
+                
                     for tp in clone_form.cleaned_data['plan']:
-                        sortkey = tp.get_case_sortkey()
-                        tp.add_case(tc_dest, sortkey = sortkey)
-                    
+                        #copy a case and keep origin case's sortkey 
+                        if tp_src:
+                            try:
+                                tcp = TestCasePlan.objects.get(plan=tp_src, case=tc_src)
+                                sortkey = tcp.sortkey
+                            except ObjectDoesNotExist, error:
+                                sortkey = tp.get_case_sortkey()
+                        else:
+                            sortkey = tp.get_case_sortkey()
+
+                        tp.add_case(tc_dest, sortkey)
+
                     tc_dest.add_text(
                         author = clone_form.cleaned_data['maintain_case_orignal_author'] and tc_src.author or request.user,
                         create_date = tc_src.latest_text().create_date,
@@ -791,15 +809,21 @@ def clone(request, template_name='case/clone.html'):
                     tc_dest.author = clone_form.cleaned_data['maintain_case_orignal_author'] and tc_src.author or request.user
                     tc_dest.default_tester = clone_form.cleaned_data['maintain_case_orignal_default_tester'] and tc_src.author or request.user
                     tc_dest.save()
-
                     for tp in clone_form.cleaned_data['plan']:
-                        try:
-                            tcp = TestCasePlan.objects.get(plan=tp_src, case=tc_dest)
-                            sortkey = tcp.sortkey
-                        except ObjectDoesNotExist, error:
+                        #create case link and keep origin plan's sortkey 
+                        if tp_src:
+                            try:
+                                tcp = TestCasePlan.objects.get(plan=tp_src, case=tc_dest)
+                                sortkey = tcp.sortkey
+                            except ObjectDoesNotExist, error:
+                                sortkey = tp.get_case_sortkey()
+                        else:
                             sortkey = tp.get_case_sortkey()
-                        TestCasePlan.objects.create(plan=tp, case=tc_dest, sortkey=sortkey)
-                
+                    try:
+                        tp.add_case(tc_dest, sortkey)
+                    except:
+                        pass
+
                 # Add the cases to plan
                 for tp in clone_form.cleaned_data['plan']:
                     # tp.add_case(case = tc_dest)
@@ -833,7 +857,7 @@ def clone(request, template_name='case/clone.html'):
                                     initial_owner = request.user,
                                     description = component.description,
                                 )
-                            
+
                             try:
                                 tc_dest.add_component(new_c)
                             except:

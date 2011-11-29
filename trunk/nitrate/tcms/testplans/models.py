@@ -174,16 +174,15 @@ class TestPlan(TCMSActionModel):
         except:
             raise
     
-    def add_case(self, case, sortkey = None):
+    def add_case(self, case, sortkey=0):
 
-        try:
-            return TestCasePlan.objects.get_or_create(
-                plan = self,
-                case = case,
-                sortkey = sortkey,
-            )
-        except:
-            raise
+        tcp, is_created = TestCasePlan.objects.get_or_create(
+            plan = self,
+            case = case,
+        )
+        if is_created:
+            tcp.sortkey = sortkey
+            tcp.save()
     
     def add_component(self, component):
         try:

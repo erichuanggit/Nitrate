@@ -218,6 +218,8 @@ Nitrate.TestCases.Clone.on_load = function()
         $('id_form_search_plan').enable();
         $('id_plan_id').value = '';
         $('id_plan_id').name = '';
+        $('id_copy_case').enable();
+        $('id_copy_case').checked = true;
     });
     
     if($('id_use_sameplan')){
@@ -227,6 +229,8 @@ Nitrate.TestCases.Clone.on_load = function()
         $('id_plan_id').name = 'plan';
         $('id_plan_container').update('<div class="ajax_loading"></div>');
         $('id_plan_container').hide();
+        $('id_copy_case').checked = false;
+        $('id_copy_case').disable();
     })
     };
 }
