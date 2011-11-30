@@ -615,7 +615,7 @@ def clone(request, template_name = 'plan/clone.html'):
                             )
 
                             # Add case to plan.
-                            tp_dest.add_case(case = tpcase_dest, sortkey = tcp.sortkey)
+                            tp_dest.add_case(tpcase_dest, tcp.sortkey)
                             
                             for tc_tag_src in tpcase_src.tag.all():
                                 tpcase_dest.add_tag(tag = tc_tag_src)
@@ -648,7 +648,7 @@ def clone(request, template_name = 'plan/clone.html'):
                     else:
                         for tpcase_src in tpcases_src:
                             tcp = get_object_or_404(TestCasePlan, plan = tp, case = tpcase_src)
-                            tp_dest.add_case(case = tpcase_src, sortkey = tcp.sortkey)
+                            tp_dest.add_case(tpcase_src, tcp.sortkey)
             
             if len(tps) == 1:
                 return HttpResponseRedirect(
@@ -775,7 +775,7 @@ def cases(request, plan_id):
                     tcs = TestCase.objects.filter(case_id__in = request.REQUEST.getlist('case'))
                     
                     for tc in tcs:
-                        tp.add_case(case = tc)
+                        tp.add_case(tc)
                 else:
                     return HttpResponse("Permission Denied")
                 

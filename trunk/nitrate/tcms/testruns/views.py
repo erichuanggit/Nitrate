@@ -617,6 +617,7 @@ def clone(request, template_name='run/clone.html'):
     # Generate the clone run page for one run
     if len(trs) == 1 and not request.REQUEST.get('submit'):
         tr = trs[0]
+        tcrs = tr.case_run.all()
         form = RunCloneForm(initial={
             'summary': tr.summary,
             'notes': tr.notes,
@@ -634,6 +635,7 @@ def clone(request, template_name='run/clone.html'):
             'sub_module': SUB_MODULE_NAME,
             'clone_form': form,
             'test_run': tr,
+            'cases_run': tcrs,
         })
     
     # Process multiple runs clone page
