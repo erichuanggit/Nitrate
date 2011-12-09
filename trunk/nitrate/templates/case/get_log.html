@@ -17,7 +17,7 @@
 				</td>
 				<td>
 					{% for action in actions %}
-						{{ action }}<br/>
+						{{ action|safe }}<br/>
 					{% endfor %}
 				</td>
 			</tr>
