@@ -83,7 +83,7 @@
 						<span class="strong">{{ comment.user.email }}</span>
 						<span class="grey">{{ comment.submit_date }}</span>
 						<br/>
-						{{ comment.comment|linebreaksbr }}
+						{{ comment.comment|urlize|linebreaksbr }}
 					</li>
 					{% endfor %}
 				<ul>
