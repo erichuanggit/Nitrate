@@ -257,16 +257,6 @@ def get(request, plan_id, template_name = 'plan/get.html'):
     
     # Generate the run list of plan
     tp_trs = tp.run.select_related('build', 'manager', 'default_tester')
-    # Further optimize by adding caserun attributes:
-    tp_trs = tp_trs.extra(
-        select = {
-        'total_num_caseruns': RawSQL.total_num_caseruns,
-        'completed_case_run_percent': RawSQL.completed_case_run_percent,
-        'failed_case_run_percent': RawSQL.failed_case_run_percent,
-        'passed_case_run_percent': RawSQL.passed_case_run_percent,
-        },
-    )
-    
     tp_rvs = tp.review.select_related('author', 'default_reviewer')
     tp_rvs = tp_rvs.extra(
         select = {

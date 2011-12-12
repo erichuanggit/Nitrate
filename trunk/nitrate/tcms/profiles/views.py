@@ -167,13 +167,6 @@ def recent(request, username, template_name='profile/recent.html'):
     
     trs = TestRun.list(runs_query)
     
-    trs = trs.extra(
-        select={
-            'completed_case_run_percent': RawSQL.completed_case_run_percent,
-            'failed_case_run_percent':RawSQL.failed_case_run_percent,
-        },
-    )
-    
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'user_profile': up,
