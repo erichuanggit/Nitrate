@@ -64,3 +64,66 @@ ALTER TABLE `testopia`.`test_tags` CHANGE COLUMN `tag_name` `tag_name` VARCHAR(2
 
 -- TCMS 3.5, added a new column for test_plans
 ALTER TABLE test_plans ADD column owner_id mediumint(9) DEFAULT null ;
+
+-- TCMS 3.6.3, added a new column for test_runs
+ALTER TABLE test_runs ADD column case_run_status varchar(100) DEFAULT '' ;
+
+-- TCMS 3.6.3, added triggers on test_case_runs
+DELIMITER '|';
+CREATE TRIGGER case_run_status_trigger_update
+    AFTER UPDATE ON test_case_runs
+    FOR EACH ROW BEGIN
+        UPDATE test_runs SET case_run_status = (
+            SELECT
+                group_concat(concat(a.status, ':', a.count)) AS status_count
+            FROM (
+                SELECT 
+                    case_run_status_id AS status,
+                    count(*) AS count FROM test_case_runs
+                WHERE
+                    run_id = NEW.run_id
+                GROUP BY case_run_status_id
+                ORDER BY status
+            ) AS a
+        )
+        WHERE run_id = NEW.run_id;
+    END|
+
+CREATE TRIGGER case_run_status_trigger_insert
+    AFTER INSERT ON test_case_runs
+    FOR EACH ROW BEGIN
+        UPDATE test_runs SET case_run_status = (
+            SELECT
+                group_concat(concat(a.status, ':', a.count)) AS status_count
+            FROM (
+                SELECT 
+                    case_run_status_id AS status,
+                    count(*) AS count FROM test_case_runs
+                WHERE
+                    run_id = NEW.run_id
+                GROUP BY case_run_status_id
+                ORDER BY status
+            ) AS a
+        )
+        WHERE run_id = NEW.run_id;
+    END|
+
+CREATE TRIGGER case_run_status_trigger_delete
+    AFTER DELETE ON test_case_runs
+    FOR EACH ROW BEGIN
+        UPDATE test_runs SET case_run_status = (
+            SELECT
+                group_concat(concat(a.status, ':', a.count)) AS status_count
+            FROM (
+                SELECT 
+                    case_run_status_id AS status,
+                    count(*) AS count FROM test_case_runs
+                WHERE
+                    run_id = OLD.run_id
+                GROUP BY case_run_status_id
+                ORDER BY status
+            ) AS a
+        )
+        WHERE run_id = OLD.run_id;
+    END|
+DELIMITER ';'|
