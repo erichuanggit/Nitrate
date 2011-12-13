@@ -1405,7 +1405,10 @@ function removePlanChildren(container, plan_id)
     var p = prompt('Enter a comma separated list of plan IDs to be removed');
     if(!p)
         return false;
-    
+	if(Number(p)==plan_id){
+        alert('can not remove current plan');
+        return false;
+	}
     var parameters = {
         pk__in: p,
     };
