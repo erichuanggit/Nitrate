@@ -34,11 +34,6 @@ except ImportError:
 # Create your models here.
 
 class TestRun(TCMSActionModel):
-    # plan_id = models.IntegerField()
-    # environment_id = models.IntegerField()
-    # build_id = models.IntegerField()
-    # manager_id = models.IntegerField()
-    # default_tester_id = models.IntegerField(null=True, blank=True)
     
     run_id = models.AutoField(primary_key=True)
     
@@ -50,7 +45,8 @@ class TestRun(TCMSActionModel):
     summary = models.TextField()
     notes = models.TextField(blank=True)
     estimated_time = TimedeltaField()
-    
+    case_run_status = models.CharField(max_length=100, default='')
+
     plan = models.ForeignKey('testplans.TestPlan', related_name='run')
     environment_id = models.IntegerField(default=0)
     build = models.ForeignKey('management.TestBuild', related_name='build_run')
