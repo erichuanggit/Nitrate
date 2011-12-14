@@ -345,7 +345,7 @@ class TestRun(TCMSActionModel):
         if not percent:
             percent = None
         else:
-            percent = int(round(percent))
+            percent = round(percent, 2)
         return percent
 
     def get_serialized_case_run_status(self):
