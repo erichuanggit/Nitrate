@@ -49,7 +49,7 @@ def get_runs():
         transaction.commit_unless_managed()
 
 def main():
-    cProfile.runctx('get_runs()', globals(), locals())
+    get_runs()
 
 if __name__ == '__main__':
     main()
