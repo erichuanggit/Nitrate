@@ -23,19 +23,19 @@ message bus integration
 BROKER_CONNECTION_INFOS = {
     'local': {
         'host': 'localhost',
-        'port': '5672',
+        'port': 5672,
         'sasl_mechanisms': 'PLAIN'
     },
 
     'qpid_dev': {
         'host': 'mixologist.lab.bos.redhat.com',
-        'port': '5671',
+        'port': 5671,
         'sasl_mechanisms': 'GSSAPI'
     },
 
     'qpid_product': {
         'host': 'qpid.devel.redhat.com',
-        'port': '5671',
+        'port': 5671,
         'sasl_mechanisms': 'GSSAPI'
     }
 }
