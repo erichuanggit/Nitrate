@@ -24,7 +24,7 @@ BROKER_CONNECTION_INFOS = {
     'local': {
         'host': 'localhost',
         'port': 5672,
-        'sasl_mechanisms': 'PLAIN'
+        'sasl_mechanisms': 'ANONYMOUS'
     },
 
     'qpid_dev': {
