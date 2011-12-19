@@ -14,3 +14,38 @@
 # distribution and at <http://www.gnu.org/licenses>.
 
 # Plugin settings
+
+'''
+Configuration for QPID connection and
+message bus integration
+'''
+
+BROKER_CONNECTION_INFOS = {
+    'local': {
+        'host': 'localhost',
+        'port': '5672',
+        'sasl_mechanisms': 'PLAIN'
+    },
+
+    'qpid_dev': {
+        'host': 'mixologist.lab.bos.redhat.com',
+        'port': '5671',
+        'sasl_mechanisms': 'GSSAPI'
+    },
+
+    'qpid_product': {
+        'host': 'qpid.devel.redhat.com',
+        'port': '5671',
+        'sasl_mechanisms': 'GSSAPI'
+    }
+}
+
+broker_ptr = 'local'
+
+BROKER_CONNECTION_INFO = BROKER_CONNECTION_INFOS[broker_ptr]
+
+ROUTING_KEY_PREFIX = 'tcms'
+TOPIC_EXCHANGE = 'eso.topic'
+
+SENDER_ADDRESS = '%s; { assert: always, node: { type: topic } }' % TOPIC_EXCHANGE
+RECEIVER_ADDRESS = ''
