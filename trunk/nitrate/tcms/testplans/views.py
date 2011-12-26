@@ -414,6 +414,8 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
                         tp.owner = owner
                     except:
                         pass
+                else:
+                    tp.owner = None
                 # IMPORTANT! tp.current_user is an instance attribute,
                 # added so that in post_save, current logged-in user info
                 # can be accessed.
