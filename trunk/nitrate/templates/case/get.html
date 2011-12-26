@@ -1,5 +1,7 @@
 {% extends "tcms_base.html" %}
 
+{% load redhat_urlize %}
+
 {% block subtitle %}Test case - {{ test_case.case_id }}: {{ test_case.summary }}{% endblock %}
 
 {% block custom_stylesheet %}
