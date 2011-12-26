@@ -180,8 +180,8 @@ def build(request, product_id, template_name='report/build.html'):
         for row in rows:
             if row[0]:
                 total += row[1]
-        
-        case_run_counter = CaseRunStatusCounter([])
+        trs = current_build.testcaserun_set.all()
+        case_run_counter = CaseRunStatusCounter(trs)
         for row in rows:
             if row[0]:
                 setattr(case_run_counter, row[0], row[1])
