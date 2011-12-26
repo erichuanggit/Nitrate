@@ -20,6 +20,8 @@ Configuration for QPID connection and
 message bus integration
 '''
 
+import os
+
 BROKER_CONNECTION_INFOS = {
     'local': {
         'host': 'localhost',
@@ -29,13 +31,13 @@ BROKER_CONNECTION_INFOS = {
 
     'qpid_dev': {
         'host': 'mixologist.lab.bos.redhat.com',
-        'port': 5671,
+        'port': 5672,
         'sasl_mechanisms': 'GSSAPI'
     },
 
     'qpid_product': {
         'host': 'qpid.devel.redhat.com',
-        'port': 5671,
+        'port': 5672,
         'sasl_mechanisms': 'GSSAPI'
     }
 }
@@ -48,4 +50,20 @@ ROUTING_KEY_PREFIX = 'tcms'
 TOPIC_EXCHANGE = 'eso.topic'
 
 SENDER_ADDRESS = '%s; { assert: always, node: { type: topic } }' % TOPIC_EXCHANGE
-RECEIVER_ADDRESS = ''
+RECEIVER_ADDRESS = '''tmp.reading.errata;
+    {
+        assert: always,
+        create: receiver,
+        delete: receiver,
+        node: {
+            type: queue, durable: False,
+            x-declare: {
+                exclusive: True,
+                auto_delete: True
+            },
+            x-bindings: [
+                { exchange: "eso.topic", queue: "tmp.test.local", key: "tcms.#" },
+                { exchange: "eso.topic", queue: "tmp.test.local", key: "secalert.tcms.#" }
+            ]
+        }
+    }'''.replace(os.linesep, '')
