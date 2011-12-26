@@ -670,7 +670,7 @@ def clone(request, template_name = 'plan/clone.html'):
                 'copy_attachements': True,
                 'copy_environment_group': True,
                 'link_testcases': True,
-                'copy_testcases': True,
+                'copy_testcases': False,
                 'maintain_case_orignal_author': True,
                 'keep_case_default_tester': True,
                 'name': 'Copy of %s' % tps[0].name
@@ -681,7 +681,7 @@ def clone(request, template_name = 'plan/clone.html'):
                 'copy_texts': True,
                 'copy_attachements': True,
                 'link_testcases': True,
-                'copy_testcases': True,
+                'copy_testcases': False,
                 'maintain_case_orignal_author': True,
                 'keep_case_default_tester': True,
             })
