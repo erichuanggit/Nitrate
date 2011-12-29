@@ -67,6 +67,7 @@ ALTER TABLE test_plans ADD column owner_id mediumint(9) DEFAULT null ;
 
 -- TCMS 3.6.3, added a new column for test_runs
 ALTER TABLE test_runs ADD column case_run_status varchar(100) DEFAULT '' ;
+ALTER TABLE test_runs ADD column errata_id mediumint(9) DEFAULT NULL ;
 
 -- TCMS 3.6.3, added triggers on test_case_runs
 DELIMITER '|';
