@@ -21,8 +21,9 @@ from signals import PrintMe
 # Receiver must be defined, it's required by plugins support.
 receiver = PrintMe()
 
-import settings
+# Initialize configuration for message bus
+import tcms.plugins.message_bus.settings
 
-if settings.broker_ptr != 'local':
-    from tcms.plugins.message_bus.message_bus import MessageBus
-    MessageBus.initialize()
+# Local test passed, and then do not need preivous revision code in production any more.
+from tcms.plugins.message_bus.message_bus import MessageBus
+MessageBus.initialize()
