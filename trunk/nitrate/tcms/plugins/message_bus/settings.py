@@ -44,9 +44,9 @@ BROKER_CONNECTION_INFOS = {
 
 # Using environment variable to control to which message broker message bus connects.
 # By default, message bus connects to QPID production broker.
-# :O MS stands for MessageBus. I just don't want a long name.
-if 'NITRATE_MS_BROKER' in os.environ:
-    broker_ptr = os.environ['NITRATE_MS_BROKER']
+# :O MB stands for MessageBus. I just don't want a long name.
+if 'NITRATE_MB_BROKER' in os.environ:
+    broker_ptr = os.environ['NITRATE_MB_BROKER']
     if broker_ptr not in BROKER_CONNECTION_INFOS.keys():
         raise NameError('Cannot read broker\'s information. {0} does not exist.'.format(broker_ptr))
 else:
