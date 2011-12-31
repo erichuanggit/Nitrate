@@ -4,6 +4,9 @@ Use this class to access Nitrate via XML-RPC
 This code is based on http://landfill.bugzilla.org/testopia2/testopia/contrib/drivers/python/testopia.py
 and https://fedorahosted.org/python-bugzilla/browser/bugzilla/base.py
 
+History:
+2011-12-31 bugfix https://bugzilla.redhat.com/show_bug.cgi?id=735937
+
 Example on how to access this library,
 
 from nitrate import NitrateXmlrpc
@@ -104,6 +107,10 @@ class CookieTransport(xmlrpclib.Transport):
                 #        (self.cookiejar.filename,str(e)))
 
         if errcode != 200:
+            # When runs here, the HTTPS connection isn't useful any more
+            #   before raising an exception to caller
+            h.close()
+
             raise xmlrpclib.ProtocolError(
                 host + handler,
                 errcode, errmsg,
@@ -117,7 +124,10 @@ class CookieTransport(xmlrpclib.Transport):
         except AttributeError:
             sock = None
 
-        return self._parse_response(h.getfile(), sock)
+        try:
+            return self._parse_response(h.getfile(), sock)
+        finally:
+            h.close()
 
         # This is just python 2.7's xmlrpclib.Transport.single_request, with
     # send additions noted below to send cookies along with the request
@@ -157,22 +167,18 @@ class CookieTransport(xmlrpclib.Transport):
             if response.status == 200:
                 self.verbose = verbose
                 return self.parse_response(response)
+
+            if (response.getheader("content-length", 0)):
+                response.read()
+            raise xmlrpclib.ProtocolError(
+                host + handler,
+                response.status, response.reason,
+                response.msg,
+                )
         except xmlrpclib.Fault:
             raise
-        except Exception:
-            # All unexpected errors leave connection in
-            # a strange state, so we clear it.
-            self.close()
-            raise
-
-        #discard any response data and raise exception
-        if (response.getheader("content-length", 0)):
-            response.read()
-        raise xmlrpclib.ProtocolError(
-            host + handler,
-            response.status, response.reason,
-            response.msg,
-            )
+        finally:
+            h.close()
 
     # Override the appropriate request method
     if hasattr(xmlrpclib.Transport, 'single_request'):
@@ -216,6 +222,40 @@ class KerbTransport(SafeCookieTransport):
         ]
         
         return host, extra_headers, x509
+
+    def _python_ver_larger_than_2_6(self):
+        import sys
+        vi = sys.version_info
+        return vi[0] >= 2 and vi[1] > 6
+
+    def make_connection(self, host):
+        '''
+        For fixing bug #735937.
+        When running on Python 2.7, make_connection will do the same behavior as that of Python 2.6's xmlrpclib
+        That is in Python 2.6, make_connection will return an individual HTTPS connection for each request
+        '''
+
+        if self._python_ver_larger_than_2_6():
+            # create a HTTPS connection object from a host descriptor
+            # host may be a string, or a (host, x509-dict) tuple
+            try:
+                HTTPS = httplib.HTTPSConnection
+            except AttributeError:
+                raise NotImplementedError(
+                    "your version of httplib doesn't support HTTPS"
+                    )
+            else:
+                chost, self._extra_headers, x509 = self.get_host_info(host)
+                # nitrate isn't ready to use HTTP/1.1 persistent connection mechanism.
+                # So tell server current opened HTTP connection should be closed after request is handled.
+                # And there will be a new connection for next request.
+                self._extra_headers.append(('Connection', 'close'))
+                self._connection = host, HTTPS(chost, None, **(x509 or {}))
+                return self._connection[1]
+
+        else:
+            # For Python 2.6, do the default behavior
+            return SafeCookieTransport.make_connection(host)
 
 class NitrateError(Exception):
     pass
