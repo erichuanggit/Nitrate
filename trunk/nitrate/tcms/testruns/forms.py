@@ -117,6 +117,10 @@ class BaseRunForm(forms.Form):
         required = False,
         initial = True
     )
+    errata_id = forms.IntegerField(
+        label = 'Errata_id',
+        required = False,
+    )
     def populate(self, product_id):
         # We can dynamically set choices for a form field:
         # Seen at: http://my.opera.com/jacob7908/blog/2009/06/19/django-choicefield-queryset (Chinese)
