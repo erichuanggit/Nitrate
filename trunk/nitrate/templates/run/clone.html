@@ -70,6 +70,10 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Clone.on_load);
 					<td><label class="strong" for="id_build_id">Build </label></td>
 					<td>{{ clone_form.build }}<div class="errors">{{ clone_form.build.errors }}</div></td>
 				</tr>
+				<tr>
+					<td><label class="strong" for="id_errata_id">Errata_ID</label></td>
+					<td>{{ clone_form.errata_id }}</td>
+				</tr>
 				{%comment%}
 				<tr>
 					<td><label class="strong">Environment </label></td>

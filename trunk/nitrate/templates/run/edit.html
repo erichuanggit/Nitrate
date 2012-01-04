@@ -72,6 +72,10 @@
 					<a href="{{ ADMIN_PREFIX }}/management/testbuild/add/" class="addlink" onclick="return popupAddAnotherWindow(this, 'product');" id="add_id_build">Add Build</a></td>
 			</tr>
 			<tr>
+				<td><label>Errata_ID </label></td>
+				<td>{{ form.errata_id }}</td>
+			</tr>
+			<tr>
 				<td><label>Manager</label></td>
 				{% ifequal test_run.manager user %}
 				<td>{{ form.manager }}</td>

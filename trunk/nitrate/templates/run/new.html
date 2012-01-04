@@ -67,6 +67,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 						<a href="{{ ADMIN_PREFIX }}/management/testbuild/add/" class="addlink" onclick="return popupAddAnotherWindow(this, 'product');" id="add_id_build">Add Build</a>
 					</td>
 				</tr>
+				<tr>
+					<td valign="top"><label class="strong" for="id_errata_id">Errata_ID</label></td>
+					<td>
+						{{ form.errata_id }}
+					</td>
+				</tr>
 				{%comment%}
 				<tr>
 					<td><label class="strong">Environment </label></td>
