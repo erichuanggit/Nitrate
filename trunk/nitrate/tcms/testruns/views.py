@@ -95,6 +95,7 @@ def new(request, template_name = 'run/new.html'):
                 manager = form.cleaned_data['manager'],
                 default_tester = default_tester,
                 estimated_time = form.cleaned_data['estimated_time'],
+                errata_id = form.cleaned_data['errata_id'],
             )
             
             keep_status = form.cleaned_data['keep_status']
@@ -402,6 +403,7 @@ def edit(request, run_id, template_name = 'run/edit.html'):
             tr.notes = form.cleaned_data['notes']
             tr.stop_date = request.REQUEST.get('finished') and datetime.now() or None
             tr.estimated_time = form.cleaned_data['estimated_time']
+            tr.errata_id = form.cleaned_data['errata_id']
             tr.save()
             return HttpResponseRedirect(
                 reverse('tcms.testruns.views.get', args=[run_id, ])
@@ -418,6 +420,7 @@ def edit(request, run_id, template_name = 'run/edit.html'):
             'notes': tr.notes,
             'finished': tr.stop_date,
             'estimated_time': tr.estimated_time,
+            'errata_id': tr.errata_id,
         })
         form.populate(product_id = tr.build.product_id)
     
@@ -627,6 +630,7 @@ def clone(request, template_name='run/clone.html'):
             'build': tr.build_id,
             'default_tester': tr.default_tester_id and tr.default_tester.email or '',
             'use_newest_case_text': True,
+            'errata_id': tr.errata_id,
         })
         form.populate(product_id = tr.plan.product_id)
         
