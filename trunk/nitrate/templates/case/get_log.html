@@ -12,12 +12,14 @@
 				<td>{{ day|date:"Y-m-d H:i:s" }}</td>
 				<td>
 					{% for action in actions %}
+                        {% if forloop.first %}
 						{{ action.who }}<br/>
+                        {% endif %}
 					{% endfor %}
 				</td>
 				<td>
 					{% for action in actions %}
-						{{ action }}<br/>
+						{{ action|safe }}<br/>
 					{% endfor %}
 				</td>
 			</tr>

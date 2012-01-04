@@ -1,4 +1,5 @@
 {% load comments %}
+{% load redhat_urlize %}
 <td id="id_case_text_{{ forloop.counter }}" colspan="12">
 	<table class="case_detail">
 		<tr>
@@ -80,7 +81,7 @@
 							<span class="strong">{{ comment.user.email }}</span>
 							<span class="grey">{{ comment.submit_date }}</span>
 							<br/>
-							{{ comment.comment|linebreaksbr }}
+							{{ comment.comment|redhat_urlize|linebreaksbr }}
 							<input class='commentdelete sprites' value='Delete Comment' type='submit' /> 
 						</form>
 						{% else %}
@@ -89,7 +90,7 @@
 						<span class="grey">{{ comment.submit_date }}</span>
 						<input class='btn_remove_comment commentdelete sprites' value='Delete Comment' type='button'>
 						<br/>
-						{{ comment.comment|linebreaksbr }}
+						{{ comment.comment|redhat_urlize|linebreaksbr }}
 						{% endifequal %}
 					</li>
 					{% endfor %}

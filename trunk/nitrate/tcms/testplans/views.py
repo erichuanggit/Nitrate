@@ -257,16 +257,6 @@ def get(request, plan_id, template_name = 'plan/get.html'):
     
     # Generate the run list of plan
     tp_trs = tp.run.select_related('build', 'manager', 'default_tester')
-    # Further optimize by adding caserun attributes:
-    tp_trs = tp_trs.extra(
-        select = {
-        'total_num_caseruns': RawSQL.total_num_caseruns,
-        'completed_case_run_percent': RawSQL.completed_case_run_percent,
-        'failed_case_run_percent': RawSQL.failed_case_run_percent,
-        'passed_case_run_percent': RawSQL.passed_case_run_percent,
-        },
-    )
-    
     tp_rvs = tp.review.select_related('author', 'default_reviewer')
     tp_rvs = tp_rvs.extra(
         select = {
@@ -424,6 +414,8 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
                         tp.owner = owner
                     except:
                         pass
+                else:
+                    tp.owner = None
                 # IMPORTANT! tp.current_user is an instance attribute,
                 # added so that in post_save, current logged-in user info
                 # can be accessed.
@@ -680,7 +672,7 @@ def clone(request, template_name = 'plan/clone.html'):
                 'copy_attachements': True,
                 'copy_environment_group': True,
                 'link_testcases': True,
-                'copy_testcases': True,
+                'copy_testcases': False,
                 'maintain_case_orignal_author': True,
                 'keep_case_default_tester': True,
                 'name': 'Copy of %s' % tps[0].name
@@ -691,7 +683,7 @@ def clone(request, template_name = 'plan/clone.html'):
                 'copy_texts': True,
                 'copy_attachements': True,
                 'link_testcases': True,
-                'copy_testcases': True,
+                'copy_testcases': False,
                 'maintain_case_orignal_author': True,
                 'keep_case_default_tester': True,
             })

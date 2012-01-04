@@ -19,6 +19,9 @@
 # FIXME: Use signal to handle log
 
 import threading
+import datetime
+
+from tcms.plugins.message_bus.message_bus import MessageBus
 
 # Reference from
 # http://www.chrisdpratt.com/2008/02/16/signals-in-django-stuff-thats-not-documented-well/
@@ -45,4 +48,53 @@ def post_run_saved(sender, *args, **kwargs):
         NewRunEmailThread(instance).start()
     else:
         # FIXME: Log, Plugin and other editing functions
+        pass
+
+# new testrun created info for qpid
+def qpid_run_created(sender, *args, **kwargs):
+    tr = kwargs['instance']
+    if kwargs.get('created'):
+        run_create_info = {
+            "plan_id": tr.plan_id,
+            "run_id": tr.run_id,
+            "errata_id": tr.errata_id,
+            "when": datetime.datetime.now().strftime("%Y-%m-%d %X")
+        }    
+        try:
+            MessageBus.send(run_create_info, "testrun.created", False)
+        except:
+            pass
+
+    else:
+        # FIXME: Log, Plugin and other editing functions
+        pass
+
+# testrun progress/finish info for qpid
+def qpid_run_progress(sender, *args, **kwargs):
+    tcr = kwargs['instance']
+    tr = tcr.run
+    if not kwargs.get('created'):
+        # testrun is progress
+        run_info = {
+            "plan_id": tr.plan_id,
+            "run_id": tr.run_id,
+            "errata_id": tr.errata_id,
+            "when": datetime.datetime.now().strftime("%Y-%m-%d %X"),
+        }
+
+        if not tr.check_all_case_runs():
+            # testrun is progress
+            try:
+                MessageBus.send(run_info, "testrun.progress", False)
+            except:
+                pass
+
+        else:
+            # testrun is finished 
+            try:
+                MessageBus.send(run_info, "testrun.finished", False)
+            except:
+                pass
+    else:
+        # FIXME: log, plugin and other editing functions
         pass
