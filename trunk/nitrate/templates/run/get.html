@@ -152,6 +152,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 				</div>
 			</div>
 			<div class="listinfo">
+				<div class="title grey">Errata_ID&nbsp;:</div>
+				<div class="name">
+				  {{ test_run.errata_id }}
+				</div>
+			</div>
+			<div class="listinfo">
 				<div class="title grey">Default Tester&nbsp;:</div>
 				<div class="name">
 					{% if test_run.default_tester %}
