@@ -64,7 +64,6 @@ RECEIVER_ADDRESS = '''tmp.reading.errata;
     {
         assert: always,
         create: receiver,
-        delete: receiver,
         node: {
             type: queue, durable: False,
             x-declare: {
