@@ -27,6 +27,4 @@ class OutgoingMessage(Message):
 
         # *** This is the outgoing message's routing key
         # *** The broker will route this message according to this routing key
-        self.subject = '{routing_key_prefix}.{event_name}'.format(
-            routing_key_prefix = settings.ROUTING_KEY_PREFIX,
-            event_name = event_name)
+        self.subject = '%s.%s' % (settings.ROUTING_KEY_PREFIX, event_name)
