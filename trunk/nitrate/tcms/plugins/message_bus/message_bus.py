@@ -22,7 +22,7 @@ class MessageBus(object):
     _pending_msgs = []
 
     @classmethod
-    def initialize(cls):
+    def _initialize_connection_if_necessary(cls):
         if not cls._connection:
             cls._connection = Connection(
                 host = settings.BROKER_CONNECTION_INFO['host'],
@@ -98,6 +98,8 @@ class MessageBus(object):
 
     @classmethod
     def send(cls, msg_content, event_name, sync=True):
+        cls._initialize_connection_if_necessary()
+
         o_msg = OutgoingMessage(raw_msg = msg_content, event_name = event_name)
 
         try:
