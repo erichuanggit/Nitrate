@@ -21,7 +21,6 @@ Update testrun.case_run_status by executing a sql
 for each testrun in a testrun queryset
 '''
 
-import cProfile
 from django.db import connection, transaction
 from tcms.testruns.models import TestRun
 

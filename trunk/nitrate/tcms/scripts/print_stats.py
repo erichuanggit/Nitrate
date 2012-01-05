@@ -22,7 +22,6 @@ Print result of cProfile in a file
 
 import sys
 import os
-import pstats
 
 def main():
     try:
@@ -33,6 +32,7 @@ def main():
         print_stats(filename)
 
 def print_stats(filename):
+    import pstats
     stats = pstats.Stats(filename)
     stats = stats.sort_stats('cumulative')
     stats.print_stats()
