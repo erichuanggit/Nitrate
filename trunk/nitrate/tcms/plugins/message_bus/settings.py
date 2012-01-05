@@ -72,8 +72,8 @@ RECEIVER_ADDRESS = '''%s;
                 auto_delete: True
             },
             x-bindings: [
-                { exchange: "%s", queue: "%s", key: "tcms.#" },
-                { exchange: "%s", queue: "%s", key: "secalert.tcms.#" }
+                { exchange: "%s", queue: "%s", key: "errata.#" },
+                { exchange: "%s", queue: "%s", key: "secalert.errata.#" }
             ]
         }
     }'''.replace(os.linesep, '') % (
