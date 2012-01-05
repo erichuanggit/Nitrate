@@ -72,8 +72,8 @@ RECEIVER_ADDRESS = '''tmp.reading.errata;
                 auto_delete: True
             },
             x-bindings: [
-                { exchange: "eso.topic", queue: "tmp.test.local", key: "tcms.#" },
-                { exchange: "eso.topic", queue: "tmp.test.local", key: "secalert.tcms.#" }
+                { exchange: "eso.topic", queue: "tmp.reading.errata", key: "tcms.#" },
+                { exchange: "eso.topic", queue: "tmp.reading.errata", key: "secalert.tcms.#" }
             ]
         }
     }'''.replace(os.linesep, '')
