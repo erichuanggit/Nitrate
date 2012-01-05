@@ -58,9 +58,10 @@ BROKER_CONNECTION_INFO = BROKER_CONNECTION_INFOS[broker_ptr]
 
 ROUTING_KEY_PREFIX = 'tcms'
 TOPIC_EXCHANGE = 'eso.topic'
+TMP_RECEIVE_QUEUE = 'tmp.reading.errata'
 
 SENDER_ADDRESS = '%s; { assert: always, node: { type: topic } }' % TOPIC_EXCHANGE
-RECEIVER_ADDRESS = '''tmp.reading.errata;
+RECEIVER_ADDRESS = '''%s;
     {
         assert: always,
         create: receiver,
@@ -71,8 +72,12 @@ RECEIVER_ADDRESS = '''tmp.reading.errata;
                 auto_delete: True
             },
             x-bindings: [
-                { exchange: "eso.topic", queue: "tmp.reading.errata", key: "tcms.#" },
-                { exchange: "eso.topic", queue: "tmp.reading.errata", key: "secalert.tcms.#" }
+                { exchange: "%s", queue: "%s", key: "tcms.#" },
+                { exchange: "%s", queue: "%s", key: "secalert.tcms.#" }
             ]
         }
-    }'''.replace(os.linesep, '')
+    }'''.replace(os.linesep, '') % (
+        TMP_RECEIVE_QUEUE,
+        TOPIC_EXCHANGE, TMP_RECEIVE_QUEUE,
+        TOPIC_EXCHANGE, TMP_RECEIVE_QUEUE)
+
