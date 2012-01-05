@@ -17,7 +17,6 @@
 #   Xuqing Kuang <xkuang@redhat.com>
 
 from datetime import datetime
-from functools import partial
 
 from django.core.urlresolvers import reverse
 from django.db import models, connection, transaction
