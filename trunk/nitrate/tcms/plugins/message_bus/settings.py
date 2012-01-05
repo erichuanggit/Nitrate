@@ -31,14 +31,16 @@ BROKER_CONNECTION_INFOS = {
 
     'qpid_dev': {
         'host': 'mixologist.lab.bos.redhat.com',
-        'port': 5672,
-        'sasl_mechanisms': 'GSSAPI'
+        'port': 5671,
+        'sasl_mechanisms': 'GSSAPI',
+        'transport': 'ssl',
     },
 
     'qpid_product': {
         'host': 'qpid.devel.redhat.com',
-        'port': 5672,
-        'sasl_mechanisms': 'GSSAPI'
+        'port': 5671,
+        'sasl_mechanisms': 'GSSAPI',
+        'transport': 'ssl',
     }
 }
 

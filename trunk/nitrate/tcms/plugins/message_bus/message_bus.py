@@ -26,7 +26,8 @@ class MessageBus(object):
             cls._connection = Connection(
                 host = settings.BROKER_CONNECTION_INFO['host'],
                 port = settings.BROKER_CONNECTION_INFO['port'],
-                sasl_mechanisms = settings.BROKER_CONNECTION_INFO['sasl_mechanisms'])
+                sasl_mechanisms = settings.BROKER_CONNECTION_INFO['sasl_mechanisms'],
+                transport = settings.BROKER_CONNECTION_INFO['transport'])
             cls._connection.open()
             cls._session = cls._connection.session()
             cls._sender = cls._session.sender(settings.SENDER_ADDRESS)
