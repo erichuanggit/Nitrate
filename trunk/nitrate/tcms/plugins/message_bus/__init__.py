@@ -23,7 +23,3 @@ receiver = PrintMe()
 
 # Initialize configuration for message bus
 import tcms.plugins.message_bus.settings
-
-# Local test passed, and then do not need preivous revision code in production any more.
-from tcms.plugins.message_bus.message_bus import MessageBus
-MessageBus.initialize()
