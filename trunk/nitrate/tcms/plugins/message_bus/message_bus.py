@@ -8,7 +8,7 @@ from qpid.messaging import Connection
 from qpid.sasl import SASLError
 
 from tcms.plugins.message_bus.outgoing_message import OutgoingMessage
-from tcms.plugins.message_bus.util import refresh_HTTP_credential_cache
+from tcms.plugins.message_bus.utils import refresh_HTTP_credential_cache
 
 class MessageBus(object):
     ''' Core message bus '''
