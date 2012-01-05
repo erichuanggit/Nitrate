@@ -5,6 +5,7 @@ from threading import Lock
 import settings
 
 from qpid.messaging import Connection
+from qpid.messaging.exceptions import AuthenticationFailure
 from qpid.sasl import SASLError
 
 from tcms.plugins.message_bus.outgoing_message import OutgoingMessage
@@ -28,7 +29,18 @@ class MessageBus(object):
                 port = settings.BROKER_CONNECTION_INFO['port'],
                 sasl_mechanisms = settings.BROKER_CONNECTION_INFO['sasl_mechanisms'],
                 transport = settings.BROKER_CONNECTION_INFO['transport'])
-            cls._connection.open()
+            try:
+                cls._connection.open()
+            except AuthenticationFailure, msg:
+                ''' For the first time TCMS runs on server, it might
+                    need to initialize Kerberos ticket. And then reopen it.
+                '''
+                # Error code:
+                #   32:  KRB5KRB_AP_ERR_TKT_EXPIRED: Ticket expired
+                #   195: KRB5_FCC_NOFILE: No credentials cache found
+                if msg.text.find('Unknown code krb5 195') >= 0 or msg.text.find('Unknown code krb5 32') >= 0:
+                    refresh_HTTP_credential_cache()
+                    cls._connection.open()
             cls._session = cls._connection.session()
             cls._sender = cls._session.sender(settings.SENDER_ADDRESS)
 
