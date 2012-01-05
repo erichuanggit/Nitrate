@@ -21,12 +21,14 @@ message bus integration
 '''
 
 import os
+import socket
 
 BROKER_CONNECTION_INFOS = {
     'local': {
         'host': 'localhost',
         'port': 5672,
-        'sasl_mechanisms': 'ANONYMOUS'
+        'sasl_mechanisms': 'ANONYMOUS',
+        'transport': 'tcp',
     },
 
     'qpid_dev': {
@@ -44,15 +46,13 @@ BROKER_CONNECTION_INFOS = {
     }
 }
 
-# Using environment variable to control to which message broker message bus connects.
-# By default, message bus connects to QPID production broker.
-# :O MB stands for MessageBus. I just don't want a long name.
-if 'NITRATE_MB_BROKER' in os.environ:
-    broker_ptr = os.environ['NITRATE_MB_BROKER']
-    if broker_ptr not in BROKER_CONNECTION_INFOS.keys():
-        raise NameError('Cannot read broker\'s information. {0} does not exist.'.format(broker_ptr))
-else:
+fqdn = socket.getfqdn()
+if fqdn in ('tcms.englab.nay.redhat.com', 'tcms-stage.englab.bne.redhat.com'):
+    broker_ptr = 'qpid_dev'
+elif fqdn == 'tcms.app.eng.bos.redhat.com':
     broker_ptr = 'qpid_product'
+else:
+    broker_ptr = 'local'
 
 BROKER_CONNECTION_INFO = BROKER_CONNECTION_INFOS[broker_ptr]
 
