@@ -31,14 +31,16 @@ BROKER_CONNECTION_INFOS = {
 
     'qpid_dev': {
         'host': 'mixologist.lab.bos.redhat.com',
-        'port': 5672,
-        'sasl_mechanisms': 'GSSAPI'
+        'port': 5671,
+        'sasl_mechanisms': 'GSSAPI',
+        'transport': 'ssl',
     },
 
     'qpid_product': {
         'host': 'qpid.devel.redhat.com',
-        'port': 5672,
-        'sasl_mechanisms': 'GSSAPI'
+        'port': 5671,
+        'sasl_mechanisms': 'GSSAPI',
+        'transport': 'ssl',
     }
 }
 
@@ -56,13 +58,13 @@ BROKER_CONNECTION_INFO = BROKER_CONNECTION_INFOS[broker_ptr]
 
 ROUTING_KEY_PREFIX = 'tcms'
 TOPIC_EXCHANGE = 'eso.topic'
+TMP_RECEIVE_QUEUE = 'tmp.reading.errata'
 
 SENDER_ADDRESS = '%s; { assert: always, node: { type: topic } }' % TOPIC_EXCHANGE
-RECEIVER_ADDRESS = '''tmp.reading.errata;
+RECEIVER_ADDRESS = '''%s;
     {
         assert: always,
         create: receiver,
-        delete: receiver,
         node: {
             type: queue, durable: False,
             x-declare: {
@@ -70,8 +72,12 @@ RECEIVER_ADDRESS = '''tmp.reading.errata;
                 auto_delete: True
             },
             x-bindings: [
-                { exchange: "eso.topic", queue: "tmp.test.local", key: "tcms.#" },
-                { exchange: "eso.topic", queue: "tmp.test.local", key: "secalert.tcms.#" }
+                { exchange: "%s", queue: "%s", key: "errata.#" },
+                { exchange: "%s", queue: "%s", key: "secalert.errata.#" }
             ]
         }
-    }'''.replace(os.linesep, '')
+    }'''.replace(os.linesep, '') % (
+        TMP_RECEIVE_QUEUE,
+        TOPIC_EXCHANGE, TMP_RECEIVE_QUEUE,
+        TOPIC_EXCHANGE, TMP_RECEIVE_QUEUE)
+
