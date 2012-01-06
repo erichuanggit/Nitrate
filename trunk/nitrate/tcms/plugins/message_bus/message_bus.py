@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 from threading import Lock
 
 import settings
@@ -21,16 +22,15 @@ class MessageBus(object):
     _reinitializing_connection = False
     _pending_msgs = []
 
-    @classmethod
-    def _initialize_connection_if_necessary(cls):
-        if not cls._connection:
-            cls._connection = Connection(
+    def _initialize_connection_if_necessary(self):
+        if MessageBus._connection == None:
+            MessageBus._connection = Connection(
                 host = settings.BROKER_CONNECTION_INFO['host'],
                 port = settings.BROKER_CONNECTION_INFO['port'],
                 sasl_mechanisms = settings.BROKER_CONNECTION_INFO['sasl_mechanisms'],
                 transport = settings.BROKER_CONNECTION_INFO['transport'])
             try:
-                cls._connection.open()
+                MessageBus._connection.open()
             except AuthenticationFailure, msg:
                 ''' For the first time TCMS runs on server, it might
                     need to initialize Kerberos ticket. And then reopen it.
@@ -40,74 +40,84 @@ class MessageBus(object):
                 #   195: KRB5_FCC_NOFILE: No credentials cache found
                 if msg.text.find('Unknown code krb5 195') >= 0 or msg.text.find('Unknown code krb5 32') >= 0:
                     refresh_HTTP_credential_cache()
-                    cls._connection.open()
-            cls._session = cls._connection.session()
-            cls._sender = cls._session.sender(settings.SENDER_ADDRESS)
+                    self.stop()
 
-    @classmethod
-    def _reinitialize(cls):
+                    # Reopen the connection need to do everything from scratch.
+                    MessageBus._connection = Connection(
+                        host = settings.BROKER_CONNECTION_INFO['host'],
+                        port = settings.BROKER_CONNECTION_INFO['port'],
+                        sasl_mechanisms = settings.BROKER_CONNECTION_INFO['sasl_mechanisms'],
+                        transport = settings.BROKER_CONNECTION_INFO['transport'])
+                    MessageBus._connection.open()
+
+            MessageBus._session = MessageBus._connection.session()
+            MessageBus._sender = MessageBus._session.sender(settings.SENDER_ADDRESS)
+
+    def _reinitialize(self, last_undelivered_msg=None):
         l = Lock()
         l.acqire()
 
-        cls._reinitializing_connection = True
+        import subprocess
+
+        subprocess.Popen('logger "tcms.debug begin reinitialize"', shell=True)
+
+        MessageBus._reinitializing_connection = True
 
         # Clean current environment
-        cls.stop()
-
-        import subprocess
-        subprocess.Popen('logger tcms.error %s' % str(msg), shell=True)
+        self.stop()
 
         # messages will be sent after message bus environment is reinitialized.
-        cls._pend_message((msg_content, event_name, sync))
 
-        refresh_HTTP_credential_cache()
-        cls.initialize()
+        subprocess.Popen('logger "tcms.debug pending message: %s"' % str(last_undelivered_msg), shell=True)
+        self._pend_message(last_undelivered_msg)
 
-        cls._reinitializing_connection = False
+        #refresh_HTTP_credential_cache()
+        self._initialize_connection_if_necessary()
+
+        MessageBus._reinitializing_connection = False
 
         # Send all pending messages and then clear
-        for msg_content, event_name, sync in cls._pending_msgs:
-            cls.send(msg_content, event_name, sync)
-        cls._clear_pending_messages()
+        for msg_content, event_name, sync in MessageBus._pending_msgs:
+            self.send(msg_content, event_name, sync)
+        self._clear_pending_messages()
 
         l.release()
 
-    @classmethod
-    def _pend_message(cls, msg):
+    def _pend_message(self, msg):
         '''
         Storing messages temporarily. And they can be sent after the connection reinitialized.
         '''
 
-        cls._pending_msgs.append(msg)
+        MessageBus._pending_msgs.append(msg)
 
-    @classmethod
-    def _clear_pending_messages(cls):
-        cls._pending_msgs = []
+    def _clear_pending_messages(self):
+        MessageBus._pending_msgs = []
 
-    @classmethod
-    def stop(cls):
-        cls._sender = None
-        cls._session.close()
-        cls._session = None
-        cls._connection.close()
-        cls._connection = None
+    def stop(self):
+        if MessageBus._sender is not None:
+            MessageBus._sender = None
 
-    @classmethod
-    def get_sender(cls):
-        return cls._sender
+        if MessageBus._session is not None:
+            MessageBus._session.close()
+            MessageBus._session = None
 
-    @classmethod
-    def send(cls, msg_content, event_name, sync=True):
-        cls._initialize_connection_if_necessary()
+        if MessageBus._connection is not None:
+            MessageBus._connection.close()
+            MessageBus._connection = None
 
+    def get_sender(self):
+        return MessageBus._sender
+
+    def send(self, msg_content, event_name, sync=True):
         o_msg = OutgoingMessage(raw_msg = msg_content, event_name = event_name, content_type='amqp/map')
 
         try:
-            if cls._reinitializing_connection:
-                cls._pend_message((msg_content, event_name, sync))
+            if MessageBus._reinitializing_connection:
+                self._pend_message((msg_content, event_name, sync))
             else:
-                cls.get_sender().send(o_msg, sync=sync)
+                self._initialize_connection_if_necessary()
+                self.get_sender().send(o_msg, sync=sync)
 
         except SASLError, msg:
             ''' Handle the the of expiration HTTP's ticket. '''
-            cls._reinitialize()
+            self._reinitialize((msg_content, event_name, sync))
