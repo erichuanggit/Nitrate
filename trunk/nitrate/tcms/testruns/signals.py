@@ -61,7 +61,7 @@ def qpid_run_created(sender, *args, **kwargs):
             "when": datetime.datetime.now().strftime("%Y-%m-%d %X")
         }    
         try:
-            MessageBus.send(run_create_info, "testrun.created", False)
+            MessageBus().send(run_create_info, "testrun.created", False)
         except:
             pass
 
@@ -85,14 +85,14 @@ def qpid_run_progress(sender, *args, **kwargs):
         if not tr.check_all_case_runs():
             # testrun is progress
             try:
-                MessageBus.send(run_info, "testrun.progress", False)
+                MessageBus().send(run_info, "testrun.progress", False)
             except:
                 pass
 
         else:
             # testrun is finished 
             try:
-                MessageBus.send(run_info, "testrun.finished", False)
+                MessageBus().send(run_info, "testrun.finished", False)
             except:
                 pass
     else:
