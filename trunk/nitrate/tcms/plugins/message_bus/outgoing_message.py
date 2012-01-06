@@ -20,11 +20,9 @@ class OutgoingMessage(Message):
             - The rest of arguments are the qpid's Message's.
         '''
 
-        # Message is not a new-style class :(
-        Message.__init__(self, *args, **kwargs)
-
-        self.content = raw_msg
-
         # *** This is the outgoing message's routing key
         # *** The broker will route this message according to this routing key
-        self.subject = '%s.%s' % (settings.ROUTING_KEY_PREFIX, event_name)
+        routing_key = '%s.%s' % (settings.ROUTING_KEY_PREFIX, event_name)
+
+        # Message is not a new-style class :(
+        Message.__init__(self, content=raw_msg, subject=routing_key, *args, **kwargs)
