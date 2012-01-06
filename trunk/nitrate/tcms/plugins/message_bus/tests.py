@@ -40,6 +40,11 @@ class TestOutgoingMessage(unittest.TestCase):
         self.assertEqual(o_msg.subject, 'tcms.%s' % event_name)
         self.assertTrue(hasattr(o_msg, 'properties'))
 
+        raw_msg = {}
+        o_msg = OutgoingMessage(raw_msg, event_name)
+        self.assertNotEqual(o_msg.content_type, None)
+        self.assertEqual(o_msg.content_type, 'amqp/map')
+
 class TestMessageBus(unittest.TestCase):
 
     binding_key = 'tcms.#'
