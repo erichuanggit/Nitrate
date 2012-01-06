@@ -63,7 +63,7 @@ def bug_add_listen(sender, *args, **kwargs):
         }
         # qpid message send
         try:
-            MessageBus.send(qpid_bug_add, "bugs.added", False)
+            MessageBus().send(qpid_bug_add, "bugs.added", False)
         except:
             pass
     else:
@@ -83,7 +83,7 @@ def bug_remove_listen(sender, *args, **kwargs):
         }
         # qpid message send
         try:
-            MessageBus.send(qpid_bug_remove, "bugs.dropped", False)
+            MessageBus().send(qpid_bug_remove, "bugs.dropped", False)
         except:
             pass
     else:
