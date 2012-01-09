@@ -22,7 +22,13 @@ class MessageBus(object):
     _reinitializing_connection = False
     _pending_msgs = []
 
+    # Protect the connection initializatin to ensure that
+    # only one thread within a Apache child process can establish connection to QPID broker.
+    _lock_for_initialize_connection = Lock()
+
     def _initialize_connection_if_necessary(self):
+        MessageBus._lock_for_initialize_connection.acquire()
+
         if MessageBus._connection == None:
             MessageBus._connection = Connection(
                 host = settings.BROKER_CONNECTION_INFO['host'],
@@ -52,6 +58,8 @@ class MessageBus(object):
 
             MessageBus._session = MessageBus._connection.session()
             MessageBus._sender = MessageBus._session.sender(settings.SENDER_ADDRESS)
+
+        MessageBus._lock_for_initialize_connection.release()
 
     def _reinitialize(self, last_undelivered_msg=None):
         l = Lock()
