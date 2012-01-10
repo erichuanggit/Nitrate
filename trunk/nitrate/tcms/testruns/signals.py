@@ -84,6 +84,8 @@ def qpid_run_progress(sender, *args, **kwargs):
 
         if not tr.check_all_case_runs():
             # testrun is progress
+            completed_percent =  str(tr.completed_case_run_percent) + "%"
+            run_info["completed_percent"] = completed_percent
             try:
                 MessageBus().send(run_info, "testrun.progress", False)
             except:
