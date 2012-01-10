@@ -25,6 +25,11 @@ Based on http://code.google.com/p/modwsgi/wiki/IntegrationWithDjango
 import os
 import django.core.handlers.wsgi
 
+# add tcms's core lib path
+import tcms, sys
+# tcms should exist in only one path.
+sys.path.append(os.path.join(tcms.__path__[0], 'core', 'lib'))
+
 os.environ['PYTHON_EGG_CACHE'] = '/tmp/.python-eggs/'
 os.environ['DJANGO_SETTINGS_MODULE'] = 'tcms.product_settings'
 
