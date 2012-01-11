@@ -123,9 +123,6 @@ def sum_orm_queries(plans, cases, runs, target):
             runs = runs.filter(plan__in=plans)
         runs = runs.extra(
             select={
-                'completed_case_run_percent': RawSQL.completed_case_run_percent,
-                'total_num_caseruns': RawSQL.total_num_caseruns,
-                'failed_case_run_percent': RawSQL.failed_case_run_percent,
                 'env_groups': RawSQL.environment_group_for_run,
             }
         )
