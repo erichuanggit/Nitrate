@@ -282,9 +282,6 @@ def all(request, template_name = 'run/all.html'):
             # Further optimize by adding caserun attributes:
             trs = trs.extra(
                 select={
-                    'completed_case_run_percent': RawSQL.completed_case_run_percent,
-                    'total_num_caseruns': RawSQL.total_num_caseruns,
-                    'failed_case_run_percent': RawSQL.failed_case_run_percent,
                     'env_groups': RawSQL.environment_group_for_run,
                 },
             )
