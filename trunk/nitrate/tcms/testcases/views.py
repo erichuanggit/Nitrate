@@ -894,7 +894,7 @@ def clone(request, template_name='case/clone.html'):
         # Initial the clone case form
         clone_form = CloneCaseForm(initial={
             'case': request.REQUEST.getlist('case'),
-            'copy_case': True,
+            'copy_case': False,
             'maintain_case_orignal_author': True,
             'maintain_case_orignal_default_tester': True,
             'copy_component': True,

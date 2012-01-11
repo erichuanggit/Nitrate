@@ -48,10 +48,20 @@ def is_redhat_url(middle):
         return False
 
     from urlparse import urlparse
+    try:
+        from urlparse import ParseResult
+        py_2_6 = True
+    except ImportError:
+        py_2_6 = False
 
     parse_result = urlparse(middle)
-    if parse_result.scheme or parse_result.netloc:
-        return parse_result.netloc.split(':')[0].endswith('redhat.com')
+    if py_2_6:
+        scheme, netloc = parse_result.scheme, parse_result.netloc
+    else:
+        scheme, netloc = parse_result[0], parse_result[1]
+
+    if scheme or netloc:
+        return netloc.split(':')[0].endswith('redhat.com')
     
     # According to the RFC 1808, which is also documented
     #   within the urlparse module seciton of Python documentation, 
@@ -59,7 +69,10 @@ def is_redhat_url(middle):
     # So, reparse the new URL
     middle = '//%s' % middle
     parse_result = urlparse(middle)
-    return parse_result.netloc.split(':')[0].endswith('redhat.com')
+    if py_2_6:
+        return parse_result.netloc.split(':')[0].endswith('redhat.com')
+    else:
+        return parse_result[1].split(':')[0].endswith('redhat.com')
 
 def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
