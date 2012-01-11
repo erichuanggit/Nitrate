@@ -53,7 +53,12 @@ class EditCaseNotifyThread(threading.Thread):
 # Bug add listen for qpid
 def bug_add_listen(sender, *args, **kwargs):
     tcr_bug = kwargs['instance']
-    tr = tcr_bug.case_run.run
+    if tcr_bug.case_run:
+        #signal is raise by testcaserun
+        tr = tcr_bug.case_run.run
+    else:
+        #signal is raise by testcase
+        return
     if tr.errata_id:
         qpid_bug_add = {
             "run_id": tr.run_id,
@@ -73,7 +78,12 @@ def bug_add_listen(sender, *args, **kwargs):
 # Bug remove listen for qpid
 def bug_remove_listen(sender, *args, **kwargs):
     tcr_bug = kwargs['instance']
-    tr = tcr_bug.case_run.run
+    if tcr_bug.case_run:
+        #signal is raise by testcaserun
+        tr = tcr_bug.case_run.run
+    else:
+        #signal is raise by testcase
+        return
     if tr.errata_id:
         qpid_bug_remove = {
             "run_id": tr.run_id,
