@@ -1,4 +1,5 @@
 {% load comments %}
+{% load redhat_urlize %}
 
 <div class="grey right-action">
 	<label class="tit" >Author:</label>
@@ -96,7 +97,7 @@
 					</form>
 					{% endifequal %}
 					<br/>
-					<pre>{{ comment.comment|linebreaksbr }}</pre>
+					<pre>{{ comment.comment|redhat_urlize|linebreaksbr }}</pre>
 				</li>
 				{% endfor %}
 		</ul>

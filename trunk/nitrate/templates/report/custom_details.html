@@ -2,6 +2,7 @@
 
 {% load comments %}
 {% load report_tags %}
+{% load redhat_urlize %}
 
 {% block subtitle %}Reporting{% endblock %}
 
@@ -200,7 +201,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 		</tr>
 		{% for comment in comments %}
 		<tr class="border-bottom">
-			<td valign="top" colspan="7">{{ comment.comment|linebreaksbr }}<span class="grey">[{{ comment.user }} {{ comment.submit_date }}]</span></td>
+			<td valign="top" colspan="7">{{ comment.comment|redhat_urlize|linebreaksbr }}<span class="grey">[{{ comment.user }} {{ comment.submit_date }}]</span></td>
 		</tr>
 		{% endfor %}
 		{% endif %}
@@ -259,7 +260,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 		</tr>
 		{% for comment in comments %}
 		<tr class="border-bottom">
-			<td valign="top" colspan="7">{{ comment.comment|linebreaksbr }}<span class="grey">[{{ comment.user }} {{ comment.submit_date }}]</span></td>
+			<td valign="top" colspan="7">{{ comment.comment|redhat_urlize|linebreaksbr }}<span class="grey">[{{ comment.user }} {{ comment.submit_date }}]</span></td>
 		</tr>
 		{% endfor %}
 		{% endif %}

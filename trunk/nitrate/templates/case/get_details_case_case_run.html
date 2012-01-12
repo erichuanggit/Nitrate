@@ -1,4 +1,5 @@
 {% load comments %}
+{% load redhat_urlize %}
 {% get_comment_list for test_case_run as case_run_comments %}
 <td colspan='12'>
 	<h4>Notes:</h4>
@@ -10,7 +11,7 @@
 			<span class="strong">#{{ forloop.counter }}</span>
 			<span class="strong">{{ comment.user.email }}</span>
 			<span class="grey">{{ comment.submit_date }}</span><br/>
-			{{ comment.comment|linebreaksbr }} 
+			{{ comment.comment|redhat_urlize|linebreaksbr }} 
 		</li>
 		{% empty %}
 		<li class="grey" style='border:none;margin:0px;padding:0px'>No comments found.</li>
