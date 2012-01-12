@@ -1,4 +1,5 @@
 {% extends "tcms_base.html" %}
+{% load redhat_urlize %}
 
 {% block subtitle %}Profile - {{ user_profile.user.username }}{% endblock %}
 
@@ -125,7 +126,7 @@ Nitrate.Utils.after_page_load(Nitrate.Profiles.Infos.on_load);
 			</tr>
 			<tr>
 				<td class="left_title sprites">Notes</td>
-				<td>{{ user_profile.notes|linebreaksbr|default:'<span class="grey">None</span>' }}</td>
+				<td>{{ user_profile.notes|redhat_urlize|linebreaksbr|default:'<span class="grey">None</span>' }}</td>
 		</table>
 		{% endifequal %}
 	</div>
