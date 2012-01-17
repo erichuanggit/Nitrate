@@ -183,6 +183,13 @@ def check_file(request, file_id):
     return response
 
 def able_to_delete_attachment(request,file_id):
+    '''
+    These are allowed to delete attachment -
+        1. super user
+        2. attachments's submitter
+        3. testplan's author or owner
+        4. testcase's owner
+    '''
     from django.contrib.auth.models import User
     from tcms.management.models import TestAttachment
     from tcms.testplans.models import TestPlan

@@ -14,7 +14,7 @@ def refresh_HTTP_credential_cache():
     realm = 'REDHAT.COM'
     principal_name = 'HTTP/%s@%s' % (socket.getfqdn(), realm)
     # This is the credential cache file, according to the Kerberbos V5 standard
-    ccache_file = '/tmp/krb5cc_%d' % os.getuid()
+    ccache_file = '/tmp/krb5cc_%d_%d' % (os.getuid(), os.getpid())
 
     ctx = krbV.default_context()
     princ = krbV.Principal(name=principal_name, context=ctx)
@@ -23,3 +23,5 @@ def refresh_HTTP_credential_cache():
 
     ccache.init(princ)
     ccache.init_creds_keytab(principal=princ, keytab=keytab)
+
+    return ccache_file

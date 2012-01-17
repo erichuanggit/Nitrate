@@ -47,7 +47,7 @@ BROKER_CONNECTION_INFOS = {
 }
 
 fqdn = socket.getfqdn()
-if fqdn in ('tcms.englab.nay.redhat.com', 'tcms-stage.englab.bne.redhat.com'):
+if fqdn in ('tcms.englab.nay.redhat.com', 'tcms.qe.lab.eng.nay.redhat.com', 'tcms-stage.englab.bne.redhat.com'):
     broker_ptr = 'qpid_dev'
 elif fqdn == 'tcms.app.eng.bos.redhat.com':
     broker_ptr = 'qpid_product'
