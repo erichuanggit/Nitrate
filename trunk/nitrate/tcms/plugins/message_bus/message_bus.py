@@ -30,31 +30,20 @@ class MessageBus(object):
         MessageBus._lock_for_initialize_connection.acquire()
 
         if MessageBus._connection == None:
+            ev_krb5ccname = 'KRB5CCNAME'
+            old_ccache = os.getenv(ev_krb5ccname)
+            new_ccache = refresh_HTTP_credential_cache()
+            os.environ[ev_krb5ccname] = 'FILE:%s' % new_ccache
+
             MessageBus._connection = Connection(
                 host = settings.BROKER_CONNECTION_INFO['host'],
                 port = settings.BROKER_CONNECTION_INFO['port'],
                 sasl_mechanisms = settings.BROKER_CONNECTION_INFO['sasl_mechanisms'],
                 transport = settings.BROKER_CONNECTION_INFO['transport'])
-            try:
-                MessageBus._connection.open()
-            except AuthenticationFailure, msg:
-                ''' For the first time TCMS runs on server, it might
-                    need to initialize Kerberos ticket. And then reopen it.
-                '''
-                # Error code:
-                #   32:  KRB5KRB_AP_ERR_TKT_EXPIRED: Ticket expired
-                #   195: KRB5_FCC_NOFILE: No credentials cache found
-                if msg.text.find('Unknown code krb5 195') >= 0 or msg.text.find('Unknown code krb5 32') >= 0:
-                    refresh_HTTP_credential_cache()
-                    self.stop()
+            MessageBus._connection.open()
 
-                    # Reopen the connection need to do everything from scratch.
-                    MessageBus._connection = Connection(
-                        host = settings.BROKER_CONNECTION_INFO['host'],
-                        port = settings.BROKER_CONNECTION_INFO['port'],
-                        sasl_mechanisms = settings.BROKER_CONNECTION_INFO['sasl_mechanisms'],
-                        transport = settings.BROKER_CONNECTION_INFO['transport'])
-                    MessageBus._connection.open()
+            if old_ccache:
+                os.environ[ev_krb5ccname] = old_ccache
 
             MessageBus._session = MessageBus._connection.session()
             MessageBus._sender = MessageBus._session.sender(settings.SENDER_ADDRESS)
