@@ -38,10 +38,16 @@ class MessageBus(object):
             'transport':       st.QPID_BROKER_TRANSPORT,
         }
         MessageBus._connection = Connection(**options)
-        MessageBus._connection.open()
 
-        if old_ccache:
-            os.environ[ev_krb5ccname] = old_ccache
+        try:
+            MessageBus._connection.open()
+        finally:
+            if old_ccache:
+                os.environ[ev_krb5ccname] = old_ccache
+            else:
+                # OS has no KRB5CCNAME originally.
+                # The current one is unncessary after establishing the connection
+                del os.environ[ev_krb5ccname]
 
     def __connect_as_regular(self):
         options = {
