@@ -16,10 +16,4 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-from signals import PrintMe
-
-# Receiver must be defined, it's required by plugins support.
-receiver = PrintMe()
-
-# Initialize configuration for message bus
-import tcms.plugins.message_bus.settings
+from tcms.plugins.message_bus.message_bus import MessageBus

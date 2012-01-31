@@ -16,51 +16,54 @@
 # Plugin settings
 
 '''
-Configuration for QPID connection and
-message bus integration
+Configuration for QPID messaging
+All settings contain sample value. You should modify them to make them apply to your project
 '''
 
 import os
-import socket
 
-BROKER_CONNECTION_INFOS = {
-    'local': {
-        'host': 'localhost',
-        'port': 5672,
-        'sasl_mechanisms': 'ANONYMOUS',
-        'transport': 'tcp',
-    },
+# Enable or disable messaging in project
+# If this is set to False, no messages will be sent from site
+ENABLE_MESSAGING = True
 
-    'qpid_dev': {
-        'host': 'mixologist.lab.bos.redhat.com',
-        'port': 5671,
-        'sasl_mechanisms': 'GSSAPI',
-        'transport': 'ssl',
-    },
+# QPID configuration
+QPID_BROKER_HOST = 'localhost'
+QPID_BROKER_PORT = 5672
+QPID_BROKER_SASL_MECHANISMS = ''
+QPID_BROKER_TRANSPORT = 'tcp'
 
-    'qpid_product': {
-        'host': 'qpid.devel.redhat.com',
-        'port': 5671,
-        'sasl_mechanisms': 'GSSAPI',
-        'transport': 'ssl',
-    }
-}
+# If using GSSAPI for kerberos authentication, should set this to True
+# When not using GSSAPI, MessageBus will ignore all Kerberos-related configuration
+USING_GSSAPI = False
 
-fqdn = socket.getfqdn()
-if fqdn in ('tcms.englab.nay.redhat.com', 'tcms.qe.lab.eng.nay.redhat.com', 'tcms-stage.englab.bne.redhat.com'):
-    broker_ptr = 'qpid_dev'
-elif fqdn == 'tcms.app.eng.bos.redhat.com':
-    broker_ptr = 'qpid_product'
-else:
-    broker_ptr = 'local'
+AUTH_USERNAME = ''
+AUTH_PASSWORD = ''
 
-BROKER_CONNECTION_INFO = BROKER_CONNECTION_INFOS[broker_ptr]
+# Kerberos configuration
+SERVICE_KEYTAB = '/path/to/httpd/conf/httpd.keytab'
+SERVICE_NAME = 'HTTP'
+SERVICE_HOSTNAME = 'x.y.z'
+REALM = 'COMPANY.COM'
+# Accoding to the Kerberos V5 standard, the principal follows format servicename/hostname@REALM
+SERVICE_PRINCIPAL = '%s/%s@%s' % (SERVICE_NAME, SERVICE_HOSTNAME, REALM)
 
-ROUTING_KEY_PREFIX = 'tcms'
-TOPIC_EXCHANGE = 'eso.topic'
-TMP_RECEIVE_QUEUE = 'tmp.reading.errata'
+# Messaging configuration
 
-SENDER_ADDRESS = '%s; { assert: always, node: { type: topic } }' % TOPIC_EXCHANGE
+# For sending messages
+EXCHANGE_NAME = 'amp.topic'
+ROUTING_KEY_PREFIX = 'project_name'
+# Sample address, youmight modify it for your project
+SENDER_ADDRESS = '%s; { assert: always, node: { type: topic } }' % EXCHANGE_NAME
+
+# For receiving messages
+TMP_QUEUE_NAME = 'tmp.queue'
+# X_BINDING_ITEMS is convenient for formatting multiple x-bindings items in receiver's address.
+# If there is only one x-bindings item, you might not need to use this. Write it in address directly.
+X_BINDING_ITEMS = (
+    #'{ exchange: "%s", queue: "%s", key: "stock.#" }' % (EXCHANGE_NAME, TMP_QUEUE_NAME),
+    #'{ exchange: "%s", queue: "%s", key: "weather.#" }' % (EXCHANGE_NAME, TMP_QUEUE_NAME),
+)
+# Sample address, you might modify it for your project
 RECEIVER_ADDRESS = '''%s;
     {
         assert: always,
@@ -71,13 +74,7 @@ RECEIVER_ADDRESS = '''%s;
                 exclusive: True,
                 auto_delete: True
             },
-            x-bindings: [
-                { exchange: "%s", queue: "%s", key: "errata.#" },
-                { exchange: "%s", queue: "%s", key: "secalert.errata.#" }
-            ]
+            x-bindings: [ %s ]
         }
     }'''.replace(os.linesep, '') % (
-        TMP_RECEIVE_QUEUE,
-        TOPIC_EXCHANGE, TMP_RECEIVE_QUEUE,
-        TOPIC_EXCHANGE, TMP_RECEIVE_QUEUE)
-
+        TMP_QUEUE_NAME, ','.join(X_BINDING_ITEMS))

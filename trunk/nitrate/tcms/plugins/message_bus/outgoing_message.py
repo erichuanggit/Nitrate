@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*- 
 
-import settings
-
 from qpid.messaging import Message
+
+from tcms.plugins.message_bus import settings as st
 
 class OutgoingMessage(Message):
     ''' A simple wrapper for constructing QPID specific message object and its routing key '''
@@ -22,7 +22,7 @@ class OutgoingMessage(Message):
 
         # *** This is the outgoing message's routing key
         # *** The broker will route this message according to this routing key
-        routing_key = '%s.%s' % (settings.ROUTING_KEY_PREFIX, event_name)
+        routing_key = '%s.%s' % (st.ROUTING_KEY_PREFIX, event_name)
 
         # Message is not a new-style class :(
         Message.__init__(self, content=raw_msg, subject=routing_key, *args, **kwargs)
