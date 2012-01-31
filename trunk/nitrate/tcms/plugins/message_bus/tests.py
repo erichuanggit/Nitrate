@@ -45,16 +45,26 @@ class TestSettings(unittest.TestCase):
         if not st.USING_GSSAPI:
             return
 
-        keytab_filename = st.SERVICE_KEYTAB
-        self.assert_(os.path.exists(keytab_filename),
-            'Keytab file %s does not exist.' % keytab_filename)
+        self.assertNotEqual(st.SERVICE_KEYTAB, None,
+            'SERVICE_KEYTAB is None. It should own an empty or an absolute path name.')
 
-        result = os.access(keytab_filename, os.R_OK)
-        self.assert_(result, 'Have no privilege to access the keytab file.')
+        keytab_filename = st.SERVICE_KEYTAB
+        if keytab_filename == '':
+            # Do nothing, next klist command can test this case.
+            pass
+        else:
+            self.assert_(os.path.exists(keytab_filename),
+                'Keytab file %s does not exist.' % keytab_filename)
+
+            result = os.access(keytab_filename, os.R_OK)
+            self.assert_(result, 'Have no privilege to access the keytab file.')
 
         po = subprocess.Popen(('klist -k -t %s' % keytab_filename).split(),
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = po.communicate()
+
+        if po.returncode > 0:
+            self.fail(stderr)
 
         ore = re.compile(r'.* (\w+)/([\w.]+)@([\w.]+)')
         for line in stdout.split(os.linesep):
