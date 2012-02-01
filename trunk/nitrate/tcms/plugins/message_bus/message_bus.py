@@ -132,7 +132,7 @@ class MessageBus(object):
         return MessageBus._sender
 
     def send(self, msg_content, event_name, sync=True):
-        o_msg = OutgoingMessage(raw_msg = msg_content, event_name = event_name, content_type='amqp/map')
+        o_msg = OutgoingMessage(raw_msg = msg_content, event_name = event_name)
 
         try:
             if MessageBus._reinitializing_connection:
