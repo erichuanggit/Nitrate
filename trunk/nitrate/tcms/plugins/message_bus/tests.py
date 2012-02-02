@@ -15,17 +15,76 @@
 
 # Plugin unit testing
 
+import os
+import re
 import subprocess
 import unittest
 
-from itertools import *
+from cStringIO import StringIO
 
 from qpid.messaging import Message
+from qpid.messaging.exceptions import ConnectError
+from qpid.messaging.exceptions import AuthenticationFailure
+from qpid.sasl import SASLError
 
-import settings
-
+from tcms.plugins.message_bus import settings as st
 from tcms.plugins.message_bus.outgoing_message import OutgoingMessage
 from tcms.plugins.message_bus.message_bus import MessageBus
+
+class TestSettings(unittest.TestCase):
+
+    def test_keytab(self):
+        # If don't want to use GSSAPI, it is unnecessary to check keytab
+        if not st.USING_GSSAPI:
+            return
+
+        keytab_filename = st.SERVICE_KEYTAB
+        self.assert_(os.path.exists(keytab_filename),
+            'Keytab file %s does not exist.' % keytab_filename)
+
+        result = os.access(keytab_filename, os.R_OK)
+        self.assert_(result, 'Have no privilege to access the keytab file.')
+
+        po = subprocess.Popen(('klist -k -t %s' % keytab_filename).split(),
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = po.communicate()
+
+        ore = re.compile(r'.* (\w+)/([\w.]+)@([\w.]+)')
+        for line in stdout.split(os.linesep):
+            om = ore.match(line)
+            if not om: continue
+
+            kt_service_name = om.group(1)
+            kt_service_hostname = om.group(2)
+            kt_realm = om.group(3)
+
+            self.assertEqual(kt_service_name, st.SERVICE_NAME,
+                'Keytab\'s service name %s does not match SERVICE_NAME in settings.' % kt_service_name)
+            self.assertEqual(kt_service_hostname, st.SERVICE_HOSTNAME,
+                'Keytab\'s hostname %s does not match SERVICE_HOSTNAME in settings.' % kt_service_hostname)
+            self.assertEqual(kt_realm, st.REALM,
+                'Keytab\'s realm %s does not match REALM in settings.' % kt_realm)
+
+            # Test ends as long as there is one principal within keytab
+            return
+
+        self.fail('Keytab does not contain service name %s, hostname %s, ' \
+                  'and realm %s set in settings.' % (
+                    st.SERVICE_NAME, st.SERVICE_HOSTNAME, st.REALM))
+
+    def test_service_principal(self):
+        principal = '%s/%s@%s' % (st.SERVICE_NAME, st.SERVICE_HOSTNAME, st.REALM)
+        self.assertEqual(principal, st.SERVICE_PRINCIPAL,
+            'You do not need to modify the SERVICE_PRINCIPAL in settings, recover it now.')
+
+    def test_broker_transport(self):
+        self.assert_(st.QPID_BROKER_TRANSPORT in ('tcp', 'tcp+tls', 'ssl'),
+            '%s is not one of tcp, tcp+tls and ssl' % st.QPID_BROKER_TRANSPORT)
+
+    def test_broker_sasl_mechanisms(self):
+        if st.USING_GSSAPI:
+            self.assert_('GSSAPI' in st.QPID_BROKER_SASL_MECHANISMS.split(' '),
+                'GSSAPI is enabled, but GSSAPI does not exist in QPID_BROKER_SASL_MECHANISMS')
 
 class TestOutgoingMessage(unittest.TestCase):
 
@@ -45,99 +104,73 @@ class TestOutgoingMessage(unittest.TestCase):
         self.assertNotEqual(o_msg.content_type, None)
         self.assertEqual(o_msg.content_type, 'amqp/map')
 
-class TestMessageBus(unittest.TestCase):
-
-    binding_key = 'tcms.#'
-    queue_name = 'tmp.qcx.test'
-
-    # Initialized when setUp
-    qmf_session = None
+class TestUtils(unittest.TestCase):
 
     def setUp(self):
-        # Setup QPID environment
-        cmd = 'qpid-config add exchange topic {0}'.format(settings.TOPIC_EXCHANGE).split()
-        subprocess.Popen(cmd).wait()
-
-        cmd = 'qpid-config add queue {0}'.format(self.queue_name).split()
-        subprocess.Popen(cmd).wait()
-
-        cmd = 'qpid-config bind {exchange_name} {queue_name} {binding_key}'.format(
-            exchange_name = settings.TOPIC_EXCHANGE,
-            queue_name = self.queue_name,
-            binding_key = self.binding_key).split()
-        subprocess.Popen(cmd).wait()
-
-        # Initialize message bus
-        MessageBus.initialize()
-
-        # Initialize session for retreiving information from QPID server
-        from qmf.console import Session
-
-        self.qmf_session = Session()
-        self.qmf_session.addBroker('{host}:{port}'.format(
-            host = settings.BROKER_CONNECTION_INFO['host'],
-            port = settings.BROKER_CONNECTION_INFO['port']))
+        self.old_ccache = os.getenv('KRB5CCNAME', None)
 
     def tearDown(self):
-        # Clear test environment in reverse order
-        self.qmf_session.close()
-        MessageBus.stop()
+        if self.old_ccache:
+            os.environ['KRB5CCNAME'] = self.old_ccache
 
-        cmd = 'qpid-config unbind {exchange_name} {queue_name}'.format(
-            exchange_name = settings.TOPIC_EXCHANGE,
-            queue_name = self.queue_name).split()
-        subprocess.Popen(cmd).wait()
+    def test_refresh_credential_cache(self):
+        '''
+        This test method depends on whether to use GSSAPI authentication mechanism.
 
-        cmd = 'qpid-config del queue {0} --force'.format(self.queue_name).split()
-        subprocess.Popen(cmd).wait()
+        When this method throws Krb5Error, do check whether enable USING_GSSAPI and
+        configure GSSAPI related configurations correctly.
+        '''
 
-        cmd = 'qpid-config del exchange {0}'.format(settings.TOPIC_EXCHANGE).split()
-        subprocess.Popen(cmd).wait()
+        from tcms.plugins.message_bus.utils import refresh_HTTP_credential_cache
 
-    def get_queue_by_name(self, queues, name):
-        # OMG, I'm crazy :D
-        found_queues = [item for item in
-            takewhile(lambda queue: queue.name == name,
-                dropwhile(lambda queue: queue.name != name, queues))]
+        old_cache = os.getenv('KRB5CCNAME', None)
 
-        return found_queues[0] if found_queues else None
+        ccache_file = refresh_HTTP_credential_cache()
+        print ccache_file
+        os.environ['KRB5CCNAME'] = ccache_file
 
-    def get_msgdepth_from_statistics(self, statistics):
-        # OMG, I'm crazy again! :D
-        result = [item for item in
-            takewhile(lambda item: item[0].name == 'msgDepth',
-                dropwhile(lambda item: item[0].name != 'msgDepth', statistics))]
+        self.assert_(os.path.exists(ccache_file),
+            'The credential cache file was not be generated.')
 
-        return result[0][1] if result else None
+        op = subprocess.Popen('klist'.split(),
+            stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        stdout, stderr = op.communicate()
 
-    def testLongTermLongCreationAndReusable(self):
-        conn = MessageBus._connection
-        self.assertNotEqual(conn, None)
-        self.assertTrue(conn.opened())
-        self.assertTrue(conn.attached())
+        if old_cache:
+            os.environ['KRB5CCNAME'] = old_cache
 
-        sess = MessageBus._session
-        self.assertNotEqual(sess, None)
+        reader = StringIO(stdout)
+        line1 = reader.readline().strip(os.linesep)
+        line2 = reader.readline().strip(os.linesep)
+        reader.close()
 
-        sender = MessageBus._sender
-        self.assertNotEqual(sender, None)
+        self.assertEqual(line1, 'Ticket cache: FILE:%s' % ccache_file,
+            'Ticket cache file name does not match the newly generated.')
+        self.assertEqual(line2, 'Default principal: %s' % st.SERVICE_PRINCIPAL,
+            'Default principal within credential cache does not match the SERVICE_PRINCIPAL in settings')
 
-    def testSendMessage(self):
-        # Step 1:
-        msg_content = 'hello world'
-        event_name = 'bugs.add'
-        self.assertEqual(MessageBus._connection.attached(), True)
-        MessageBus.send(msg_content, event_name)
+class TestMessageBus(unittest.TestCase):
 
-        # Step 2:
-        queues = self.qmf_session.getObjects(_class='queue', _package='org.apache.qpid.broker')
-        queue = self.get_queue_by_name(queues, self.queue_name)
-        self.assertNotEqual(queue, None)
+    def test_sending_message(self):
+        msg_content = {
+            'who': 'TestMessageBus.test_sending_message',
+            'when': '2012-1-30 15:17:10',
+            'percent': '100%',
+            'errata_id': 1234
+        }
 
-        msg_depth = self.get_msgdepth_from_statistics(queue.getStatistics())
-        self.assertNotEqual(msg_depth, None)
-        self.assertEqual(msg_depth, 1)
+        try:
+            MessageBus().send(msg_content=msg_content, event_name='testrun.created')
+        except ConnectError, err:
+            # Something wrong with the connection establishing
+            self.fail(str(err))
+        except AuthenticationFailure, err:
+            # Something wrong with the authentication configuration,
+            # or not allowed to send message with current ticket.
+            self.fail(str(err))
+        except SASLError, err:
+            # Same as above, check the error's message for detial
+            self.fail(str(err))
 
 if __name__ == '__main__':
     unittest.main()
-
