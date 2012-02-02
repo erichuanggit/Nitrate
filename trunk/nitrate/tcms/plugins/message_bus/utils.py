@@ -18,7 +18,13 @@ def refresh_HTTP_credential_cache():
 
     ctx = krbV.default_context()
     princ = krbV.Principal(name=principal_name, context=ctx)
-    keytab = krbV.Keytab(name=keytab_file, context=ctx)
+    if keytab_file:
+        keytab = krbV.Keytab(name=keytab_file, context=ctx)
+    else:
+        # According the documentation of MIT Kerberos V5,
+        # default keytab file is /etc/krb5.keytab. It might be changed
+        # by modifying default_keytab_name in krb5.conf
+        keytab = ctx.default_keytab()
     ccache = krbV.CCache(name=ccache_file, context=ctx)
 
     ccache.init(princ)
