@@ -307,3 +307,8 @@ LISTENING_MODEL_SIGNAL = True
 # Kerberos settings
 # Required by kerberos authentication backend
 KRB5_REALM = ''
+
+# Integration with Errata system, used to linkify the Errata ID
+# A valid Errata URL:
+# https://errata.devel.redhat.com/errata/stateview/{Errata ID}
+ERRATA_URL_PREFIX = 'https://errata.devel.redhat.com/errata/stateview'
