@@ -1,24 +1,30 @@
 # -*- coding: utf-8 -*-
 
+from tcms.plugins.message_bus import settings as st
+
 def refresh_HTTP_credential_cache():
     '''
-    Refresh HTTP ticket cache from /etc/httpd/httpd.keytab
+    Put service ticket into credential cache from service's keytab file.
 
-    No return value.
+    Return the credential cache file name.
     '''
 
-    import krbV, os, socket
+    import krbV, os
 
-    # TODO: There may be a better way to get the keytab file name rather than hard code here.
-    keytab_file = '/etc/httpd/conf/httpd.keytab'
-    realm = 'REDHAT.COM'
-    principal_name = 'HTTP/%s@%s' % (socket.getfqdn(), realm)
+    keytab_file = st.SERVICE_KEYTAB
+    principal_name = st.SERVICE_PRINCIPAL
     # This is the credential cache file, according to the Kerberbos V5 standard
     ccache_file = '/tmp/krb5cc_%d_%d' % (os.getuid(), os.getpid())
 
     ctx = krbV.default_context()
     princ = krbV.Principal(name=principal_name, context=ctx)
-    keytab = krbV.Keytab(name=keytab_file, context=ctx)
+    if keytab_file:
+        keytab = krbV.Keytab(name=keytab_file, context=ctx)
+    else:
+        # According the documentation of MIT Kerberos V5,
+        # default keytab file is /etc/krb5.keytab. It might be changed
+        # by modifying default_keytab_name in krb5.conf
+        keytab = ctx.default_keytab()
     ccache = krbV.CCache(name=ccache_file, context=ctx)
 
     ccache.init(princ)
