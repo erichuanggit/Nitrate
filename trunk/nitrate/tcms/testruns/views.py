@@ -29,6 +29,8 @@ from models import TestRun, TestCaseRun, TestCaseRunStatus, TCMSEnvRunValueMap
 from tcms.search.order import order_run_queryset
 from tcms.search import remove_from_request_path
 
+from tcms.settings import ERRATA_URL_PREFIX
+
 MODULE_NAME = "testruns"
 
 @user_passes_test(lambda u: u.has_perm('testruns.add_testrun'))
@@ -362,6 +364,7 @@ def get(request, run_id, template_name = 'run/get.html'):
         'test_case_run_bugs': tcr_bugs,
         'test_case_run_status': TestCaseRunStatus.objects.order_by('pk'),
         'priorities': Priority.objects.all(),
+        'errata_url_prefix': ERRATA_URL_PREFIX,
     })
 
 @user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
