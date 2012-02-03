@@ -1,15 +1,26 @@
 # -*- coding: utf-8 -*-
 
 import os
+import subprocess
+import sys
+
 from threading import Lock
 
 from qpid.messaging import Connection
+from qpid.messaging.exceptions import ConnectionError
+from qpid.messaging.exceptions import ConnectError
 from qpid.messaging.exceptions import AuthenticationFailure
 from qpid.sasl import SASLError
 
 from tcms.plugins.message_bus import settings as st
 from tcms.plugins.message_bus.outgoing_message import OutgoingMessage
 from tcms.plugins.message_bus.utils import refresh_HTTP_credential_cache
+
+errlog = sys.stderr
+write_errlog = lambda log_content: errlog.write(log_content + os.linesep)
+
+errlog_write = lambda log_content: errlog.write(log_content)
+errlog_writeline = lambda log_content: errlog.write(log_content + os.linesep)
 
 class MessageBus(object):
     ''' Core message bus '''
@@ -18,12 +29,23 @@ class MessageBus(object):
     _session = None
     _sender = None
 
-    _reinitializing_connection = False
-    _pending_msgs = []
+    _lock_for_open_connection = Lock()
 
-    # Protect the connection initializatin to ensure that
-    # only one thread within a Apache child process can establish connection to QPID broker.
-    _lock_for_initialize_connection = Lock()
+    @property
+    def connection(self):
+        return self._connection
+
+    @property
+    def session(self):
+        return self._session
+
+    @property
+    def sender(self):
+        return self._sender
+
+    @property
+    def status(self):
+        return self._status
 
     def __connect_with_gssapi(self):
         ev_krb5ccname = 'KRB5CCNAME'
@@ -37,10 +59,10 @@ class MessageBus(object):
             'sasl_mechanisms': st.QPID_BROKER_SASL_MECHANISMS,
             'transport':       st.QPID_BROKER_TRANSPORT,
         }
-        MessageBus._connection = Connection(**options)
+        self._connection = Connection(**options)
 
         try:
-            MessageBus._connection.open()
+            self._connection.open()
         finally:
             if old_ccache:
                 os.environ[ev_krb5ccname] = old_ccache
@@ -58,89 +80,85 @@ class MessageBus(object):
             'username':        st.AUTH_USERNAME,
             'password':        st.AUTH_PASSWORD,
         }
-        MessageBus._connection = Connection(**options)
-        MessageBus._connection.open()
+        self._connection = Connection(**options)
+        self._connection.open()
 
     if st.USING_GSSAPI:
         __connect_broker = __connect_with_gssapi
     else:
         __connect_broker = __connect_as_regular
 
-    def _initialize_connection_if_necessary(self):
-        MessageBus._lock_for_initialize_connection.acquire()
-
-        if MessageBus._connection == None:
-            self.__connect_broker()
-            MessageBus._session = MessageBus._connection.session()
-            MessageBus._sender = MessageBus._session.sender(st.SENDER_ADDRESS)
-
-        MessageBus._lock_for_initialize_connection.release()
-
-    def _reinitialize(self, last_undelivered_msg=None):
-        l = Lock()
-        l.acqire()
-
-        import subprocess
-
-        subprocess.Popen('logger "tcms.debug begin reinitialize"', shell=True)
-
-        MessageBus._reinitializing_connection = True
-
-        # Clean current environment
-        self.stop()
-
-        # messages will be sent after message bus environment is reinitialized.
-
-        subprocess.Popen('logger "tcms.debug pending message: %s"' % str(last_undelivered_msg), shell=True)
-        self._pend_message(last_undelivered_msg)
-
-        #refresh_HTTP_credential_cache()
-        self._initialize_connection_if_necessary()
-
-        MessageBus._reinitializing_connection = False
-
-        # Send all pending messages and then clear
-        for msg_content, event_name, sync in MessageBus._pending_msgs:
-            self.send(msg_content, event_name, sync)
-        self._clear_pending_messages()
-
-        l.release()
-
-    def _pend_message(self, msg):
+    def __establish(self):
         '''
-        Storing messages temporarily. And they can be sent after the connection reinitialized.
+        Establish a connection to QPID broker actually.
+
+        The connection to QPID broker is alive forever,
+        unless the Apache is stopped, the broker is down,
+        or even the network is unavialable.
+
+        MessageBus also saves the session and sender for
+        subsequent request of sending messages.
         '''
 
-        MessageBus._pending_msgs.append(msg)
+        self.__connect_broker()
+        self._session = self._connection.session()
+        self._sender = self._session.sender(st.SENDER_ADDRESS)
 
-    def _clear_pending_messages(self):
-        MessageBus._pending_msgs = []
+    def __connect_broker_if_necessary(self):
+        '''
+        Establishing connection to QPID broker.
+        '''
 
-    def stop(self):
-        if MessageBus._sender is not None:
-            MessageBus._sender = None
-
-        if MessageBus._session is not None:
-            MessageBus._session.close()
-            MessageBus._session = None
-
-        if MessageBus._connection is not None:
-            MessageBus._connection.close()
-            MessageBus._connection = None
-
-    def get_sender(self):
-        return MessageBus._sender
-
-    def send(self, msg_content, event_name, sync=True):
-        o_msg = OutgoingMessage(raw_msg = msg_content, event_name = event_name, content_type='amqp/map')
+        self._lock_for_open_connection.acquire()
 
         try:
-            if MessageBus._reinitializing_connection:
-                self._pend_message((msg_content, event_name, sync))
-            else:
-                self._initialize_connection_if_necessary()
-                self.get_sender().send(o_msg, sync=sync)
+            if not self.connection:
+                self.__establish()
+        finally:
+            self._lock_for_open_connection.release()
 
-        except SASLError, msg:
-            ''' Handle the the of expiration HTTP's ticket. '''
-            self._reinitialize((msg_content, event_name, sync))
+    def stop(self):
+        '''
+        Stop the connection to the QPID broker.
+
+        This can be considered to clear MessageBus' environment also.
+        '''
+
+        if self._sender is not None:
+            self._sender = None
+
+        if self._session is not None:
+            self._session.close()
+            self._session = None
+
+        if self._connection is not None:
+            self._connection.close()
+            self._connection = None
+
+    def send(self, msg_content, event_name, sync=True):
+        '''
+        Send a message to QPID broker.
+
+        The routing key consists of the prefix defined in settings and event_name.
+        '''
+
+        try:
+            self.__connect_broker_if_necessary()
+
+        except AuthenticationFailure, err:
+            errlog_writeline('AuthenticationError. Please check settings\'s configuration ' \
+                             'and your authentication environment. Error message: ' + str(err))
+
+        except ConnectError, err:
+            errlog_writeline('ConnectError. ' + str(err))
+            return
+
+        try:
+            o_msg = OutgoingMessage(raw_msg = msg_content, event_name = event_name)
+            self.sender.send(o_msg, sync=sync)
+
+        except ConnectionError, err:
+            errlog_writeline('ConnectionError %s while sending message %s.' % \
+                             (str(err), str(msg_content)))
+
+            self.stop()

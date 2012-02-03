@@ -152,9 +152,11 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 				</div>
 			</div>
 			<div class="listinfo">
-				<div class="title grey">Errata_ID&nbsp;:</div>
+				<div class="title grey">Errata&nbsp;:</div>
 				<div class="name">
-				  {{ test_run.errata_id }}
+                {% if test_run.errata_id %}
+				  <a href="{{ errata_url_prefix }}/{{ test_run.errata_id }}" target="_blank">{{ test_run.errata_id }}</a>
+                {% endif %}
 				</div>
 			</div>
 			<div class="listinfo">
