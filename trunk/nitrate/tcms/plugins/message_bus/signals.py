@@ -16,14 +16,18 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-from pprint import pprint
+from tcms.plugins.message_bus.settings import ENABLE_MESSAGING
 
-class PrintMe(object):
-    def __init__(self):
-        pass
-        
-    def __call__(self, args):
-        return self.print_me(args)
-    
-    def print_me(self, args):
-        pprint(args)
+'''
+Message Bus is controlled by ENABLE_MESSAGING variable defined in settings.
+If the messaging is not enabled, no signal will be registered here.
+'''
+
+if ENABLE_MESSAGING:
+
+    '''
+    Register signals here. These signal handler will
+    handle the message sending and the related data
+    '''
+
+    # TODO: add signal handler here

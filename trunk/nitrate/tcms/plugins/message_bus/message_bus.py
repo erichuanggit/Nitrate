@@ -3,12 +3,11 @@
 import os
 from threading import Lock
 
-import settings
-
 from qpid.messaging import Connection
 from qpid.messaging.exceptions import AuthenticationFailure
 from qpid.sasl import SASLError
 
+from tcms.plugins.message_bus import settings as st
 from tcms.plugins.message_bus.outgoing_message import OutgoingMessage
 from tcms.plugins.message_bus.utils import refresh_HTTP_credential_cache
 
@@ -26,27 +25,54 @@ class MessageBus(object):
     # only one thread within a Apache child process can establish connection to QPID broker.
     _lock_for_initialize_connection = Lock()
 
+    def __connect_with_gssapi(self):
+        ev_krb5ccname = 'KRB5CCNAME'
+        old_ccache = os.getenv(ev_krb5ccname, None)
+        new_ccache = refresh_HTTP_credential_cache()
+        os.environ[ev_krb5ccname] = 'FILE:%s' % new_ccache
+
+        options = {
+            'host':            st.QPID_BROKER_HOST,
+            'port':            st.QPID_BROKER_PORT,
+            'sasl_mechanisms': st.QPID_BROKER_SASL_MECHANISMS,
+            'transport':       st.QPID_BROKER_TRANSPORT,
+        }
+        MessageBus._connection = Connection(**options)
+
+        try:
+            MessageBus._connection.open()
+        finally:
+            if old_ccache:
+                os.environ[ev_krb5ccname] = old_ccache
+            else:
+                # OS has no KRB5CCNAME originally.
+                # The current one is unncessary after establishing the connection
+                del os.environ[ev_krb5ccname]
+
+    def __connect_as_regular(self):
+        options = {
+            'host':            st.QPID_BROKER_HOST,
+            'port':            st.QPID_BROKER_PORT,
+            'sasl_mechanisms': st.QPID_BROKER_SASL_MECHANISMS,
+            'transport':       st.QPID_BROKER_TRANSPORT,
+            'username':        st.AUTH_USERNAME,
+            'password':        st.AUTH_PASSWORD,
+        }
+        MessageBus._connection = Connection(**options)
+        MessageBus._connection.open()
+
+    if st.USING_GSSAPI:
+        __connect_broker = __connect_with_gssapi
+    else:
+        __connect_broker = __connect_as_regular
+
     def _initialize_connection_if_necessary(self):
         MessageBus._lock_for_initialize_connection.acquire()
 
         if MessageBus._connection == None:
-            ev_krb5ccname = 'KRB5CCNAME'
-            old_ccache = os.getenv(ev_krb5ccname)
-            new_ccache = refresh_HTTP_credential_cache()
-            os.environ[ev_krb5ccname] = 'FILE:%s' % new_ccache
-
-            MessageBus._connection = Connection(
-                host = settings.BROKER_CONNECTION_INFO['host'],
-                port = settings.BROKER_CONNECTION_INFO['port'],
-                sasl_mechanisms = settings.BROKER_CONNECTION_INFO['sasl_mechanisms'],
-                transport = settings.BROKER_CONNECTION_INFO['transport'])
-            MessageBus._connection.open()
-
-            if old_ccache:
-                os.environ[ev_krb5ccname] = old_ccache
-
+            self.__connect_broker()
             MessageBus._session = MessageBus._connection.session()
-            MessageBus._sender = MessageBus._session.sender(settings.SENDER_ADDRESS)
+            MessageBus._sender = MessageBus._session.sender(st.SENDER_ADDRESS)
 
         MessageBus._lock_for_initialize_connection.release()
 

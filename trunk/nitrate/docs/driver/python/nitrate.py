@@ -255,7 +255,7 @@ class KerbTransport(SafeCookieTransport):
 
         else:
             # For Python 2.6, do the default behavior
-            return SafeCookieTransport.make_connection(host)
+            return SafeCookieTransport.make_connection(self, host)
 
 class NitrateError(Exception):
     pass
