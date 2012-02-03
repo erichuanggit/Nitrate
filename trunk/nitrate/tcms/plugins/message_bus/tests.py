@@ -24,6 +24,7 @@ from cStringIO import StringIO
 
 from qpid.messaging import Message
 from qpid.messaging.exceptions import ConnectError
+from qpid.messaging.exceptions import ConnectionError
 from qpid.messaging.exceptions import AuthenticationFailure
 from qpid.sasl import SASLError
 
@@ -211,6 +212,54 @@ class TestMessageBus(unittest.TestCase):
         except ConnectError, err:
             # Something wrong with the connection establishing
             self.fail(str(err))
+
+class TestStateTransmissionLocally(unittest.TestCase):
+    '''
+    Test transmission of MessageBus' status locally
+
+    This testcase assumes that you have installed QPID
+    in your machine, either development machine or test server.
+    '''
+
+    def setUp(self):
+        self.org_host = st.QPID_BROKER_HOST
+        self.org_port = st.QPID_BROKER_PORT
+        self.org_mech = st.QPID_BROKER_SASL_MECHANISMS
+        self.org_transport = st.QPID_BROKER_TRANSPORT
+        self.org_exchange_name = st.EXCHANGE_NAME
+        self.org_using_gssapi = st.USING_GSSAPI
+
+        st.QPID_BROKER_HOST = 'localhost'
+        st.QPID_BROKER_PORT = 5672
+        st.QPID_BROKER_SASL_MECHANISMS = 'ANONYMOUS'
+        st.QPID_BROKER_TRANSPORT = 'tcp'
+        st.EXCHANGE_NAME = 'amq.topic'
+        st.USING_GSSAPI = False
+
+    def tearDown(self):
+        st.QPID_BROKER_HOST = self.org_host
+        st.QPID_BROKER_PORT = self.org_port
+        st.QPID_BROKER_SASL_MECHANISMS = self.org_mech
+        st.QPID_BROKER_TRANSPORT = self.org_transport
+        st.EXCHANGE_NAME = self.org_exchange_name
+        st.USING_GSSAPI = self.org_using_gssapi
+
+    def start_qpidd(self):
+        print 'Starting qpidd for subsequent tests.'
+        print 'Command for starting qpidd [sudo /etc/init.d/qpidd start]: ',
+        cmd = 'sudo /etc/init.d/qpidd start'
+        cmd = raw_input().strip()
+        subprocess.Popen(cmd.split()).wait()
+
+    def stop_qpidd(self):
+        print 'stopping qpidd for subsequent tests.'
+        print 'Command for stopping qpidd [sudo /etc/init.d/qpidd stop]:',
+        cmd = 'sudo /etc/init.d/qpidd stop'
+        cmd = raw_input().strip()
+        subprocess.Popen(cmd.split()).wait()
+
+    def test_status_transition(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()
