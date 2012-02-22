@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Nitrate is copyright 2010 Red Hat, Inc.
-# 
+#
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -9,10 +9,10 @@
 # the hope that it will be useful, but WITHOUT ANY WARRANTY; without
 # even the implied warranties of TITLE, NON-INFRINGEMENT,
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
-# 
+#
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
@@ -23,7 +23,7 @@ from django.db import models, connection, transaction
 from django.db.models import signals
 
 from tcms.core.models import TCMSActionModel, TimedeltaField
-from tcms.testcases.models import TestCaseBug, TestCaseText, NoneText
+from tcms.apps.testcases.models import TestCaseBug, TestCaseText, NoneText
 
 from signals import post_run_saved, qpid_run_created, qpid_run_progress
 
@@ -36,13 +36,13 @@ except ImportError:
 # Create your models here.
 
 class TestRun(TCMSActionModel):
-    
+
     run_id = models.AutoField(primary_key=True)
     errata_id = models.IntegerField(max_length=11, null=True, blank=True)
-    
+
     product_version = models.CharField(max_length=192, blank=True)
     plan_text_version = models.IntegerField()
-    
+
     start_date = models.DateTimeField(auto_now_add=True)
     stop_date = models.DateTimeField(null=True, blank=True)
     summary = models.TextField()
@@ -64,54 +64,54 @@ class TestRun(TCMSActionModel):
     #    through='testcases.TestCaseRun',
     #    related_name='run_case'
     #)
-    
+
     env_value = models.ManyToManyField(
         'management.TCMSEnvValue',
         through='testruns.TCMSEnvRunValueMap',
     )
-    
+
     tag = models.ManyToManyField(
         'management.TestTag',
         through='testruns.TestRunTag',
     )
-    
+
     cc = models.ManyToManyField(
         'auth.User',
         through='testruns.TestRunCC',
     )
-    
+
     # Auto-generated attributes from back-references:
     #   'caseruns' : query on TestCaseRuns (from TestCaseRuns.run)
-    
+
     class Meta:
         db_table = u'test_runs'
         unique_together = ('run_id', 'product_version', 'plan_text_version')
         ordering = ['-run_id', 'summary']
-    
+
     def __unicode__(self):
         return self.summary
-    
+
     @classmethod
     def list(cls, query):
         from django.db.models import Q
-        
+
         q = cls.objects
-        
+
         if query.get('search'):
            q = q.filter(
                 Q(run_id__icontains = query['search']) |
                 Q(summary__icontains = query['search'])
             )
-        
+
         if query.get('summary'):
             q = q.filter(summary__icontains = query['summary'])
-        
+
         if query.get('product'):
             q = q.filter(build__product = query['product'])
-        
+
         if query.get('product_version'):
             q = q.filter(product_version = query['product_version'])
-        
+
         plan_str = query.get('plan')
         if plan_str:
             try:
@@ -122,24 +122,24 @@ class TestRun(TCMSActionModel):
                 # Not an integer - treat plan_str as a plan name:
                 q = q.filter(plan__name__icontains = plan_str)
         del plan_str
-        
+
         if query.get('build'):
             q = q.filter(build = query['build'])
-        
+
         # Old style environment search
         #if query.get('env_id'):
         #    q = q.filter(environment__environment_id = query.get('env_id'))
-        
+
         # New environment search
         if query.get('env_group'):
             q = q.filter(plan__env_group = query['env_group'])
-        
+
         if query.get('people_id'):
             q = q.filter(
                 Q(manager__id = query['people_id'])
                 | Q(default_tester__id = query['people_id'])
             )
-        
+
         if query.get('people'):
             if query.get('people_type') == 'default_tester':
                 q = q.filter(default_tester = query['people'])
@@ -150,46 +150,46 @@ class TestRun(TCMSActionModel):
                     Q(manager = query['people'])
                     | Q(default_tester = query['people'])
                 )
-        
+
         if query.get('manager'):
             q = q.filter(manager = query['manager'])
-        
+
         if query.get('default_tester'):
             q = q.filter(default_tester = query['default_tester'])
-        
+
         if query.get('sortby'):
             q = q.order_by(query.get('sortby'))
-        
+
         if query.get('status'):
             if query.get('status').lower() == 'running':
                 q = q.filter(stop_date__isnull = True)
             if query.get('status').lower() == 'finished':
                 q = q.filter(stop_date__isnull = False)
-        
+
         if query.get('tag__name__in'):
             q = q.filter(tag__name__in = query['tag__name__in'])
-        
+
         if query.get('case_run__assignee'):
             q = q.filter(case_run__assignee = query['case_run__assignee'])
-        
+
         return q.distinct()
-    
+
     def belong_to(self, user):
         if self.manager == user or self.plan.author == user:
             return True
-            
+
         return False
-    
+
     def check_all_case_runs(self, case_run_id = None):
         tcrs = self.case_run.all()
         tcrs = tcrs.select_related('case_run_status')
-        
+
         if case_run_id:
             for tcr in tcrs:
                 if tcr.is_current:
                     tcr.is_current = False
                     tcr.save()
-                    
+
                 if tcr.case_run_id == case_run_id:
                     try:
                         prev_tcr, next_tcr = tcr.get_previous_or_next()
@@ -197,22 +197,22 @@ class TestRun(TCMSActionModel):
                         next_tcr.save()
                     except:
                         raise
-        
+
         for tcr in tcrs:
             if not tcr.is_finished():
                 return False
-        
+
         return True
-    
+
     def get_absolute_url(self, request = None):
         # Upward compatibility code
         if request:
             return request.build_absolute_uri(
-                reverse('tcms.testruns.views.get', args=[self.pk, ])
+                reverse('tcms.apps.testruns.views.get', args=[self.pk, ])
             )
-        
+
         return self.get_url(request)
-    
+
     def get_notify_addrs(self):
         """
         Get the all related mails from the run
@@ -221,15 +221,15 @@ class TestRun(TCMSActionModel):
         to.extend(self.cc.values_list('email', flat=True))
         if self.default_tester_id:
             to.append(self.default_tester.email)
-            
+
         for tcr in self.case_run.select_related('assignee').all():
             if tcr.assignee_id:
                 to.append(tcr.assignee.email)
         return list(set(to))
-    
+
     def get_url_path(self):
-        return reverse('tcms.testruns.views.get', args=[self.pk, ])
-    
+        return reverse('tcms.apps.testruns.views.get', args=[self.pk, ])
+
     def get_product_version(self):
         """
         Workaround the schema problem with default_product_version
@@ -243,14 +243,14 @@ class TestRun(TCMSActionModel):
             )
         except Version.DoesNotExist:
             return None
-    
+
     def get_version_id(self):
         """
         Workaround the schema problem with default_product_version
         """
         version = self.get_product_version()
         return version and version.id or None
-    
+
     def add_case_run(self, case, case_run_status = 1, assignee = None, case_text_version = None, build = None, notes = None, sortkey = 0):
         try:
             return self.case_run.create(
@@ -275,7 +275,7 @@ class TestRun(TCMSActionModel):
             )
         except:
             raise
-    
+
     def add_tag(self, tag):
         try:
             return TestRunTag.objects.get_or_create(
@@ -284,7 +284,7 @@ class TestRun(TCMSActionModel):
             )
         except:
             raise
-    
+
     def add_cc(self, user):
         try:
             return TestRunCC.objects.get_or_create(
@@ -293,7 +293,7 @@ class TestRun(TCMSActionModel):
             )
         except:
             raise
-    
+
     def add_env_value(self, env_value):
         try:
             return TCMSEnvRunValueMap.objects.get_or_create(
@@ -302,26 +302,26 @@ class TestRun(TCMSActionModel):
             )
         except:
             raise
-    
+
     def remove_tag(self, tag):
         cursor = connection.cursor()
         cursor.execute("DELETE from test_run_tags \
             WHERE run_id = %s \
-            AND tag_id = %s", 
+            AND tag_id = %s",
             (self.pk, tag.pk)
         )
-    
+
     def remove_cc(self, user):
         try:
             cursor = connection.cursor()
             cursor.execute("DELETE from test_run_cc \
                 WHERE run_id = %s \
-                AND who = %s", 
+                AND who = %s",
                 (self.run_id, user.id)
             )
         except:
             raise
-    
+
     def remove_env_value(self, env_value):
         try:
             run_env_value = TCMSEnvRunValueMap.objects.get(
@@ -331,7 +331,7 @@ class TestRun(TCMSActionModel):
             run_env_value.delete()
         except:
             raise
-    
+
     def mail(self, template, subject, context, to = [], request = None):
         from tcms.core.utils.mailto import mailto
         to = self.get_notify_addrs()
@@ -450,25 +450,25 @@ class TestCaseRunStatus(TCMSActionModel):
         return completed_status.values_list('pk', flat=True)
 
 class TestCaseRunManager(models.Manager):
-    
+
     def get_automated_case_count(self):
         return self.filter(case__is_automated = 1).count()
-    
+
     def get_manual_case_count(self):
         return self.filter(case__is_automated = 0).count()
-    
-    
+
+
     def get_both(self):
         count1 = self.get_automated_case_count()
         count2 = self.get_manual_case_count()
         return self.count() - count1 - count2
-    
+
     def get_caserun_failed_count(self):
         return self.filter(case_run_status__name = 'failed').count()
-    
+
     def get_caserun_passed_count(self):
         return self.filter(case_run_status__name = 'passed').count()
-    
+
 
 class TestCaseRun(TCMSActionModel):
     objects = TestCaseRunManager()
@@ -491,21 +491,21 @@ class TestCaseRun(TCMSActionModel):
     notes = models.TextField(blank=True)
     is_current = models.BooleanField(db_column="iscurrent")
     sortkey = models.IntegerField(null=True, blank=True)
-    
+
     run = models.ForeignKey(TestRun, related_name='case_run')
     case = models.ForeignKey('testcases.TestCase', related_name='case_run')
     case_run_status = models.ForeignKey(TestCaseRunStatus)
     build = models.ForeignKey('management.TestBuild')
     environment_id = models.IntegerField(default=0)
-    
+
     class Meta:
         db_table = u'test_case_runs'
         unique_together = ('case', 'run', 'case_text_version')
         ordering = ['sortkey', 'case_run_id']
-    
+
     def __unicode__(self):
         return '%s: %s' % (self.pk, self.case_id)
-    
+
     @classmethod
     def mail_scene(cls, objects, field = None, value = None, ctype = None, object_pk = None):
         tr = objects[0].run
@@ -520,9 +520,9 @@ class TestCaseRun(TCMSActionModel):
                 'context': {'test_run': tr, 'test_case_runs': tcrs},
             }
         }
-        
+
         return scence_templates.get(field)
-    
+
     def add_bug(self, bug_id, bug_system, summary = None, description = None):
         try:
             return self.case.add_bug(
@@ -534,24 +534,24 @@ class TestCaseRun(TCMSActionModel):
             )
         except:
             raise
-    
+
     def remove_bug(self, bug_id, run_id=None):
         try:
             self.case.remove_bug(bug_id = bug_id, run_id=run_id)
         except:
             raise
-    
+
     def is_finished(self):
         return self.case_run_status.is_finished()
-    
+
     def get_bugs(self):
         return TestCaseBug.objects.filter(case_run__case_run_id = self.case_run_id)
-    
+
     def get_text_versions(self):
         return TestCaseText.objects.filter(
             case__pk = self.case.pk
         ).values_list('case_text_version', flat=True)
-    
+
     def get_text_with_version(self, case_text_version = None):
         if case_text_version:
             try:
@@ -568,7 +568,7 @@ class TestCaseRun(TCMSActionModel):
             )
         except TestCaseText.DoesNotExist:
             return NoneText
-    
+
     def get_previous_or_next(self):
         ids = list(self.run.case_run.values_list('case_run_id', flat=True))
         current_idx = ids.index(self.case_run_id)
@@ -577,9 +577,9 @@ class TestCaseRun(TCMSActionModel):
             next = TestCaseRun.objects.get(case_run_id = ids[current_idx + 1])
         except IndexError:
             next = TestCaseRun.objects.get(case_run_id = ids[0])
-            
+
         return (prev, next)
-    
+
     def latest_text(self):
         try:
             return TestCaseText.objects.filter(
@@ -587,13 +587,13 @@ class TestCaseRun(TCMSActionModel):
             ).order_by('-case_text_version')[0]
         except IndexError:
             return NoneText
-    
+
     def set_current(self):
         for case_run in self.run.case_run.all():
             if case_run.is_current:
                 case_run.is_current = False
                 case_run.save()
-                
+
         self.is_current = True
         self.save()
 
@@ -603,21 +603,21 @@ class TestRunTag(models.Model):
     )
     run = models.ForeignKey(TestRun)
     user = models.IntegerField(db_column='userid', default='0')
-    
+
     class Meta:
         db_table = u'test_run_tags'
 
 class TestRunCC(models.Model):
     run = models.ForeignKey(TestRun, primary_key=True)
     user = models.ForeignKey('auth.User', db_column='who')
-    
+
     class Meta:
         db_table = u'test_run_cc'
 
 class TCMSEnvRunValueMap(models.Model):
     run = models.ForeignKey(TestRun)
     value = models.ForeignKey('management.TCMSEnvValue')
-    
+
     class Meta:
         db_table = u'tcms_env_run_value_map'
 
@@ -627,9 +627,9 @@ signals.post_save.connect(post_run_saved, sender=TestRun)
 signals.post_save.connect(qpid_run_created, sender=TestRun)
 #testrun progress listen for qpid
 signals.post_save.connect(
-    qpid_run_progress, 
+    qpid_run_progress,
     sender=TestCaseRun,
-    dispatch_uid="tcms.testruns.signals.qpid_run_progress",
+    dispatch_uid="tcms.apps.testruns.signals.qpid_run_progress",
 )
 
 
@@ -653,7 +653,7 @@ def contributing_to_class():
     '''
     make_caserun_status_id_attributes()
 contributing_to_class()
-    
+
 if register_model:
     register_model(TestRun)
     register_model(TestCaseRun)
