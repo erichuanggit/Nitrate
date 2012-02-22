@@ -180,6 +180,7 @@ XMLRPC_METHODS = {
         ('tcms.xmlrpc.testplan', 'TestPlan'),
         ('tcms.xmlrpc.testrun', 'TestRun'),
         ('tcms.xmlrpc.user', 'User'),
+        ('tcms.xmlrpc.version', 'Version'),
     ),
 }
 
