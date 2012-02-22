@@ -14,26 +14,9 @@
 # distribution and at <http://www.gnu.org/licenses>.
 # 
 # Authors:
-#   Xuqing Kuang <xkuang@redhat.com>
+#   Xuqing Kuang <xkuang@redhat.com>, Chenxiong Qi <cqi@redhat.com>
 
-VERSION = (3, 3, 0, 'final', 4, True)
-XMLRPC_VERSION = (1, 1, 0, 'final', 1)
+VERSION = (3, 6, 3)
 
 def get_version():
-    import os.path.dirname
-    from django.utils.version import get_svn_revision
-    
-    version = '%s.%s' % (VERSION[0], VERSION[1])
-    if VERSION[2]:
-        version += '.%s' % VERSION[2]
-    else:
-        if VERSION[3] != 'final':
-            version += ' %s%s' % (VERSION[3], VERSION[4])
-    
-    svn_rev = get_svn_revision(os.path.dirname(__file__))
-    if svn_rev != u'SVN-unknown':
-        version = "%s %s" % (version, svn_rev)
-    return version
-
-def is_release():
-    return VERSION[5]
+    return VERSION
