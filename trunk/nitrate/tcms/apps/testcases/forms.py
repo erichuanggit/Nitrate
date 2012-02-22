@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Nitrate is copyright 2010 Red Hat, Inc.
-# 
+#
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -9,10 +9,10 @@
 # the hope that it will be useful, but WITHOUT ANY WARRANTY; without
 # even the implied warranties of TITLE, NON-INFRINGEMENT,
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
-# 
+#
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
@@ -23,8 +23,8 @@ from django import forms
 from tcms.core.forms import UserField, TimedeltaFormField, MultipleEmailField, TinyMCEWidget
 from tcms.core.forms.widgets import SECONDS_PER_MIN, SECONDS_PER_HOUR
 
-from tcms.testplans.models import TestPlan
-from tcms.testruns.models import TestCaseRun
+from tcms.apps.testplans.models import TestPlan
+from tcms.apps.testruns.models import TestCaseRun
 from tcms.management.models import Priority, Product, Component, Version, TestTag
 
 from models import TestCase, TestCaseCategory, TestCaseStatus
@@ -57,14 +57,14 @@ class CaseModelForm(forms.ModelForm):
         label = 'Autoproposed', widget = forms.CheckboxInput(),
         required = False
     )
-    
+
     product = forms.ModelChoiceField(
         label = "Product",
         queryset = Product.objects.all(),
         empty_label = None,
     )
     category = forms.ModelChoiceField(
-        label = "Category", 
+        label = "Category",
         queryset = TestCaseCategory.objects.none(),
         empty_label = None,
     )
@@ -85,40 +85,40 @@ class CaseModelForm(forms.ModelForm):
         queryset = Priority.objects.all(),
         empty_label = None,
     )
-    
+
     class Meta:
         model = TestCase
         exclude = ('author', )
         widgets = {
             'default_tester': UserField(),
         }
-    
+
     #def clean_alias(self):
     #    data = self.cleaned_data['alias']
     #    tc_count = TestCase.objects.filter(alias = data).count()
-    #    
+    #
     #    if tc_count == 0:
     #        return data
-    #        
+    #
     #    raise forms.ValidationError('Duplicated alias exist in database.')
-    
+
     def clean_is_automated(self):
         data = self.cleaned_data['is_automated']
         if len(data) == 2:
             return 2
-        
+
         if len(data):
             return data[0]
-        
+
         return data
-    
+
     def populate(self, product_id = None):
         # We can dynamically set choices for a form field:
         # Seen at: http://my.opera.com/jacob7908/blog/2009/06/19/django-choicefield-queryset (Chinese)
         # Is this documented elsewhere?
         if hasattr(self, 'product') and self.product and not product_id:
             product = self.product
-        
+
         if product_id:
             self.fields['category'].queryset = TestCaseCategory.objects.filter(product__id = product_id)
             self.fields['component'].queryset = Component.objects.filter(product__id = product_id)
@@ -160,7 +160,7 @@ class BaseCaseForm(forms.Form):
         empty_label = None,
     )
     category = forms.ModelChoiceField(
-        label = "Category", 
+        label = "Category",
         queryset = TestCaseCategory.objects.none(),
         empty_label = None,
     )
@@ -170,8 +170,8 @@ class BaseCaseForm(forms.Form):
         required = False,
     )
     notes = forms.CharField(
-        label='Notes', 
-        widget=forms.Textarea, 
+        label='Notes',
+        widget=forms.Textarea,
         required=False
     )
     estimated_time = TimedeltaFormField()
@@ -179,47 +179,47 @@ class BaseCaseForm(forms.Form):
     action = forms.CharField(label="Actions", widget = TinyMCEWidget, required = False)
     effect = forms.CharField(label="Expect results", widget = TinyMCEWidget, required = False)
     breakdown = forms.CharField(label="Breakdown", widget = TinyMCEWidget, required = False)
-    
+
     tag = forms.CharField(
         label = "Tag",
         required = False
     )
-    
+
     def clean_is_automated(self):
         data = self.cleaned_data['is_automated']
         if len(data) == 2:
             return 2
-        
+
         if len(data):
             #FIXME: Should data always be a list?
             try:
                 return int(data[0])
             except ValueError, e:
                 return data[0]
-        
+
         return data
-    
+
     #def clean_alias(self):
     #    data = self.cleaned_data['alias']
     #    tc_count = TestCase.objects.filter(alias = data).count()
-    #    
+    #
     #    if tc_count == 0:
     #        return data
-    #        
+    #
     #    raise forms.ValidationError('Duplicated alias exist in database.')
-    
+
     def clean_tag(self):
         return TestTag.objects.filter(
             name__in = TestTag.string_to_list(self.cleaned_data['tag'])
         )
-    
+
     def populate(self, product_id = None):
         # We can dynamically set choices for a form field:
         # Seen at: http://my.opera.com/jacob7908/blog/2009/06/19/django-choicefield-queryset (Chinese)
         # Is this documented elsewhere?
         if hasattr(self, 'product') and self.product and not product_id:
             product = self.product
-        
+
         if product_id:
             self.fields['category'].queryset = TestCaseCategory.objects.filter(product__id = product_id)
             self.fields['component'].queryset = Component.objects.filter(product__id = product_id)
@@ -228,10 +228,10 @@ class BaseCaseForm(forms.Form):
             self.fields['component'].queryset = Component.objects.all()
 
 class NewCaseForm(BaseCaseForm):
-    def clean_case_status(self): 
-        if not self.cleaned_data['case_status']: 
-            return TestCaseStatus.get_PROPOSED() 
-        
+    def clean_case_status(self):
+        if not self.cleaned_data['case_status']:
+            return TestCaseStatus.get_PROPOSED()
+
         return self.cleaned_data['case_status']
 
 class EditCaseForm(BaseCaseForm):
@@ -255,13 +255,13 @@ class XMLRPCBaseCaseForm(BaseCaseForm):
         widget = forms.CheckboxSelectMultiple(),
         required = False,
     )
-    
+
     def clean_estimated_time(self):
         et = self.cleaned_data['estimated_time']    # Estimated time
-        
+
         if not et:
             return
-        
+
         h, m, s = map(lambda x: int(x), et.split(':'))  # Hours, Minutes, Seconds
         s += SECONDS_PER_MIN * m
         s += SECONDS_PER_HOUR * h
@@ -275,17 +275,17 @@ class XMLRPCNewCaseForm(XMLRPCBaseCaseForm):
         queryset = TestPlan.objects.all(),
         required = False,
     )
-    
+
     def clean_case_status(self):
         if not self.cleaned_data['case_status']:
             return TestCaseStatus.get_PROPOSED()
 
         return self.cleaned_data['case_status']
-    
+
     def clean_is_automated(self):
         if self.cleaned_data['is_automated'] == '':
             return 0
-        
+
         return self.cleaned_data['is_automated']
 
 class XMLRPCUpdateCaseForm(XMLRPCBaseCaseForm):
@@ -318,7 +318,7 @@ class BaseCaseSearchForm(forms.Form):
     default_tester = forms.CharField(required=False)
     tag__name__in = forms.CharField(required = False)
     category = forms.ModelChoiceField(
-        label="Category", 
+        label="Category",
         queryset=TestCaseCategory.objects.none(),
         required=False
     )
@@ -347,7 +347,7 @@ class BaseCaseSearchForm(forms.Form):
     is_automated_proposed = forms.BooleanField(
         label = 'Autoproposed', required = False
     )
-    
+
     def clean_bug_id(self):
         from tcms.core.utils import string_to_list
         data = self.cleaned_data['bug_id']
@@ -357,12 +357,12 @@ class BaseCaseSearchForm(forms.Form):
                 int(d)
             except ValueError, error:
                 raise forms.ValidationError(error)
-        
+
         return data
-    
+
     def clean_tag__name__in(self):
         return TestTag.string_to_list(self.cleaned_data['tag__name__in'])
-    
+
     def populate(self, product_id = None):
         """Limit the query to fit the plan"""
         if product_id:
@@ -419,7 +419,7 @@ class CloneCaseForm(forms.Form):
         help_text = 'Copy the attachments to new product you specific (Unchecking will remove attachments of copied test case)',
         required = False
     )
-    
+
     def populate(self, case_ids, plan = None):
         self.fields['case'].queryset = TestCase.objects.filter(case_id__in = case_ids)
 
@@ -444,27 +444,27 @@ class CaseAutomatedForm(forms.Form):
         label = 'Autoproposed', required = False,
         help_text = 'This test case is planned to be automated.'
     )
-    
+
     def clean(self):
         super(CaseAutomatedForm, self).clean()
         cdata = self.cleaned_data.copy() # Cleanen data
-        
+
         cdata['is_automated'] = None
         cdata['is_automated_proposed'] = None
-        
+
         if cdata['o_is_manual'] and cdata['o_is_automated']:
             cdata['is_automated'] = 2
         else:
             if cdata['o_is_manual']:
                 cdata['is_automated'] = 0
-            
+
             if cdata['o_is_automated']:
                 cdata['is_automated'] = 1
-        
+
         cdata['is_automated_proposed'] = cdata['o_is_automated_proposed']
-        
+
         return cdata
-    
+
     def populate(self):
         self.fields['case'].queryset = TestCase.objects.all()
 
@@ -504,7 +504,7 @@ class CaseComponentForm(forms.Form):
         else:
             #self.fields['category'].queryset = TestCaseCategory.objects.all()
             self.fields['o_component'].queryset = Component.objects.all()
-   
+
 class CaseCategoryForm(forms.Form):
     product = forms.ModelChoiceField(
         queryset = Product.objects.all(),
