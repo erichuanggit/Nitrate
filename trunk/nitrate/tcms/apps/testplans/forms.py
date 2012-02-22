@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Nitrate is copyright 2010 Red Hat, Inc.
-# 
+#
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -9,10 +9,10 @@
 # the hope that it will be useful, but WITHOUT ANY WARRANTY; without
 # even the implied warranties of TITLE, NON-INFRINGEMENT,
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
-# 
+#
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
@@ -26,7 +26,7 @@ from tcms.core.forms.fields import TimedeltaFormField
 from tcms.core.forms.widgets import TinyMCEWidget
 
 from tcms.management.models import Component, Product, Version, TCMSEnvGroup, Priority, TestTag
-from tcms.testcases.models import TestCaseStatus, TestCaseCategory, TestCaseTag
+from tcms.apps.testcases.models import TestCaseStatus, TestCaseCategory, TestCaseTag
 
 from models import TestPlan, TestPlanType
 
@@ -37,14 +37,14 @@ class PlanFileField(forms.FileField):
         'invalid_file_type': 'The file you uploaded is not a correct, Html/Plain text/ODT file.',
         'unexcept_odf_error': 'Unable to analyse the file or the file you upload is not Open Document.',
     }
-    
+
     def clean(self, data, initial=None):
         f = super(PlanFileField, self).clean(data, initial)
         if f is None:
             return None
         elif not data and initial:
             return initial
-        
+
         # Detemine the file type, raise error if the file type is not correct
         if not (data.content_type == 'text/html'
             or data.content_type == 'text/plain'
@@ -52,21 +52,21 @@ class PlanFileField(forms.FileField):
             or data.content_type == 'application/vnd.oasis.opendocument.text'
         ):
             raise forms.ValidationError(self.error_messages['invalid_file_type'])
-        
+
         # Process the ODF file
         if data.content_type == 'application/octet-stream' or data.content_type == 'application/vnd.oasis.opendocument.text':
             from tcms.core.lib.odfpy.odf.odf2xhtml import ODF2XHTML
             generatecss = True
             embedable = True
-            
+
             odhandler = ODF2XHTML(generatecss, embedable)
             try:
                 plan_text = odhandler.odf2xhtml(data)
             except:
                 raise forms.ValidationError(self.error_messages['unexcept_odf_error'])
-            
+
             return plan_text
-        
+
         # We need to get a file object. We might have a path or we might
         # have to read the data into memory.
         if hasattr(data, 'temporary_file_path'):
@@ -75,7 +75,7 @@ class PlanFileField(forms.FileField):
             plan_text = data.read()
         else:
             plan_text = data['content']
-        
+
         return plan_text
 
 class CasePlanXMLField(forms.FileField):
@@ -93,9 +93,9 @@ class CasePlanXMLField(forms.FileField):
         'element_could_not_found': 'The element \'%s\' value \'%s\' could not found in database.',
         'element_is_required': 'The element \'%s\' is required in XML.'
     }
-    
+
     xml_data = ''
-    
+
     def process_case(self, case):
         # Check author
         element = 'author'
@@ -107,7 +107,7 @@ class CasePlanXMLField(forms.FileField):
                 raise forms.ValidationError(self.error_messages['element_could_not_found'] % (element, case[element]['value']))
         else:
             raise forms.ValidationError(self.error_messages['element_is_required'] % element)
-        
+
         # Check default tester
         element = 'defaulttester'
         if case.get(element, {}).get('value'):
@@ -118,7 +118,7 @@ class CasePlanXMLField(forms.FileField):
                 raise forms.ValidationError(self.error_messages['element_could_not_found'] % (element, case[element]['value']))
         else:
             default_tester_id = None
-        
+
         # Check priority
         element = 'priority'
         if case.get(element, {}).get('value'):
@@ -129,14 +129,14 @@ class CasePlanXMLField(forms.FileField):
                 raise forms.ValidationError(self.error_messages['element_could_not_found'] % (element, case[element]['value']))
         else:
             raise forms.ValidationError(self.error_messages['element_is_required'] % element)
-        
+
         # Check automated status
         element = 'automated'
         if case.get(element, {}).get('value'):
             is_automated = case[element]['value'] == 'Automatic' and True or False
         else:
             is_automated = False
-        
+
         # Check status
         element = 'status'
         if case.get(element, {}).get('value'):
@@ -147,7 +147,7 @@ class CasePlanXMLField(forms.FileField):
                 raise forms.ValidationError(self.error_messages['element_could_not_found'] % (element, case[element]['value']))
         else:
             raise forms.ValidationError(self.error_messages['element_is_required'] % element)
-        
+
         # Check category
         # *** Ugly code here ***
         # There is a bug in the XML file, the category is related to product.
@@ -159,7 +159,7 @@ class CasePlanXMLField(forms.FileField):
             category_name = case[element]['value']
         else:
             raise forms.ValidationError(self.error_messages['element_is_required'] % element)
-        
+
         # Check or create the tag
         element = 'tag'
         if case.get(element, {}):
@@ -167,14 +167,14 @@ class CasePlanXMLField(forms.FileField):
             if isinstance(case[element], dict):
                 tag, create = TestTag.objects.get_or_create(name = case[element]['value'])
                 tags.append(tag)
-            
+
             if isinstance(case[element], list):
                 for tag_name in case[element]:
                     tag, create = TestTag.objects.get_or_create(name = tag_name['value'])
                     tags.append(tag)
         else:
             tags = None
-        
+
         new_case = {
             'summary': case.get('summary', {}).get('value', ''),
             'author_id': author_id,
@@ -191,9 +191,9 @@ class CasePlanXMLField(forms.FileField):
             'breakdown': case.get('breakdown', {}).get('value', ''),
             'tags': tags,
         }
-        
+
         return new_case
-    
+
     def clean(self, data, initial=None):
         """
         Check the file content type is XML or not
@@ -203,10 +203,10 @@ class CasePlanXMLField(forms.FileField):
             return None
         elif not data and initial:
             return initial
-        
+
         if not data.content_type == 'text/xml':
             raise forms.ValidationError(self.error_messages['invalid_file'])
-        
+
         # We need to get a file object for PIL. We might have a path or we might
         # have to read the data into memory.
         if hasattr(data, 'temporary_file_path'):
@@ -216,24 +216,24 @@ class CasePlanXMLField(forms.FileField):
                 xml_file = data.read()
             else:
                 xml_file = data['content']
-        
+
         # Replace line breaks for XML interpret
         xml_file = xml_file.replace('\n', '')
         xml_file = xml_file.replace('&testopia_', '&')
-        
+
         # Insert clean code here
         try:
             xml = XML2Dict()
             self.xml_data = xml.fromstring(xml_file)
             if not self.xml_data.get('testopia') :
                 raise forms.ValidationError(self.error_messages['root_element_is_needed'])
-            
+
             if not self.xml_data['testopia'].get('version') != settings.TESTOPIA_XML_VERSION:
                 raise forms.ValidationError(self.error_messages['xml_version_is_incorrect'])
-            
+
             if not self.xml_data['testopia'].get('testcase'):
                 raise forms.ValidationError(self.error_messages['test_case_element_is_needed'])
-            
+
             new_case_from_xml = []
             if isinstance(self.xml_data['testopia']['testcase'], list):
                 for case in self.xml_data['testopia']['testcase']:
@@ -242,7 +242,7 @@ class CasePlanXMLField(forms.FileField):
                 new_case_from_xml.append(self.process_case(self.xml_data['testopia']['testcase']))
             else:
                 raise forms.ValidationError(self.error_messages['test_case_element_is_needed'])
-        
+
         except Exception, error:
             raise forms.ValidationError('%s: %s' % (
                 self.error_messages['interpret_error'],
@@ -255,7 +255,7 @@ class CasePlanXMLField(forms.FileField):
             ))
         if hasattr(f, 'seek') and callable(f.seek):
             f.seek(0)
-        
+
         return new_case_from_xml
 
 # =========== New Plan ModelForm ==============
@@ -276,7 +276,7 @@ class BasePlanForm(forms.Form):
     )
     text = forms.CharField(
         label = "Plan Document",
-        widget = TinyMCEWidget, 
+        widget = TinyMCEWidget,
         required = False
     )
     product = forms.ModelChoiceField(
@@ -309,9 +309,9 @@ class BasePlanForm(forms.Form):
     def clean_default_product_version(self):
         if hasattr(self.cleaned_data['default_product_version'], 'value'):
             return self.cleaned_data['default_product_version'].value
-        
+
         return self.cleaned_data['default_product_version']
-    
+
     def clean_parent(self):
         try:
             p = self.cleaned_data['parent']
@@ -319,7 +319,7 @@ class BasePlanForm(forms.Form):
                 return TestPlan.objects.get(pk = p)
         except TestPlan.DoesNotExist, error:
             raise forms.ValidationError('The plan does not exist in database.')
-    
+
     def populate(self, product_id = None):
         # We can dynamically set choices for a form field:
         # Seen at: http://my.opera.com/jacob7908/blog/2009/06/19/django-choicefield-queryset (Chinese)
@@ -365,12 +365,12 @@ class NewPlanForm(BasePlanForm):
         label=' when plan is deleted',
         required=False
     )
-    
+
     def clean_tag(self):
         return TestTag.objects.filter(
             name__in = TestTag.string_to_list(self.cleaned_data['tag'])
         )
-    
+
     def clean(self):
         cleaned_data = self.cleaned_data
         if cleaned_data.get('upload_plan_text'):
@@ -439,10 +439,10 @@ class SearchPlanForm(forms.Form):
             return [int(r) for r in results]
         except Exception, e:
             raise forms.ValidationError(str(e))
-    
+
     def clean_tag__name__in(self):
         return TestTag.string_to_list(self.cleaned_data['tag__name__in'])
-    
+
     def populate(self, product_id = None):
         # We can dynamically set choices for a form field:
         # Seen at: http://my.opera.com/jacob7908/blog/2009/06/19/django-choicefield-queryset (Chinese)
@@ -503,7 +503,7 @@ class ClonePlanForm(BasePlanForm):
 
 class XMLRPCNewPlanForm(EditPlanForm):
     text = forms.CharField()
-    
+
 class XMLRPCEditPlanForm(EditPlanForm):
     name = forms.CharField(
         label="Plan name", required = False
@@ -543,16 +543,16 @@ class PlanComponentForm(forms.Form):
         queryset = Component.objects.none(),
         required = False,
     )
-    
+
     def __init__(self, tps, **kwargs):
         tp_ids = tps.values_list('pk', flat = True)
         product_ids = list(set(tps.values_list('product_id', flat = True)))
-        
+
         if kwargs.get('initial'):
             kwargs['initial']['plan'] = tp_ids
-        
+
         super(PlanComponentForm, self).__init__(**kwargs)
-        
+
         self.fields['plan'].queryset = tps
         self.fields['component'].queryset = Component.objects.filter(
             product__pk__in = product_ids
