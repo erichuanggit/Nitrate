@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Nitrate is copyright 2010 Red Hat, Inc.
-# 
+#
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -9,10 +9,10 @@
 # the hope that it will be useful, but WITHOUT ANY WARRANTY; without
 # even the implied warranties of TITLE, NON-INFRINGEMENT,
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
-# 
+#
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
@@ -36,22 +36,22 @@ class Profiles(models.Model):
         q = UserGroupMap.objects.filter(user__userid = self.userid)
         q = q.select_related()
         groups = [assoc.group for assoc in q.all()]
-        return groups  
+        return groups
 
     def add_testopia_permissions(self):
         """
         Emulate Testopia permissions for a freshly-created account.
-        
+
         Add rows to test_plan_permissions for any of the regexps that this
         account matches.
         """
         import re
-        from tcms.testplans.models import TestPlanPermission, TestPlanPermissionsRegexp
+        from tcms.apps.testplans.models import TestPlanPermission, TestPlanPermissionsRegexp
         for perm_regexp in TestPlanPermissionsRegexp.objects.all():
             if re.match(perm_regexp.user_regexp, self.login_name):
                 TestPlanPermission.objects.create(
                     userid = self.userid,
-                    plan_id = perm_regexp.plan_id, 
+                    plan_id = perm_regexp.plan_id,
                     permissions = perm_regexp.permissions,
                     grant_type = 2 # GRANT_REGEXP
                 )
@@ -89,13 +89,13 @@ class UserProfile(models.Model):
     notes = models.TextField(blank=True, default='')
     class Meta:
         db_table = u'tcms_user_profiles'
-    
+
     def get_im(self):
         from forms import IM_CHOICES
-        
+
         if not self.im:
             return None
-        
+
         for c in IM_CHOICES:
             if self.im_type_id == c[0]:
                 return '[%s] %s' % (c[1], self.im)
@@ -109,7 +109,7 @@ class BookmarkCategory(models.Model):
     name = models.CharField(max_length=1024)
     class Meta:
         db_table = u'tcms_bookmark_categories'
-    
+
     def __unicode__(self):
         return self.name
 
@@ -121,6 +121,6 @@ class Bookmark(TCMSBaseSharedModel):
     url = models.CharField(max_length=8192)
     class Meta:
         db_table = u'tcms_bookmarks'
-    
+
     def __unicode__(self):
         return self.name

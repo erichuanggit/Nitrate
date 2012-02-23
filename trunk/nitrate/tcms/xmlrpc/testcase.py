@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Nitrate is copyright 2010 Red Hat, Inc.
-# 
+#
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -9,16 +9,16 @@
 # the hope that it will be useful, but WITHOUT ANY WARRANTY; without
 # even the implied warranties of TITLE, NON-INFRINGEMENT,
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
-# 
+#
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
 from django.core.exceptions import ObjectDoesNotExist
-from tcms.testcases.models import TestCase
+from tcms.apps.testcases.models import TestCase
 from utils import pre_process_ids, compare_list
 
 __all__ = (
@@ -67,10 +67,10 @@ def add_comment(request, case_ids, comment):
 
     Params:      $case_ids - Integer/Array/String: An integer representing the ID in the database,
                              an array of case_ids, or a string of comma separated case_ids.
-                 
+
                  $comment - String - The comment
 
-    Returns:     Array: empty on success or an array of hashes with failure 
+    Returns:     Array: empty on success or an array of hashes with failure
                         codes if a failure occured.
 
     Example:
@@ -86,10 +86,10 @@ def add_comment(request, case_ids, comment):
     c = Comment(
         request = request,
         content_type = 'testcases.testcase',
-        object_pks = object_pks, 
+        object_pks = object_pks,
         comment = comment
     )
-    
+
     return c.add()
 
 @log_call
@@ -100,11 +100,11 @@ def add_component(request, case_ids, component_ids):
 
     Params:      $case_ids - Integer/Array/String: An integer representing the ID in the database,
                              an array of case_ids, or a string of comma separated case_ids.
-                 
-                 $component_ids - Integer/Array/String - The component ID, an array of Component IDs
-                                  or a comma separated list of component IDs 
 
-    Returns:     Array: empty on success or an array of hashes with failure 
+                 $component_ids - Integer/Array/String - The component ID, an array of Component IDs
+                                  or a comma separated list of component IDs
+
+    Returns:     Array: empty on success or an array of hashes with failure
                         codes if a failure occured.
 
     Example:
@@ -115,22 +115,22 @@ def add_component(request, case_ids, component_ids):
     # Add component ids list '1234, 5678' to cases list '56789, 12345' with String
     >>> TestCase.add_component('56789, 12345', '1234, 5678')
     """
-    from tcms.management.models import Component
-    
+    from tcms.apps.management.models import Component
+
     tcs = TestCase.objects.filter(
         case_id__in = pre_process_ids(value = case_ids)
     )
     cs = Component.objects.filter(
         id__in = pre_process_ids(value = component_ids)
     )
-    
+
     try:
         for tc in tcs:
             for c in cs:
                 tc.add_component(component = c)
     except:
         pass
-    
+
     return
 
 @log_call
@@ -143,9 +143,9 @@ def add_tag(request, case_ids, tags):
                             an array of case_ids, or a string of comma separated case_ids.
 
                 $tags - String/Array - A single tag, an array of tags,
-                        or a comma separated list of tags. 
+                        or a comma separated list of tags.
 
-    Returns:    Array: empty on success or an array of hashes with failure 
+    Returns:    Array: empty on success or an array of hashes with failure
                        codes if a failure occured.
 
     Example:
@@ -156,19 +156,19 @@ def add_tag(request, case_ids, tags):
     # Add tag list ['foo', 'bar'] to cases list [12345, 67890] with String
     >>> TestCase.add_tag('12345, 67890', 'foo, bar')
     """
-    from tcms.management.models import TestTag
-    
+    from tcms.apps.management.models import TestTag
+
     tcs = TestCase.objects.filter(
         case_id__in = pre_process_ids(value = case_ids)
     )
-    
+
     tags = TestTag.string_to_list(tags)
-    
+
     for tag in tags:
         t, c = TestTag.objects.get_or_create(name = tag)
         for tc in tcs:
             tc.add_tag(tag = t)
-    
+
     return
 
 @log_call
@@ -181,9 +181,9 @@ def add_to_run(request, case_ids, run_ids):
                              an array of case_ids, or a string of comma separated case_ids.
 
                  $run_ids - Integer/Array/String: An integer representing the ID in the database
-                             an array of IDs, or a comma separated list of IDs. 
+                             an array of IDs, or a comma separated list of IDs.
 
-    Returns:     Array: empty on success or an array of hashes with failure 
+    Returns:     Array: empty on success or an array of hashes with failure
                         codes if a failure occured.
 
     Example:
@@ -194,17 +194,17 @@ def add_to_run(request, case_ids, run_ids):
     # Add case ids list 56789 and 12345 to run list 1234 and 5678 with String
     >>> TestCase.add_to_run('56789, 12345', '1234, 5678')
     """
-    from tcms.testruns.models import TestRun
+    from tcms.apps.testruns.models import TestRun
     case_ids = pre_process_ids(case_ids)
     run_ids = pre_process_ids(run_ids)
-    
+
     trs = TestRun.objects.filter(run_id__in = run_ids)
     tcs = TestCase.objects.filter(case_id__in = case_ids)
-    
+
     for tr in trs:
         for tc in tcs:
             tr.add_case_run(case = tc)
-    
+
     return
 
 @log_call
@@ -213,7 +213,7 @@ def attach_bug(request, values):
     """
     Description: Add one or more bugs to the selected test cases.
 
-    Params:     $values - Array/Hash: A reference to a hash or array of hashes with keys and values  
+    Params:     $values - Array/Hash: A reference to a hash or array of hashes with keys and values
                                       matching the fields of the test case bug to be created.
 
       +-------------------+----------------+-----------+-------------------------------+
@@ -226,7 +226,7 @@ def attach_bug(request, values):
       | description       | String         | Required  | Bug description               |
       +-------------------+----------------+-----------+-------------------------------+
 
-    Returns:     Array: empty on success or an array of hashes with failure 
+    Returns:     Array: empty on success or an array of hashes with failure
                  codes if a failure occured.
 
     Example:
@@ -238,23 +238,23 @@ def attach_bug(request, values):
         'description': 'Just foo and bar',
     })
     """
-    from tcms.testcases.models import TestCaseBugSystem
-    
+    from tcms.apps.testcases.models import TestCaseBugSystem
+
     if isinstance(values, dict):
         values = [values, ]
-    
+
     for value in values:
         if not value.get('case_id'):
             continue
-        
+
         if not value.get('bug_system_id'):
             value['bug_system_id'] = 1
-        
+
         try:
             bug_system = TestCaseBugSystem.objects.get(id = value['bug_system_id'])
         except:
             raise
-        
+
         try:
             tc = TestCase.objects.get(case_id = value['case_id'])
             tc.add_bug(
@@ -265,7 +265,7 @@ def attach_bug(request, values):
             )
         except:
             raise
-    
+
     return
 
 def check_case_status(request, name):
@@ -279,7 +279,7 @@ def check_case_status(request, name):
     Example:
     >>> TestCase.check_case_status('proposed')
     """
-    from tcms.testcases.models import TestCaseStatus
+    from tcms.apps.testcases.models import TestCaseStatus
     return TestCaseStatus.objects.get(name = name).serialize()
 
 def check_priority(request, value):
@@ -293,7 +293,7 @@ def check_priority(request, value):
     Example:
     >>> TestCase.check_priority('p1')
     """
-    from tcms.management.models import Priority
+    from tcms.apps.management.models import Priority
     return Priority.objects.get(value = value).serialize()
 
 def calculate_average_estimated_time(request, case_ids):
@@ -309,15 +309,15 @@ def calculate_average_estimated_time(request, case_ids):
     """
     from datetime import timedelta
     from tcms.core.utils.xmlrpc import SECONDS_PER_DAY
-    
+
     tcs = TestCase.objects.filter(pk__in = pre_process_ids(case_ids))
     time = timedelta(0)
     for tc in tcs:
         time += tc.estimated_time
-    
+
     seconds = time.seconds + (time.days * SECONDS_PER_DAY)
     seconds = seconds / len(tcs)
-    
+
     return '%02i:%02i:%02i' % (
         seconds / 3600,   # Hours
         seconds / 60,     # Minutes
@@ -337,14 +337,14 @@ def calculate_total_estimated_time(request, case_ids):
     """
     from datetime import timedelta
     from tcms.core.utils.xmlrpc import SECONDS_PER_DAY
-    
+
     tcs = TestCase.objects.filter(pk__in = pre_process_ids(case_ids))
     time = timedelta(0)
     for tc in tcs:
         time += tc.estimated_time
-    
+
     seconds = time.seconds + (time.days * SECONDS_PER_DAY)
-    
+
     return '%02i:%02i:%02i' % (
         seconds / 3600,   # Hours
         seconds / 60,     # Minutes
@@ -357,8 +357,8 @@ def create(request, values):
     """
     Description: Creates a new Test Case object and stores it in the database.
 
-    Params:      $values - Array/Hash: A reference to a hash or array of hashes with keys and values  
-                 matching the fields of the test case to be created. 
+    Params:      $values - Array/Hash: A reference to a hash or array of hashes with keys and values
+                 matching the fields of the test case to be created.
       +----------------------------+----------------+-----------+-----------------------------+
       | Field                      | Type           | Null      | Description                 |
       +----------------------------+----------------+-----------+-----------------------------+
@@ -386,7 +386,7 @@ def create(request, values):
       +----------------------------+----------------+-----------+-----------------------------+
 
     Returns:     Array/Hash: The newly created object hash if a single case was created, or
-                             an array of objects if more than one was created. If any single case threw an 
+                             an array of objects if more than one was created. If any single case threw an
                              error during creation, a hash with an ERROR key will be set in its place.
 
     Example:
@@ -400,23 +400,23 @@ def create(request, values):
     >>> TestCase.create(values)
     """
     from tcms.core import forms
-    from tcms.testcases.forms import XMLRPCNewCaseForm
-    from tcms.management.models import TestTag
-    
+    from tcms.apps.testcases.forms import XMLRPCNewCaseForm
+    from tcms.apps.management.models import TestTag
+
     if not (values.get('category') or values.get('summary')):
         raise ValueError()
-    
+
     values['component'] = pre_process_ids(values.get('component', []))
     values['plan'] = pre_process_ids(values.get('plan', []))
     values['bug'] = pre_process_ids(values.get('bug', []))
-    
+
     form = XMLRPCNewCaseForm(values)
     form.populate(values.get('product'))
-    
+
     if form.is_valid():
         # Create the case
         tc = TestCase.create( author = request.user, values = form.cleaned_data)
-        
+
         # Add case text to the case
         tc.add_text(
             action = form.cleaned_data['action'] or '',
@@ -424,17 +424,17 @@ def create(request, values):
             setup = form.cleaned_data['setup'] or '',
             breakdown = form.cleaned_data['breakdown'] or '',
         )
-        
+
         # Add the case to specific plans
         for p in form.cleaned_data['plan']:
             tc.add_to_plan(plan = p)
             del p
-        
+
         # Add components to the case
         for c in form.cleaned_data['component']:
             tc.add_component(component = c)
             del c
-        
+
         # Add tag to the case
         for tag in TestTag.string_to_list(values.get('tag', [])):
             t, c = TestTag.objects.get_or_create(name = tag)
@@ -442,7 +442,7 @@ def create(request, values):
     else:
         # Print the errors if the form is not passed validation.
         return forms.errors_to_list(form)
-    
+
     return get(request, tc.case_id)
 
 @log_call
@@ -455,9 +455,9 @@ def detach_bug(request, case_ids, object_pks):
                              an array of case_ids, or a string of comma separated case_ids
 
                  $object_pks - Integer/Array/String: An integer representing the ID in the database, it's not real bug id,
-                           an array of primary key of bug, or a string of comma separated primary key of bug. 
+                           an array of primary key of bug, or a string of comma separated primary key of bug.
 
-    Returns:     Array: empty on success or an array of hashes with failure 
+    Returns:     Array: empty on success or an array of hashes with failure
                  codes if a failure occured.
 
     Example:
@@ -470,7 +470,7 @@ def detach_bug(request, case_ids, object_pks):
     """
     case_ids = pre_process_ids(case_ids)
     object_pks = pre_process_ids(object_pks)
-    
+
     tcs = TestCase.objects.filter(case_id__in = case_ids)
     for tc in tcs:
         for opk in object_pks:
@@ -478,7 +478,7 @@ def detach_bug(request, case_ids, object_pks):
                 tc.remove_bug(id = opk)
             except ObjectDoesNotExist, error:
                 pass
-    
+
     return
 
 def filter(request, query):
@@ -539,7 +539,7 @@ def filter_count(request, values = {}):
     Example:
     # See TestCase.filter()
     """
-    from tcms.testcases.models import TestCase
+    from tcms.apps.testcases.models import TestCase
     return TestCase.objects.filter(**values).count()
 
 def get(request, case_id):
@@ -557,9 +557,9 @@ def get(request, case_id):
         tc = TestCase.objects.get(case_id = case_id)
     except:
         raise
-    
+
     tc_latest_text = tc.latest_text().serialize()
-    
+
     response = tc.serialize()
     response['text'] = tc_latest_text
     return response
@@ -575,7 +575,7 @@ def get_bug_systems(request, id):
     Example:
     >>> TestCase.get_bug_systems(1)
     """
-    from tcms.testcases.models import TestCaseBugSystem
+    from tcms.apps.testcases.models import TestCaseBugSystem
     return TestCaseBugSystem.objects.get(pk = id).serialize()
 
 def get_bugs(request, case_ids):
@@ -594,12 +594,12 @@ def get_bugs(request, case_ids):
     # Get bug belong to case ids list 12456 and 23456 with string
     >>> TestCase.get_bugs('12456, 23456')
     """
-    from tcms.testcases.models import TestCaseBug
-    
+    from tcms.apps.testcases.models import TestCaseBug
+
     tcs = TestCase.objects.filter(
         case_id__in = pre_process_ids(value = case_ids)
     )
-    
+
     query = {'case__case_id__in': tcs.values_list('case_id', flat=True)}
     return TestCaseBug.to_xmlrpc(query)
 
@@ -632,10 +632,10 @@ def get_case_status(request, id = None):
     # Get case status by ID 1
     >>> TestCase.get_case_status(1)
     """
-    from tcms.testcases.models import TestCaseStatus
+    from tcms.apps.testcases.models import TestCaseStatus
     if id:
         return TestCaseStatus.objects.get(id = id).serialize()
-    
+
     return TestCaseStatus.to_xmlrpc()
 
 def get_change_history(request, case_id):
@@ -663,12 +663,12 @@ def get_components(request, case_id):
     Example:
     >>> TestCase.get_components(12345)
     """
-    from tcms.management.models import Component
+    from tcms.apps.management.models import Component
     try:
         tc = TestCase.objects.get(case_id = case_id)
     except:
         raise
-    
+
     component_ids = tc.component.values_list('id', flat = True)
     query = {'id__in': component_ids}
     return Component.to_xmlrpc(query)
@@ -684,12 +684,12 @@ def get_plans(request, case_id):
     Example:
     >>> TestCase.get_plans(12345)
     """
-    from tcms.testplans.models import TestPlan
+    from tcms.apps.testplans.models import TestPlan
     try:
         tc = TestCase.objects.get(case_id = case_id)
     except:
         raise
-    
+
     plan_ids = tc.plan.values_list('plan_id', flat = True)
     query = {'plan_id__in': plan_ids}
     return TestPlan.to_xmlrpc(query)
@@ -705,12 +705,12 @@ def get_tags(request, case_id):
     Example:
     >>> TestCase.get_tags(12345)
     """
-    from tcms.management.models import TestTag
+    from tcms.apps.management.models import TestTag
     try:
         tc = TestCase.objects.get(case_id = case_id)
     except:
         raise
-    
+
     tag_ids = tc.tag.values_list('id', flat=True)
     query = {'id__in': tag_ids}
     return TestTag.to_xmlrpc(query)
@@ -733,12 +733,12 @@ def get_text(request, case_id, case_text_version = None):
     # Get all case text with version 4
     >>> TestCase.get_text(12345, 4)
     """
-    from tcms.testcases.models import TestCaseText
+    from tcms.apps.testcases.models import TestCaseText
     try:
         tc = TestCase.objects.get(case_id = case_id)
     except:
         raise
-    
+
     return tc.get_text_with_version(
         case_text_version = case_text_version
     ).serialize()
@@ -754,7 +754,7 @@ def get_priority(request, id):
     Example:
     >>> TestCase.get_priority(1)
     """
-    from tcms.management.models import Priority
+    from tcms.apps.management.models import Priority
     return Priority.objects.get(id = id).serialize()
 
 @log_call
@@ -782,31 +782,31 @@ def link_plan(request, case_ids, plan_ids, force = True):
     # Add case ids list 56789 and 12345 to plan list 1234 and 5678 with String
     >>> TestCase.link_plan('56789, 12345', '1234, 5678')
     """
-    from tcms.testplans.models import TestPlan
-    
+    from tcms.apps.testplans.models import TestPlan
+
     case_ids = pre_process_ids(value = case_ids)
     plan_ids = pre_process_ids(value = plan_ids)
-    
-    tcs = TestCase.objects.filter(pk__in = case_ids) 
+
+    tcs = TestCase.objects.filter(pk__in = case_ids)
     tps = TestPlan.objects.filter(pk__in = plan_ids)
-    
+
     # Check the non-exist case ids.
     if not force and len(tcs) < len(case_ids):
         raise ObjectDoesNotExist(
             compare_list(case_ids, tcs.values_list('pk', flat=True))
         )
-    
+
     # Check the non-exist plan ids.
     if not force and len(tps) < len(plan_ids):
         raise ObjectDoesNotExist(
             compare_list(case_ids, tcs.values_list('pk', flat=True))
         )
-    
+
     # Link the plans to cases
-    for tc in tcs: 
-        for tp in tps: 
-            tc.add_to_plan(tp) 
-    
+    for tc in tcs:
+        for tp in tps:
+            tc.add_to_plan(tp)
+
     return
 
 def lookup_category_name_by_id(request, id):
@@ -862,21 +862,21 @@ def remove_component(request, case_ids, component_ids):
     # Remove component ids list '1234, 5678' from cases list '56789, 12345' with String
     >>> TestCase.remove_component('56789, 12345', '1234, 5678')
     """
-    from tcms.management.models import Component
+    from tcms.apps.management.models import Component
     tcs = TestCase.objects.filter(
         case_id__in = pre_process_ids(value = case_ids)
     )
     tccs = Component.objects.filter(
         id__in = pre_process_ids(value = component_ids)
     )
-    
+
     for tc in tcs:
         for tcc in tccs:
             try:
                 tc.remove_component(component = tcc)
             except:
                 pass
-    
+
     return
 
 @log_call
@@ -888,7 +888,7 @@ def remove_tag(request, case_ids, tags):
     Params:      $case_ids - Integer/Array/String: An integer or alias representing the ID in the database,
                              an array of case_ids, or a string of comma separated case_ids.
 
-                 $tags - String/Array - A single or multiple tag to be removed. 
+                 $tags - String/Array - A single or multiple tag to be removed.
 
     Returns:     Array: Empty on success.
 
@@ -900,15 +900,15 @@ def remove_tag(request, case_ids, tags):
     # Remove tag 'foo' and 'bar' from cases list '56789, 12345' with String
     >>> TestCase.remove_tag('56789, 12345', 'foo, bar')
     """
-    from tcms.management.models import TestTag
-    
+    from tcms.apps.management.models import TestTag
+
     tcs = TestCase.objects.filter(
         case_id__in = pre_process_ids(value = case_ids)
     )
     tgs = TestTag.objects.filter(
         name__in = TestTag.string_to_list(tags)
     )
-    
+
     for tc in tcs:
         for tg in tgs:
             try:
@@ -917,7 +917,7 @@ def remove_tag(request, case_ids, tags):
                 pass
             except:
                 raise
-    
+
     return
 
 @log_call
@@ -944,12 +944,12 @@ def store_text(request, case_id, action, effect = '', setup = '', breakdown = ''
         tc = TestCase.objects.get(case_id = case_id)
     except:
         raise
-    
+
     if author_id:
         author = User.objects.get(id = author_id)
     else:
         author = request.user
-    
+
     return tc.add_text(
         author = author,
         action = action,
@@ -973,15 +973,15 @@ def unlink_plan(requst, case_id, plan_id):
     Example:
     >>> TestCase.unlink_plan(12345, 137)
     """
-    from tcms.testplans.models import TestPlan
+    from tcms.apps.testplans.models import TestPlan
     try:
         tc = TestCase.objects.get(case_id = case_id)
         tp = tc.plan.get(plan_id = plan_id)
     except:
         raise
-    
+
     tc.remove_plan(plan = tp)
-    
+
     plan_ids = tc.plan.values_list('plan_id', flat = True)
     query = {'plan_id__in': plan_ids}
     return TestPlan.to_xmlrpc(query)
@@ -998,11 +998,11 @@ def update(request, case_ids, values):
                                       processing.
                              Array:   An array of case IDs for batch mode processing
 
-                 $values   - Hash of keys matching TestCase fields and the new values 
+                 $values   - Hash of keys matching TestCase fields and the new values
                              to set each field to.
 
-    Returns:  Array: an array of case hashes. If the update on any particular 
-                     case failed, the has will contain a ERROR key and the 
+    Returns:  Array: an array of case hashes. If the update on any particular
+                     case failed, the has will contain a ERROR key and the
                      message as to why it failed.
         +-----------------------+----------------+-----------------------------------------+
         | Field                 | Type           | Null                                    |
@@ -1027,16 +1027,16 @@ def update(request, case_ids, values):
     >>> TestCase.update([12345, 23456], {'alias': 'tcms'})
     """
     from tcms.core import forms
-    from tcms.testcases.forms import XMLRPCUpdateCaseForm
-    
+    from tcms.apps.testcases.forms import XMLRPCUpdateCaseForm
+
     form = XMLRPCUpdateCaseForm(values)
-    
+
     if values.get('category') and not values.get('product'):
         raise ValueError('Product ID is required for category')
-    
+
     if values.get('product'):
         form.populate(product_id = values['product'])
-    
+
     if form.is_valid():
         tcs = TestCase.update(
             case_ids = pre_process_ids(value = case_ids),
@@ -1044,7 +1044,7 @@ def update(request, case_ids, values):
         )
     else:
         return forms.errors_to_list(form)
-    
+
     query = {'pk__in': tcs.values_list('pk', flat = True)}
     return TestCase.to_xmlrpc(query)
 

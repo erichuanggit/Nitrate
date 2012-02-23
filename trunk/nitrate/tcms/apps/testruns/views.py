@@ -25,7 +25,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 from tcms.core.utils.prompt import Prompt
-from models import TestRun, TestCaseRun, TestCaseRunStatus, TCMSEnvRunValueMap
+from tcms.apps.testruns.models import TestRun, TestCaseRun, TestCaseRunStatus, TCMSEnvRunValueMap
 from tcms.search.order import order_run_queryset
 from tcms.search import remove_from_request_path
 
@@ -42,7 +42,7 @@ def new(request, template_name = 'run/new.html'):
     from tcms.apps.testruns.models import TestCaseRun
     from tcms.apps.testplans.models import TestPlan
     from tcms.apps.testcases.models import TestCase
-    from tcms.management.models import Version
+    from tcms.apps.management.models import Version
     from tcms.core.utils.prompt import Prompt
     from tcms.apps.testcases.models import TestCasePlan
 
@@ -372,7 +372,7 @@ def edit(request, run_id, template_name = 'run/edit.html'):
     """
     Edit test plan view
     """
-    from tcms.management.models import Version
+    from tcms.apps.management.models import Version
     from tcms.apps.testruns.forms import EditRunForm
 
     # Define the default sub module
@@ -953,7 +953,7 @@ def export(request, run_id, template_name = 'run/export.csv'):
 def env_value(request):
     """Run environment property edit function"""
     from django.utils import simplejson
-    from tcms.management.models import TCMSEnvValue
+    from tcms.apps.management.models import TCMSEnvValue
 
     trs = TestRun.objects.filter(run_id__in = request.REQUEST.getlist('run_id'))
 

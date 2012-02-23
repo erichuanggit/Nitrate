@@ -25,7 +25,7 @@ from django.core.cache import cache
 from django.utils.safestring import mark_safe, SafeData
 from django.conf import settings
 
-from tcms.management.models import TCMSEnvPlanMap
+from tcms.apps.management.models import TCMSEnvPlanMap
 from tcms.apps.testcases.models import TestCasePlan
 from tcms.core.models import TCMSActionModel
 
@@ -269,7 +269,7 @@ class TestPlan(TCMSActionModel):
         Workaround the schema problem with default_product_version
         Get a 'Versions' object based on a string query
         """
-        from tcms.management.models import Version
+        from tcms.apps.management.models import Version
         try:
             return Version.objects.get(
                 product = self.product,

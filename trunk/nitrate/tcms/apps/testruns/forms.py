@@ -20,7 +20,7 @@ from django import forms
 from django.contrib.auth.models import User
 
 from tcms.core.forms import UserField, TimedeltaFormField
-from tcms.management.models import Product, Version, TestBuild, TCMSEnvGroup, TestTag
+from tcms.apps.management.models import Product, Version, TestBuild, TCMSEnvGroup, TestTag
 from tcms.apps.testplans.models import TestPlan
 from tcms.apps.testcases.models import TestCase
 from models import TestRun, TestCaseRunStatus

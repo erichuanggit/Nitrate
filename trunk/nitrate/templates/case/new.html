@@ -158,7 +158,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Create.on_load);
 				{% if test_plan %}
 				<input type="submit" name="_addanother" value="Save and add another" />
 				<input type="submit" name="_returntoplan" value="Save and return to plan" />
-				<input type="button" value="Cancel" onclick="window.location.href='{% url tcms.testplans.views.get test_plan.plan_id %}'" />
+				<input type="button" value="Cancel" onclick="window.location.href='{% url tcms.apps.testplans.views.get test_plan.plan_id %}'" />
 				{% else %}
 				<input type="button" value="cancel" onclick="window.history.go(-1);">
 				{% endif %}

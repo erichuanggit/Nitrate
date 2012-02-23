@@ -31,7 +31,7 @@ from tcms.core.utils import Prompt
 from tcms.core.utils.raw_sql import RawSQL
 
 from tcms.core.models import TCMSLog
-from tcms.management.models import Product
+from tcms.apps.management.models import Product
 from tcms.search.order import order_plan_queryset
 from tcms.search import remove_from_request_path
 
@@ -43,7 +43,7 @@ MODULE_NAME = "testplans"
 @user_passes_test(lambda u: u.has_perm('testplans.add_testplan'))
 def new(request, template_name = 'plan/new.html'):
     from forms import NewPlanForm
-    from tcms.management.models import TCMSEnvGroup
+    from tcms.apps.management.models import TCMSEnvGroup
 
     SUB_MODULE_NAME = "new_plan"
 
@@ -367,7 +367,7 @@ def edit(request, plan_id, template_name = 'plan/edit.html'):
     Edit test plan view
     """
     from forms import EditPlanForm
-    from tcms.management.models import TCMSEnvGroup, Version
+    from tcms.apps.management.models import TCMSEnvGroup, Version
     # Define the default sub module
     SUB_MODULE_NAME = 'plans'
 
@@ -647,7 +647,7 @@ def clone(request, template_name = 'plan/clone.html'):
                     reverse('tcms.apps.testplans.views.get', args = [tp_dest.plan_id, ])
                 )
             else:
-                from tcms.management.models import Version
+                from tcms.apps.management.models import Version
                 args = {
                     'action': 'search',
                     'product': clone_form.cleaned_data['product'].id,
@@ -736,7 +736,7 @@ def cases(request, plan_id):
     from tcms.core.utils import Prompt
     from tcms.apps.testcases.models import TestCase, TestCaseCategory, TestCaseTag
     from tcms.apps.testcases.models import TestCaseText, TestCaseStatus
-    from tcms.management.models import TestTag
+    from tcms.apps.management.models import TestTag
 
     ajax_response = { 'rc': 0, 'response': 'ok' }
 
@@ -969,7 +969,7 @@ def component(request, template_name = 'plan/get_component.html'):
     Returns:
       HTML page by default, or a JSON when the 'multiple' parameter specific.
     """
-    from tcms.management.models import Component
+    from tcms.apps.management.models import Component
     from models import TestPlanComponent
 
     ajax_response = { 'rc': 0, 'response': 'ok' }

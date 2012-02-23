@@ -231,7 +231,7 @@ def all(request, template_name="case/all.html"):
 
     from tcms.core.utils.raw_sql import RawSQL
     from tcms.apps.testplans.models import TestPlan
-    from tcms.management.models import Priority, TestTag
+    from tcms.apps.management.models import Priority, TestTag
 
     # Intial the plan in plan details page
     if request.REQUEST.get('from_plan'):
@@ -721,7 +721,7 @@ def clone(request, template_name='case/clone.html'):
     from tcms.apps.testplans.models import TestPlan
     from tcms.apps.testcases.models import TestCasePlan
     from tcms.apps.testplans.forms import SearchPlanForm
-    from tcms.management.models import Product
+    from tcms.apps.management.models import Product
     from forms import CloneCaseForm
 
     SUB_MODULE_NAME = 'cases'

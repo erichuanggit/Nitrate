@@ -19,7 +19,7 @@
 from django import forms
 from models import TestReview
 from tcms.core.forms import UserField
-from tcms.management.models import TestBuild
+from tcms.apps.management.models import TestBuild
 from tcms.apps.testcases.models import TestCase
 
 from models import TestReviewCase

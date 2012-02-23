@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Nitrate is copyright 2010 Red Hat, Inc.
-# 
+#
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -9,15 +9,15 @@
 # the hope that it will be useful, but WITHOUT ANY WARRANTY; without
 # even the implied warranties of TITLE, NON-INFRINGEMENT,
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
-# 
+#
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
-from tcms.management.models import Product, TestBuild
+from tcms.apps.management.models import Product, TestBuild
 from utils import pre_check_product
 
 __all__ = (
@@ -28,10 +28,10 @@ __all__ = (
 def check_build(request, name, product):
     """
     Description: Looks up and returns a build by name.
-    
+
     Params:      $name - String: name of the build.
                  $product - product_id of the product in the Database
-    
+
     Returns:     Hash: Matching Build object hash or error if not found.
 
     Example:
@@ -45,7 +45,7 @@ def check_build(request, name, product):
         tb = TestBuild.objects.get(name = name, product = p)
     except TestBuild.DoesNotExist, error:
         return error
-    
+
     return tb.serialize()
 
 @log_call
@@ -76,9 +76,9 @@ def create(request, values):
     """
     if not values.get('product') or not values.get('name'):
         raise ValueError('Product and name are both required.')
-    
+
     p = pre_check_product(values)
-    
+
     return TestBuild.objects.create(
         product = p,
         name = values['name'],
@@ -89,9 +89,9 @@ def create(request, values):
 def get(request, build_id):
     """
     Description: Used to load an existing build from the database.
-    
+
     Params:      $id - An integer representing the ID in the database
-    
+
     Returns:     A blessed Build object hash
 
     Example:
@@ -110,11 +110,11 @@ def get_runs(request, build_id):
     Example:
     >>> Build.get_runs(1234)
     """
-    from tcms.testruns.models import TestRun
-    
+    from tcms.apps.testruns.models import TestRun
+
     tb = TestBuild.objects.get(build_id = build_id)
     query = {'build': tb}
-    
+
     return TestRun.to_xmlrpc(query)
 
 def get_caseruns(request, build_id):
@@ -128,11 +128,11 @@ def get_caseruns(request, build_id):
     Example:
     >>> Build.get_caseruns(1234)
     """
-    from tcms.testruns.models import TestCaseRun
-    
+    from tcms.apps.testruns.models import TestCaseRun
+
     tb = TestBuild.objects.get(build_id = build_id)
     query = {'build': tb}
-    
+
     return TestCaseRun.to_xmlrpc(query)
 
 def lookup_id_by_name(request, name, product):
@@ -140,7 +140,7 @@ def lookup_id_by_name(request, name, product):
     DEPRECATED - CONSIDERED HARMFUL Use Build.check_build instead
     """
     return check_build(request, name, product)
-    
+
 def lookup_name_by_id(request, build_id):
     """
     DEPRECATED Use Build.get instead
@@ -157,7 +157,7 @@ def update(request, build_id, values):
 
                  $values - Hash of keys matching Build fields and the new values
                  to set each field to.
-                
+
         +-------------+----------------+-----------+---------------------------+
         | Field       | Type           | Null      | Description               |
         +-------------+----------------+-----------+---------------------------+
@@ -179,12 +179,12 @@ def update(request, build_id, values):
         tb = TestBuild.objects.get(build_id = build_id)
     except TestBuild.DoesNotExist, error:
         return error
-    
+
     try:
         if values.get('product'):
             p = check_product(values)
             tb.product = p
-        
+
         if values.get('name'): tb.name = values['name']
         if values.get('description'): tb.description = values['description']
         if values.get('is_active'): tb.is_active = values.get('is_active', True)
@@ -193,5 +193,5 @@ def update(request, build_id, values):
         return error
     except:
         return 'Unknown error'
-    
+
     return tb.serialize()

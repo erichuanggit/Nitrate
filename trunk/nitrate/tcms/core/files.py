@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Nitrate is copyright 2010 Red Hat, Inc.
-# 
+#
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -9,10 +9,10 @@
 # the hope that it will be useful, but WITHOUT ANY WARRANTY; without
 # even the implied warranties of TITLE, NON-INFRINGEMENT,
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
-# 
+#
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
@@ -25,26 +25,26 @@ def upload_file(request):
     if request.FILES.get('upload_file'):
         import os
         from datetime import datetime
-        
+
         from django.conf import settings
         from tcms.core.utils.prompt import Prompt
-        from tcms.management.models import TestAttachment, TestAttachmentData
-        
+        from tcms.apps.management.models import TestAttachment, TestAttachmentData
+
         try:
             upload_file = request.FILES['upload_file']
-            
+
             now = datetime.now()
-            
+
             stored_name = '%s-%s-%s' % (
                 request.user.username,
                 now,
                 upload_file.name
             )
-            
+
             stored_file_name = os.path.join(
                 settings.FILE_UPLOAD_DIR, stored_name
             ).replace('\\','/')
-            
+
             if upload_file._size > settings.MAX_UPLOAD_SIZE:
                 return HttpResponse(Prompt.render(
                     request = request,
@@ -54,13 +54,13 @@ def upload_file(request):
                         ' % settings.MAX_UPLOAD_SIZE,
                     next = 'javascript:window.history.go(-1);',
                 ))
-            
+
             # Create the upload directory when it's not exist
             try:
                 os.listdir(settings.FILE_UPLOAD_DIR)
             except OSError:
                 os.mkdir(settings.FILE_UPLOAD_DIR)
-            
+
             # Write to a temporary file
             try:
                 open(stored_file_name, 'ro')
@@ -74,12 +74,12 @@ def upload_file(request):
                 ))
             except IOError:
                 pass
-            
+
             dest = open(stored_file_name, 'wb+')
             for chunk in upload_file.chunks():
                 dest.write(chunk)
             dest.close()
-            
+
             # Write the file to database
             #store_file = open(upload_file_name, 'ro')
             ta = TestAttachment.objects.create(
@@ -90,39 +90,39 @@ def upload_file(request):
                 create_date = now,
                 mime_type = upload_file.content_type
             )
-            
+
             if request.REQUEST.get('to_plan_id'):
-                from tcms.testplans.models import TestPlanAttachment
-                
+                from tcms.apps.testplans.models import TestPlanAttachment
+
                 try:
                     int(request.REQUEST['to_plan_id'])
                 except ValueError, error:
                     raise
-                
+
                 TestPlanAttachment.objects.create(
                     plan_id = request.REQUEST.get('to_plan_id'),
                     attachment_id = ta.attachment_id,
                 )
-                
+
                 return HttpResponseRedirect(
-                    reverse('tcms.testplans.views.attachment',
+                    reverse('tcms.apps.testplans.views.attachment',
                     args=[request.REQUEST['to_plan_id']])\
                 )
             elif request.REQUEST.get('to_case_id'):
-                from tcms.testcases.models import TestCaseAttachment
-                
+                from tcms.apps.testcases.models import TestCaseAttachment
+
                 try:
                     int(request.REQUEST['to_case_id'])
                 except ValueError, error:
                     raise
-                
+
                 TestCaseAttachment.objects.create(
                     attachment_id = ta.attachment_id,
                     case_id = request.REQUEST['to_case_id']
                 )
-                
+
                 return HttpResponseRedirect(
-                    reverse('tcms.testcases.views.attachment',
+                    reverse('tcms.apps.testcases.views.attachment',
                     args=[request.REQUEST['to_case_id']])
                 )
         except:
@@ -130,15 +130,15 @@ def upload_file(request):
     else:
         try:
             return HttpResponseRedirect(
-                    reverse('tcms.testplans.views.attachment',
+                    reverse('tcms.apps.testplans.views.attachment',
                     args=[request.REQUEST['to_plan_id']])\
                 )
         except KeyError:
             return HttpResponseRedirect(
-                    reverse('tcms.testcases.views.attachment',
+                    reverse('tcms.apps.testcases.views.attachment',
                     args=[request.REQUEST['to_case_id']])
                 )
-    
+
     raise NotImplementedError
 
 def check_file(request, file_id):
@@ -146,12 +146,12 @@ def check_file(request, file_id):
     from urllib import unquote
     from django.conf import settings
     from django.utils.http import urlquote
-    from tcms.management.models import TestAttachment, TestAttachmentData
+    from tcms.apps.management.models import TestAttachment, TestAttachmentData
     try:
         attachment = TestAttachment.objects.get(attachment_id = file_id)
     except TestAttachment.DoesNotExist:
         raise Http404
-    
+
     try:
         attachment = TestAttachment.objects.get(attachment_id = file_id)
         attachment_data = TestAttachmentData.objects.get(
@@ -177,16 +177,16 @@ def check_file(request, file_id):
                 contents = f.read()
             except IOError, error:
                 raise Http404(error)
-    
+
     response = HttpResponse(contents, mimetype=str(attachment.mime_type))
     response['Content-Disposition'] = 'attachment; filename=%s' % attachment.file_name
     return response
 
 def able_to_delete_attachment(request,file_id):
     from django.contrib.auth.models import User
-    from tcms.management.models import TestAttachment
-    from tcms.testplans.models import TestPlan
-    from tcms.testcases.models import TestCase
+    from tcms.apps.management.models import TestAttachment
+    from tcms.apps.testplans.models import TestPlan
+    from tcms.apps.testcases.models import TestCase
 
     user = request.user
     if user.is_superuser:
@@ -206,29 +206,29 @@ def able_to_delete_attachment(request,file_id):
                 return True
         except KeyError, TestPlan.DoesNotExist:
             raise
-             
-    
+
+
     elif request.REQUEST.get('from_case'):
-        try: 
+        try:
             caseid = int(request.REQUEST['from_case'])
             ownerid = TestCase.objects.all().get(case_id=caseid).author_id
             if user.id == ownerid:
                 return True
         except KeyError:
             raise
-    
+
     return False
-        
-                
+
+
 # Delete Attachment
 def delete_file(request,file_id):
     import os
     from urllib import unquote
     from django.conf import settings
     from django.utils.http import urlquote
-    from django.utils import simplejson 
-    
-    ajax_response = {'rc':0,'response':'ok'} 
+    from django.utils import simplejson
+
+    ajax_response = {'rc':0,'response':'ok'}
     DELEFAILURE = 1
     AUTHUNSUCCESS = 2
 
@@ -237,10 +237,10 @@ def delete_file(request,file_id):
         ajax_response['rc'] = AUTHUNSUCCESS
         ajax_response['response'] = 'auth_failure'
         return HttpResponse(simplejson.dumps(ajax_response))
-     
+
     # Delete plan's attachment
     if request.REQUEST.get('from_plan'):
-        from tcms.testplans.models import TestPlanAttachment
+        from tcms.apps.testplans.models import TestPlanAttachment
         try:
             attachment = TestPlanAttachment.objects.get(attachment=file_id)
             attachment.delete()
@@ -248,10 +248,10 @@ def delete_file(request,file_id):
             ajax_response['rc'] = DELEFAILURE
             ajax_response['response'] = 'failure'
         return HttpResponse(simplejson.dumps(ajax_response))
-    
+
     # Delete cases' attachment
     elif request.REQUEST.get('from_case'):
-        from tcms.testcases.models import TestCaseAttachment
+        from tcms.apps.testcases.models import TestCaseAttachment
         try:
             attachment = TestCaseAttachment.objects.get(attachment=file_id)
             attachment.delete()
@@ -259,6 +259,3 @@ def delete_file(request,file_id):
             ajax_response['rc'] = DELEFAILURE
             ajax_response['response'] = 'failure'
         return HttpResponse(simplejson.dumps(ajax_response))
-        #return HttpResponseRedirect(
-         #       reverse('tcms.testcases.views.attachment',args=[case_id])\
-        #)

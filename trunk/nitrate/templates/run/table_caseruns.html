@@ -56,7 +56,7 @@
 			</td>
 			<td>
 				{% if test_case_run.tested_by_id %}
-				<a href="{% url tcms.apps.lprofiles.views.profile test_case_run.tested_by.username %}" class="link_tested_by">{{ test_case_run.tested_by }}</a>
+				<a href="{% url tcms.apps.profiles.views.profile test_case_run.tested_by.username %}" class="link_tested_by">{{ test_case_run.tested_by }}</a>
 				{% else %}
 				<a class="link_tested_by">None</a>
 				{% endif %}

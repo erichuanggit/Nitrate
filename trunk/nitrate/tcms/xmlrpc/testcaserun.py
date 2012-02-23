@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Nitrate is copyright 2010 Red Hat, Inc.
-# 
+#
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -9,15 +9,15 @@
 # the hope that it will be useful, but WITHOUT ANY WARRANTY; without
 # even the implied warranties of TITLE, NON-INFRINGEMENT,
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
-# 
+#
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
-from tcms.testruns.models import TestCaseRun, TestCaseRunStatus
+from tcms.apps.testruns.models import TestCaseRun, TestCaseRunStatus
 from utils import pre_process_ids
 
 __all__ = (
@@ -45,18 +45,18 @@ __all__ = (
 class GetCaseRun(object):
     def pre_process_tcr(self, case_run_id):
         return TestCaseRun.objects.get(pk = case_run_id)
-    
+
     def pre_process_tcr_s(self, run_id, case_id, build_id, environment_id = 0):
         query = {
             'run__pk': run_id,
             'case__pk': case_id,
             'build__pk': build_id
         }
-        
+
         if environment_id:
             query['environment_id'] = environment_id
             return TestCaseRun.objects.get(**query)
-        
+
         return TestCaseRun.objects.get(**query)
 
 gcr = GetCaseRun()
@@ -69,10 +69,10 @@ def add_comment(request, case_run_ids, comment):
 
     Params:      $case_run_ids - Integer/Array/String: An integer representing the ID in the database,
                              an array of case_run_ids, or a string of comma separated case_run_ids.
-                 
+
                  $comment - String - The comment
 
-    Returns:     Array: empty on success or an array of hashes with failure 
+    Returns:     Array: empty on success or an array of hashes with failure
                         codes if a failure occured.
 
     Example:
@@ -88,10 +88,10 @@ def add_comment(request, case_run_ids, comment):
     c = Comment(
         request = request,
         content_type = 'testruns.testcaserun',
-        object_pks = object_pks, 
+        object_pks = object_pks,
         comment = comment
     )
-    
+
     return c.add()
 
 @log_call
@@ -100,7 +100,7 @@ def attach_bug(request, values):
     """
     Description: Add one or more bugs to the selected test cases.
 
-    Params:     $values - Array/Hash: A reference to a hash or array of hashes with keys and values  
+    Params:     $values - Array/Hash: A reference to a hash or array of hashes with keys and values
                                       matching the fields of the test case bug to be created.
 
       +-------------------+----------------+-----------+------------------------+
@@ -113,7 +113,7 @@ def attach_bug(request, values):
       | description       | String         | Required  | Bug description        |
       +-------------------+----------------+-----------+------------------------+
 
-    Returns:     Array: empty on success or an array of hashes with failure 
+    Returns:     Array: empty on success or an array of hashes with failure
                  codes if a failure occured.
 
     Example:
@@ -125,23 +125,23 @@ def attach_bug(request, values):
         'description': 'Just foo and bar',
     })
     """
-    from tcms.testcases.models import TestCaseBugSystem
-    
+    from tcms.apps.testcases.models import TestCaseBugSystem
+
     if isinstance(values, dict):
         values = [values, ]
-    
+
     for value in values:
         if not value.get('case_run_id'):
             continue
-        
+
         if not value.get('bug_system_id'):
             value['bug_system_id'] = 1
-        
+
         try:
             bug_system = TestCaseBugSystem.objects.get(id = value['bug_system_id'])
         except:
             raise
-        
+
         try:
             tcr = TestCaseRun.objects.get(case_run_id = value['case_run_id'])
             tcr.add_bug(
@@ -152,12 +152,12 @@ def attach_bug(request, values):
             )
         except:
             raise
-    
+
     return
 
 def check_case_run_status(request, name):
     """
-    Params:      $name - String: the status name. 
+    Params:      $name - String: the status name.
 
     Returns:     Hash: Matching case run status object hash or error if not found.
 
@@ -171,11 +171,11 @@ def check_case_run_status(request, name):
 def create(request, values):
     """
     *** It always report - ValueError: invalid literal for int() with base 10: '' ***
-    
+
     Description: Creates a new Test Case Run object and stores it in the database.
 
-    Params:      $values - Hash: A reference to a hash with keys and values  
-                           matching the fields of the test case to be created. 
+    Params:      $values - Hash: A reference to a hash with keys and values
+                           matching the fields of the test case to be created.
   +--------------------+----------------+-----------+------------------------------------------------+
   | Field              | Type           | Null      | Description                                    |
   +--------------------+----------------+-----------+------------------------------------------------+
@@ -201,15 +201,15 @@ def create(request, values):
     >>> TestCaseRun.create(values)
     """
     from tcms.core import forms
-    from tcms.testcases.models import TestCase
-    from tcms.testruns.models import TestRun
-    from tcms.testruns.forms import XMLRPCNewCaseRunForm
-    
+    from tcms.apps.testcases.models import TestCase
+    from tcms.apps.testruns.models import TestRun
+    from tcms.apps.testruns.forms import XMLRPCNewCaseRunForm
+
     form = XMLRPCNewCaseRunForm(values)
-    
+
     if form.is_valid():
         tr = form.cleaned_data['run']
-        
+
         tcr = tr.add_case_run(
             case = form.cleaned_data['case'],
             build = form.cleaned_data['build'],
@@ -221,7 +221,7 @@ def create(request, values):
         )
     else:
         return forms.errors_to_list(form)
-    
+
     return tcr.serialize()
 
 @log_call
@@ -234,9 +234,9 @@ def detach_bug(request, case_run_ids, object_pks):
                                                        an array of case_run_ids, or a string of comma separated case_run_ids.
 
                  $object_pks - Integer/Array/String: An integer or alias representing the ID in the database, it's not real bug id,
-                                                  an array of bugs primary key, or a string of comma separated bugs primary key. 
+                                                  an array of bugs primary key, or a string of comma separated bugs primary key.
 
-    Returns:     Array: empty on success or an array of hashes with failure 
+    Returns:     Array: empty on success or an array of hashes with failure
                         codes if a failure occured.
 
     Example:
@@ -250,16 +250,16 @@ def detach_bug(request, case_run_ids, object_pks):
     tcrs = TestCaseRun.objects.filter(
         case_run_id__in = pre_process_ids(case_run_ids)
     )
-    
+
     object_pks = pre_process_ids(object_pks)
-    
+
     for tcr in tcrs:
         for opk in object_pks:
             try:
                 tcr.remove_bug(id = opk)
             except:
                 pass
-    
+
     return
 
 def filter(request, values = {}):
@@ -305,7 +305,7 @@ def filter_count(request, values = {}):
     Example:
     # See TestCaseRun.filter()
     """
-    from tcms.testruns.models import TestCaseRun
+    from tcms.apps.testruns.models import TestCaseRun
     return TestCaseRun.objects.filter(**values).count()
 
 def get(request, case_run_id):
@@ -350,12 +350,12 @@ def get_bugs(request, case_run_id):
     Example:
     >>> TestCase.get_bugs(12345)
     """
-    from tcms.testcases.models import TestCaseBug
+    from tcms.apps.testcases.models import TestCaseBug
     try:
         tcr = gcr.pre_process_tcr(case_run_id = case_run_id)
     except:
         raise
-    
+
     query = {'case_run__case_run_id': tcr.case_run_id}
     return TestCaseBug.to_xmlrpc(query)
 
@@ -373,7 +373,7 @@ def get_bugs_s(request, run_id, case_id, build_id, environment_id = 0):
     Example:
     >>> TestCaseRun.get_bugs_s(3113, 565, 72, 90)
     """
-    from tcms.testcases.models import TestCaseBug
+    from tcms.apps.testcases.models import TestCaseBug
     try:
         tcr = gcr.pre_process_tcr_s(
             run_id = run_id,
@@ -383,7 +383,7 @@ def get_bugs_s(request, run_id, case_id, build_id, environment_id = 0):
         )
     except:
         raise
-        
+
     query = {'case_run__case_run_id': tcr.case_run_id}
     return TestCaseBug.to_xmlrpc(query)
 
@@ -403,7 +403,7 @@ def get_case_run_status(request, id = None):
     """
     if id:
         return TestCaseRunStatus.objects.get(id = id).serialize()
-    
+
     return TestCaseRunStatus.to_xmlrpc()
 
 def get_completion_time(request, case_run_id):
@@ -421,11 +421,11 @@ def get_completion_time(request, case_run_id):
 
     """
     from tcms.core.forms.widgets import SECONDS_PER_DAY
-    
+
     tcr = gcr.pre_process_tcr(case_run_id = case_run_id)
     if not tcr.running_date or not tcr.close_date:
         return
-    
+
     time = tcr.close_date - tcr.running_date
     time = time.days * SECONDS_PER_DAY + time.seconds
     return time
@@ -454,7 +454,7 @@ def get_completion_time_s(request, run_id, case_id, build_id, environment_id = 0
     )
     if not tcr.running_date or not tcr.close_date:
         return
-    
+
     time = tcr.close_date - tcr.running_date
     time = time.days * SECONDS_PER_DAY + time.seconds
     return time
@@ -512,7 +512,7 @@ def update(request, case_run_ids, values):
                                  processing.
                         Array:   An array of TestCaseRun IDs for batch mode processing
 
-                 $values - Hash of keys matching TestCaseRun fields and the new values 
+                 $values - Hash of keys matching TestCaseRun fields and the new values
                  to set each field to.
                          +--------------------+----------------+
                          | Field              | Type           |
@@ -522,11 +522,11 @@ def update(request, case_run_ids, values):
                          | case_run_status    | Integer        |
                          | notes              | String         |
                          | sortkey            | Integer        |
-                         +--------------------+----------------+ 
+                         +--------------------+----------------+
 
-    Returns:     Hash/Array: In the case of a single object, it is returned. If a 
+    Returns:     Hash/Array: In the case of a single object, it is returned. If a
                  list was passed, it returns an array of object hashes. If the
-                 update on any particular object failed, the hash will contain a 
+                 update on any particular object failed, the hash will contain a
                  ERROR key and the message as to why it failed.
 
     Example:
@@ -535,32 +535,32 @@ def update(request, case_run_ids, values):
     """
     from datetime import datetime
     from tcms.core import forms
-    from tcms.testruns.forms import XMLRPCUpdateCaseRunForm
-    
+    from tcms.apps.testruns.forms import XMLRPCUpdateCaseRunForm
+
     tcrs = TestCaseRun.objects.filter(
         pk__in = pre_process_ids(case_run_ids)
     )
     form = XMLRPCUpdateCaseRunForm(values)
-    
+
     if form.is_valid():
         if form.cleaned_data['build']:
             tcrs.update(build = form.cleaned_data['build'])
-            
+
         if form.cleaned_data['assignee']:
             tcrs.update(assignee = form.cleaned_data['assignee'])
-            
+
         if form.cleaned_data['case_run_status']:
             tcrs.update(case_run_status = form.cleaned_data['case_run_status'])
             tcrs.update(tested_by = request.user)
             tcrs.update(close_date = datetime.now())
-        
+
         if form.cleaned_data['notes']:
             tcrs.update(notes = form.cleaned_data['notes'])
-            
+
         if form.cleaned_data['sortkey']:
             tcrs.update(sortkey = form.cleaned_data['sortkey'])
     else:
         return forms.errors_to_list(form)
-    
+
     query = {'pk__in': tcrs.values_list('pk', flat = True)}
     return TestCaseRun.to_xmlrpc(query)
