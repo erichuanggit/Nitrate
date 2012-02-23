@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Nitrate is copyright 2010 Red Hat, Inc.
-# 
+#
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -9,10 +9,10 @@
 # the hope that it will be useful, but WITHOUT ANY WARRANTY; without
 # even the implied warranties of TITLE, NON-INFRINGEMENT,
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
-# 
+#
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
@@ -21,8 +21,8 @@ from django.contrib.auth.models import User
 
 from tcms.core.forms import UserField, TimedeltaFormField
 from tcms.management.models import Product, Version, TestBuild, TCMSEnvGroup, TestTag
-from tcms.testplans.models import TestPlan
-from tcms.testcases.models import TestCase
+from tcms.apps.testplans.models import TestPlan
+from tcms.apps.testcases.models import TestCase
 from models import TestRun, TestCaseRunStatus
 
 STATUS_CHOICES = (
@@ -51,7 +51,7 @@ PEOPLE_TYPE_CHOICES = (
 class RunModelForm(forms.ModelForm):
     manager = UserField(label='Manager')
     default_tester = UserField(
-        label='Default Tester', 
+        label='Default Tester',
         required=False
     )
     product = forms.ModelChoiceField(
@@ -63,10 +63,10 @@ class RunModelForm(forms.ModelForm):
         label='Build',
         queryset=TestBuild.objects.none(),
     )
-    
+
     class Meta:
         model = TestRun
-    
+
     def populate(self, product_id):
         # We can dynamically set choices for a form field:
         # Seen at: http://my.opera.com/jacob7908/blog/2009/06/19/django-choicefield-queryset (Chinese)
@@ -74,7 +74,7 @@ class RunModelForm(forms.ModelForm):
         query = {'product_id': product_id}
         self.fields['product_version'].queryset = Version.objects.filter(product__id = product_id)
         self.fields['build'].queryset = TestBuild.list_active(query)
-    
+
     def clean_product_version(self):
         if hasattr(self.cleaned_data['product_version'], 'value'):
             return self.cleaned_data['product_version'].value
@@ -85,7 +85,7 @@ class BaseRunForm(forms.Form):
     summary = forms.CharField(label='Summary', max_length=255)
     manager = UserField(label='Manager')
     default_tester = UserField(
-        label='Default Tester', 
+        label='Default Tester',
         required=False
     )
     product = forms.ModelChoiceField(
@@ -104,8 +104,8 @@ class BaseRunForm(forms.Form):
         queryset=TestBuild.objects.none(),
     )
     notes = forms.CharField(
-        label='Notes', 
-        widget=forms.Textarea, 
+        label='Notes',
+        widget=forms.Textarea,
         required=False
     )
     keep_status = forms.BooleanField(
@@ -128,11 +128,11 @@ class BaseRunForm(forms.Form):
         query = {'product_id': product_id}
         self.fields['product_version'].queryset = Version.objects.filter(product__id = product_id)
         self.fields['build'].queryset = TestBuild.list_active(query)
-    
+
     def clean_product_version(self):
         if hasattr(self.cleaned_data['product_version'], 'value'):
             return self.cleaned_data['product_version'].value
-        
+
         return self.cleaned_data['product_version']
 
 class NewRunForm(BaseRunForm):
@@ -173,7 +173,7 @@ class XMLRPCNewRunForm(BaseRunForm):
         label='Tag',
         required=False
     )
-    
+
     def clean_plan_text_version(self):
         data = self.cleaned_data.get('plan_text_version')
         if not data:
@@ -182,20 +182,20 @@ class XMLRPCNewRunForm(BaseRunForm):
                 data = plan_text.plan_text_version
             else:
                 data = 0
-                
+
         return data
-    
+
     def clean_status(self):
         data = self.cleaned_data.get('status')
         if not data:
             data = 0
-        
+
         return data
 
     def clean_tag(self):
         tag = self.cleaned_data.get('tag')
         return str(tag)
-        
+
 class XMLRPCUpdateRunForm(XMLRPCNewRunForm):
     plan = forms.ModelChoiceField(
         label = 'Test Plan',
@@ -224,7 +224,7 @@ class XMLRPCUpdateRunForm(XMLRPCNewRunForm):
         queryset=TestBuild.objects.none(),
         required=False
     )
-    
+
     def clean_status(self):
         return self.cleaned_data.get('status')
 
@@ -258,18 +258,18 @@ class SearchRunForm(forms.Form):
     default_tester = UserField(required=False)
     status = forms.ChoiceField(choices=STATUS_CHOICES, required=False)
     tag__name__in = forms.CharField(label='Tag', required=False)
-    
+
     case_run__assignee = UserField(required=False)
-    
+
     def clean_tag__name__in(self):
         return TestTag.string_to_list(self.cleaned_data['tag__name__in'])
-    
+
     def clean_product_version(self):
         if hasattr(self.cleaned_data['product_version'], 'value'):
             return self.cleaned_data['product_version'].value
-        
+
         return self.cleaned_data['product_version']
-    
+
     def populate(self, product_id = None):
         # We can dynamically set choices for a form field:
         # Seen at: http://my.opera.com/jacob7908/blog/2009/06/19/django-choicefield-queryset (Chinese)
@@ -341,10 +341,10 @@ class MulitpleRunsCloneForm(forms.Form):
         help_text='Unchecking it will not clone the tags',
         required=False
     )
-    
+
     def populate(self, trs, product_id = None):
         self.fields['run'].queryset = TestRun.objects.filter(pk__in = trs)
-        
+
         if product_id:
             self.fields['product_version'].queryset = Version.objects.filter(
                 product__pk = product_id
@@ -392,7 +392,7 @@ class XMLRPCNewCaseRunForm(BaseCaseRunForm):
     case = forms.ModelChoiceField(
         label = 'TestCase', queryset = TestCase.objects.all(),
     )
-    
+
     def clean_assignee(self):
         data = self.cleaned_data.get('assignee')
         if not data:
@@ -400,23 +400,23 @@ class XMLRPCNewCaseRunForm(BaseCaseRunForm):
                 data = self.cleaned_data['case'].default_tester
             elif self.cleaned_data.get('run') and self.cleaned_data['run'].default_tester_id:
                 data = self.cleaned_data['run'].default_tester
-        
+
         return data
-    
+
     def clean_case_text_version(self):
         data = self.cleaned_data.get('case_text_version')
         if not data and self.cleaned_data.get('case'):
             tc_ltxt = self.cleaned_data['case'].latest_text()
             if tc_ltxt:
                 data = tc_ltxt.case_text_version
-        
+
         return data
-    
+
     def clean_case_run_status(self):
         data = self.cleaned_data.get('case_run_status')
         if not data:
             data = TestCaseRunStatus.get_IDLE()
-            
+
         return data
 
 class XMLRPCUpdateCaseRunForm(BaseCaseRunForm):
