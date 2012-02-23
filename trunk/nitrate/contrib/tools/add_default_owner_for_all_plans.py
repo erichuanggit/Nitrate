@@ -12,7 +12,7 @@ Refer to https://bugzilla.redhat.com/show_bug.cgi?id=589633
 import os, random
 os.environ['DJANGO_SETTINGS_MODULE'] = 'tcms.mysettings'
 
-from tcms.testplans.models import TestPlan
+from tcms.apps.testplans.models import TestPlan
 
 def add_default_owner():
     print 'start updating data ...'

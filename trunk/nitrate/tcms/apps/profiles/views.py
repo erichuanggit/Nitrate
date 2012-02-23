@@ -179,4 +179,4 @@ def recent(request, username, template_name='profile/recent.html'):
 
 @login_required
 def redirect_to_profile(request):
-    return HttpResponseRedirect(reverse('tcms.profiles.views.recent', args=[request.user.username]))
+    return HttpResponseRedirect(reverse('tcms.apps.profiles.views.recent', args=[request.user.username]))

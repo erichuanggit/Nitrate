@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Nitrate is copyright 2010 Red Hat, Inc.
-# 
+#
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -9,10 +9,10 @@
 # the hope that it will be useful, but WITHOUT ANY WARRANTY; without
 # even the implied warranties of TITLE, NON-INFRINGEMENT,
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
-# 
+#
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>, Chaobin Tang <ctang@redhat.com>
 
@@ -40,7 +40,7 @@ def add_comment(objs, comments, user, submit_date=None):
         @submit_date: datetime object
     >>> from django.contrib.auth.models import User
     >>> testuser = User.objects.get(email='ctang@redhat.com')
-    >>> from tcms.testruns.models import TestCaseRun as Run
+    >>> from tcms.apps.testruns.models import TestCaseRun as Run
     >>> testrun = Run.objects.get(pk=171675)
     >>> comments = 'stupid comments by Homer'
     >>> add_comment([testrun,], comments, testuser)

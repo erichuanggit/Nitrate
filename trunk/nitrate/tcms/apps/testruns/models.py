@@ -235,7 +235,7 @@ class TestRun(TCMSActionModel):
         Workaround the schema problem with default_product_version
         Get a 'Versions' object based on a string query
         """
-        from tcms.management.models import Version
+        from tcms.apps.management.models import Version
         try:
             return Version.objects.get(
                 product = self.build.product,

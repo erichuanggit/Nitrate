@@ -25,7 +25,7 @@ from tcms.core.lib.xml2dict.xml2dict import XML2Dict
 from tcms.core.forms.fields import TimedeltaFormField
 from tcms.core.forms.widgets import TinyMCEWidget
 
-from tcms.management.models import Component, Product, Version, TCMSEnvGroup, Priority, TestTag
+from tcms.apps.management.models import Component, Product, Version, TCMSEnvGroup, Priority, TestTag
 from tcms.apps.testcases.models import TestCaseStatus, TestCaseCategory, TestCaseTag
 
 from models import TestPlan, TestPlanType

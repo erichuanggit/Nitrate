@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Nitrate is copyright 2010 Red Hat, Inc.
-# 
+#
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -9,10 +9,10 @@
 # the hope that it will be useful, but WITHOUT ANY WARRANTY; without
 # even the implied warranties of TITLE, NON-INFRINGEMENT,
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
-# 
+#
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>, Chaobin Tang <ctang@redhat.com>
 
@@ -30,10 +30,10 @@ from django.core.cache import cache
 from django.db.models.query import QuerySet
 
 # from tcms
-from tcms.testplans.models import TestPlan, TestPlanType
-from tcms.testcases.models import TestCase
-from tcms.testruns.models import TestRun
-from tcms.management.models import Product, Version, Priority
+from tcms.apps.testplans.models import TestPlan, TestPlanType
+from tcms.apps.testcases.models import TestCase
+from tcms.apps.testruns.models import TestRun
+from tcms.apps.management.models import Product, Version, Priority
 from tcms.search.query import SmartDjangoQuery
 from tcms.search.forms import CaseForm, RunForm, PlanForm
 from tcms.search.order import order_targets

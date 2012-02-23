@@ -25,7 +25,7 @@ from tcms.core.forms.widgets import SECONDS_PER_MIN, SECONDS_PER_HOUR
 
 from tcms.apps.testplans.models import TestPlan
 from tcms.apps.testruns.models import TestCaseRun
-from tcms.management.models import Priority, Product, Component, Version, TestTag
+from tcms.apps.management.models import Priority, Product, Component, Version, TestTag
 
 from models import TestCase, TestCaseCategory, TestCaseStatus
 from models import TestCaseBug, AUTOMATED_CHOICES as FULL_AUTOMATED_CHOICES

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Nitrate is copyright 2010 Red Hat, Inc.
-# 
+#
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -9,15 +9,15 @@
 # the hope that it will be useful, but WITHOUT ANY WARRANTY; without
 # even the implied warranties of TITLE, NON-INFRINGEMENT,
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
-# 
+#
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
-from tcms.testplans.models import TestPlan, TestPlanType
+from tcms.apps.testplans.models import TestPlan, TestPlanType
 from utils import pre_process_ids
 
 __all__ = (
@@ -52,9 +52,9 @@ def add_tag(request, plan_ids, tags):
                       an arry of plan_ids, or a string of comma separated plan_ids.
 
                   $tags - String/Array - A single tag, an array of tags,
-                      or a comma separated list of tags. 
+                      or a comma separated list of tags.
 
-    Returns:     Array: empty on success or an array of hashes with failure 
+    Returns:     Array: empty on success or an array of hashes with failure
                   codes if a failure occured.
 
     Example:
@@ -65,22 +65,22 @@ def add_tag(request, plan_ids, tags):
     # Add tag list ['foo', 'bar'] to plan list [12345, 67890] with String
     >>> TestPlan.add_tag('12345, 67890', 'foo, bar')
     """
-    from tcms.management.models import TestTag
+    from tcms.apps.management.models import TestTag
     tps = TestPlan.objects.filter(
         plan_id__in = pre_process_ids(value = plan_ids)
     )
     tags = TestTag.string_to_list(tags)
-    
+
     for tag in tags:
         t, c = TestTag.objects.get_or_create(name = tag)
         for tp in tps:
             tp.add_tag(tag = t)
-    
+
     return
 
 def check_plan_type(request, name):
     """
-    Params:      $name - String: the plan type. 
+    Params:      $name - String: the plan type.
 
     Returns:     Hash: Matching plan type object hash or error if not found.
 
@@ -95,8 +95,8 @@ def create(request, values):
     """
     Description: Creates a new Test Plan object and stores it in the database.
 
-    Params:      $values - Hash: A reference to a hash with keys and values  
-                  matching the fields of the test plan to be created. 
+    Params:      $values - Hash: A reference to a hash with keys and values
+                  matching the fields of the test plan to be created.
       +-------------------------+----------------+-----------+------------------------------------+
       | Field                   | Type           | Null      | Description                        |
       +-------------------------+----------------+-----------+------------------------------------+
@@ -105,7 +105,7 @@ def create(request, values):
       | type                    | Integer        | Required  | ID of plan type                    |
       | default_product_version | Integer        | Required  |                                    |
       | text                    | String         | Required  | Plan documents, HTML acceptable.   |
-      | parent                  | Integer        | Optional  | Parent plan ID                     | 
+      | parent                  | Integer        | Optional  | Parent plan ID                     |
       | is_active               | Boolean        | Optional  | 0: Archived 1: Active (Default 1)  |
       +-------------------------+----------------+-----------+------------------------------------+
 
@@ -124,14 +124,14 @@ def create(request, values):
     >>> TestPlan.create(values)
     """
     from tcms.core import forms
-    from tcms.testplans.forms import XMLRPCNewPlanForm
-    
+    from tcms.apps.testplans.forms import XMLRPCNewPlanForm
+
     if not values.get('product'):
         raise ValueError('Value of product is required')
-    
+
     form = XMLRPCNewPlanForm(values)
     form.populate(product_id = values['product'])
-    
+
     if form.is_valid():
         tp = TestPlan.objects.create(
             product = form.cleaned_data['product'],
@@ -142,12 +142,12 @@ def create(request, values):
             parent = form.cleaned_data['parent'],
             is_active = form.cleaned_data['is_active']
         )
-        
+
         tp.add_text(
             author = request.user,
             plan_text = values['text'],
         )
-        
+
         return tp.serialize()
     else:
         return forms.errors_to_list(form)
@@ -218,7 +218,7 @@ def get(request, plan_id):
         tp = TestPlan.objects.get(plan_id = plan_id)
     except TestPlan.DoesNotExist, error:
         return error
-    
+
     return tp.serialize()
 
 def get_change_history(request, plan_id):
@@ -240,8 +240,8 @@ def get_env_groups(request, plan_id):
 
     Returns:     Array: An array of hashes with env groups.
     """
-    from tcms.management.models import TCMSEnvGroup
-    
+    from tcms.apps.management.models import TCMSEnvGroup
+
     query = {'testplan__pk': plan_id}
     return TCMSEnvGroup.to_xmlrpc(query)
 
@@ -280,12 +280,12 @@ def get_tags(request, plan_id):
     Example:
     >>> TestPlan.get_tags(137)
     """
-    from tcms.management.models import TestTag
+    from tcms.apps.management.models import TestTag
     try:
         tp = TestPlan.objects.get(plan_id = plan_id)
     except:
         raise
-    
+
     tag_ids = tp.tag.values_list('id', flat=True)
     query = {'id__in': tag_ids}
     return TestTag.to_xmlrpc(query)
@@ -301,7 +301,7 @@ def get_test_cases(request, plan_id):
     Example:
     >>> TestPlan.get_test_cases(137)
     """
-    from tcms.testcases.models import TestCase
+    from tcms.apps.testcases.models import TestCase
     query = {'plan': plan_id}
     return TestCase.to_xmlrpc(query)
 
@@ -316,7 +316,7 @@ def get_test_runs(request, plan_id):
     Example:
     >>> TestPlan.get_test_runs(plan_id)
     """
-    from tcms.testruns.models import TestRun
+    from tcms.apps.testruns.models import TestRun
     query = {'plan': plan_id}
     return TestRun.to_xmlrpc(query)
 
@@ -347,7 +347,7 @@ def get_text(request, plan_id, plan_text_version = None):
 def lookup_type_id_by_name(request, name):
     """DEPRECATED - CONSIDERED HARMFUL Use TestPlan.check_plan_type instead"""
     return check_plan_type(request = request, name = name)
-    
+
 def lookup_type_name_by_id(request, id):
     """DEPRECATED - CONSIDERED HARMFUL Use TestPlan.get_plan_type instead"""
     return get_plan_type(request = request, id = id)
@@ -361,7 +361,7 @@ def remove_tag(request, plan_ids, tags):
     Params:      $plan_ids - Integer/Array/String: An integer or alias representing the ID in the database,
                                                    an array of plan_ids, or a string of comma separated plan_ids.
 
-                 $tag - String - A single tag to be removed. 
+                 $tag - String - A single tag to be removed.
 
     Returns:     Array: Empty on success.
 
@@ -373,14 +373,14 @@ def remove_tag(request, plan_ids, tags):
     # Remove tag 'foo' and 'bar' from plan list '56789, 12345' with String
     >>> TestPlan.remove_tag('56789, 12345', 'foo, bar')
     """
-    from tcms.management.models import TestTag
+    from tcms.apps.management.models import TestTag
     tps = TestPlan.objects.filter(
         plan_id__in = pre_process_ids(value = plan_ids)
     )
     tgs = TestTag.objects.filter(
         name__in = TestTag.string_to_list(tags)
     )
-    
+
     for tp in tps:
         for tg in tgs:
             try:
@@ -389,7 +389,7 @@ def remove_tag(request, plan_ids, tags):
                 pass
             except:
                 raise
-    
+
     return
 
 @log_call
@@ -400,7 +400,7 @@ def store_text(request, plan_id, text, author = None):
 
     Params:      $plan_id - Integer: An integer representing the ID of this plan in the database.
                  $text - String: Text for the document. Can contain HTML.
-                 [$author] = Integer: (OPTIONAL) The numeric ID or the login of the author. 
+                 [$author] = Integer: (OPTIONAL) The numeric ID or the login of the author.
                       Defaults to logged in user.
 
     Returns:     Hash: The new text object hash.
@@ -409,14 +409,14 @@ def store_text(request, plan_id, text, author = None):
     >>> TestPlan.store_text(1234, 'Plan Text', 2207)
     """
     from django.contrib.auth.models import User
-    
+
     tp = TestPlan.objects.get(plan_id = plan_id)
-    
+
     if author:
         author = User.objects.get(id = author)
     else:
         author = request.user
-        
+
     return tp.add_text(
         author = author,
         plan_text = text,
@@ -430,7 +430,7 @@ def update(request, plan_ids, values):
 
     Params:      $plan_ids - Integer: A single TestPlan ID.
 
-                 $values - Hash of keys matching TestPlan fields and the new values 
+                 $values - Hash of keys matching TestPlan fields and the new values
                             to set each field to.
                  +-------------------------+----------------+
                  | Field                   | Type           |
@@ -451,42 +451,42 @@ def update(request, plan_ids, values):
     >>> TestCase.update([207, 208], {'product': 61})
     """
     from tcms.core import forms
-    from tcms.testplans.forms import XMLRPCEditPlanForm
-    
+    from tcms.apps.testplans.forms import XMLRPCEditPlanForm
+
     form = XMLRPCEditPlanForm(values)
     if values.get('default_product_version') and not values.get('product'):
         raise ValueError('Product value is required by default product version')
-    
+
     if values.get('default_product_version') and values.get('product'):
         form.populate(product_id = values['product'])
-    
+
     tps = TestPlan.objects.filter(pk__in = pre_process_ids(value = plan_ids))
-    
+
     if form.is_valid():
         if form.cleaned_data['name']:
             tps.update(name = form.cleaned_data['name'])
-        
+
         if form.cleaned_data['type']:
             tps.update(type = form.cleaned_data['type'])
-        
+
         if form.cleaned_data['product']:
             tps.update(product = form.cleaned_data['product'])
-        
+
         if form.cleaned_data['default_product_version']:
             tps.update(default_product_version = form.cleaned_data['default_product_version'])
-        
+
         if form.cleaned_data['parent']:
             tps.update(parent = form.cleaned_data['parent'])
-        
+
         if isinstance(form.cleaned_data['is_active'], int):
             tps.update(is_active = form.cleaned_data['is_active'])
-        
+
         if form.cleaned_data['env_group']:
             for tp in tps:
                 tp.clear_env_groups()
                 tp.add_env_group(form.cleaned_data['env_group'])
     else:
         return forms.errors_to_list(form)
-    
+
     query = {'pk__in': tps.values_list('pk', flat = True)}
     return TestPlan.to_xmlrpc(query)
