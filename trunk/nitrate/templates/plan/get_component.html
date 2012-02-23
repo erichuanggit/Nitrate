@@ -1,4 +1,4 @@
-<form id="id_form_plan_components" action="{% url tcms.testplans.views.component %}" method="post">
+<form id="id_form_plan_components" action="{% url tcms.apps.testplans.views.component %}" method="post">
 	<div class="mixbar actions">
 		<div class='marginLeft fixed'>
 			{% if perms.testplans.change_testplancomponent %}
@@ -6,7 +6,7 @@
 				<input class="component icon_plan left_float" type="button" value="Update components" onclick="constructPlanComponentModificationDialog()">
 				<input class="delete icon_plan left_float" type="submit" name="a" value="Remove" />
 				{% comment %}
-				<form action="{% url tcms.testplans.views.component %}">
+				<form action="{% url tcms.apps.testplans.views.component %}">
 					<span class="tit">Add attachment</span>
 					<input type="hidden" name="plan" value="{{ test_plan.pk }}">
 					<label>Component ID:</label>

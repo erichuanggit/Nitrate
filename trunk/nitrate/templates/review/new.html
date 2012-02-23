@@ -24,12 +24,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestReviews.New.on_load);
 <div id="content">
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
-		>> <a href="{% url tcms.testplans.views.all %}">Plans</a>
-		>> <a href="{% url tcms.testplans.views.get testplan.plan_id %}">{{ testplan.plan_id}}:{{ testplan }}</a>
+		>> <a href="{% url tcms.apps.testplans.views.all %}">Plans</a>
+		>> <a href="{% url tcms.apps.testplans.views.get testplan.plan_id %}">{{ testplan.plan_id}}:{{ testplan }}</a>
 		>> New Test Review
 	</div>
 	<h2>Create New Test Review</h2>
-	<form action="{% url tcms.testreviews.views.new testplan.plan_id %}" method="post">
+	<form action="{% url tcms.apps.testreviews.views.new testplan.plan_id %}" method="post">
 		<div class="Detailform border-1">
 			<table class="editor" cellspan="0" cellspacing="0">
 				<tr>
@@ -84,7 +84,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestReviews.New.on_load);
 								</li>
 								{% empty%}
 								<div class="system_help">
-									<p>This environment group has no property yet. For set environment for test review,<br/>please add some properties to this environment group , <br/>or change environment group for test plan(<a href="{% url tcms.testplans.views.get testplan.plan_id %}">{{ testplan.plan_id}}:{{ testplan }}).
+									<p>This environment group has no property yet. For set environment for test review,<br/>please add some properties to this environment group , <br/>or change environment group for test plan(<a href="{% url tcms.apps.testplans.views.get testplan.plan_id %}">{{ testplan.plan_id}}:{{ testplan }}).
 									</p>
 								</div>
 								{% endfor %}
@@ -93,7 +93,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestReviews.New.on_load);
 						{% empty%}
 						<div class="system_help">
 							<p>
-								If need to set environment for this test review, please select <b> environment group</b> for the test plan ( <a href="{% url tcms.testplans.views.get testplan.plan_id %}">{{ testplan.plan_id }}</a>:{{ testplan }}) .If you haven't permission to edit this plan, please contact with the author of this plan.
+								If need to set environment for this test review, please select <b> environment group</b> for the test plan ( <a href="{% url tcms.apps.testplans.views.get testplan.plan_id %}">{{ testplan.plan_id }}</a>:{{ testplan }}) .If you haven't permission to edit this plan, please contact with the author of this plan.
 							</p>
 						</div>
 						{% endfor %}

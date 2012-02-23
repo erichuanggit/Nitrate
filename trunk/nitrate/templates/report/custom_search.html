@@ -63,7 +63,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomSearch.on_load);
                 </td>
 				<td valign="top">
                 {% if build.runs_count %}
-                <a href="{% url tcms.testruns.views.all %}?product={{ build.product.pk }}&build={{ build.pk }}&product_version={{ REQUEST_CONTENTS.build_run__product_version }}">{{ build.runs_count }}</a>
+                <a href="{% url tcms.apps.testruns.views.all %}?product={{ build.product.pk }}&build={{ build.pk }}&product_version={{ REQUEST_CONTENTS.build_run__product_version }}">{{ build.runs_count }}</a>
                 {% else %}
                 {{ build.runs_count }}
                 {% endif %}

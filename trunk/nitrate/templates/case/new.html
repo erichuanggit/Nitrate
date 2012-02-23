@@ -24,15 +24,15 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Create.on_load);
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
 		{% if test_plan %}
-		>> <a href="{% url tcms.testplans.views.all %}">Planning</a>
-		>> <a href="{% url tcms.testplans.views.get test_plan.plan_id %}">{{ test_plan.name }}</a>
+		>> <a href="{% url tcms.apps.testplans.views.all %}">Planning</a>
+		>> <a href="{% url tcms.apps.testplans.views.get test_plan.plan_id %}">{{ test_plan.name }}</a>
 		{% else %}
-		>> <a href="{% url tcms.testcases.views.all %}">Testing</a>
+		>> <a href="{% url tcms.apps.testcases.views.all %}">Testing</a>
 		{% endif %}
 		>> Create new case
 	</div>
 	
-	<form action="{% url tcms.testcases.views.new %}{% if test_plan %}?from_plan={{ test_plan.plan_id }}{% endif %}" method="POST">
+	<form action="{% url tcms.apps.testcases.views.new %}{% if test_plan %}?from_plan={{ test_plan.plan_id }}{% endif %}" method="POST">
 		{% if test_plan %}
 		<input type="hidden" name="from_plan" value="{{ test_plan.plan_id }}" />
 		{% endif %}

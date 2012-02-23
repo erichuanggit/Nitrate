@@ -10,8 +10,8 @@
 	</tr>
 	{% for test_plan in test_plans %}
 	<tr class="{% cycle 'even' 'odd' %}">
-			<td><a href="{% url tcms.testplans.views.get test_plan.plan_id %}">{{ test_plan.plan_id }}</a></td>
-			<td><a href="{% url tcms.testplans.views.get test_plan.plan_id %}">{{ test_plan.name }}</a></td>
+			<td><a href="{% url tcms.apps.testplans.views.get test_plan.plan_id %}">{{ test_plan.plan_id }}</a></td>
+			<td><a href="{% url tcms.apps.testplans.views.get test_plan.plan_id %}">{{ test_plan.name }}</a></td>
 			<td>{{ test_plan.author.email }}</td>
 			<td>{{ test_plan.type }}</td>
 			<td>{{ test_plan.product }}</td>

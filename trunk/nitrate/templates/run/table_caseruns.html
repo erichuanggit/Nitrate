@@ -48,7 +48,7 @@
 				<a href="#caserun_{{ test_case_run.pk }}">#{{ test_case_run.pk }}</a>
 			</td>
 			<td "{{ test_case_run.case_id }}" class="case_title expandable">
-				<a href="{% url tcms.testcases.views.get test_case_run.case_id %}?from_plan={{ test_case_run.run.plan_id }}">{{ test_case_run.case_id }}</a>
+				<a href="{% url tcms.apps.testcases.views.get test_case_run.case_id %}?from_plan={{ test_case_run.run.plan_id }}">{{ test_case_run.case_id }}</a>
 			</td>
 			
 			<td class="expandable">
@@ -56,14 +56,14 @@
 			</td>
 			<td>
 				{% if test_case_run.tested_by_id %}
-				<a href="{% url tcms.profiles.views.profile test_case_run.tested_by.username %}" class="link_tested_by">{{ test_case_run.tested_by }}</a>
+				<a href="{% url tcms.apps.lprofiles.views.profile test_case_run.tested_by.username %}" class="link_tested_by">{{ test_case_run.tested_by }}</a>
 				{% else %}
 				<a class="link_tested_by">None</a>
 				{% endif %}
 			</td>
 			<td>
 				{% if test_case_run.assignee_id %}
-				<a href="{% url tcms.profiles.views.profile test_case_run.assignee.username %}" class="link_assignee">{{ test_case_run.assignee }}</a>
+				<a href="{% url tcms.apps.profiles.views.profile test_case_run.assignee.username %}" class="link_assignee">{{ test_case_run.assignee }}</a>
 				{% else %}
 				None
 				{% endif %}

@@ -5,7 +5,7 @@
 	<a id="blind_link_{{ forloop.counter }}" class="lab-80" >
 		<img id="blind_icon_{{ forloop.counter }}" class="blind_link" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="" />
 	</a>
-	<a id="id_{{ forloop.counter }}" class="blind_title_link lab-80" href="{% url tcms.testcases.views.get test_review_case.case.case_id %}" >{{ test_review_case.case.case_id }}</a>
+	<a id="id_{{ forloop.counter }}" class="blind_title_link lab-80" href="{% url tcms.apps.testcases.views.get test_review_case.case.case_id %}" >{{ test_review_case.case.case_id }}</a>
 	<a id="link_{{ forloop.counter }}" class="blind_title_link lab-300">{{ test_review_case.case.summary }}</a>
 	<span class="lab-100">{{ test_review_case.case.priority.value }}</span>
 	<span class="lab-150 actions">
@@ -19,7 +19,7 @@
     <span class="lab-80">{{ comment_count }}</span>
     
     <span class="lab-100_right">
-    <a class="editlink" href="{% url tcms.testcases.views.edit test_review_case.case.case_id %}?from_plan={{ testplan.plan_id }}">Edit</a>
+    <a class="editlink" href="{% url tcms.apps.testcases.views.edit test_review_case.case.case_id %}?from_plan={{ testplan.plan_id }}">Edit</a>
     </span>
 	{% comment %}
 	<span class="mark">
@@ -87,7 +87,7 @@
 	</table>
 	<div class="action_form right-action">
 		<span class="strong">Change to status</span>
-		<form id="id_form_case_{{ forloop.counter }}" action="{% url tcms.testreviews.views.change_case_status test_review_case.review_id %}">
+		<form id="id_form_case_{{ forloop.counter }}" action="{% url tcms.apps.testreviews.views.change_case_status test_review_case.review_id %}">
 			<input type="hidden" name="review_id" value="{{ test_review_case.review_id }}" />
 			<input type="hidden" name="review_case_id" value="{{ test_review_case.id }}" />
 			<input type="hidden" name="case_id" value="{{ test_review_case.case_id }}" />

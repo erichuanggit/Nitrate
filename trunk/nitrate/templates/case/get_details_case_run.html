@@ -74,7 +74,7 @@
 			<div class="container">
 				<h4 class="borderB">bug:
 					<span>
-						[ <a href="{% url tcms.testruns.views.bug test_case_run.pk %}?a=file" target="_blank" class="buglink" title="File a bug on bugzilla">File</a>&nbsp;|&nbsp;
+						[ <a href="{% url tcms.apps.testruns.views.bug test_case_run.pk %}?a=file" target="_blank" class="buglink" title="File a bug on bugzilla">File</a>&nbsp;|&nbsp;
 						{% if perms.testcases.add_testcasebug %}
 						<a href="javascript:void(0);" title="Add" onclick="addCaseRunBug(this.up(6).previous(), this.up(6), {{ test_case_run.case_id }}, {{ test_case_run.pk }})">Add</a>
 						{% endif %} ]
@@ -90,13 +90,13 @@
 								{% for bug in bugs %}
 								    {% if bug.case_run_id %}
 								        <span class="grey">From Run</span>
-								        <a href="{% url tcms.testruns.views.get bug.case_run.run_id %}">{{ bug.case_run.run_id }}</a>
+								        <a href="{% url tcms.apps.testruns.views.get bug.case_run.run_id %}">{{ bug.case_run.run_id }}</a>
 								        {% ifequal bug.case_run_id test_case_run.pk %}
 								        <a href="javascript:void(0);" title="Remove This Bug" onclick="removeCaseRunBug(this.up(10).previous(), this.up(10), {{ bug.bug_id }}, {{ test_case_run.case_id }}, {{ test_case_run.pk }})"><img width="9" height="9" title="remove this tag" src="/media/images/remove_small.png"></a>
 								        {% endifequal %}
 								    {% else %}
 								        <span class="grey">From Case</span>
-								        <a href="{% url tcms.testcases.views.get bug.case_id %}">{{ bug.case_id }}</a>
+								        <a href="{% url tcms.apps.testcases.views.get bug.case_id %}">{{ bug.case_id }}</a>
 								    {% endif %}
 								{% endfor %}
 								</td>
@@ -164,7 +164,7 @@
 								Attachment:
 								<span>[
 								{% if perms.management.add_testattachment %}
-								<a href="{% url tcms.testcases.views.attachment test_case_run.case_id %}?from_plan={{ testrun.plan_id }}" target="_blank">Add</a>
+								<a href="{% url tcms.apps.testcases.views.attachment test_case_run.case_id %}?from_plan={{ testrun.plan_id }}" target="_blank">Add</a>
 								{% endif %}
 								]</span>
 							</h4>
