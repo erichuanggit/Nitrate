@@ -23,8 +23,8 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.AssignCases.on_load);
 	</div>
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
-		>> <a href="{% url tcms.testplans.views.all %}">Planning</a>
-		>> <a href="{% url tcms.testplans.views.get testplan.plan_id %}">{{ testplan.plan_id }}: {{ testplan.name }}</a>
+		>> <a href="{% url tcms.apps.testplans.views.all %}">Planning</a>
+		>> <a href="{% url tcms.apps.testplans.views.get testplan.plan_id %}">{{ testplan.plan_id }}: {{ testplan.name }}</a>
 		>> Manage Test Cases
 	</div>
 	<h2>{{ testplan.name }}</h2>
@@ -35,7 +35,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.AssignCases.on_load);
 		</div>
 		<div class="cell">
 			<div class="sd">Author :</div>
-			<div id="display_author"><a href="{% url tcms.profiles.views.profile testplan.author.username %}">{{ testplan.author }}</a></div>
+			<div id="display_author"><a href="{% url tcms.apps.profiles.views.profile testplan.author.username %}">{{ testplan.author }}</a></div>
 		</div>
 		<div class="cell">
 			<div class="sd">Product :</div>
@@ -69,7 +69,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.AssignCases.on_load);
 		<div class="submit-row">
 			<input type="button" value="x" onclick="$('id_import_case_zone').style.display='none'; $('import-error').innerHTML='';">
 		</div>
-		<form action="{% url tcms.testplans.views.assign_case testplan.plan_id %}" method="POST" enctype="multipart/form-data">
+		<form action="{% url tcms.apps.testplans.views.assign_case testplan.plan_id %}" method="POST" enctype="multipart/form-data">
 			<div  class="right-bar" >
 				<label class="errors" id="import-error">{{ xml_form.xml_file.errors }}</label>	
 				{{ xml_form.action }}
@@ -81,13 +81,13 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.AssignCases.on_load);
 			</div>
 		</form>
 	</div>
-	<form action="{% url tcms.testplans.views.delete_case testplan.plan_id %}" method="POST">
+	<form action="{% url tcms.apps.testplans.views.delete_case testplan.plan_id %}" method="POST">
 		<div class="mixbar">
 			<span class="tit">{{ testplan_relate_testcase|length }} Test Cases </span>
 			<span id="id_buttons" class="button">
 				<input type="button" value="Import cases" onclick="$('id_import_case_zone').style.display='block';">
-				<input type="button" value="Create new test case" onclick="window.location.href='{% url tcms.testcases.views.new testplan.plan_id %}'"/>
-				<input type="button" value="Search other " onclick="window.location.href='{% url tcms.testplans.views.search_case testplan.plan_id %}'"/>
+				<input type="button" value="Create new test case" onclick="window.location.href='{% url tcms.apps.testcases.views.new testplan.plan_id %}'"/>
+				<input type="button" value="Search other " onclick="window.location.href='{% url tcms.apps.testplans.views.search_case testplan.plan_id %}'"/>
 				{% if perms.testcases.delete_testcaseplan %}
 				<input type="submit" value="Remove " />
 				{% else %}
@@ -123,8 +123,8 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.AssignCases.on_load);
 								<a href="#" onclick="changeCaseOrder('{{ testplan.plan_id }}', '{{ testcase|testcaseplan:testplan }}')">{{ testcase|sortkey:testplan }}</a>
 							</div>
 						</td>
-						<td valign="top"><a href="{% url tcms.testcases.views.get testcase.case_id %}?from_plan={{ testplan.plan_id }}">{{ testcase.summary }}</a></td>
-						<td valign="top"><a href="{% url tcms.profiles.views.profile testcase.author.username %}">{{ testcase.author.email }}</a></td> 
+						<td valign="top"><a href="{% url tcms.apps.testcases.views.get testcase.case_id %}?from_plan={{ testplan.plan_id }}">{{ testcase.summary }}</a></td>
+						<td valign="top"><a href="{% url tcms.apps.profiles.views.profile testcase.author.username %}">{{ testcase.author.email }}</a></td> 
 						<td valign="top">
 							{% if perms.testcases.change_testcase %}
 							<a id="case_status_{{ forloop.counter }}" onclick="javascript:showStatusSelect('{{ forloop.counter }}')" style="display: none;">{{ testcase.case_status }}</a>
@@ -148,8 +148,8 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.AssignCases.on_load);
 					<span class="tit">{{ testplan_relate_testcase|length }} Test Cases </span>
 					<span id="id_buttons" class="button">
 						<input type="button" value="Import cases" onclick="$('id_import_case_zone').style.display='block';">
-						<input type="button" value="Create new test case" onclick="window.location.href='{% url tcms.testcases.views.new testplan.plan_id %}'"/>
-						<input type="button" value="Search other " onclick="window.location.href='{% url tcms.testplans.views.search_case testplan.plan_id %}'"/>
+						<input type="button" value="Create new test case" onclick="window.location.href='{% url tcms.apps.testcases.views.new testplan.plan_id %}'"/>
+						<input type="button" value="Search other " onclick="window.location.href='{% url tcms.apps.testplans.views.search_case testplan.plan_id %}'"/>
 						{% if perms.testcases.delete_testcaseplan %}
 						<input type="submit" value="Remove" />
 						{% else %}

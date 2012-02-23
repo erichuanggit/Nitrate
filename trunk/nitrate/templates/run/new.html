@@ -29,12 +29,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 	</div>
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
-		>> <a href="{% url tcms.testplans.views.all %}">...</a>
-		>> <a href="{% url tcms.testplans.views.get test_plan.plan_id %}">{{ test_plan.plan_id }}: {{ test_plan.name }}</a>
+		>> <a href="{% url tcms.apps.testplans.views.all %}">...</a>
+		>> <a href="{% url tcms.apps.testplans.views.get test_plan.plan_id %}">{{ test_plan.plan_id }}: {{ test_plan.name }}</a>
 		>> New Test Run
 	</div>
 	<h2>Create New Test Run</h2>
-	<form action="{% url tcms.testruns.views.new %}" method="post">
+	<form action="{% url tcms.apps.testruns.views.new %}" method="post">
 		<input type="hidden" id="id_plan_id" name="from_plan" value="{{ from_plan }}" />
 		{# Working around for the bug https://bugzilla.redhat.com/show_bug.cgi?id=715499 #}
 		<input type="hidden" name="POSTING_TO_CREATE" value="YES" />
@@ -121,7 +121,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 						<div class="system_help">
 							
                             <p>
-                            Environment group must be set for this test plan (<b>{{ test_plan.product.name }}</b>:<b>{{ test_plan.default_product_version }}</b>:<b><a href="{% url tcms.testplans.views.get test_plan.plan_id %}">{{ test_plan }}</a></b>) before you will be able to select environments for this test run.If you do not have permission to edit this plan, please contact the author of this plan, mailto <a href="mailto:{{ test_plan.author.email }}">{{ test_plan.author.email }}</a>
+                            Environment group must be set for this test plan (<b>{{ test_plan.product.name }}</b>:<b>{{ test_plan.default_product_version }}</b>:<b><a href="{% url tcms.apps.testplans.views.get test_plan.plan_id %}">{{ test_plan }}</a></b>) before you will be able to select environments for this test run.If you do not have permission to edit this plan, please contact the author of this plan, mailto <a href="mailto:{{ test_plan.author.email }}">{{ test_plan.author.email }}</a>
                             
                             </p>
 						</div>
@@ -260,7 +260,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 			<span class="prompt-message">
 				<center>
 					No testcase in this testrun , you may 
-					<a href="{% url tcms.testplans.views.get test_plan.plan_id %}">
+					<a href="{% url tcms.apps.testplans.views.get test_plan.plan_id %}">
 						<strong>Select Cases </strong>
 					</a>
 					from test plan.

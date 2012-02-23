@@ -5,23 +5,15 @@
 		{#<span class="tit">{{ test_plans.count }} Plans</span>#}
 		<span>
 			{% if perms.testplans.add_testplan %}
-			<input type="button" title="Create new test plan" value="New Test Plan" onclick="window.location='{% url tcms.testplans.views.new %}'" />
-			<input type="button" value="Clone" title="clone selected test plans." onclick="postToURL('{% url tcms.testplans.views.clone %}', this.form.serialize(true), 'get')" />
+			<input type="button" title="Create new test plan" value="New Test Plan" onclick="window.location='{% url tcms.apps.testplans.views.new %}'" />
+			<input type="button" value="Clone" title="clone selected test plans." onclick="postToURL('{% url tcms.apps.testplans.views.clone %}', this.form.serialize(true), 'get')" />
 			{% endif %}
-			<input type="button" value="Printable copy" title="Create the printable copy for selected plans." onclick="postToURL('{% url tcms.testcases.views.printable %}', this.form.serialize(true))" />
-			<input type="button" value="Export" title="Export the cases for selected plans." onclick="postToURL('{% url tcms.testcases.views.export %}', this.form.serialize(true))" />
+			<input type="button" value="Printable copy" title="Create the printable copy for selected plans." onclick="postToURL('{% url tcms.apps.testcases.views.printable %}', this.form.serialize(true))" />
+			<input type="button" value="Export" title="Export the cases for selected plans." onclick="postToURL('{% url tcms.apps.testcases.views.export %}', this.form.serialize(true))" />
 		</span>
 		
 		<span class="right-action">
 			{% paginate %}
-			{% comment %}
-			Add Column
-			<select id="column_add">
-				<option></option>
-				<option id="col_product_option" value="col_product">Product</option>
-				<option id="col_product_veresion_option" value="col_product_version">Product Version</option>
-			</select>
-			{% endcomment %}
 		</span>
 	</div>
 	<table id="testplans_table" class="list border-bottom" cellpadding="0" cellspacing="0" border="0" style="table-layout:fixed;">
@@ -44,12 +36,12 @@
 			{% for test_plan in test_plans %}
 			<tr class="{% if not test_plan.is_active %}line-through inactive{% endif %}">
 				<td><input type="checkbox" name="plan" value="{{ test_plan.pk }}" title="Select/Unselect"></td>
-				<td class="{% if not test_plan.is_active %}underline{% endif %}"><a href="{% url tcms.testplans.views.get test_plan.plan_id %}">{{ test_plan.plan_id }}</a></td>
-				<td class="{% if not test_plan.is_active %}underline{% endif %}"><a href="{% url tcms.testplans.views.get test_plan.plan_id %}" title="Go to {{ test_plan.name }}">{{ test_plan }} </a></td>
-				<td><a href="{% url tcms.profiles.views.profile test_plan.author.username %}">{{ test_plan.author }}</a></td>
+				<td class="{% if not test_plan.is_active %}underline{% endif %}"><a href="{% url tcms.apps.testplans.views.get test_plan.plan_id %}">{{ test_plan.plan_id }}</a></td>
+				<td class="{% if not test_plan.is_active %}underline{% endif %}"><a href="{% url tcms.apps.testplans.views.get test_plan.plan_id %}" title="Go to {{ test_plan.name }}">{{ test_plan }} </a></td>
+				<td><a href="{% url tcms.apps.profiles.views.profile test_plan.author.username %}">{{ test_plan.author }}</a></td>
 				<td>
 					{% if test_plan.owner %}
-					<a href="{% url tcms.profiles.views.profile test_plan.owner.username %}">{{ test_plan.owner }}</a>
+					<a href="{% url tcms.apps.profiles.views.profile test_plan.owner.username %}">{{ test_plan.owner }}</a>
 					{% else %}
 					No owner
 					{% endif %}
@@ -57,11 +49,11 @@
 				<td class="col_product_content">{{ test_plan.product }}</td>
 				<td style="display:none" class="col_product_version_content">{{ test_plan.default_product_version }}</td>
 				<td>{{ test_plan.type }}</td>
-				<td><a href="{% url tcms.testplans.views.get test_plan.plan_id %}" title="{{ test_plan.num_cases }} test cases">{{ test_plan.num_cases }}</a></td>
-				<td><a href="{% url tcms.testplans.views.get test_plan.plan_id %}#testruns" title="{{ test_plan.num_runs }} test runs">{{ test_plan.num_runs }}</a></td>
+				<td><a href="{% url tcms.apps.testplans.views.get test_plan.plan_id %}" title="{{ test_plan.num_cases }} test cases">{{ test_plan.num_cases }}</a></td>
+				<td><a href="{% url tcms.apps.testplans.views.get test_plan.plan_id %}#testruns" title="{{ test_plan.num_runs }} test runs">{{ test_plan.num_runs }}</a></td>
 				<td>
 					{% if perms.testplans.change_testplan %}
-					<a class="editlink" href="{% url tcms.testplans.views.edit test_plan.plan_id %}">Edit</a>
+					<a class="editlink" href="{% url tcms.apps.testplans.views.edit test_plan.plan_id %}">Edit</a>
 					{% endif %}
 				</td>
 			</tr>

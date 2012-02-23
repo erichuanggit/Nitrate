@@ -50,28 +50,25 @@ Nitrate.TestPlans.Instance = {
 <div id="content">
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
-		>> <a href="{% url tcms.testplans.views.all %}">Planning</a>
+		>> <a href="{% url tcms.apps.testplans.views.all %}">Planning</a>
 		>> {{ test_plan.plan_id }}: {{ test_plan.name }}
 	</div>
 	<input id="id_plan_id" type="hidden" name="plan_id" value="{{ test_plan.plan_id }}">
 	<div class="control">
 		<span id="id_buttons" class="button">
-			<input id="btn_edit" type="button" value="Edit Plan " title="Edit test plan" onclick="window.location.href='{% url tcms.testplans.views.edit test_plan.plan_id %}'" {% if perms.testplans.change_testplan %}{% else%}disabled{% endif %}>
-			<input id="btn_clone" type="button" value="Clone Plan" title="Clone this plan to other product" onclick="window.location.href='{% url tcms.testplans.views.clone %}?plan={{ test_plan.plan_id }}'" {% if perms.testplans.add_testplan %}{% else %}disabled{% endif %}>
+			<input id="btn_edit" type="button" value="Edit Plan " title="Edit test plan" onclick="window.location.href='{% url tcms.apps.testplans.views.edit test_plan.plan_id %}'" {% if perms.testplans.change_testplan %}{% else%}disabled{% endif %}>
+			<input id="btn_clone" type="button" value="Clone Plan" title="Clone this plan to other product" onclick="window.location.href='{% url tcms.apps.testplans.views.clone %}?plan={{ test_plan.plan_id }}'" {% if perms.testplans.add_testplan %}{% else %}disabled{% endif %}>
 			{% if test_plan.is_active %}
 			<input id="btn_disable" type="button" value="Disable Plan " title="Disabled this plan" {% if not perms.testplans.change_testplan %}disabled="true"{% endif %}>
 			{% else %}
 			<input id="btn_enable" type="button" value="Enable Plan " title="Enabled this plan" {% if not perms.testplans.change_testplan %}disabled="true"{% endif %}>
 			{% endif %}
-			{% comment %}
-			<input id="btn_report" type="button" value="Report " title="" onclick="window.location.href='{% url tcms.testplans.views.report test_plan.plan_id %}'">
-			{% endcomment %}
-			<input id="btn_export" type="button" value="Export All Cases " title="Export all cases to XML file" onclick="window.location.href='{% url tcms.testcases.views.export %}?plan={{ test_plan.pk }}'">
-			<input id="btn_print" type="button" value="Print Plan " title="Print Plan" onclick="window.location.href='{% url tcms.testcases.views.printable %}?plan={{ test_plan.pk }}'">	
+			<input id="btn_export" type="button" value="Export All Cases " title="Export all cases to XML file" onclick="window.location.href='{% url tcms.apps.testcases.views.export %}?plan={{ test_plan.pk }}'">
+			<input id="btn_print" type="button" value="Print Plan " title="Print Plan" onclick="window.location.href='{% url tcms.apps.testcases.views.printable %}?plan={{ test_plan.pk }}'">	
 			<!--
 			<span class="right-action">
 				<img src="{{ MEDIA_URL}}/images/icon_printer.png" width="16px">
-				<a href="{% url tcms.testcases.views.printable %}?plan={{ test_plan.pk }}">Print Plan</a>
+				<a href="{% url tcms.apps.testcases.views.printable %}?plan={{ test_plan.pk }}">Print Plan</a>
 			</span>
 	-->
 		</span>
@@ -83,19 +80,19 @@ Nitrate.TestPlans.Instance = {
 		<div class="leftlistinfo">
 			<div class="listinfo">
 				<div class="title grey">Author&nbsp;:</div>
-				<div id="display_author"  class="name " > <a href="{% url tcms.profiles.views.profile test_plan.author.username %}">{{ test_plan.author }}</a></div>
+				<div id="display_author"  class="name " > <a href="{% url tcms.apps.profiles.views.profile test_plan.author.username %}">{{ test_plan.author }}</a></div>
 			</div>
 			<!--<div class="listinfo">
 				<div class="title grey">Doc Author/Manager&nbsp;:</div>
-				<div id="display_author"  class="name" ><a href="{% url tcms.profiles.views.profile test_plan.latest_text.author.username|default:"unknown" %}">{{ test_plan.latest_text.author }}</a></div>
+				<div id="display_author"  class="name" ><a href="{% url tcms.apps.profiles.views.profile test_plan.latest_text.author.username|default:"unknown" %}">{{ test_plan.latest_text.author }}</a></div>
 			</div>-->
 			<div class="listinfo">
 				<div class="title grey">Owner&nbsp;:</div>
-				<div id="display_author"  class="name" ><a href="{% url tcms.profiles.views.profile test_plan.owner.username|default:"unknown" %}">{{ test_plan.owner }}</a></div>
+				<div id="display_author"  class="name" ><a href="{% url tcms.apps.profiles.views.profile test_plan.owner.username|default:"unknown" %}">{{ test_plan.owner }}</a></div>
 			</div>
 			<div class="listinfo">
 				<div class="title grey">Product&nbsp;:</div>
-				<div id="display_product"  class="name "><a href="{% url tcms.testplans.views.all %}?action=search&name__icontains=&author__email__startswith=&owner__username__startswith=&type=&tag__name__in=&case__default_tester__username__startswith=&is_active=on&product={{ test_plan.product_id }}&default_product_version=&env_group=&create_date__gte=&create_date__lte=" title="Search plans of {{ test_plan.product }} ">{{ test_plan.product }}</a></div>
+				<div id="display_product"  class="name "><a href="{% url tcms.apps.testplans.views.all %}?action=search&name__icontains=&author__email__startswith=&owner__username__startswith=&type=&tag__name__in=&case__default_tester__username__startswith=&is_active=on&product={{ test_plan.product_id }}&default_product_version=&env_group=&create_date__gte=&create_date__lte=" title="Search plans of {{ test_plan.product }} ">{{ test_plan.product }}</a></div>
 			</div>
 			<div class="listinfo">
 				<div class="title grey">Version&nbsp;:</div>
@@ -111,7 +108,7 @@ Nitrate.TestPlans.Instance = {
 				<div class="title grey">Environment Group&nbsp;:</div>
 				<div class="name">
 					{% for env_group in test_plan.env_group.all %}
-					<span class="blue strong"><a href="{% url tcms.testplans.views.all %}?action=search&name__icontains=&author__email__startswith=&owner__username__startswith=&type=&tag__name__in=&case__default_tester__username__startswith=&product=&default_product_version=&env_group={{ env_group.id }}&create_date__gte=&create_date__lte=" title="Search plans of use {{ env_group.name }} ">{{ env_group.name }}</a></span>
+					<span class="blue strong"><a href="{% url tcms.apps.testplans.views.all %}?action=search&name__icontains=&author__email__startswith=&owner__username__startswith=&type=&tag__name__in=&case__default_tester__username__startswith=&product=&default_product_version=&env_group={{ env_group.id }}&create_date__gte=&create_date__lte=" title="Search plans of use {{ env_group.name }} ">{{ env_group.name }}</a></span>
 					{% endfor %}
 				</div>
 				<div id="display_summary" >
@@ -140,7 +137,7 @@ Nitrate.TestPlans.Instance = {
 				{% comment %}<div class="name "><a href="#treeview" onclick="fireEvent($('tab_treeview').down(), 'click');">{{ test_plan.parent.pk }}</a></div>{% endcomment %}
 				<div class="name ">
 				{% if test_plan.parent.pk %}
-					<a href="{% url tcms.testplans.views.get test_plan.parent.pk %}">{{ test_plan.parent.pk }}</a>
+					<a href="{% url tcms.apps.testplans.views.get test_plan.parent.pk %}">{{ test_plan.parent.pk }}</a>
 				{% else %}				
 					None
 				{% endif %}				
@@ -223,7 +220,7 @@ Nitrate.TestPlans.Instance = {
 		<div class="submit-row">
 			<input type="button" value="x" onclick="parentNode.parentNode.hide(); $('import-error').innerHTML='';">
 		</div>
-		<form action="{% url tcms.testplans.views.cases test_plan.plan_id %}" method="POST" enctype="multipart/form-data">
+		<form action="{% url tcms.apps.testplans.views.cases test_plan.plan_id %}" method="POST" enctype="multipart/form-data">
 			<div  class="right-bar" >
 				<label class="errors" id="import-error">{{ xml_form.xml_file.errors }}</label>	
 				{{ xml_form.a }}

@@ -1,6 +1,6 @@
 {% load ifin %}
 {% load testcase_tags %}
-<form action="{% url tcms.testcases.views.all %}" method="get">
+<form action="{% url tcms.apps.testcases.views.all %}" method="get">
 	<input type="hidden" name="type" value="case" />
 	<input type="hidden" name="case_sort_by" value="{{ REQUEST_CONTENTS.case_sort_by }}" />
 	<input type="hidden" name="plan" value="{{ REQUEST_CONTENTS.from_plan }}" />
@@ -13,24 +13,24 @@
 			<ul>
 				<li>
 					{% if perms.testcases.add_testcase %}
-					<span class='sprites toolbar_case icon_plan' onclick="window.location.href='{% url tcms.testcases.views.new %}?from_plan={{ test_plan.plan_id }}';">Case</span>
+					<span class='sprites toolbar_case icon_plan' onclick="window.location.href='{% url tcms.apps.testcases.views.new %}?from_plan={{ test_plan.plan_id }}';">Case</span>
 					{% else %}
 					<span class='sprites toolbar_case icon_plan'>Case</span>
 					{% endif %}
 					<ul>
 						{% if perms.testcases.add_testcase %}
-						<li><input class="add_new icon_plan" type="button" value="Write new case" onclick="window.location.href='{% url tcms.testcases.views.new %}?from_plan={{ test_plan.plan_id }}';"/></li>
+						<li><input class="add_new icon_plan" type="button" value="Write new case" onclick="window.location.href='{% url tcms.apps.testcases.views.new %}?from_plan={{ test_plan.plan_id }}';"/></li>
 						<li><input type="button" class="import icon_plan" value="Import cases from XML" onclick="$('id_import_case_zone').toggle();" /></li>
-						<li><input type="button" class="search icon_plan" value="Add cases from other plans" onclick="window.location.href='{% url tcms.testplans.views.cases test_plan.plan_id %}?a=link_cases'" /></li>
+						<li><input type="button" class="search icon_plan" value="Add cases from other plans" onclick="window.location.href='{% url tcms.apps.testplans.views.cases test_plan.plan_id %}?a=link_cases'" /></li>
 						{% else %}
 						<li><input type="button" class="add_new icon_plan" disabled="true" value="Write new case"/></li>
 						<li><input type="button" class="import icon_plan" disabled="true" value="Import cases from XML"	/></li>
 						<li><input type="button" class="search icon_plan" disabled="true" value="Add cases from other plans" /></li>
 						{% endif %}
-						<li><input type="button" class="export icon_plan" title="Export selected cases into XML file" value="Export" onclick="exportCase('{% url tcms.testcases.views.export %}', serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
-						<li><input type="button" class="print_view icon_plan" value="Print"  title="print view of selected cases" onclick="exportCase('{% url tcms.testcases.views.printable %}', serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
+						<li><input type="button" class="export icon_plan" title="Export selected cases into XML file" value="Export" onclick="exportCase('{% url tcms.apps.testcases.views.export %}', serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
+						<li><input type="button" class="print_view icon_plan" value="Print"  title="print view of selected cases" onclick="exportCase('{% url tcms.apps.testcases.views.printable %}', serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
 						{% if perms.testcases.add_testcase %}
-						<li><input type="button" class="clone icon_plan" value="Clone" title="Clone selected cases to another test plan" onclick="postToURL('{% url tcms.testcases.views.clone %}', serialzeCaseForm(this.up(6), this.up(6).next()), 'get');" /></li>
+						<li><input type="button" class="clone icon_plan" value="Clone" title="Clone selected cases to another test plan" onclick="postToURL('{% url tcms.apps.testcases.views.clone %}', serialzeCaseForm(this.up(6), this.up(6).next()), 'get');" /></li>
 						{% else %}
 						<li><input type="button" class="clone icon_plan" value="Clone" title="Clone selected cases to another test plan" disabled="true"/></li>
 						{% endif %}
@@ -49,8 +49,8 @@
                 {% endif %}
                     <ul>
 				        {% if perms.testruns.add_testrun %}
-                        <li><input class="new_run icon_plan" type="button" value="Write new run" onclick="var p = serialzeCaseForm(this.up(6), this.up(6).next()); postToURL('{% url tcms.testruns.views.new %}', p, 'post');"/></li>
-                        <li><input type= "button" class="search icon_plan" value="Add cases to run" onclick="var p = serialzeCaseForm(this.up(6), this.up(6).next()); postToURL('{% url tcms.testplans.views.choose_run test_plan.plan_id %}', p, 'get');" /></li>
+                        <li><input class="new_run icon_plan" type="button" value="Write new run" onclick="var p = serialzeCaseForm(this.up(6), this.up(6).next()); postToURL('{% url tcms.apps.testruns.views.new %}', p, 'post');"/></li>
+                        <li><input type= "button" class="search icon_plan" value="Add cases to run" onclick="var p = serialzeCaseForm(this.up(6), this.up(6).next()); postToURL('{% url tcms.apps.testplans.views.choose_run test_plan.plan_id %}', p, 'get');" /></li>
 			    	    {% else %}
 				        <li><input type="button" class="new_run icon_plan" title="Make new test run from selected cases" value="Write new run" disabled="true" /></li>
                         <li><input type="button" class="search icon_plan" value="Add cases to run" disabled="true"></li>
@@ -198,13 +198,13 @@
 				<input type="checkbox" name="case" value="{{ test_case.pk }}" class="checkbox" {% ifin test_case.pk selected_case_ids %}checked{% endifin %} />
 			</td>
 			<td>
-				<a href="{% url tcms.testcases.views.get test_case.case_id %}?from_plan={{ test_plan.plan_id }}">{{ test_case.pk }}</a>
+				<a href="{% url tcms.apps.testcases.views.get test_case.case_id %}?from_plan={{ test_plan.plan_id }}">{{ test_case.pk }}</a>
 			</td>
 			<td class="subject expandable">
 				<a class="blind_down_link">{{ test_case.summary }}</a>
 			</td>
-			<td class="col_author_content"><a href="{% url tcms.profiles.views.profile test_case.author.username %}">{{ test_case.author }}</a></td>
-			<td class="col_author_content">{% if test_case.default_tester_id %}<a href="{% url tcms.profiles.views.profile test_case.default_tester.username %}">{% endif %}{{ test_case.default_tester }}{% if test_case.default_tester_id %}</a>{% endif %}</td>
+			<td class="col_author_content"><a href="{% url tcms.apps.profiles.views.profile test_case.author.username %}">{{ test_case.author }}</a></td>
+			<td class="col_author_content">{% if test_case.default_tester_id %}<a href="{% url tcms.apps.profiles.views.profile test_case.default_tester.username %}">{% endif %}{{ test_case.default_tester }}{% if test_case.default_tester_id %}</a>{% endif %}</td>
 			<td class="col_tester_content expandable">{{ test_case.get_is_automated_status }}</td>
 			<!-- <td >{{ testcase.create_date }}</td>-->
 			<td>
@@ -230,7 +230,7 @@
 			</td>
 			<td align="center" >
 				{% if perms.testcases.change_testcase %}
-				<a class="editlink" href="{% url tcms.testcases.views.edit test_case.case_id %}?from_plan={{ test_plan.plan_id }}">Edit</a>
+				<a class="editlink" href="{% url tcms.apps.testcases.views.edit test_case.case_id %}?from_plan={{ test_plan.plan_id }}">Edit</a>
 				{% else %}
 				<span class="editlink grey">Edit</span>
 				{% endif %}
