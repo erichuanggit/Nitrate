@@ -102,20 +102,6 @@
 				<td><span class="highlight">{{ test_case_run.case_run_status.name|upper }}</span></td>
 				<td>{{ test_case_run.close_date }}</td>
 			</tr>
-			{% comment %}
-			{% if test_case_run.log %}
-			<tr>
-				<td class="sep" align="right" valign="top"><span class="notes">Logs:</span></td>
-				<td class="sep" align="left" valign="top" colspan="8">
-					<span class="notes">
-						{% for log in test_case_run.log %}
-						<li>[{{ log.date }}] - [{{ log.who }}] - {{ log.action }}</li>
-						{% endfor %}
-						 
-				</span></td>
-			</tr>
-			{% endif %}
-			{% endcomment %}
 			<tr>
 				<td align="left" valign="top" colspan="8" class='hide'>
 					{% if test_case_run.get_bugs %}

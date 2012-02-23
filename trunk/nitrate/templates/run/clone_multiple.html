@@ -64,18 +64,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Clone.on_load);
 						<div class="errors">{{ clone_form.default_tester.errors }}</div>
 					</td>
 				</tr>
-{% comment %}
-				<tr>
-					<td><label for="id_default_tester">Assignee</label></td>
-					<td>
-						{{ clone_form.assignee }}
-						{{ clone_form.update_assignee }}
-						{{ clone_form.update_assignee.label }}
-						<div class="errors">{{ clone_form.default_tester.errors }}</div>
-					</td>
-				</tr>
-                <tr>
-{% endcomment %}
                 	<td colspan="2">
                     	<ul class="clone_multiple_option">
                         	<li>{{ clone_form.update_case_text }}{{ clone_form.update_case_text.label }}</li>

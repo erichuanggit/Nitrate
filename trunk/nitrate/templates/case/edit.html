@@ -43,9 +43,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
             Edit History
         </a>
     </span>
-    {% comment %}
-    <span class="errors">{{ form.errors }}</span>
-    {% endcomment %}
     <form action="{% url tcms.apps.testcases.views.edit test_case.case_id %}" method="post">
         <input type="hidden" name="from_plan" value="{{ test_plan.plan_id }}">
         <div class="Detailform border-1" >
@@ -59,16 +56,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
                         <label>Product</label>
                         <div>{{ form.product }}</div>
                     </div>
-                    {% comment %}
-                    <div class="data_row">
-                        <input id="id_refresh_product" type="button" value="Refresh component/category" title="Refresh component and category after change product" />
-                    </div>
-                    <div class="data_row">
-                        <label>Component </label>
-                        {{ form.component.errors }}
-                        <div class="component_select">{{ form.component }}</div>
-                    </div>
-                    {% endcomment %}
                     <div class="data_row">
                         <label>Category</label>
                         <span id="form_category" >{{ form.category }}</span><a href="{{ ADMIN_PREFIX }}/testcases/testcasecategory/add/" class="addlink" onclick="return showAddAnotherPopup(this);" id="id_addt_product_casecategory" target="_blank">Add Category</a><span class="grey">After Add and Refresh page</span>

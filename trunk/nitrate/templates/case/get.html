@@ -71,18 +71,6 @@ Nitrate.TestCases.Instance = {
 	<div class="listinfo_content">
 		<fieldset class="no-border">
 			<div class="leftlistinfo">
-				{% comment %}
-				<div class="cell">
-					<div class="sd">Component:</div>
-					<dl class="ul-no-format" style="float:left">
-						{% for component in test_case.component.all %}
-						<dd id="display_category" >{{ component.name }}</dd>
-						{% empty %}
-						<dd class="grey">No component</dd>
-						{% endfor %}
-					</dl>
-				</div>
-				{% endcomment %}
 				<div class="listinfo">
 					<div class="title grey">Default Tester&nbsp;:</div>
 					<div class="name">
@@ -184,11 +172,6 @@ Nitrate.TestCases.Instance = {
 			<li id="tab_component" class="tab">
 				<a href="#component" title="component">Components ({{ test_case.component.count }})</a>
 			</li>
-			{% comment %}
-			<li id="tab_case_depend" class="tab" style="display:none">
-				<a href="#depend" title="depend">Dependencies </a>
-			</li>
-			{% endcomment %}
 			<li id="tab_case_tag" class="tab">
 				<a href="#tag" title="tag">Tags ({{ test_case.tag.count }})</a>
 			</li>
@@ -214,11 +197,6 @@ Nitrate.TestCases.Instance = {
 		<div id="component" style="display:none" class="tab_list">
 			{% include "case/get_component.html" %}
 		</div>
-		{% comment %}
-		<div id="depend" class="tab_list" style="display:none">
-			{% include "case/get_depend.html" %}
-		</div>
-		{% endcomment %}
 		<div id="tag" class="tab_list" style="display:none">
 			<div class="ajax_loading"></div>
 		</div>

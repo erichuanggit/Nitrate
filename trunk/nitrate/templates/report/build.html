@@ -24,39 +24,9 @@ Nitrate.Utils.after_page_load(Nitrate.Report.Builds.on_load);
 	</div>
 	{% include 'report/nav.html' %}
 	<div class="Detailform border-1" style="background:#f1f1f1 ;">
-		{% comment %}
-		<div class="crumb">
-			<span class="right-action"> <label class="select">report</label> | <label class="">dashboard </label></span>
-		</div>
-		{% endcomment %}
 		{% if build %}
 		<div class="report">
 			<h2>Build: {{ build }}</h2>
-			{% comment %}
-			<div class="page_control">
-				<span><a href="#">pre RHEL5.4-Server-Supplementary-20090813.0</a></span>
-				|
-				<span><a href="#">next RHEL5.4-Server-Supplementary-20090813.0</a> </span>
-			</div>
-			{% endcomment %}
-			<!--filter of data report -->
-			{% comment %}
-			<fieldset class="filter">
-				<legend>Filter</legend>
-				<div class="option_row">
-					<label>Test Run</label>
-					<select>
-						<option>All</option>
-						<option>Running</option>
-						<option>Finished</option>
-					</select>
-				</div>
-				<div class="apply_row">
-					<a class="applylink"><a>Apply</a></a>
-				</div>
-			</fieldset>
-			{% endcomment %}
-			<!--end of filter of data report -->
 			<!--data of status of caserun -->
 			<table class="report_data report" border="0" cellspacing="1" cellpadding="0" width="75%">
 				<tr class="variety_pass">
@@ -103,13 +73,6 @@ Nitrate.Utils.after_page_load(Nitrate.Report.Builds.on_load);
 			<!--end data of status of caserun -->
 		</divs>
 		{% endif %}
-		{% comment %}
-		<div class="page_control">
-			<span><a href="#">pre RHEL5.4-Server-Supplementary-20090813.0</a></span>
-			|
-			<span><a href="#">next RHEL5.4-Server-Supplementary-20090813.0</a> </span>
-		</div>
-		{% endcomment %}
 		<table class="list report" id="report_build" border="0" cellspacing="0" cellpadding="0" width="100%">
 			<thead>
 				<tr>

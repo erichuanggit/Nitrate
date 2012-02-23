@@ -71,12 +71,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 					<td valign="top"><label class="strong" for="id_errata_id">Errata</label></td>
 					<td>{{ form.errata_id }}</td>
 				</tr>
-				{%comment%}
-				<tr>
-					<td><label class="strong">Environment </label></td>
-					<td>{{ form.env_id }}<div class="errors">{{ form.env_id.errors }}</div></td>
-				</tr>
-				{%endcomment%}
 				<tr>
 					<td valign="top" valign="top"><label for="id_manager">Run Manager </label></td>
 					<td valign="top">{{ form.manager }}<div class="errors">{{ form.manager.errors }}</div></td>
@@ -130,10 +124,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 				</tr>
 			</table>
 			<div class="submit-row ">
-            	
-                {% comment %}
-				{{ form.errors }}
-                {% endcomment %}
 				<input type="submit" name="" value="Save">
 				<input type="button" name="cancel" value="cancel" onclick="history.go(-1);">
 			</div>

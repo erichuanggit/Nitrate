@@ -13,11 +13,6 @@
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/tablednd.js'></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testreview_actions.js'></script>
-{% comment %}
-<script type="text/javascript">
-Nitrate.Utils.after_page_load(Nitrate.TestReviews.New.on_load);
-</script>
-{% endcomment %}
 {% endblock %}
 
 {% block contents %}
@@ -51,12 +46,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestReviews.New.on_load);
 					<td><label class="strong">Build </label></td>
 					<td>{{ form.build }}<div class="errors">{{ form.build.errors }}</div></td>
 				</tr>
-				{%comment%}
-				<tr>
-					<td><label class="strong">Environment </label></td>
-					<td>{{ form.env_id }}<div class="errors">{{ form.env_id.errors }}</div></td>
-				</tr>
-				{%endcomment%}
 				<tr>
 					<td><label>Reviewer</label></td>
 					<td>{{ form.default_reviewer }} <div class="errors">{{ form.default_reviewer.errors }}</div></td>

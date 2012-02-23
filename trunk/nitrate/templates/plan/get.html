@@ -134,7 +134,6 @@ Nitrate.TestPlans.Instance = {
 			</div>
 			<div class="listinfo">
 				<div class="title grey">Parent&nbsp;:</div>
-				{% comment %}<div class="name "><a href="#treeview" onclick="fireEvent($('tab_treeview').down(), 'click');">{{ test_plan.parent.pk }}</a></div>{% endcomment %}
 				<div class="name ">
 				{% if test_plan.parent.pk %}
 					<a href="{% url tcms.apps.testplans.views.get test_plan.parent.pk %}">{{ test_plan.parent.pk }}</a>
@@ -161,11 +160,6 @@ Nitrate.TestPlans.Instance = {
 				<li id="tab_testruns"  class="tab">
 					<a href="#testruns" title="testruns">Runs ({{ test_plan.run.count }})</a>
 				</li>
-				{% comment %}
-				<li id="tab_testreviews"  class="tab">
-					<a href="#testreviews" title="testreviews">Reviews ({{ test_plan.review.count }})</a>
-				</li>
-				{% endcomment %}
 				<li id="tab_components"	 class="tab">
 					<a href="#components" title="components">Default Components ({{ test_plan.component.count }})</a>
 				</li>
@@ -191,11 +185,6 @@ Nitrate.TestPlans.Instance = {
 			<div id="testruns" class="tab_list" style="display:none;">
 				{% include "plan/get_runs.html" %}
 			</div>
-			{% comment %}
-			<div id="testreviews" class="tab_list" style="display:none;">
-				{% include "plan/get_reviews.html" %}
-			</div>
-			{% endcomment %}
 			<div id="components" class="tab_list" style="display:none;">
 				<div class="ajax_loading"></div>
 			</div>

@@ -24,13 +24,6 @@ Nitrate.Utils.after_page_load(Nitrate.Report.List.on_load);
 	</div>
 	{% include 'report/nav.html' %}
 	<div class="Detailform border-1" style="background:#f1f1f1 ;">
-		{% comment %}
-		<span class="right-action tab_shift"> 
-			<label class="select">report</label>
-			 | 
-			<label class=""><a href="/tt/report/version_dashboard.html" onclick="">dashboard</a></label>
-		</span>
-		{% endcomment %}
 		{% if version %}
 		<h2>Version: {{ version }}</h2>
 		<div class="bold-line" style="float:left;width:100%"></div>
@@ -77,13 +70,6 @@ Nitrate.Utils.after_page_load(Nitrate.Report.List.on_load);
 			</tr>
 		</table>
 		{% endif %}
-		{% comment %}
-		<div class="page_control">
-			<span><a href="#">pre 5.0</a></span>
-			|
-			<span><a href="#">next 5.2</a> </span>
-		</div>
-		{% endcomment %}
 		<table class="list report" border="0" cellspacing="0" cellpadding="0" width="100%">
 			<tr>
 				<th width="20%">Version</th>

@@ -23,9 +23,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Create.on_load);
 		>> New Test Plan
 	</div>
 	<form method="post" action="{% url tcms.apps.testplans.views.new %}" enctype="multipart/form-data">
-		{% comment %}
-        <span >{{ form.errors }}</span>
-        {% endcomment %}
 		<h2>Create New Test Plan</h2>
 		<div class="Detailform border-1" >
 			<table class="editor" cellspan="0" cellspacing="0">

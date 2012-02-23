@@ -36,15 +36,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 				<h2>Search Run</h2>
 				{% include 'run/form/search.html' %}
 			</div>
-			{% comment %}
-			<div>
-				<div class="relativeSearchTitle">Case Information Option<div class="down" id="relativeSearchOption_case"></div></div>
-				<div class="relativeSearchBox" style="display:none" id="relativeSearch_case">
-					{% include 'run/form/search_case.html' %}
-					<div class="clear"></div>
-				</div>
-			</div>
-			{% endcomment %}
 			<div class="bottom">
 				<input type="submit" size="7" value="Search" class="left_float" />
 				<input type="reset" size="7"  value="Reset" class="left_float" />
@@ -65,13 +56,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 		
 		<span class="right-action">
 			{% paginate %}
-			{% comment %}
-			<label for="run_column_add">Add Column</label>
-			<select id="run_column_add">
-				<option value="" id="">---</option>
-				<option value="col_plan" id="col_plan_option">Plan</option>
-			</select>
-			{% endcomment %}
 		</span>
 	</div>
 	{% include "run/common/run_filtered.html" %}
