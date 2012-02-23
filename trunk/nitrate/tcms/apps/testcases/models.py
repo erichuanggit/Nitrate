@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Nitrate is copyright 2010 Red Hat, Inc.
-# 
+#
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -9,10 +9,10 @@
 # the hope that it will be useful, but WITHOUT ANY WARRANTY; without
 # even the implied warranties of TITLE, NON-INFRINGEMENT,
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
-# 
+#
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
@@ -34,10 +34,10 @@ try:
 except ImportError:
     register_model = None
 
-AUTOMATED_CHOICES = ( 
-    (0, 'Manual'), 
-    (1, 'Auto'), 
-    (2, 'Both'), 
+AUTOMATED_CHOICES = (
+    (0, 'Manual'),
+    (1, 'Auto'),
+    (2, 'Both'),
 )
 
 class NoneText:
@@ -55,40 +55,40 @@ class TestCaseStatus(TCMSActionModel):
     )
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    
+
     class Meta:
         db_table = u'test_case_status'
         verbose_name = "Test case status"
         verbose_name_plural = "Test case status"
-        
+
     def __unicode__(self):
         return self.name
-    
+
     @classmethod
     def get_PROPOSED(cls):
         try:
             return cls.objects.get(name='PROPOSED')
         except cls.DoesNotExist:
             return None
-    
+
     @classmethod
     def get_CONFIRMED(cls):
         try:
             return cls.objects.get(name='CONFIRMED')
         except cls.DoesNotExist:
             return None
-    
+
     @classmethod
     def string_to_instance(self, name):
         return cls.objects.get(name=name)
-    
+
     @classmethod
     def id_to_string(cls, id):
         try:
             return cls.objects.get(id = id).name
         except cls.DoesNotExist:
             return None
-    
+
     def is_confirmed(self):
         return self.name == 'CONFIRMED'
 
@@ -97,12 +97,12 @@ class TestCaseCategory(TCMSActionModel):
     name = models.CharField(max_length=720)
     product = models.ForeignKey('management.Product', related_name="category")
     description = models.TextField(blank=True)
-    
+
     class Meta:
         db_table = u'test_case_categories'
         verbose_name_plural = u'test case categories'
         unique_together = ('product', 'name')
-    
+
     def __unicode__(self):
         return self.name
 
@@ -142,28 +142,28 @@ class TestCase(TCMSActionModel):
         'management.TestAttachment',
         through='testcases.TestCaseAttachment',
     )
-    
+
     plan = models.ManyToManyField(
         'testplans.TestPlan',
         through='testcases.TestCasePlan',
     )
-    
+
     component = models.ManyToManyField(
         'management.Component',
         through='testcases.TestCaseComponent',
     )
-    
+
     tag = models.ManyToManyField(
         'management.TestTag',
         through='testcases.TestCaseTag',
     )
-    
+
     # Auto-generated attributes from back-references:
     #   'texts' : list of TestCaseTexts (from TestCaseTexts.case)
     class Meta:
         db_table = u'test_cases'
         ordering = ['summary', 'case_id',]
-    
+
     def __unicode__(self):
         return self.summary
 
@@ -196,7 +196,7 @@ class TestCase(TCMSActionModel):
             case_ids = [case_ids, ]
 
         fields = [field.name for field in cls._meta.fields]
-        
+
         tcs = cls.objects.filter(pk__in = case_ids)
 
         for k, v in values.items():
@@ -204,7 +204,7 @@ class TestCase(TCMSActionModel):
                 tcs.update(**{k: v})
 
         return tcs
-    
+
     @classmethod
     def list(cls, query):
         """List the cases with request"""
@@ -216,10 +216,10 @@ class TestCase(TCMSActionModel):
                 | Q(summary__icontains = query['search'])
                 | Q(author__email__startswith = query['search'])
             )
-        
+
         if query.get('summary'):
             q = q.filter(Q(summary__icontains=query['summary']))
-        
+
         if query.get('author'):
             q = q.filter(
                 Q(author__first_name__startswith = query['author'])
@@ -227,7 +227,7 @@ class TestCase(TCMSActionModel):
                 | Q(author__username__icontains = query['author'])
                 | Q(author__email__startswith = query['author'])
             )
-        
+
         if query.get('default_tester'):
             q = q.filter(
                 Q(default_tester__first_name__startswith = query['default_tester'])
@@ -235,19 +235,19 @@ class TestCase(TCMSActionModel):
                 | Q(default_tester__username__icontains = query['default_tester'])
                 | Q(default_tester__email__startswith = query['default_tester'])
             )
-        
+
         if query.get('tag__name__in'):
             q = q.filter(tag__name__in = query['tag__name__in'])
-        
+
         if query.get('category'):
             q = q.filter(category = query['category'])
-        
+
         if query.get('priority'):
             q = q.filter(priority__in = query['priority'])
-        
+
         if query.get('case_status'):
             q = q.filter(case_status__in = query['case_status'])
-        
+
         #If plan exists, remove leading and trailing whitespace from it.
         plan_str = query.get('plan','').strip()
         if plan_str:
@@ -259,34 +259,34 @@ class TestCase(TCMSActionModel):
                 # Not an integer - treat plan_str as a plan name:
                 q = q.filter(plan__name__icontains = plan_str)
         del plan_str
-        
+
         if query.get('product'):
             q = q.filter(category__product=query['product'])
-        
+
         if query.get('component'):
             q = q.filter(component = query['component'])
-        
+
         if query.get('bug_id'):
             q = q.filter(case_bug__bug_id__in = query['bug_id'])
-        
+
         if query.get('is_automated'):
             q = q.filter(is_automated = query['is_automated'])
-        
+
         if query.get('is_automated_proposed'):
             q = q.filter(is_automated_proposed = query['is_automated_proposed'])
-        
+
         return q.distinct()
-    
+
     @classmethod
     def list_confirmed(self):
         confirmed_case_status = TestCaseStatus.get_CONFIRMED()
-        
+
         query = {
             'case_status_id': confirmed_case_status.case_status_id,
         }
-        
+
         return cls.list(query)
-    
+
     @classmethod
     def mail_scene(cls, objects, field = None, value = None, ctype = None, object_pk = None):
         tcs = objects.select_related()
@@ -298,9 +298,9 @@ class TestCase(TCMSActionModel):
                 'context': {'test_cases': tcs},
             }
         }
-        
+
         return scence_templates.get(field)
-    
+
     def add_bug(self, bug_id, bug_system, summary = None, description = None, case_run = None):
         try:
             self.case_bug.get_or_create(
@@ -312,7 +312,7 @@ class TestCase(TCMSActionModel):
             )
         except:
             raise
-    
+
     def add_component(self, component):
         try:
             return TestCaseComponent.objects.create(
@@ -321,7 +321,7 @@ class TestCase(TCMSActionModel):
             )
         except:
             raise
-    
+
     def add_tag(self, tag):
         try:
             return TestCaseTag.objects.get_or_create(
@@ -330,7 +330,7 @@ class TestCase(TCMSActionModel):
             )
         except:
             raise
-    
+
     def add_text(
         self,
         action,
@@ -343,12 +343,12 @@ class TestCase(TCMSActionModel):
     ):
         if not author:
             author = self.author
-        
+
         latest_text = self.latest_text()
         if latest_text.action != action or latest_text.effect != effect \
         or latest_text.setup != setup or latest_text.breakdown != breakdown:
             case_text_version = latest_text.case_text_version + 1
-            
+
             try:
                 latest_text = TestCaseText.objects.create(
                     case = self,
@@ -362,9 +362,9 @@ class TestCase(TCMSActionModel):
                 )
             except:
                 raise
-        
+
         return latest_text
-    
+
     def add_to_plan(self, plan):
 
         try:
@@ -387,30 +387,30 @@ class TestCase(TCMSActionModel):
         return TestCaseBug.objects.select_related(
             'case_run', 'bug_system__url_reg_exp'
         ).filter(case__case_id = self.case_id)
-    
+
     def get_components(self):
         return self.component.all()
-    
+
     def get_component_names(self):
         return self.component.values_list('name', flat=True)
-    
-    def get_choiced(self, obj_value, choices): 
-        for x in choices: 
+
+    def get_choiced(self, obj_value, choices):
+        for x in choices:
             if x[0] == obj_value:
                 return x[1]
-    
-    def get_is_automated(self): 
-        return self.get_choiced(self.is_automated, AUTOMATED_CHOICES)     
-    
+
+    def get_is_automated(self):
+        return self.get_choiced(self.is_automated, AUTOMATED_CHOICES)
+
     def get_is_automated_form_value(self):
         if self.is_automated == 2:
             return [0, 1]
-        
+
         return (self.is_automated, )
-    
+
     def get_is_automated_status(self):
         return self.get_is_automated() + (self.is_automated_proposed and '(Autoproposed)' or '')
-    
+
     def get_previous_and_next(self, pk_list):
         pk_list = list(pk_list)
         current_idx = pk_list.index(self.pk)
@@ -419,9 +419,9 @@ class TestCase(TCMSActionModel):
             next = TestCase.objects.get(pk = pk_list[current_idx + 1])
         except IndexError:
             next = TestCase.objects.get(pk = pk_list[0])
-        
+
         return (prev, next)
-    
+
     def get_text_with_version(self, case_text_version = None):
         if case_text_version:
             try:
@@ -431,54 +431,54 @@ class TestCase(TCMSActionModel):
                 )
             except TestCaseText.DoesNotExist, error:
                 return NoneText
-        
+
         return self.latest_text()
-    
+
     def latest_text(self):
         try:
             return self.text.order_by('-case_text_version')[0]
         except IndexError:
             return NoneText
-    
+
     def mail(self, template, subject, context = {}, to = [], request = None):
         from tcms.core.utils.mailto import mailto
         if not to:
             to = self.author.email
-            
+
         to = list(set(to))
         mailto(template, subject, to, context, request)
-    
+
     def remove_bug(self, bug_id, run_id=None):
         bugs = self.case_bug.filter(bug_id=bug_id)
         if run_id:
             bugs = bugs.filter(case_run=run_id)
         bugs.delete()
-    
+
     def remove_component(self, component):
         cursor = connection.cursor()
         cursor.execute("DELETE from test_case_components \
             WHERE case_id = %s AND component_id = %s",
             (self.case_id, component.id)
         )
-    
+
     def remove_plan(self, plan):
         cursor = connection.cursor()
         cursor.execute("DELETE from test_case_plans \
             WHERE plan_id = %s \
-            AND case_id = %s", 
+            AND case_id = %s",
             (plan.plan_id, self.case_id)
         )
-    
+
     def remove_tag(self, tag):
         cursor = connection.cursor()
         cursor.execute("DELETE from test_case_tags \
             WHERE case_id = %s \
-            AND tag_id = %s", 
+            AND tag_id = %s",
             (self.pk, tag.pk)
         )
-    
+
     def get_url_path(self, request = None):
-        return reverse('tcms.testcases.views.get', args=[self.pk, ])
+        return reverse('tcms.apps.testcases.views.get', args=[self.pk, ])
 
     def _get_email_conf(self):
         try:
@@ -504,26 +504,26 @@ class TestCaseText(TCMSActionModel):
         db_table = u'test_case_texts'
         ordering = ['case', '-case_text_version']
         unique_together = ('case', 'case_text_version')
-    
+
     def get_plain_text(self):
         from tcms.core.utils.html import html2text
         from django.utils.encoding import smart_str
-        
+
         self.action = html2text(smart_str(self.action))
         self.effect = html2text(smart_str(self.effect))
         self.setup = html2text(smart_str(self.setup))
         self.breakdown = html2text(smart_str(self.breakdown))
-        
+
         return self
 
 class TestCasePlan(models.Model):
     # plan_id = models.IntegerField(max_length=11, primary_key=True)
     # case_id = models.IntegerField(max_length=11, primary_key=True)
-    
+
     plan = models.ForeignKey('testplans.TestPlan')
     case = models.ForeignKey(TestCase)
     sortkey = models.IntegerField(max_length=11, null=True, blank=True)
-    
+
     class Meta:
         db_table = u'test_case_plans'
 
@@ -548,7 +548,7 @@ class TestCaseComponent(models.Model):
     component = models.ForeignKey('management.Component') # component_id
     class Meta:
         db_table = u'test_case_components'
-        
+
     #def __unicode__(self):
         #Another choice: return the related case summary too?
     #    return "%s, %s" %(self.component.name, self.case.summary)
@@ -559,7 +559,7 @@ class TestCaseTag(models.Model):
     )
     case = models.ForeignKey(TestCase)
     user = models.IntegerField(db_column='userid', default='0')
-    
+
     class Meta:
         db_table = u'test_case_tags'
 
@@ -567,10 +567,10 @@ class TestCaseBugSystem(TCMSActionModel):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     url_reg_exp = models.CharField(max_length=8192)
-    
+
     class Meta:
         db_table = u'test_case_bug_systems'
-    
+
     def __unicode__(self):
         return self.name
 
@@ -588,27 +588,27 @@ class TestCaseBug(TCMSActionModel):
     bug_system = models.ForeignKey(TestCaseBugSystem, default=1)
     summary = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    
+
     class Meta:
         db_table = u'test_case_bugs'
         unique_together = (
             ('bug_id', 'case_run', 'case'),
             ('bug_id', 'case_run')
         )
-    
+
     def __unicode__(self):
         return str(self.bug_id)
-    
+
     def get_name(self):
         if self.summary:
             return self.summary
-        
+
         return self.bug_id
-    
+
     def get_absolute_url(self):
         # Upward compatibility code
         return self.get_url()
-    
+
     def get_url(self):
         return self.bug_system.url_reg_exp % self.bug_id
 
@@ -627,8 +627,8 @@ class TestCaseEmailSettings(models.Model):
 
 def _listen():
     from django.db.models.signals import post_save, post_delete
-    from tcms.testcases import watchers as case_watchers
-    from tcms.testcases.signals import bug_add_listen, bug_remove_listen
+    from tcms.apps.testcases import watchers as case_watchers
+    from tcms.apps.testcases.signals import bug_add_listen, bug_remove_listen
 
     post_save.connect(case_watchers.on_case_save, TestCase)
     post_delete.connect(case_watchers.on_case_delete, TestCase)
