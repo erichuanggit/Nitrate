@@ -14,28 +14,10 @@
 # distribution and at <http://www.gnu.org/licenses>.
 #
 # Authors:
-#   Xuqing Kuang <xkuang@redhat.com>
+#   Xuqing Kuang <xkuang@redhat.com>, Chenxiong Qi <cqi@redhat.com>
 
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
-
-MODULE_NAME = "index"
-
-def index(request, template_name = 'index.html'):
-    """
-    Home page of TCMS
-    """
-    from django.views.generic.simple import direct_to_template
-    from django.db.models import Q
-
-    print "##EEEE#htllo"
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('django.contrib.auth.views.login'))
-    print "###htllo"
-
-    return HttpResponseRedirect(
-        reverse('tcms.apps.profiles.views.recent', args=[request.user.username])
-    )
 
 def search(request):
     """

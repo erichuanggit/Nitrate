@@ -24,7 +24,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
-from tcms.core.utils.prompt import Prompt
+from tcms.core.views import Prompt
 from tcms.apps.testruns.models import TestRun, TestCaseRun, TestCaseRunStatus, TCMSEnvRunValueMap
 from tcms.search.order import order_run_queryset
 from tcms.search import remove_from_request_path
@@ -43,7 +43,7 @@ def new(request, template_name = 'run/new.html'):
     from tcms.apps.testplans.models import TestPlan
     from tcms.apps.testcases.models import TestCase
     from tcms.apps.management.models import Version
-    from tcms.core.utils.prompt import Prompt
+    from tcms.core.views import Prompt
     from tcms.apps.testcases.models import TestCasePlan
 
 
@@ -895,7 +895,7 @@ def update_case_run_text(request, run_id):
     """
     Update the IDLE cases to newest text
     """
-    from tcms.core.utils import Prompt
+    from tcms.core.views import Prompt
     try:
         tr = TestRun.objects.get(run_id = run_id)
     except ObjectDoesNotExist, error:
