@@ -18,13 +18,13 @@
 
 from django.db import models
 
-from tcms.core.models.base import TCMSBaseSharedModel
+from tcms.core.models.base import TCMSContentTypeBaseModel
 
 from managers import TCMSLogManager
 
 # Create your models here.
 
-class TCMSLogModel(TCMSBaseSharedModel):
+class TCMSLogModel(TCMSContentTypeBaseModel):
     who = models.ForeignKey('auth.User', related_name='log_who')
     date = models.DateTimeField(auto_now_add=True)
     action = models.TextField()

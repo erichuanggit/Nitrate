@@ -57,7 +57,7 @@ class UrlMixin(object):
         return urlparse.urlunparse(('', '') + bits[2:])
     get_url_path.dont_recurse = True
 
-class TCMSBaseSharedModel(models.Model):
+class TCMSContentTypeBaseModel(models.Model):
     """
     TCMS log models.
     The code is from comments contrib from Django
