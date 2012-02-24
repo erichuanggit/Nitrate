@@ -19,7 +19,7 @@
 from django.db import models
 
 from fields import TimedeltaField, BlobValueWrapper, BlobField
-from base import TCMSBaseSharedModel, UrlMixin
+from base import TCMSContentTypeBaseModel, UrlMixin
 
 from tcms.core.utils.xmlrpc import XMLRPCSerializer
 from tcms.core.contrib.logs.views import TCMSLog
