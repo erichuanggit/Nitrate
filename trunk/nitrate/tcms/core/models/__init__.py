@@ -22,7 +22,7 @@ from fields import TimedeltaField, BlobValueWrapper, BlobField
 from base import TCMSBaseSharedModel, UrlMixin
 
 from tcms.core.utils.xmlrpc import XMLRPCSerializer
-from tcms.core.contrib.logs.views import TCMSLog
+from tcms.core.logs.views import TCMSLog
 
 class TCMSActionModel(models.Model, UrlMixin):
     """

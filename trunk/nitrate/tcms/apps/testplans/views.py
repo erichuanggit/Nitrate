@@ -30,7 +30,7 @@ from django.shortcuts import get_object_or_404
 from tcms.core.views import Prompt
 from tcms.core.utils.raw_sql import RawSQL
 
-from tcms.core.models import TCMSLog
+from tcms.core.logs.views import TCMSLog
 from tcms.apps.management.models import Product
 from tcms.search.order import order_plan_queryset
 from tcms.search import remove_from_request_path
