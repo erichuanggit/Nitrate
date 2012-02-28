@@ -21,7 +21,7 @@
 import threading
 import datetime
 
-from tcms.plugins.message_bus.message_bus import MessageBus
+from tcms.integration.djqpid import Producer
 
 # Reference from
 # http://www.chrisdpratt.com/2008/02/16/signals-in-django-stuff-thats-not-documented-well/
@@ -61,7 +61,7 @@ def qpid_run_created(sender, *args, **kwargs):
             "when": datetime.datetime.now().strftime("%Y-%m-%d %X")
         }    
         try:
-            MessageBus().send(run_create_info, "testrun.created", False)
+            Producer().send(run_create_info, "testrun.created", False)
         except:
             pass
 
@@ -94,7 +94,7 @@ def qpid_run_progress(sender, *args, **kwargs):
         else:
             # testrun is finished 
             try:
-                MessageBus().send(run_info, "testrun.finished", False)
+                Producer().send(run_info, "testrun.finished", False)
             except:
                 pass
     else:

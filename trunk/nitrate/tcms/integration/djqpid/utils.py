@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from tcms.plugins.message_bus import settings as st
+from tcms.integration.djqpid import settings as st
 
 def refresh_HTTP_credential_cache():
     '''

@@ -28,9 +28,9 @@ from qpid.messaging.exceptions import ConnectionError
 from qpid.messaging.exceptions import AuthenticationFailure
 from qpid.sasl import SASLError
 
-from tcms.plugins.message_bus import settings as st
-from tcms.plugins.message_bus.outgoing_message import OutgoingMessage
-from tcms.plugins.message_bus.message_bus import MessageBus
+from tcms.integration.djqpid import settings as st
+from tcms.integration.djqpid.outgoing_message import OutgoingMessage
+from tcms.integration.djqpid.producer import Producer
 
 class TestSettings(unittest.TestCase):
     '''
@@ -161,7 +161,7 @@ class TestUtils(unittest.TestCase):
         configure GSSAPI related configurations correctly.
         '''
 
-        from tcms.plugins.message_bus.utils import refresh_HTTP_credential_cache
+        from tcms.integration.djqpid.utils import refresh_HTTP_credential_cache
 
         old_cache = os.getenv('KRB5CCNAME', None)
 
@@ -190,18 +190,18 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(line2, 'Default principal: %s' % st.SERVICE_PRINCIPAL,
             'Default principal within credential cache does not match the SERVICE_PRINCIPAL in settings')
 
-class TestMessageBus(unittest.TestCase):
+class TestProducer(unittest.TestCase):
 
     def test_sending_message(self):
         msg_content = {
-            'who': 'TestMessageBus.test_sending_message',
+            'who': 'TestProducer.test_sending_message',
             'when': '2012-1-30 15:17:10',
             'percent': '100%',
             'errata_id': 1234
         }
 
         try:
-            MessageBus().send(msg_content=msg_content, event_name='testrun.created')
+            Producer().send(msg_content=msg_content, event_name='testrun.created')
         except AuthenticationFailure, err:
             # Something wrong with the authentication configuration,
             # or not allowed to send message with current ticket.
@@ -215,7 +215,7 @@ class TestMessageBus(unittest.TestCase):
 
 class TestStateTransmissionLocally(unittest.TestCase):
     '''
-    Test transmission of MessageBus' status locally
+    Test transmission of Producer' status locally
 
     This testcase assumes that you have installed QPID
     in your machine, either development machine or test server.

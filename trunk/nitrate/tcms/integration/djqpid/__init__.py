@@ -14,6 +14,6 @@
 # distribution and at <http://www.gnu.org/licenses>.
 # 
 # Authors:
-#   Xuqing Kuang <xkuang@redhat.com>
+#   Xuqing Kuang <xkuang@redhat.com>, Chenxiong Qi <cqi@redhat.com>
 
-from tcms.plugins.message_bus.message_bus import MessageBus
+from tcms.integration.djqpid.producer import Producer

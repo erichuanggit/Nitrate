@@ -16,7 +16,7 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-from tcms.plugins.message_bus.settings import ENABLE_MESSAGING
+from tcms.integration.djqpid.settings import ENABLE_MESSAGING
 
 '''
 Message Bus is controlled by ENABLE_MESSAGING variable defined in settings.

@@ -12,9 +12,9 @@ from qpid.messaging.exceptions import ConnectError
 from qpid.messaging.exceptions import AuthenticationFailure
 from qpid.sasl import SASLError
 
-from tcms.plugins.message_bus import settings as st
-from tcms.plugins.message_bus.outgoing_message import OutgoingMessage
-from tcms.plugins.message_bus.utils import refresh_HTTP_credential_cache
+from tcms.integration.djqpid import settings as st
+from tcms.integration.djqpid.outgoing_message import OutgoingMessage
+from tcms.integration.djqpid.utils import refresh_HTTP_credential_cache
 
 errlog = sys.stderr
 write_errlog = lambda log_content: errlog.write(log_content + os.linesep)
@@ -22,7 +22,7 @@ write_errlog = lambda log_content: errlog.write(log_content + os.linesep)
 errlog_write = lambda log_content: errlog.write(log_content)
 errlog_writeline = lambda log_content: errlog.write(log_content + os.linesep)
 
-class MessageBus(object):
+class Producer(object):
     ''' Core message bus '''
 
     _connection = None
@@ -33,19 +33,19 @@ class MessageBus(object):
 
     @property
     def connection(self):
-        return self._connection
+        return Producer._connection
 
     @property
     def session(self):
-        return self._session
+        return Producer._session
 
     @property
     def sender(self):
-        return self._sender
+        return Producer._sender
 
     @property
     def status(self):
-        return self._status
+        return Producer._status
 
     def __connect_with_gssapi(self):
         ev_krb5ccname = 'KRB5CCNAME'
@@ -59,10 +59,10 @@ class MessageBus(object):
             'sasl_mechanisms': st.QPID_BROKER_SASL_MECHANISMS,
             'transport':       st.QPID_BROKER_TRANSPORT,
         }
-        self._connection = Connection(**options)
+        Producer._connection = Connection(**options)
 
         try:
-            self._connection.open()
+            Producer._connection.open()
         finally:
             if old_ccache:
                 os.environ[ev_krb5ccname] = old_ccache
@@ -80,8 +80,8 @@ class MessageBus(object):
             'username':        st.AUTH_USERNAME,
             'password':        st.AUTH_PASSWORD,
         }
-        self._connection = Connection(**options)
-        self._connection.open()
+        Producer._connection = Connection(**options)
+        Producer._connection.open()
 
     if st.USING_GSSAPI:
         __connect_broker = __connect_with_gssapi
@@ -101,8 +101,8 @@ class MessageBus(object):
         '''
 
         self.__connect_broker()
-        self._session = self._connection.session()
-        self._sender = self._session.sender(st.SENDER_ADDRESS)
+        Producer._session = Producer._connection.session()
+        Producer._sender = Producer._session.sender(st.SENDER_ADDRESS)
 
     def __connect_broker_if_necessary(self):
         '''
@@ -124,16 +124,17 @@ class MessageBus(object):
         This can be considered to clear MessageBus' environment also.
         '''
 
-        if self._sender is not None:
-            self._sender = None
+        if self.sender is not None:
+            Producer._sender.close()
+            Producer._sender = None
 
-        if self._session is not None:
-            self._session.close()
-            self._session = None
+        if self.session is not None:
+            Producer._session.close()
+            Producer._session = None
 
-        if self._connection is not None:
-            self._connection.close()
-            self._connection = None
+        if self.connection is not None:
+            Producer._connection.close()
+            Producer._connection = None
 
     def send(self, msg_content, event_name, sync=True):
         '''
