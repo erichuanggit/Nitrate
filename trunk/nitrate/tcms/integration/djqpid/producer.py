@@ -6,14 +6,13 @@ import sys
 
 from threading import Lock
 
-from qpid.messaging import Connection
+from qpid.messaging import Connection, Message
 from qpid.messaging.exceptions import ConnectionError
 from qpid.messaging.exceptions import ConnectError
 from qpid.messaging.exceptions import AuthenticationFailure
 from qpid.sasl import SASLError
 
 from tcms.integration.djqpid import settings as st
-from tcms.integration.djqpid.outgoing_message import OutgoingMessage
 from tcms.integration.djqpid.utils import refresh_HTTP_credential_cache
 
 errlog = sys.stderr
@@ -42,10 +41,6 @@ class Producer(object):
     @property
     def sender(self):
         return Producer._sender
-
-    @property
-    def status(self):
-        return Producer._status
 
     def __connect_with_gssapi(self):
         ev_krb5ccname = 'KRB5CCNAME'
@@ -136,12 +131,8 @@ class Producer(object):
             Producer._connection.close()
             Producer._connection = None
 
-    def send(self, msg_content, event_name, sync=True):
-        '''
-        Send a message to QPID broker.
-
-        The routing key consists of the prefix defined in settings and event_name.
-        '''
+    def send(self, msg, routing_key, sync=True):
+        ''' Send a message to QPID broker.  '''
 
         try:
             self.__connect_broker_if_necessary()
@@ -155,11 +146,11 @@ class Producer(object):
             return
 
         try:
-            o_msg = OutgoingMessage(raw_msg = msg_content, event_name = event_name)
+            o_msg = Message(msg, subject=routing_key)
             self.sender.send(o_msg, sync=sync)
 
         except ConnectionError, err:
             errlog_writeline('ConnectionError %s while sending message %s.' % \
-                             (str(err), str(msg_content)))
+                             (str(err), str(o_msg)))
 
             self.stop()

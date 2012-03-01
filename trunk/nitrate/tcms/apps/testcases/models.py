@@ -628,14 +628,9 @@ class TestCaseEmailSettings(models.Model):
 def _listen():
     from django.db.models.signals import post_save, post_delete
     from tcms.apps.testcases import watchers as case_watchers
-    from tcms.apps.testcases.signals import bug_add_listen, bug_remove_listen
 
     post_save.connect(case_watchers.on_case_save, TestCase)
     post_delete.connect(case_watchers.on_case_delete, TestCase)
-
-    # Bug add/remove listen for qpid
-    post_save.connect(bug_add_listen, TestCaseBug)
-    post_delete.connect(bug_remove_listen, TestCaseBug)
 
 if settings.LISTENING_MODEL_SIGNAL:
     _listen()

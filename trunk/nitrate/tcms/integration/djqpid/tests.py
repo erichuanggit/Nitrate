@@ -29,7 +29,6 @@ from qpid.messaging.exceptions import AuthenticationFailure
 from qpid.sasl import SASLError
 
 from tcms.integration.djqpid import settings as st
-from tcms.integration.djqpid.outgoing_message import OutgoingMessage
 from tcms.integration.djqpid.producer import Producer
 
 class TestSettings(unittest.TestCase):
@@ -118,32 +117,6 @@ class TestSettings(unittest.TestCase):
             self.assert_('GSSAPI' in st.QPID_BROKER_SASL_MECHANISMS.split(' '),
                 'GSSAPI is enabled, but GSSAPI does not exist in QPID_BROKER_SASL_MECHANISMS')
 
-class TestOutgoingMessage(unittest.TestCase):
-
-    def testOutgoingMessageShouldRepresentMessage(self):
-        '''
-        Ensure the OutgoingMessage can represent a Message,
-        which is provided by python-qpid package.
-
-        The important thing is to check whether the instance of OutgoingMessage
-        recognizes the message's content type.
-        '''
-
-        raw_msg = 'hello world'
-        event_name = 'bugs.add'
-
-        o_msg = OutgoingMessage(raw_msg, event_name)
-
-        self.assertTrue(isinstance(o_msg, Message))
-        self.assertEqual(o_msg.content, raw_msg)
-        self.assertEqual(o_msg.subject, 'tcms.%s' % event_name)
-        self.assertTrue(hasattr(o_msg, 'properties'))
-
-        raw_msg = {}
-        o_msg = OutgoingMessage(raw_msg, event_name)
-        self.assertNotEqual(o_msg.content_type, None)
-        self.assertEqual(o_msg.content_type, 'amqp/map')
-
 class TestUtils(unittest.TestCase):
 
     def setUp(self):
@@ -201,7 +174,7 @@ class TestProducer(unittest.TestCase):
         }
 
         try:
-            Producer().send(msg_content=msg_content, event_name='testrun.created')
+            Producer().send(msg=msg_content, routing_key='test.unittest')
         except AuthenticationFailure, err:
             # Something wrong with the authentication configuration,
             # or not allowed to send message with current ticket.
