@@ -18,7 +18,7 @@
 
 from django.db import models
 
-from tcms.core.models.base import TCMSBaseSharedModel
+from tcms.core.models import TCMSContentTypeBaseModel
 
 class Profiles(models.Model):
     userid = models.AutoField(primary_key=True)
@@ -113,7 +113,7 @@ class BookmarkCategory(models.Model):
     def __unicode__(self):
         return self.name
 
-class Bookmark(TCMSBaseSharedModel):
+class Bookmark(TCMSContentTypeBaseModel):
     user = models.ForeignKey('auth.User')
     category = models.ForeignKey(BookmarkCategory, blank=True, null=True, related_name='bookmark')
     name = models.CharField(max_length=1024)
