@@ -27,7 +27,7 @@ def upload_file(request):
         from datetime import datetime
 
         from django.conf import settings
-        from tcms.core.utils.prompt import Prompt
+        from tcms.core.views import Prompt
         from tcms.apps.management.models import TestAttachment, TestAttachmentData
 
         try:

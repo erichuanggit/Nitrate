@@ -26,7 +26,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils import simplejson
 
 from tcms.core import forms
-from tcms.core.utils import Prompt
+from tcms.core.views import Prompt
 
 from models import TestCase, TestCaseStatus, TestCaseAttachment, TestCasePlan
 from models import TestCaseCategory

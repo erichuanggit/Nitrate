@@ -27,7 +27,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils import simplejson
 from django.shortcuts import get_object_or_404
 
-from tcms.core.utils import Prompt
+from tcms.core.views import Prompt
 from tcms.core.utils.raw_sql import RawSQL
 
 from tcms.core.models import TCMSLog
@@ -733,7 +733,7 @@ def text_history(request, plan_id, template_name = 'plan/history.html'):
 def cases(request, plan_id):
     """Process the xml with import"""
     from django.utils.simplejson import dumps as json_dumps
-    from tcms.core.utils import Prompt
+    from tcms.core.views import Prompt
     from tcms.apps.testcases.models import TestCase, TestCaseCategory, TestCaseTag
     from tcms.apps.testcases.models import TestCaseText, TestCaseStatus
     from tcms.apps.management.models import TestTag

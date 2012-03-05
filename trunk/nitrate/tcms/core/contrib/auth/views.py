@@ -22,7 +22,7 @@ from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.views.generic.simple import direct_to_template
 
-from tcms.core.utils import Prompt
+from tcms.core.views import Prompt
 
 from models import UserActivateKey
 
