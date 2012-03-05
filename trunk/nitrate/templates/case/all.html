@@ -20,12 +20,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.List.on_load);
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a> >>
 		{% if query_result %}
-		<a href="{% url tcms.testcases.views.all %}">Search Cases</a> >> Search result
+		<a href="{% url tcms.apps.testcases.views.all %}">Search Cases</a> >> Search result
 		{% else %}
 		Search Cases
 		{% endif %}
 	</div>
-	<form action="{% url tcms.testcases.views.all %}" method="get">
+	<form action="{% url tcms.apps.testcases.views.all %}" method="get">
 		<div id="itemSearch" class="itemSearch">
 			<h2>Search Case</h2>
 			{% include "case/form/search.html" %}

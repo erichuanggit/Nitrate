@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Nitrate is copyright 2010 Red Hat, Inc.
-# 
+#
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -9,16 +9,16 @@
 # the hope that it will be useful, but WITHOUT ANY WARRANTY; without
 # even the implied warranties of TITLE, NON-INFRINGEMENT,
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
-# 
+#
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required
 from kobo.django.xmlrpc.decorators import log_call, log_traceback
-from tcms.management.models import Product
+from tcms.apps.management.models import Product
 from utils import pre_check_product
 
 __all__ = (
@@ -64,7 +64,7 @@ def check_category(request, name, product):
     # Get with product name
     >>> Product.check_category('Feature', 'Red Hat Enterprise Linux 5')
     """
-    from tcms.testcases.models import TestCaseCategory
+    from tcms.apps.testcases.models import TestCaseCategory
     p = pre_check_product(values = product)
     query = {'product': p}
     return TestCaseCategory.objects.get(name = name, product = p).serialize()
@@ -86,7 +86,7 @@ def check_component(request, name, product):
     # Get with product name
     >>> Product.check_component('acpi', 'Red Hat Enterprise Linux 5')
     """
-    from tcms.management.models import Component
+    from tcms.apps.management.models import Component
     p = pre_check_product(values = product)
     query = {'product': p}
     return Component.objects.get(name = name, product = p).serialize()
@@ -113,9 +113,9 @@ def check_product(request, name):
 def filter(request, query):
     """
     Description: Performs a search and returns the resulting list of products.
-    
+
     Params:      $query - Hash: keys must match valid search fields.
-    
+
     +------------------------------------------------------------------+
     |               Product Search Parameters                          |
     +------------------------------------------------------------------+
@@ -127,7 +127,7 @@ def filter(request, query):
     +------------------------------------------------------------------+
 
     Returns:     Array: Matching products are retuned in a list of hashes.
-    
+
     Example:
     # Get all of product named 'Red Hat Enterprise Linux 5'
     >>> Product.filter({'name': 'Red Hat Enterprise Linux 5'})
@@ -137,7 +137,7 @@ def filter(request, query):
 def filter_categories(request, query):
     """
     Description: Performs a search and returns the resulting list of categories.
-    
+
     Params:      $query - Hash: keys must match valid search fields.
 
     +------------------------------------------------------------------+
@@ -158,13 +158,13 @@ def filter_categories(request, query):
     # Get all of categories named in product 'Red Hat Enterprise Linux 5'
     >>> Product.filter_categories({'product__name': 'Red Hat Enterprise Linux 5'})
     """
-    from tcms.testcases.models import TestCaseCategory
+    from tcms.apps.testcases.models import TestCaseCategory
     return TestCaseCategory.to_xmlrpc(query)
 
 def filter_components(request, query):
     """
     Description: Performs a search and returns the resulting list of components.
-    
+
     Params:      $query - Hash: keys must match valid search fields.
 
     +------------------------------------------------------------------+
@@ -187,13 +187,13 @@ def filter_components(request, query):
     # Get all of components named in product 'Red Hat Enterprise Linux 5'
     >>> Product.filter_components({'product__name': 'Red Hat Enterprise Linux 5'})
     """
-    from tcms.management.models import Component
+    from tcms.apps.management.models import Component
     return Component.to_xmlrpc(query)
 
 def filter_versions(request, query):
     """
     Description: Performs a search and returns the resulting list of versions.
-    
+
     Params:      $query - Hash: keys must match valid search fields.
 
     +------------------------------------------------------------------+
@@ -213,7 +213,7 @@ def filter_versions(request, query):
     # Get all of filter_versions named in product 'Red Hat Enterprise Linux 5'
     >>> Product.filter_versions({'product__name': 'Red Hat Enterprise Linux 5'})
     """
-    from tcms.management.models import Version
+    from tcms.apps.management.models import Version
     return Version.to_xmlrpc(query)
 
 def get(request, id):
@@ -236,7 +236,7 @@ def get_builds(request, product, is_active = True):
     Params:      $product  -  Integer/String
                               Integer: product_id of the product in the Database
                               String: Product name
-                 $is_active - Boolean: True to only include builds where is_active is true. 
+                 $is_active - Boolean: True to only include builds where is_active is true.
                               Default: True
     Returns:     Array: Returns an array of Build objects.
 
@@ -246,8 +246,8 @@ def get_builds(request, product, is_active = True):
     # Get with product name excluding all inactive builds
     >>> Product.get_builds('Red Hat Enterprise Linux 5', 0)
     """
-    from tcms.management.models import TestBuild
-    
+    from tcms.apps.management.models import TestBuild
+
     p = pre_check_product(values = product)
     query = {'product': p, 'is_active': is_active}
     return TestBuild.to_xmlrpc(query)
@@ -268,7 +268,7 @@ def get_cases(request, product):
     # Get with product name
     >>> Product.get_cases('Red Hat Enterprise Linux 5')
     """
-    from tcms.testcases.models import TestCase
+    from tcms.apps.testcases.models import TestCase
     p = pre_check_product(values = product)
     query = {'category__product': p}
     return TestCase.to_xmlrpc(query)
@@ -289,7 +289,7 @@ def get_categories(request, product):
     # Get with product name
     >>> Product.get_categories('Red Hat Enterprise Linux 5')
     """
-    from tcms.testcases.models import TestCaseCategory
+    from tcms.apps.testcases.models import TestCaseCategory
     p = pre_check_product(values = product)
     query = {'product': p}
     return TestCaseCategory.to_xmlrpc(query)
@@ -305,7 +305,7 @@ def get_category(request, id):
     Example:
     >>> Product.get_category(11)
     """
-    from tcms.testcases.models import TestCaseCategory
+    from tcms.apps.testcases.models import TestCaseCategory
     return TestCaseCategory.objects.get(id = id).serialize()
 
 def get_component(request, id):
@@ -319,7 +319,7 @@ def get_component(request, id):
     Example:
     >>> Product.get_component(11)
     """
-    from tcms.management.models import Component
+    from tcms.apps.management.models import Component
     return Component.objects.get(id = id).serialize()
 
 def get_components(request, product):
@@ -338,7 +338,7 @@ def get_components(request, product):
     # Get with product name
     >>> Product.get_components('Red Hat Enterprise Linux 5')
     """
-    from tcms.management.models import Component
+    from tcms.apps.management.models import Component
     p = pre_check_product(values = product)
     query = {'product': p}
     return Component.to_xmlrpc(query)
@@ -346,11 +346,11 @@ def get_components(request, product):
 def get_environments(request, product):
     """FIXME: NOT IMPLEMENTED"""
     pass
-    
+
 def get_milestones(request, product):
     """FIXME: NOT IMPLEMENTED"""
     pass
-    
+
 def get_plans(request, product):
     """
     Description: Get the list of plans associated with this product.
@@ -367,7 +367,7 @@ def get_plans(request, product):
     # Get with product name
     >>> Product.get_plans('Red Hat Enterprise Linux 5')
     """
-    from tcms.testplans.models import TestPlan
+    from tcms.apps.testplans.models import TestPlan
     p = pre_check_product(values = product)
     query = {'product': p}
     return TestPlan.to_xmlrpc(query)
@@ -388,7 +388,7 @@ def get_runs(request, product):
     # Get with product name
     >>> Product.get_runs('Red Hat Enterprise Linux 5')
     """
-    from tcms.testruns.models import TestRun
+    from tcms.apps.testruns.models import TestRun
     p = pre_check_product(values = product)
     query = {'build__product': p}
     return TestRun.to_xmlrpc(query)
@@ -404,7 +404,7 @@ def get_tag(request, id):
     Example:
     >>> Product.get_tag(10)
     """
-    from tcms.management.models import TestTag
+    from tcms.apps.management.models import TestTag
     return Component.objects.get(pk = id).serialize()
 
 @log_call
@@ -429,8 +429,8 @@ def add_version(request, values):
     >>> Product.add_version({'value': 'devel', 'product': 272})
     [['__all__', 'Version with this Product and Value already exists.']]
     """
-    from tcms.management.models import Version
-    from tcms.management.forms import VersionForm
+    from tcms.apps.management.models import Version
+    from tcms.apps.management.forms import VersionForm
     from tcms.core import forms
 
     form = VersionForm(values)
@@ -458,7 +458,7 @@ def get_versions(request, product):
     # Get with product name
     >>> Product.get_runs('Red Hat Enterprise Linux 5')
     """
-    from tcms.management.models import Version
+    from tcms.apps.management.models import Version
     p = pre_check_product(values = product)
     query = {'product': p}
     return Version.to_xmlrpc(query)
@@ -466,7 +466,7 @@ def get_versions(request, product):
 def lookup_name_by_id(request, id):
     """DEPRECATED Use Product.get instead"""
     return get(request, id)
-    
+
 def lookup_id_by_name(request, name):
     """DEPRECATED - CONSIDERED HARMFUL Use Product.check_product instead"""
     return check_product(request, name)

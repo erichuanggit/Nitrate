@@ -33,13 +33,13 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Clone.on_load);
 	</div>
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
-		>> <a href="{% url tcms.testplans.views.all %}">...</a>
-		>> <a href="{% url tcms.testplans.views.get test_run.plan_id %}">...</a>
-		>> <a href="{% url tcms.testruns.views.get test_run.run_id %}">{{ test_run.summary }}</a>
+		>> <a href="{% url tcms.apps.testplans.views.all %}">...</a>
+		>> <a href="{% url tcms.apps.testplans.views.get test_run.plan_id %}">...</a>
+		>> <a href="{% url tcms.apps.testruns.views.get test_run.run_id %}">{{ test_run.summary }}</a>
 		>> Clone
 	</div>
 	<h2>Clone Test Run - {{ test_run.summary }}</h2>
-	<form action="{% url tcms.testruns.views.new %}" method="post">
+	<form action="{% url tcms.apps.testruns.views.new %}" method="post">
 		<input type="hidden" id="id_plan_id" name="from_plan" value="{{ test_run.plan_id }}" />
 		<input type="hidden" id="id_product_id" name="product_id" value="{{ test_run.plan.product_id }}" />
 		<input type="hidden" name="do" value="clone_run" />
@@ -74,12 +74,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Clone.on_load);
 					<td><label class="strong" for="id_errata_id">Errata</label></td>
 					<td>{{ clone_form.errata_id }}</td>
 				</tr>
-				{%comment%}
-				<tr>
-					<td><label class="strong">Environment </label></td>
-					<td>{{ clone_form.env_id }}<div class="errors">{{ clone_form.env_id.errors }}</div></td>
-				</tr>
-				{%endcomment%}
 				<tr>
 					<td><label for="id_manager">Run Manager </label></td>
 					<td>{{ clone_form.manager }}<div class="errors">{{ clone_form.manager.errors }}</div></td>
@@ -168,7 +162,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Clone.on_load);
 							</a>
 						</td>
 						<td>
-							<a href="{% url tcms.testcases.views.get case_run.case_id %}">{{ case_run.case_id }}</a>
+							<a href="{% url tcms.apps.testcases.views.get case_run.case_id %}">{{ case_run.case_id }}</a>
 							<input type="hidden" name="case" value="{{ case_run.case_id }}">
                             <input type="hidden" name="case_run_id" value="{{ case_run.case_run_id }}">
 						</td>

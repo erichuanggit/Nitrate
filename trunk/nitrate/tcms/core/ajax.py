@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Nitrate is copyright 2010 Red Hat, Inc.
-# 
+#
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -9,10 +9,10 @@
 # the hope that it will be useful, but WITHOUT ANY WARRANTY; without
 # even the implied warranties of TITLE, NON-INFRINGEMENT,
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
-# 
+#
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
@@ -30,15 +30,15 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from django.core.cache import cache
 
-from tcms.testplans.models import TestPlan, TestCasePlan
-from tcms.testcases.models import TestCase, TestCaseTag, TestCaseBugSystem as BugSystem
-from tcms.testruns.models import TestRun, TestCaseRun, TestRunTag
-from tcms.management.models import TestTag
+from tcms.apps.testplans.models import TestPlan, TestCasePlan
+from tcms.apps.testcases.models import TestCase, TestCaseTag, TestCaseBugSystem as BugSystem
+from tcms.apps.testruns.models import TestRun, TestCaseRun, TestRunTag
+from tcms.apps.management.models import TestTag
 from tcms.core.utils import get_string_combinations
 from tcms.core.helpers.comments import add_comment
 
-from tcms.testcases.models import TestCaseCategory
-from tcms.management.models import Component, TestBuild, Version
+from tcms.apps.testcases.models import TestCaseCategory
+from tcms.apps.management.models import Component, TestBuild, Version
 
 import datetime
 
@@ -54,50 +54,50 @@ def strip_parameters(request, skip_parameters):
         for k, v in dict_.items():
             if k not in skip_parameters and v:
                 parameters[str(k)] = v
-    
+
     return parameters
 
 def info(request):
     """Ajax responsor for misc information"""
     from django.core import serializers
-    
+
     class Objects(object):
         __all__ = [
             'builds', 'categories', 'components', 'envs', 'env_groups',
             'env_properties', 'env_values', 'tags', 'users', 'versions'
         ]
-        
+
         def __init__(self, request, product_id = None):
             self.request = request
             self.product_id = product_id
             self.internal_parameters = ('info_type', 'field', 'format')
-        
+
         def builds(self):
-            from tcms.management.models import TestBuild
+            from tcms.apps.management.models import TestBuild
             query = {
                 'product_id': self.product_id,
                 'is_active': self.request.REQUEST.get('is_active')
             }
             return TestBuild.list(query)
-        
+
         def categories(self):
-            from tcms.testcases.models import TestCaseCategory
+            from tcms.apps.testcases.models import TestCaseCategory
             return TestCaseCategory.objects.filter(product__id = self.product_id)
-        
+
         def components(self):
-            from tcms.management.models import Component
+            from tcms.apps.management.models import Component
             return Component.objects.filter(product__id = self.product_id)
-        
+
         def envs(self):
-            from tcms.management.models import TestEnvironment
+            from tcms.apps.management.models import TestEnvironment
             return TestEnvironment.objects.filter(product__id = self.product_id)
-        
+
         def env_groups(self):
-            from tcms.management.models import TCMSEnvGroup
+            from tcms.apps.management.models import TCMSEnvGroup
             return TCMSEnvGroup.objects.all()
-        
+
         def env_properties(self):
-            from tcms.management.models import TCMSEnvGroup, TCMSEnvProperty
+            from tcms.apps.management.models import TCMSEnvGroup, TCMSEnvProperty
             if self.request.REQUEST.get('env_group_id'):
                 env_group = TCMSEnvGroup.objects.get(
                     id = self.request.REQUEST['env_group_id']
@@ -105,13 +105,13 @@ def info(request):
                 return env_group.property.all()
             else:
                 return TCMSEnvProperty.objects.all()
-        
+
         def env_values(self):
-            from tcms.management.models import TCMSEnvValue
+            from tcms.apps.management.models import TCMSEnvValue
             return TCMSEnvValue.objects.filter(
                 property__id = self.request.REQUEST.get('env_property_id')
             )
-        
+
         def tags(self):
             query = strip_parameters(request, self.internal_parameters)
             tags = TestTag.objects
@@ -123,22 +123,22 @@ def info(request):
                     '|'.join(["Q(name__startswith = '%s')" % item for item in seq])
                 ))
                 del query['name__startswith']
-            
+
             tags = tags.filter(**query).distinct()
             return tags
-        
+
         def users(self):
             from django.contrib.auth.models import User
             query = strip_parameters(self.request, self.internal_parameters)
             return User.objects.filter(**query)
-        
+
         def versions(self):
-            from tcms.management.models import Version
+            from tcms.apps.management.models import Version
             return Version.objects.filter(product__id = self.product_id)
-        
+
     objects = Objects(request = request, product_id = request.REQUEST.get('product_id'))
     obj = getattr(objects, request.REQUEST.get('info_type'), None)
-    
+
     if obj:
         if request.REQUEST.get('format') == 'ulli':
             field = request.REQUEST.get('field', 'name')
@@ -147,13 +147,13 @@ def info(request):
                 response_str += '<li>' + getattr(o, field, None) + '</li>'
             response_str += '</ul>'
             return HttpResponse(response_str)
-        
+
         return HttpResponse(serializers.serialize(
             request.REQUEST.get('format', 'json'),
             obj(),
             excludes=('password',)
         ))
-    
+
     return HttpResponse('Unrecognizable infotype')
 
 def form(request):
@@ -167,15 +167,15 @@ def form(request):
     q_format = request.REQUEST.get('format')
     if not q_format:
         q_format = 'p'
-    
+
     if not q_app_form:
         return HttpResponse('Unrecognizable app_form')
-    
+
     # Get the form
     q_app, q_form = q_app_form.split('.')[0], q_app_form.split('.')[1]
     exec('from tcms.%s.forms import %s as form' % (q_app, q_form))
     form = form(initial=parameters)
-    
+
     # Generate the HTML and reponse
     html = getattr(form, 'as_' + q_format)
     return HttpResponse(html())
@@ -184,11 +184,11 @@ def tag(request, template_name="management/get_tag.html"):
     """Get tags for test plan or test case"""
     from django.utils import simplejson
     from django.core import serializers
-    from tcms.management.models import TestTag
-    
+    from tcms.apps.management.models import TestTag
+
     class Objects(object):
         __all__ = ['plan', 'case', 'run']
-        
+
         def __init__(self, request, template_name):
             self.template_name = template_name
             for o in self.__all__:
@@ -196,29 +196,29 @@ def tag(request, template_name="management/get_tag.html"):
                     self.object = o
                     self.object_pks = request.REQUEST.getlist(o)
                     break
-        
+
         def get(self):
             func = getattr(self, self.object)
             return func()
-        
+
         def plan(self):
             return self.template_name, TestPlan.objects.filter(pk__in = self.object_pks)
-        
+
         def case(self):
             return self.template_name, TestCase.objects.filter(pk__in = self.object_pks)
-        
+
         def run(self):
             self.template_name = 'run/get_tag.html'
             return self.template_name, TestRun.objects.filter(pk__in = self.object_pks)
-    
+
     class TagActions(object):
         __all__ = ['add', 'remove']
-        
+
         def __init__(self, obj, tag):
             self.obj = obj
             self.tag = TestTag.string_to_list(tag)
             self.request = request
-            
+
         def add(self):
             for tag_str in self.tag:
                 try:
@@ -229,7 +229,7 @@ def tag(request, template_name="management/get_tag.html"):
                     return "Error when adding %s" % self.tag
 
             return True
-        
+
         def remove(self):
             tp_pks = request.REQUEST.getlist('plan')
             tc_pks = request.REQUEST.getlist('case')
@@ -240,23 +240,23 @@ def tag(request, template_name="management/get_tag.html"):
                 tags_set = TestTag.objects.filter(testcase__pk__in = tc_pks)
             elif tr_pks:
                 tags_set = TestTag.objects.filter(testrun__pk__in = tr_pks)
-            
+
             for tag_str in self.tag:
                 try:
                     tag = tags_set.filter(name = tag_str)[0]
                 except IndexError:
                     return "Tag %s does not exist in current plan." % tag_str
-                
+
                 for o in self.obj:
                     try:
                         o.remove_tag(tag)
                     except:
                         return "Remove tag %s error." % tag
             return True
-    
+
     objects = Objects(request, template_name)
     template_name, obj = objects.get()
-    
+
     q_tag = request.REQUEST.get('tags')
     q_action = request.REQUEST.get('a')
     if q_action:
@@ -265,33 +265,33 @@ def tag(request, template_name="management/get_tag.html"):
         response = func()
         if response != True:
             return HttpResponse(simplejson.dumps({'response': response, 'rc': 1}))
-    
+
     del q_tag, q_action
-    
+
     # Response to batch operations
     if request.REQUEST.get('t') == 'json':
         if request.REQUEST.get('f') == 'serialized':
             return HttpResponse(
                 serializers.serialize(request.REQUEST['t'], obj)
             )
-        
+
         return HttpResponse(simplejson.dumps({'response': 'ok'}))
-    
+
     # Response the single operation
     if len(obj) == 1:
         tags = obj[0].tag.all()
-        
+
         tags = tags.extra(select={
             'num_plans': 'SELECT COUNT(*) FROM test_plan_tags WHERE test_tags.tag_id = test_plan_tags.tag_id',
             'num_cases': 'SELECT COUNT(*) FROM test_case_tags WHERE test_tags.tag_id = test_case_tags.tag_id',
             'num_runs': 'SELECT COUNT(*) FROM test_run_tags WHERE test_tags.tag_id = test_run_tags.tag_id',
         })
-        
+
         return direct_to_template(request, template_name, {
             'tags': tags,
             'object': obj[0],
         })
-    
+
     return HttpResponse('')
 
 def get_value_by_type(val, v_type):
@@ -354,7 +354,7 @@ def update(request):
     object_pk_str = data.get("object_pk")
     field     = data.get('field')
     value     = data.get('value')
-    
+
     object_pk = [int(a) for a in object_pk_str.split(',')]
 
     if not field or not value or not object_pk or not ctype:
@@ -402,7 +402,7 @@ def update(request):
                 pass
 
     # Special hacking for updating test case run status
-    # https://bugzilla.redhat.com/show_bug.cgi?id=658160 
+    # https://bugzilla.redhat.com/show_bug.cgi?id=658160
     if ctype == 'testruns.testcaserun' and field == 'case_run_status':
         if len(targets) == 1:
             targets[0].set_current()

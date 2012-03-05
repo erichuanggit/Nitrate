@@ -28,26 +28,17 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
 		{% if query_result %}
-		>> <a href="{% url tcms.testplans.views.all %}">Planning</a> 
+		>> <a href="{% url tcms.apps.testplans.views.all %}">Planning</a> 
 		>> Search result
 		{% else %}
 		>> Planning
 		{% endif %}
 	</div>
 	<div id="itemSearch" class="itemSearch">
-		<form id="id_search_plan_form" action="{% url tcms.testplans.views.all %}" method="get">
+		<form id="id_search_plan_form" action="{% url tcms.apps.testplans.views.all %}" method="get">
 			<input type="hidden" name="action" value="search" />
 			<h2>Search Plan</h2>
 			{% include 'plan/form/search.html' %}
-			{% comment %}
-			<div class="relativeSearchTitle">Case Information Option
-				<div class="down" id="relativeSearchOption_case"></div>
-			</div>
-			<div class="relativeSearchBox" style="display:none" id="relativeSearch_case">
-				{% include 'plan/form/search_case.html' %}
-				<div class="clear"></div>
-			</div>
-			{% endcomment %}
 			<div class="bottom">
 				<input type="submit" size="7" value="Search" class="left_float" />
 				<input type="reset" size="7" value="Reset" title="Reset the form" class="left_float" />

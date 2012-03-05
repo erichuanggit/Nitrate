@@ -127,7 +127,7 @@ INSTALLED_APPS = (
     'tcms.core',
     'tcms.core.contrib.auth',
     'tcms.core.contrib.comments',
-    'tcms.core.contrib.logs',
+    'tcms.core.logs',
     'tcms.management',
     'tcms.testcases',
     'tcms.testplans',
@@ -135,7 +135,8 @@ INSTALLED_APPS = (
     'tcms.testreviews',
     'tcms.core.lib.django-pagination.pagination',
 
-    'tcms.plugins.message_bus',
+    'tcms.integration.djqpid',
+    'tcms.integration.apps.errata',
 )
 
 # RequestContext settings
@@ -180,6 +181,7 @@ XMLRPC_METHODS = {
         ('tcms.xmlrpc.testplan', 'TestPlan'),
         ('tcms.xmlrpc.testrun', 'TestRun'),
         ('tcms.xmlrpc.user', 'User'),
+        ('tcms.xmlrpc.version', 'Version'),
     ),
 }
 

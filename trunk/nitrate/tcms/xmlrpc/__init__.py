@@ -25,5 +25,10 @@ See https://wiki.mozilla.org/Testopia:Documentation:XMLRPC for testopia docs.
 
 __all__ = (
     'auth', 'build', 'testcase', 'testcaserun', 'testopia', 'testplan',
-    'testrun', 'user'
+    'testrun', 'user', 'version',
 )
+
+XMLRPC_VERSION = (1, 1, 0, 'final', 1)
+
+def get_version():
+    return XMLRPC_VERSION

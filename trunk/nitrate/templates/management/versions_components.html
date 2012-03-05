@@ -14,16 +14,16 @@
 <div id="content">
     <div class="sprites crumble">
         <a href="{% url tcms.core.views.index %}">Home</a>
-        >> <a href="{% url tcms.management.views.management_index %}">...</a>
+        >> <a href="{% url tcms.apps.management.views.management_index %}">...</a>
         >> Products
     </div>
     <div class="control-bar">
         <ul>
-            <li class="addlink"><a href="{% url tcms.management.views.classification_new %}">New Classification</a></li>
-            <li class="addlink"><a href="{% url tcms.management.views.product_new %}">New Product</a></li>
-            <li class="addlink"><a href="{% url tcms.management.views.milestone_new %}">New Milestone</a></li>
-            <li class="addlink"><a href="{% url tcms.management.views.build_new %}">New Build</a></li>
-            <li class="addlink"><a href="{% url tcms.management.views.case_category_new %}">New Category</a></li>
+            <li class="addlink"><a href="{% url tcms.apps.management.views.classification_new %}">New Classification</a></li>
+            <li class="addlink"><a href="{% url tcms.apps.management.views.product_new %}">New Product</a></li>
+            <li class="addlink"><a href="{% url tcms.apps.management.views.milestone_new %}">New Milestone</a></li>
+            <li class="addlink"><a href="{% url tcms.apps.management.views.build_new %}">New Build</a></li>
+            <li class="addlink"><a href="{% url tcms.apps.management.views.case_category_new %}">New Category</a></li>
         </ul>
     </div>
     <table class="itemList product"  border="0" cellspacing="0" cellspan="0">
@@ -40,7 +40,7 @@
             {% for classification in classifications %}
             <tr class="classification">
                 <td colspan="4">
-                    <b>Classification :</b> <a class="editlink" href="{% url tcms.management.views.classification_edit classification.id %}">{{ classification.name }}</a>{% if classification.description %} - {{ classification.description }}{% endif %}
+                    <b>Classification :</b> <a class="editlink" href="{% url tcms.apps.management.views.classification_edit classification.id %}">{{ classification.name }}</a>{% if classification.description %} - {{ classification.description }}{% endif %}
                    
                 </td>
             </tr>
@@ -48,12 +48,7 @@
             {% for product in classification.product.all %}
             <tr class="evenRow" >
                 <th>
-                    {%comment%}
-                    <a id="link_{{ product.id }}" href="javascript:blinddownProductContent({{ forloop.counter0 }}, {{ product.id }})">
-                        <b>{{ product.name }}</b>
-                    </a>
-                    {%endcomment%}
-                    <a href="{% url tcms.management.views.product_edit product.id %}" class="editlink">{{ product.name }}</a>
+                    <a href="{% url tcms.apps.management.views.product_edit product.id %}" class="editlink">{{ product.name }}</a>
                     <br />
                     {% if product.description %}<span class="description">{{ product.description }}</span>{% endif %}
                     <!--
@@ -70,7 +65,7 @@
                             <div >
                                 <ul class="milestone-list">
                                     <li>
-                                        <a  href="{% url tcms.management.views.milestone_edit milestone.id %}">{{ milestone.name }} </a>
+                                        <a  href="{% url tcms.apps.management.views.milestone_edit milestone.id %}">{{ milestone.name }} </a>
                                        
                                     </li>
                                     {% for build in builds %}
@@ -79,11 +74,11 @@
                                     <ul class="build-list" >
                                         {% if build.is_active %}
                                         <li>
-                                           <a href="{% url tcms.management.views.build_edit build.build_id %}"> {{ build.name }}</a>
+                                           <a href="{% url tcms.apps.management.views.build_edit build.build_id %}"> {{ build.name }}</a>
                                         </li>
                                         {% else %}
                                         <li>
-                                            <a href="{% url tcms.management.views.build_edit build.build_id %}"><label class="disabled_build">{{ build.name }}</label></a>
+                                            <a href="{% url tcms.apps.management.views.build_edit build.build_id %}"><label class="disabled_build">{{ build.name }}</label></a>
                                         </li>
                                         {% endif %}
                                     </ul>
@@ -98,7 +93,7 @@
                     <td style="vertical-align:top">
                              <ul>
                             {% for case_category in product.case_category.all %}
-                                 <li><a href="{% url tcms.management.views.case_category_edit case_category.category_id %}">{{ case_category.name }}</a></li>
+                                 <li><a href="{% url tcms.apps.management.views.case_category_edit case_category.category_id %}">{{ case_category.name }}</a></li>
                              {% endfor %}
                              </ul>
                     </td>

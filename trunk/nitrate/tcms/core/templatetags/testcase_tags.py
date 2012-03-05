@@ -1,7 +1,7 @@
 from django import template
 from django.template import Node, TemplateSyntaxError
 
-from tcms.testcases.models import TestCasePlan
+from tcms.apps.testcases.models import TestCasePlan
 
 register = template.Library()
 
@@ -13,7 +13,7 @@ def sortkey(case, plan):
         return None
     else:
         return tcp.sortkey
-    
+
 @register.filter(name = 'testcaseplan')
 def testcaseplan(case, plan):
     try:

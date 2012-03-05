@@ -35,42 +35,34 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
 		{% if request.REQUEST.from_plan %}
-		>> <a href="{% url tcms.testplans.views.all %}">Seach Plan</a>
-		>>Test Plan: <a href="{% url tcms.testplans.views.get test_run.plan.plan_id %}">[{{ test_run.plan.plan_id }}] {{ test_run.plan.name }}</a>
+		>> <a href="{% url tcms.apps.testplans.views.all %}">Seach Plan</a>
+		>>Test Plan: <a href="{% url tcms.apps.testplans.views.get test_run.plan.plan_id %}">[{{ test_run.plan.plan_id }}] {{ test_run.plan.name }}</a>
 		{% else %}
-		>> <a href="{% url tcms.testruns.views.all %}">Search Runs</a>
+		>> <a href="{% url tcms.apps.testruns.views.all %}">Search Runs</a>
 		{% endif %}
 		>> [{{ test_run.run_id }}] {{ test_run.summary }}
 	</div>
 	<div class="control">
 		{% if perms.testruns.change_testcaserun %}
-		<input id="btn_edit" type="button" value="Edit" title="Edit this test run" onclick="window.location.href='{% url tcms.testruns.views.edit test_run.run_id %}?from_plan={{ request.REQUEST.from_plan }}'">
+		<input id="btn_edit" type="button" value="Edit" title="Edit this test run" onclick="window.location.href='{% url tcms.apps.testruns.views.edit test_run.run_id %}?from_plan={{ request.REQUEST.from_plan }}'">
 		{% else %}
 		<input id="btn_edit" type="button" value="Edit" disabled="true">
 		{% endif %}
 		
 		{% if perms.testruns.add_testrun %}
-		<input type="button" value="Clone" title="Clone test run to other test build" onclick="postToURL('{% url tcms.testruns.views.clone_with_filteredCaseRun test_run.pk %}', serializeCaseRunFromInputList('id_table_cases','case_run'))" />
+		<input type="button" value="Clone" title="Clone test run to other test build" onclick="postToURL('{% url tcms.apps.testruns.views.clone_with_filteredCaseRun test_run.pk %}', serializeCaseRunFromInputList('id_table_cases','case_run'))" />
 		{% else %}
 		<input type="button" value="Clone" disabled="true"/>
 		{% endif %}
-		{% comment %}
-		{# The standalone execute page is not longer needed #}
-		{% if perms.testruns.change_testcaserun %}
-		<input type="button" value="Execute" title="Execute cases in this run" onclick="window.location.href='{% url tcms.testruns.views.execute test_run.pk %}'">
-		{% else %}
-		<input type="button" value="Execute" disabled="true">
-		{% endif %}
-		{% endcomment %}
 		{% if perms.testruns.delete_testrun %}
 		{% ifequal test_run.manager user %}
-		<input type="button" value="Delete" title="Delete the run" onclick="window.location.href='{% url tcms.testruns.views.delete test_run.pk %}'">
+		<input type="button" value="Delete" title="Delete the run" onclick="window.location.href='{% url tcms.apps.testruns.views.delete test_run.pk %}'">
 		{% else %}
 		{% ifequal test_run.plan.author user %}
-		<input type="button" value="Delete" title="Delete the run" onclick="window.location.href='{% url tcms.testruns.views.delete test_run.pk %}'">
+		<input type="button" value="Delete" title="Delete the run" onclick="window.location.href='{% url tcms.apps.testruns.views.delete test_run.pk %}'">
 		{% endifequal %}
 		{% endifequal %}
-		<input type="button" value="Export" title="Export cases in this run" onclick="window.location.href='{% url tcms.testruns.views.export test_run.pk %}?' + $('id_form_case_runs').serialize();" >
+		<input type="button" value="Export" title="Export cases in this run" onclick="window.location.href='{% url tcms.apps.testruns.views.export test_run.pk %}?' + $('id_form_case_runs').serialize();" >
 		{% endif %}
 	</div>
 	<h2 id="display_title">{{ test_run.summary }}</h2>
@@ -82,21 +74,21 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 			<div class="listinfo">
 				<div class="title grey">Test Plan&nbsp;:</div>
 				<div class="name">
-					<a href="{% url tcms.testplans.views.get test_run.plan.pk %}">[{{ test_run.plan.pk }}] {{ test_run.plan.name }}</a>
+					<a href="{% url tcms.apps.testplans.views.get test_run.plan.pk %}">[{{ test_run.plan.pk }}] {{ test_run.plan.name }}</a>
 			
 				</div>
 			</div>
 			<div class="listinfo">
 				<div class="title grey">Product Version&nbsp;:</div>
 				<div class="name">
-					<a href="{% url tcms.testruns.views.all %}?product={{ test_run.build.product_id }}&product_version={{ test_run.get_version_id }}" title="Search test runs of {{ test_run.product_version }}">{{ test_run.product_version }}</a>
+					<a href="{% url tcms.apps.testruns.views.all %}?product={{ test_run.build.product_id }}&product_version={{ test_run.get_version_id }}" title="Search test runs of {{ test_run.product_version }}">{{ test_run.product_version }}</a>
 			
 				</div>
 			</div>
 			<div class="listinfo">
 				<div class="title grey">Manager&nbsp;:</div>
 				<div class="name">
-					<a href="{% url tcms.profiles.views.profile test_run.manager.username %}">{{ test_run.manager.email }}</a>
+					<a href="{% url tcms.apps.profiles.views.profile test_run.manager.username %}">{{ test_run.manager.email }}</a>
 			
 				</div>
 			</div>
@@ -142,13 +134,13 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 			<div class="listinfo">
 				<div class="title grey">Product&nbsp;:</div>
 				<div class="name">
-					<a href="{% url tcms.testruns.views.all %}?product={{ test_run.build.product_id }}" title="Search test runs of {{ test_run.build.product }}">{{ test_run.build.product }}</a>
+					<a href="{% url tcms.apps.testruns.views.all %}?product={{ test_run.build.product_id }}" title="Search test runs of {{ test_run.build.product }}">{{ test_run.build.product }}</a>
 				</div>
 			</div>
 			<div class="listinfo">
 				<div class="title grey">Build&nbsp;:</div>
 				<div class="name">
-					<a href="{% url tcms.testruns.views.all %}?build={{ test_run.build_id }}" title="Search test runs of {{ test_run.build_id }}">{{ test_run.build }}</a>
+					<a href="{% url tcms.apps.testruns.views.all %}?build={{ test_run.build_id }}" title="Search test runs of {{ test_run.build_id }}">{{ test_run.build }}</a>
 				</div>
 			</div>
 			<div class="listinfo">
@@ -163,7 +155,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 				<div class="title grey">Default Tester&nbsp;:</div>
 				<div class="name">
 					{% if test_run.default_tester %}
-					<a href="{% url tcms.profiles.views.profile test_run.default_tester.username %}">{{ test_run.default_tester.email }}</a>
+					<a href="{% url tcms.apps.profiles.views.profile test_run.default_tester.username %}">{{ test_run.default_tester.email }}</a>
 					{% else %}
 					{{ test_run.default_tester }}
 					{% endif %}
@@ -177,12 +169,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 						Finished
 					</span>
 					{% if perms.testruns.change_testrun %}
-					<input type="button"  class="spadelink" value="Set to Running" onclick="window.location.href='{% url tcms.testruns.views.change_status test_run.run_id %}?finished=0'">
+					<input type="button"  class="spadelink" value="Set to Running" onclick="window.location.href='{% url tcms.apps.testruns.views.change_status test_run.run_id %}?finished=0'">
 					{% endif %}
 					{% else %}
 					<span class="runninglink">Running</span>
 					{% if perms.testruns.change_testrun %}
-					<input type="button"class="spadelink" value="Set to Finished" onclick="window.location.href='{% url tcms.testruns.views.change_status test_run.run_id %}?finished=1'">
+					<input type="button"class="spadelink" value="Set to Finished" onclick="window.location.href='{% url tcms.apps.testruns.views.change_status test_run.run_id %}?finished=1'">
 					{% endif %}
 					{% endif %}
 				</div>
@@ -231,10 +223,10 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 		</ul>
 		<div class="clear"></div>
 		<ul>
-			<li style="background:url(../../media/images/btn_bg_report.png) no-repeat; height:25px; line-height:25px; width:57px; padding-left:30px; margin-right:15px;"><a href="{% url tcms.testruns.views.report test_run.run_id %}" title="report of test caserun">Report</a></li>
+			<li style="background:url(../../media/images/btn_bg_report.png) no-repeat; height:25px; line-height:25px; width:57px; padding-left:30px; margin-right:15px;"><a href="{% url tcms.apps.testruns.views.report test_run.run_id %}" title="report of test caserun">Report</a></li>
 			<li style="background:url(../../media/images/btn_bg_showbug.png) no-repeat; height:25px; line-height:25px; width:133px; padding-left:30px;">
 			{% ifnotequal test_case_run_bugs|length 0 %}	
-				<a href="{% url tcms.testruns.views.report test_run.run_id %}#buglist" title="Show ALl Bugs">Show All Bugs <span>[</span>{{ test_case_run_bugs|length }}<span>]</span></a>
+				<a href="{% url tcms.apps.testruns.views.report test_run.run_id %}#buglist" title="Show ALl Bugs">Show All Bugs <span>[</span>{{ test_case_run_bugs|length }}<span>]</span></a>
 			{% else %}
 				Show All Bugs <span>[</span>{{ test_case_run_bugs|length }}<span>]</span>
 				{% endifnotequal %}
@@ -266,12 +258,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 			</tr>
 			<tr>
 				<th colspan="2">
-					<a class="strong" href="{% url tcms.testruns.views.report test_run.run_id %}" title="report of test caserun">Report</a>
+					<a class="strong" href="{% url tcms.apps.testruns.views.report test_run.run_id %}" title="report of test caserun">Report</a>
 				</th>
 			</tr>
 			<tr>
 				<th colspan="2">
-					<a class="strong" href="{% url tcms.testruns.views.report test_run.run_id %}#buglist" title="Show ALl Bugs">Show All Bugs ({{ test_case_run_bugs|length }})</a>
+					<a class="strong" href="{% url tcms.apps.testruns.views.report test_run.run_id %}#buglist" title="Show ALl Bugs">Show All Bugs ({{ test_case_run_bugs|length }})</a>
 				</th>
 			</tr>
 		</table>

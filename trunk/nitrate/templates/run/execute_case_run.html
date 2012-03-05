@@ -26,7 +26,7 @@
 		 <td valign="top" rowspan="2" width="200" class="right_panel">
 			<h4><span class="title strong">Attachment:</span></h4>
 			
-			<a href="{% url tcms.testcases.views.attachment test_case_run.case_id %}?from_plan={{ testrun.plan_id }}" class="addlink" target="_blank">Add Attachment</a>
+			<a href="{% url tcms.apps.testcases.views.attachment test_case_run.case_id %}?from_plan={{ testrun.plan_id }}" class="addlink" target="_blank">Add Attachment</a>
 			
 			<ul class="ul-no-format" style="display:block; margin-left:16px;">
 				{% for attachment in test_case_run.case.attachment.all %}
@@ -55,7 +55,7 @@
 				{% endfor %}
 			</ul>
 			<h4><span class="title strong">Related Bug:</span></h4>
-			<a href="{% url tcms.testruns.views.bug test_case_run.pk %}?a=file" target="_blank" class="buglink" title="File a bug on bugzilla">File</a>
+			<a href="{% url tcms.apps.testruns.views.bug test_case_run.pk %}?a=file" target="_blank" class="buglink" title="File a bug on bugzilla">File</a>
 			<a href="#bug" class="addlink" title="Add" onclick="addCaseRunBug(this.up(4).previous(), this.up(4), {{ test_case_run.case_id }}, {{ test_case_run.pk }})">Add</a>
 			<ul class="ul-no-format" style="display:block; margin-left:16px;">
 			   {% for bug in test_case_run.case.get_bugs %}

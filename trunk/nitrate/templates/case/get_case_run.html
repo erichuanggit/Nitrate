@@ -18,7 +18,7 @@
 </thead><tbody>
 {% for plan, test_case_runs in runs_ordered_by_plan %}
 
-<tr><td colspan="12" class="listGroupBlue">Plan:<span style="padding:0 0 0 6px;"><a href="{% url tcms.testplans.views.get plan.pk %}">[{{ plan.pk }}] {{ plan.name }}</a></span></td></tr>
+<tr><td colspan="12" class="listGroupBlue">Plan:<span style="padding:0 0 0 6px;"><a href="{% url tcms.apps.testplans.views.get plan.pk %}">[{{ plan.pk }}] {{ plan.name }}</a></span></td></tr>
 
 	
 		{% for test_case_run in test_case_runs %}
@@ -30,25 +30,25 @@
 				<input type="hidden" name="case_text_version" value="{{ test_case_run.case_text_version }}" />
 			</td>
 			<td class="expandable">
-				<a href="{% url tcms.testcases.views.get test_case_run.case_id %}?from_plan={{ test_case_run.run.plan_id }}">{{ test_case_run.case_run_id }}</a>
+				<a href="{% url tcms.apps.testcases.views.get test_case_run.case_id %}?from_plan={{ test_case_run.run.plan_id }}">{{ test_case_run.case_run_id }}</a>
 			</td>
 			<td>
-				<a href="{% url tcms.testruns.views.get test_case_run.run_id %}">{{ test_case_run.run_id }}</a>
+				<a href="{% url tcms.apps.testruns.views.get test_case_run.run_id %}">{{ test_case_run.run_id }}</a>
 			</td>
 			<td class="expandable">
-				<p>{# <a id="link_{{ forloop.counter }}" href="{% url tcms.testruns.views.get test_case_run.run_id %}#caserun_{{ test_case_run.case_run_id }}" >{{ test_case_run.run.summary }}</a> #}
+				<p>{# <a id="link_{{ forloop.counter }}" href="{% url tcms.apps.testruns.views.get test_case_run.run_id %}#caserun_{{ test_case_run.case_run_id }}" >{{ test_case_run.run.summary }}</a> #}
 				{{ test_case_run.run.summary }}</p>
 			</td>
 			<td>
 				{% if test_case_run.tested_by %}
-				<a href="{% url tcms.profiles.views.profile test_case_run.tested_by.username %}">{{ test_case_run.tested_by }}</a>
+				<a href="{% url tcms.apps.profiles.views.profile test_case_run.tested_by.username %}">{{ test_case_run.tested_by }}</a>
 				{% else %}
 				<label>None</label>
 				{% endif %}
 			</td>
 			<td>
 				{% if test_case_run.assignee_id %}
-				<a href="{% url tcms.profiles.views.profile test_case_run.assignee.username %}">{{ test_case_run.assignee }}</a>
+				<a href="{% url tcms.apps.profiles.views.profile test_case_run.assignee.username %}">{{ test_case_run.assignee }}</a>
 				{% else%}
 				None
 				{% endif %}

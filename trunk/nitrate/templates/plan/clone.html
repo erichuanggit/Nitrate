@@ -18,9 +18,9 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Clone.on_load);
 <div id="content">
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
-		>> <a href="{% url tcms.testplans.views.all %}">Planning</a>
+		>> <a href="{% url tcms.apps.testplans.views.all %}">Planning</a>
 		{% ifequal testplans|length 1 %}
-		>> <a href="{% url tcms.testplans.views.get testplans.0.plan_id %}">{{ testplans.0.plan_id }}: {{ testplans.0.name }}</a> 
+		>> <a href="{% url tcms.apps.testplans.views.get testplans.0.plan_id %}">{{ testplans.0.plan_id }}: {{ testplans.0.name }}</a> 
 		>> Clone Plan
 		{% else %}
 		>> Clone plans
@@ -31,7 +31,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Clone.on_load);
 		select different product 
 	</p>
 	<div class="Detailform border-1">
-		<form action="{% url tcms.testplans.views.clone %}" method="post">
+		<form action="{% url tcms.apps.testplans.views.clone %}" method="post">
 			{% for testplan in testplans %}
 			<input type="hidden" name="plan" value="{{ testplan.pk }}" />
 			{% endfor %}
@@ -52,7 +52,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Clone.on_load);
 								<span class="lab-50">{{ testplan.plan_id }}</span>
 								<span class="lab-100">{{ testplan.type }}</span>
 								<span>
-									<a href="{% url tcms.testplans.views.get testplan.pk %}" title="{{ testplan.name }} ({{ testplan.author.email }})">
+									<a href="{% url tcms.apps.testplans.views.get testplan.pk %}" title="{{ testplan.name }} ({{ testplan.author.email }})">
 									 {{ testplan.name }}
 									</a>
 								</span>

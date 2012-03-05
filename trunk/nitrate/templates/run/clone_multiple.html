@@ -17,11 +17,11 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Clone.on_load);
 <div id="content">
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
-		>> <a href="{% url tcms.testplans.views.all %}">Test Runs</a>
+		>> <a href="{% url tcms.apps.testplans.views.all %}">Test Runs</a>
 		>> Clone mulitple
 	</div>
 
-	<form action="{% url tcms.testruns.views.clone %}" method="post">
+	<form action="{% url tcms.apps.testruns.views.clone %}" method="post">
 		<div class="boxnotype">
         	<div class="boxtitle">The runs you have choosed</div>
 				{{ clone_form.run }}
@@ -64,18 +64,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Clone.on_load);
 						<div class="errors">{{ clone_form.default_tester.errors }}</div>
 					</td>
 				</tr>
-{% comment %}
-				<tr>
-					<td><label for="id_default_tester">Assignee</label></td>
-					<td>
-						{{ clone_form.assignee }}
-						{{ clone_form.update_assignee }}
-						{{ clone_form.update_assignee.label }}
-						<div class="errors">{{ clone_form.default_tester.errors }}</div>
-					</td>
-				</tr>
-                <tr>
-{% endcomment %}
                 	<td colspan="2">
                     	<ul class="clone_multiple_option">
                         	<li>{{ clone_form.update_case_text }}{{ clone_form.update_case_text.label }}</li>

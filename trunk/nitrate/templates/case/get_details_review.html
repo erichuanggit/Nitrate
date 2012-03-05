@@ -47,7 +47,7 @@
 						<a href="{{ bug.get_absolute_url }}">{{ bug }}</a>
 						{% if bug.case_run_id %}
 						<span class="grey"> - From Run</span>
-						<a href="{% url tcms.testruns.views.get bug.case_run.run_id %}">{{ bug.case_run.run_id }}</a>
+						<a href="{% url tcms.apps.testruns.views.get bug.case_run.run_id %}">{{ bug.case_run.run_id }}</a>
 						{% endif %}
 					</li>
 					{% empty %}
@@ -110,14 +110,6 @@
 					{{ comment_form.email }}
 					{{ comment_form.url }}
 					<br/>
-					{% comment %}
-					{# Disable the change case status buttons temporary #}
-					<input type="hidden" name="template_type" value="review_case">
-					<input type="hidden" name="value" value="" />
-					{% for status in test_case_status %}
-					<input type="submit" value="{{ status }}" {% ifequal status test_case.case_status %}disabled="True"{% endifequal %} nclick="this.form.value='{{ tcs.pk }}'" />
-					{% endfor %}
-					{% endcomment %}
 					<input type="submit" class="submit-post margin-top" value='Add Comment'>
 				</form>
 			</td>

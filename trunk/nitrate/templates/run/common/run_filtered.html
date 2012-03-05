@@ -19,11 +19,11 @@
 		{% for test_run in test_runs %}
 		<tr class="{% cycle 'rowodd' 'roweven' %}">
 			<td><input type='checkbox' name="run" value="{{ test_run.pk }}" /></td>
-			<td><a href="{% url tcms.testruns.views.get test_run.run_id %}" />{{ test_run.run_id }}</a></td>
-			<td><a href="{% url tcms.testruns.views.get test_run.run_id %}" />{{ test_run.summary|striptags }}</a></td>
-			<td><a href="{% url tcms.profiles.views.profile test_run.manager.username %}">{{ test_run.manager }}</a></td>
-			<td>{% if test_run.default_tester_id %}<a href="{% url tcms.profiles.views.profile test_run.default_tester.username %}">{% endif %}{{ test_run.default_tester }}{% if test_run.default_tester_id %}</a>{% endif %}</td>
-			<td style="display:none" class="col_plan_content"><a href="{% url tcms.testplans.views.get test_run.plan_id %}" >{{ test_run.plan }}</a></td>
+			<td><a href="{% url tcms.apps.testruns.views.get test_run.run_id %}" />{{ test_run.run_id }}</a></td>
+			<td><a href="{% url tcms.apps.testruns.views.get test_run.run_id %}" />{{ test_run.summary|striptags }}</a></td>
+			<td><a href="{% url tcms.apps.profiles.views.profile test_run.manager.username %}">{{ test_run.manager }}</a></td>
+			<td>{% if test_run.default_tester_id %}<a href="{% url tcms.apps.profiles.views.profile test_run.default_tester.username %}">{% endif %}{{ test_run.default_tester }}{% if test_run.default_tester_id %}</a>{% endif %}</td>
+			<td style="display:none" class="col_plan_content"><a href="{% url tcms.apps.testplans.views.get test_run.plan_id %}" >{{ test_run.plan }}</a></td>
 			<td>{{ test_run.build.product }}</td>
 			<td>{{ test_run.product_version }}</td>
 			<td>{{ test_run.env_groups }}</td>
@@ -45,15 +45,6 @@
 					<div class="percent">{{ test_run.completed_case_run_percent|default:"0" }}%</div>
 				</div>
 			</td>
-			{% comment %}
-			<td>
-				{% if perms.testruns.change_testcaserun %}
-				<a class="golink" href="/run/{{ test_run.run_id}}/execute/">Execute</a>
-				{% else %}
-				None
-				{% endif %}
-			</td>
-			{% endcomment %}
 		</tr>
 		{% endfor %}
 	</tbody>

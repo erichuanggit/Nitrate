@@ -1,4 +1,4 @@
-<form id='id_form_run' action="{% url tcms.testruns.views.clone %}" method="get">
+<form id='id_form_run' action="{% url tcms.apps.testruns.views.clone %}" method="get">
 	<input type="hidden" name="from_plan" value="{{ test_plan.pk }}" />
 	<input type="hidden" name="product" value="{{ test_plan.product.pk }}" />
 	<input type="hidden" name="product_version" value="{{ test_plan.get_version_id }}" />
@@ -30,13 +30,13 @@
 			<tr class="{% cycle 'odd' 'even' %}">
 				<td><input type="checkbox" name="run" value="{{ test_run.pk }}" /></td>
 				<td	 valign="top">
-					<a href="{% url tcms.testruns.views.get test_run.run_id %}?from_plan={{ test_plan.plan_id }}">{{ test_run.run_id }}</a>
+					<a href="{% url tcms.apps.testruns.views.get test_run.run_id %}?from_plan={{ test_plan.plan_id }}">{{ test_run.run_id }}</a>
 				</td>
 				<td valign="top" class="subject">
-					<a href="{% url tcms.testruns.views.get test_run.run_id %}?from_plan={{ test_plan.plan_id }}">{{ test_run.summary }}</a>
+					<a href="{% url tcms.apps.testruns.views.get test_run.run_id %}?from_plan={{ test_plan.plan_id }}">{{ test_run.summary }}</a>
 				</td>
-				<td valign="top"><a href="{% url tcms.profiles.views.profile test_run.manager.username %}">{{ test_run.manager }}</a></td>
-				<td valign="top">{% if test_run.default_tester_id %}<a href="{% url tcms.profiles.views.profile test_run.default_tester.username %}">{{ test_run.default_tester }}</a>{% else%} None{% endif %}</td>
+				<td valign="top"><a href="{% url tcms.apps.profiles.views.profile test_run.manager.username %}">{{ test_run.manager }}</a></td>
+				<td valign="top">{% if test_run.default_tester_id %}<a href="{% url tcms.apps.profiles.views.profile test_run.default_tester.username %}">{{ test_run.default_tester }}</a>{% else%} None{% endif %}</td>
 				<td valign="top">{{ test_run.start_date }}</td>
 				<td valign="top">{{ test_run.build }}</td>
 				<td valign="top">{% if test_run.stop_date %}Finished{% else %}Running{% endif %}</td>
@@ -56,21 +56,12 @@
 						</div>
 					</div>
 				</td>
-				{% comment %}
-				<td >
-					{% if perms.testruns.change_testcaserun %}
-					<a class="golink" href="{% url tcms.testruns.views.execute test_run.run_id %}?from_plan={{ test_plan.plan_id }}">Execute</a>
-					{% else %}
-					<span class="golink grey" title="Please login">None</span>
-					{% endif %}
-				</td>
-				{% endcomment %}
 			</tr>
 			{% empty %}
 			<tr>
 				<td colspan="9">
 					{% if perms.testruns.add_testrun %}
-					<span class="prompt-message"><center >No Test Run was found in this plan, if you  want to create one ,go to <a href="{% url tcms.testruns.views.new %}?from_plan={{ test_plan.plan_id }}">Create Test Run</a>.</center></span>
+					<span class="prompt-message"><center >No Test Run was found in this plan, if you  want to create one ,go to <a href="{% url tcms.apps.testruns.views.new %}?from_plan={{ test_plan.plan_id }}">Create Test Run</a>.</center></span>
 					{% else %}
 					<span class="prompt-message"><center >No Test Run was found in this plan.</center></span>
 					{% endif %}
