@@ -136,6 +136,7 @@ INSTALLED_APPS = (
     'tcms.core.lib.django-pagination.pagination',
 
     'tcms.integration.djqpid',
+    'tcms.integration.apps.errata',
 )
 
 # RequestContext settings

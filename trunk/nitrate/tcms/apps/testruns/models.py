@@ -25,7 +25,7 @@ from django.db.models import signals
 from tcms.core.models import TCMSActionModel, TimedeltaField
 from tcms.apps.testcases.models import TestCaseBug, TestCaseText, NoneText
 
-from signals import post_run_saved, qpid_run_created, qpid_run_progress
+from tcms.apps.testruns.signals import post_run_saved
 
 
 try:
@@ -623,15 +623,6 @@ class TCMSEnvRunValueMap(models.Model):
 
 # Signals handler
 signals.post_save.connect(post_run_saved, sender=TestRun)
-# testrun create listen for qpid
-signals.post_save.connect(qpid_run_created, sender=TestRun)
-#testrun progress listen for qpid
-signals.post_save.connect(
-    qpid_run_progress,
-    sender=TestCaseRun,
-    dispatch_uid="tcms.apps.testruns.signals.qpid_run_progress",
-)
-
 
 def make_caserun_status_id_attributes():
     '''
