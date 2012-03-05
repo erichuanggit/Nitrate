@@ -127,7 +127,7 @@ INSTALLED_APPS = (
     'tcms.core',
     'tcms.core.contrib.auth',
     'tcms.core.contrib.comments',
-    'tcms.core.contrib.logs',
+    'tcms.core.logs',
     'tcms.management',
     'tcms.testcases',
     'tcms.testplans',

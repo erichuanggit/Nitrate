@@ -339,7 +339,7 @@ def get(request, case_id, template_name = 'case/get.html'):
     """Get the case content"""
     from tcms.apps.testruns.models import TestCaseRunStatus
     from tcms.core.utils.raw_sql import RawSQL
-    from tcms.core.contrib.logs.models import TCMSLogModel
+    from tcms.core.logs.models import TCMSLogModel
 
     # Get the case
     try:
