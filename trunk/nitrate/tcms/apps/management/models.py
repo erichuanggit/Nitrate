@@ -17,7 +17,7 @@
 #   Xuqing Kuang <xkuang@redhat.com>
 
 from django.db import models
-from tcms.core.models import TCMSActionModel, BlobField
+from tcms.core.models import TCMSBaseSharedModel, TCMSActionModel, BlobField
 from tcms.core.utils.xmlrpc import XMLRPCSerializer
 from tcms.core.utils import calc_percent
 
