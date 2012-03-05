@@ -42,14 +42,6 @@
 					<a href="{% url tcms.apps.testcases.views.new %}">New Case</a>
 				</li>
 				{% endif %}
-				{% comment %}
-				{% if perms.testruns.add_testrun %}
-				<li {% ifequal sub_module 'new_run' %} class="subcurrent"{% endifequal %} onclick="window.location='{% url tcms.apps.testruns.views.new %}'">
-					<a href="{% url tcms.apps.testruns.views.new %}" onmouseover="skip()"  onmouseout="skiphide()">New Run</a>
-					<span id="skip" class="prompt-message" style="font-size:0.8em; display:none;">Go to Select Test Plan</span>
-				</li>
-				{% endif %}
-				{% endcomment %}
 			</ul>
 		</li>
 		<li class="sprites menuline"></li>

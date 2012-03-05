@@ -56,15 +56,6 @@
 						</div>
 					</div>
 				</td>
-				{% comment %}
-				<td >
-					{% if perms.testruns.change_testcaserun %}
-					<a class="golink" href="{% url tcms.apps.testruns.views.execute test_run.run_id %}?from_plan={{ test_plan.plan_id }}">Execute</a>
-					{% else %}
-					<span class="golink grey" title="Please login">None</span>
-					{% endif %}
-				</td>
-				{% endcomment %}
 			</tr>
 			{% empty %}
 			<tr>

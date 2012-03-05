@@ -9,7 +9,7 @@
 	<a id="link_{{ forloop.counter }}" class="blind_title_link lab-300">{{ test_review_case.case.summary }}</a>
 	<span class="lab-100">{{ test_review_case.case.priority.value }}</span>
 	<span class="lab-150 actions">
-		<label>{% comment %}class="{{ test_review_case.case.case_status|lower}}" {% endcomment %}
+		<label>
 			{{ test_review_case.case.case_status.name|upper }}
 		</label>
 	</span>
@@ -21,11 +21,6 @@
     <span class="lab-100_right">
     <a class="editlink" href="{% url tcms.apps.testcases.views.edit test_review_case.case.case_id %}?from_plan={{ testplan.plan_id }}">Edit</a>
     </span>
-	{% comment %}
-	<span class="mark">
-		{{ test_review_case.sort_key }}
-	</span>
-	{% endcomment %}
 </div>
 <div id="hidenRow_{{ forloop.counter }}"  style="display:none;" class="hide">
 	<table class="case_detail">

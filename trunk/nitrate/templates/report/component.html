@@ -24,61 +24,12 @@ Nitrate.Utils.after_page_load(Nitrate.Report.List.on_load);
 	</div>
 	{% include 'report/nav.html' %}
 	<div class="Detailform border-1" style="background:#f1f1f1 ;">
-		{% comment %}
-		<div class="crumb">
-			<span class="right-action"> <label class="select">report</label> | <label class="">dashboard </label></span>
-		</div>
-		{% endcomment %}
 		{% if component %}
 		<div class="report">
 			<h2>Component: {{ component }}</h2>
-			{% comment %}
-			<div class="page_control">
-				<span><a href="#">celt051</a></span>
-				|
-				<span><a href="#">rt73usb-firmware</a> </span>
-				<select>
-					<option>rt73usb-firmware</option>
-					<option>celt051</option>
-				</select>
-			</div>
-			<!--filter of data report -->
-			<fieldset class="filter">
-				<legend>Filter</legend>
-				<div class="option_row">
-					<span class="lab"><label>Test Run</label></span>
-					<select>
-						<option>All</option>
-						<option>Running</option>
-						<option>Finished</option>
-					</select>
-				</div>
-				<div class="option_row">
-					<span class="lab"><label>Case Category</label></span>
-					<select>
-						<option>Defult</option>
-						<option>Regression</option>
-						<option>Feature</option>
-						<option>Bug verification</option>
-					</select>
-				</div>
-				<div class="apply_row">
-					<a class="applylink"><a>Apply</a></a>
-				</div>
-			</fieldset>
-			{% endcomment %}
 			<!--end of filter of data report -->
 			<!--data of status of caserun -->
 			<table class="report_data report" border="0" cellspacing="1" cellpadding="0" width="75%">
-				{% comment %}
-				<tr>
-					<td colspan="3">
-						<ul class="ul-no-format">
-							<li>Testing Cases :1245</li>
-						</ul>
-					</td>
-				</tr>
-				{% endcomment %}
 				<tr class="variety_pass">
 					<td>PASSED</td>
 					<td>{{ case_run_count.PASSED }}</td>

@@ -45,15 +45,6 @@
 					<div class="percent">{{ test_run.completed_case_run_percent|default:"0" }}%</div>
 				</div>
 			</td>
-			{% comment %}
-			<td>
-				{% if perms.testruns.change_testcaserun %}
-				<a class="golink" href="/run/{{ test_run.run_id}}/execute/">Execute</a>
-				{% else %}
-				None
-				{% endif %}
-			</td>
-			{% endcomment %}
 		</tr>
 		{% endfor %}
 	</tbody>

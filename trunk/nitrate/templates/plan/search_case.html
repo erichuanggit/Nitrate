@@ -82,25 +82,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.SearchCase.on_load);
 						<td valign="top" >{{ test_case.create_date }}</td>
 						<td valign="top" >{{ test_case.case_status}}</td>
 					</tr>
-					{% comment %}
-					<tr id="hidenRow_{{ test_case.case_id }}" style="display: none;" class="hide case_detail"	>
-						<td >
-							<td colspan="4" >
-								<div>
-									<h4>SETUP</h4>
-									<p> {{ test_case.latest_text.setup|safe }}</p>
-									<h4>ACTIONS</h4>
-									<p>{{ test_case.latest_text.action|safe }}</p>
-								</div>
-							</td>
-							<td colspan="3">
-								<h4>BREAKDOWN</h4>
-								<p>{{ test_case.latest_text.breakdown|safe }}</p>
-								<h4>EFFECT</h4>
-								<p>{{ test_case.latest_text.effect|safe }}</p>
-							</td>
-						</tr>
-						{% endcomment %}
 						{% endfor %}
 					</tbody>
 				</table>

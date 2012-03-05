@@ -17,13 +17,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 		
 		<span class="right-action">
 			{% paginate %}
-			{% comment %}
-			<label for="run_column_add">Add Column</label>
-			<select id="run_column_add">
-				<option value="" id="">---</option>
-				<option value="col_plan" id="col_plan_option">Plan</option>
-			</select>
-			{% endcomment %}
 		</span>
 	</div>
 	{% include "run/common/run_filtered.html" %}

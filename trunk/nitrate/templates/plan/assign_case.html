@@ -28,43 +28,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.AssignCases.on_load);
 		>> Manage Test Cases
 	</div>
 	<h2>{{ testplan.name }}</h2>
-	{% comment %}
-	<div id="" class="planDetail">
-		<div class="cell">
-			<span id="display_title" style="line-height:1.2em;">{{ testplan.name }}</span>
-		</div>
-		<div class="cell">
-			<div class="sd">Author :</div>
-			<div id="display_author"><a href="{% url tcms.apps.profiles.views.profile testplan.author.username %}">{{ testplan.author }}</a></div>
-		</div>
-		<div class="cell">
-			<div class="sd">Product :</div>
-			<div id="display_product">{{ testplan.product.name }}</div>
-			<input type="hidden" id="id_product_id" name="product_id" value="{{ testplan.product.id }}" />
-		</div>
-		<div class="cell">
-			<div class="sd">Version :</div>
-			<div id="display_product_version">{{ testplan.default_product_version }}</div>
-		</div>
-		<div class="cell">
-			<div class="sd">Plan Type :</div>
-			<div id="display_type">{{ testplan.type.name }}</div>
-		</div>
-		<div class="cell" style="width:100%;">
-			<div class="sd">Document :</div>
-			{% if testplan.latest_text.plan_text %}
-			<div id="display_summary_short" style="width:50%; float:left; margin-left:5px;">{{ testplan.latest_text.plan_text|striptags|truncatewords:"5" }}
-				<a id="id_link_show_more" href="javascript:showMoreSummary()"><strong>more ..>></strong></a>
-			</div>
-			<div id="display_summary" style="width:80%; display: none;	float:left; margin-left:5px;" >{{ testplan.latest_text.plan_text|safe }}  
-				<a id="id_link_show_short" href="javascript:showShortSummary()"><strong><< close </strong></a>
-			</div>
-			{% else %}
-			<div id="display_summary" style="width:50%; float:left; margin-left:5px;"><span style="color: #666">The document for this plan hasn't been written yet.</span></div>
-			{% endif %}
-		</div>
-	</div>
-	{% endcomment %}
 	<div class="popup" id="id_import_case_zone" {% if xml_form.xml_file.errors %}{% else %}style="display:none;"{% endif %}>
 		<div class="submit-row">
 			<input type="button" value="x" onclick="$('id_import_case_zone').style.display='none'; $('import-error').innerHTML='';">

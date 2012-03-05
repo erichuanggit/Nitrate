@@ -39,15 +39,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.List.on_load);
 			<input type="hidden" name="action" value="search" />
 			<h2>Search Plan</h2>
 			{% include 'plan/form/search.html' %}
-			{% comment %}
-			<div class="relativeSearchTitle">Case Information Option
-				<div class="down" id="relativeSearchOption_case"></div>
-			</div>
-			<div class="relativeSearchBox" style="display:none" id="relativeSearch_case">
-				{% include 'plan/form/search_case.html' %}
-				<div class="clear"></div>
-			</div>
-			{% endcomment %}
 			<div class="bottom">
 				<input type="submit" size="7" value="Search" class="left_float" />
 				<input type="reset" size="7" value="Reset" title="Reset the form" class="left_float" />

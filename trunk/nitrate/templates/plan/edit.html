@@ -126,12 +126,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Edit.on_load);
                         {{ form.upload_plan_text }}
                         <span class="grey">Html, Plain text or ODT is acceptable.</span>
                         <div >{{ form.upload_plan_text.errors }}</div>
-						{% comment %}
-						<span>
-							<input type="button" id="id_btn_upload_plan_summary"  value="Upload plan document..." />
-							<font size="-3"><em>Html or plain text.</em></font>
-						</span>
-						{% endcomment %}
 						<div class="errors">{{ form.text.errors }}</div>
 					</td>
 				</tr>

@@ -48,11 +48,6 @@
             {% for product in classification.product.all %}
             <tr class="evenRow" >
                 <th>
-                    {%comment%}
-                    <a id="link_{{ product.id }}" href="javascript:blinddownProductContent({{ forloop.counter0 }}, {{ product.id }})">
-                        <b>{{ product.name }}</b>
-                    </a>
-                    {%endcomment%}
                     <a href="{% url tcms.apps.management.views.product_edit product.id %}" class="editlink">{{ product.name }}</a>
                     <br />
                     {% if product.description %}<span class="description">{{ product.description }}</span>{% endif %}

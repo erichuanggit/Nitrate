@@ -26,11 +26,6 @@ Nitrate.Utils.after_page_load(Nitrate.Report.List.on_load);
 		<div class="tab">
 			<div class="menu {% ifequal SUB_MODULE_NAME 'overview' %}selected{% endifequal %}"><div><a href="">Overview</a></div></div>
 			<div class="menu selected"><div><a href="">Versions</a></div></div>
-			{% comment %}
-			<div class="menu {% ifequal SUB_MODULE_NAME 'build' %}selected{% endifequal %}"><div><a href="{% url tcms.report.views.build product.id %}">Builds</a></div></div>
-			<div class="menu {% ifequal SUB_MODULE_NAME 'component' %}selected{% endifequal %}"><div><a href="{% url tcms.report.views.component product.id %}">Components</a></div></div>
-			<div class="menu {% ifequal SUB_MODULE_NAME 'version' %}env{% endifequal %}"><div><a href="{% url tcms.report.views.overview product.id %}">Env Group</a></div></div>
-			{% endcomment %}
 		</div>
 
 	</div>
@@ -45,13 +40,6 @@ Nitrate.Utils.after_page_load(Nitrate.Report.List.on_load);
 		<div class="bold-line" style="float:left;width:100%"></div>
 		
 		{% endif %}
-		{% comment %}
-		<div class="page_control">
-			<span><a href="#">pre 5.0</a></span>
-			|
-			<span><a href="#">next 5.2</a> </span>
-		</div>
-		{% endcomment %}
 		<table class="list dashboard_tb" collspan="0" cellspacing="0">
 			<tr>
 				<th>Plans</th>
