@@ -135,7 +135,7 @@ INSTALLED_APPS = (
     'tcms.testreviews',
     'tcms.core.lib.django-pagination.pagination',
 
-    'tcms.plugins.message_bus',
+    'tcms.integration.djqpid',
 )
 
 # RequestContext settings

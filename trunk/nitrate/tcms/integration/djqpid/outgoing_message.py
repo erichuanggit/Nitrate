@@ -2,7 +2,7 @@
 
 from qpid.messaging import Message
 
-from tcms.plugins.message_bus import settings as st
+from tcms.integration.djqpid import settings as st
 
 class OutgoingMessage(Message):
     ''' A simple wrapper for constructing QPID specific message object and its routing key '''

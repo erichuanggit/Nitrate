@@ -19,7 +19,7 @@
 import threading
 import datetime
 
-from tcms.plugins.message_bus.message_bus import MessageBus
+from tcms.integration.djqpid import Producer
 
 # Reference from
 # http://www.chrisdpratt.com/2008/02/16/signals-in-django-stuff-thats-not-documented-well/
@@ -68,7 +68,7 @@ def bug_add_listen(sender, *args, **kwargs):
         }
         # qpid message send
         try:
-            MessageBus().send(qpid_bug_add, "bugs.added", False)
+            Producer().send(qpid_bug_add, "bugs.added", False)
         except:
             pass
     else:
@@ -93,7 +93,7 @@ def bug_remove_listen(sender, *args, **kwargs):
         }
         # qpid message send
         try:
-            MessageBus().send(qpid_bug_remove, "bugs.dropped", False)
+            Producer().send(qpid_bug_remove, "bugs.dropped", False)
         except:
             pass
     else:
