@@ -17,14 +17,23 @@
 #   Xuqing Kuang <xkuang@redhat.com>
 
 from django.views.decorators.csrf import csrf_protect
-from django.contrib.auth.decorators import user_passes_test, login_required
 from django.views.generic.simple import direct_to_template
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.exceptions import ObjectDoesNotExist
-
+from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.conf import settings
+from django.utils import simplejson
+from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.forms import PasswordChangeForm
+
+from tcms.core.utils.raw_sql import RawSQL
+from tcms.apps.testcases.models import TestCase
+from tcms.apps.testplans.models import TestPlan
+from tcms.apps.testruns.models import TestRun
+from tcms.apps.profiles.models import UserProfile, BookmarkCategory, Bookmark
+
+from tcms.apps.profiles.forms import BookmarkForm, UserProfileForm
 
 MODULE_NAME = 'profile'
 
@@ -34,11 +43,6 @@ def bookmark(request, username, template_name = 'profile/bookmarks.html'):
     """
     Bookmarks for the user
     """
-    from django.conf import settings
-    from django.utils import simplejson
-
-    from forms import BookmarkForm
-    from models import BookmarkCategory, Bookmark
 
     if username != request.user.username:
         return HttpResponseRedirect(reverse('django.contrib.auth.views.login'))
@@ -108,8 +112,6 @@ def profile(request, username, template_name = 'profile/info.html'):
     """
     Edit the profiles of the user
     """
-    from forms import UserProfileForm
-    from models import UserProfile
 
     try:
         u = User.objects.get(username = username)
@@ -138,11 +140,6 @@ def recent(request, username, template_name='profile/recent.html'):
     """
     List the recent plan/run.
     """
-    print "########"
-    from tcms.apps.testplans.models import TestPlan
-    from tcms.apps.testruns.models import TestRun
-    from tcms.apps.testcases.models import TestCase
-    from tcms.core.utils.raw_sql import RawSQL
 
     if username != request.user.username:
         return HttpResponseRedirect(reverse('django.contrib.auth.views.login'))
