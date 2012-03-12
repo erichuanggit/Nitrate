@@ -23,11 +23,16 @@ from django.db import models, connection, transaction
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.cache import cache
 from django.utils.safestring import mark_safe, SafeData
+from django.db.models.signals import post_save, post_delete
 from django.conf import settings
+
+from tcms.core.models import TCMSActionModel
 
 from tcms.apps.management.models import TCMSEnvPlanMap
 from tcms.apps.testcases.models import TestCasePlan
-from tcms.core.models import TCMSActionModel
+
+# single listen
+from tcms.apps.testplans import signals as plan_watchers
 
 try:
     from tcms.core.contrib.plugins_support.signals import register_model
@@ -50,12 +55,6 @@ class TestPlan(TCMSActionModel):
     A plan within the TCMS
     """
     plan_id = models.AutoField(max_length=11, primary_key=True)
-    # product_id = models.IntegerField(max_length=6)
-    # author_id = models.IntegerField(max_length=9)
-    # type_id = models.IntegerField(max_length=4)
-
-    # Unfortunately, default_product_version is a text field,
-    # rather than a foreign key into the "versions" table:
     default_product_version = models.TextField()
     name = models.CharField(max_length=255)
     create_date = models.DateTimeField(db_column='creation_date', auto_now_add=True)
@@ -97,8 +96,6 @@ class TestPlan(TCMSActionModel):
         through='testplans.TestPlanTag',
     )
 
-    # Auto-generated attributes from back-references:
-    #   'cases' : list of TestCases (from TestCases.plans)
 
     class Meta:
         db_table = u'test_plans'
@@ -406,8 +403,6 @@ if register_model:
     register_model(TestPlanComponent)
 
 def _listen():
-    from django.db.models.signals import post_save, post_delete
-    from tcms.apps.testplans import watchers as plan_watchers
     post_save.connect(plan_watchers.on_plan_save, TestPlan)
     post_delete.connect(plan_watchers.on_plan_delete, TestPlan)
 
