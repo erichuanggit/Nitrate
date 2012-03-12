@@ -17,35 +17,37 @@
 #   Xuqing Kuang <xkuang@redhat.com>
 
 from django.db import models
+from django.db.models.signals import post_save
 from django.core.urlresolvers import reverse
 
 from tcms.apps.testcases.models import TestCaseText, NoneText
 from tcms.core.models import TCMSActionModel
 
-from django.db.models import signals
-from signals import post_review_saved
+from tcms.apps.testreviews import signals as review_watchers
+
 
 # Create your models here.
-
 class TestReview(TCMSActionModel):
-    plan = models.ForeignKey('testplans.TestPlan', related_name = 'review')
-    summary = models.CharField(max_length = 255)
+    plan = models.ForeignKey('testplans.TestPlan', related_name='review')
+    summary = models.CharField(max_length=255)
     notes = models.TextField(blank=True, null=True)
-    author = models.ForeignKey('auth.User', related_name = 'review_author')
-    build = models.ForeignKey('management.TestBuild', related_name = 'review_build')
+    author = models.ForeignKey('auth.User', related_name='review_author')
+    build = models.ForeignKey('management.TestBuild', related_name='review_build')
     start_date = models.DateTimeField(auto_now_add=True)
     stop_date = models.DateTimeField(blank=True, null=True)
 
     default_reviewer = models.ManyToManyField(
         'auth.User',
-        related_name = 'review_default_reviewer',
-        blank = True, null = True,
+        related_name='review_default_reviewer',
+        blank=True,
+        null=True,
     )
 
     env_value = models.ManyToManyField(
         'management.TCMSEnvValue',
-        related_name = 'review_env',
-        blank = True, null = True,
+        related_name='review_env',
+        blank=True,
+        null=True,
     )
 
     class Meta:
@@ -54,9 +56,9 @@ class TestReview(TCMSActionModel):
 
     def add_case(self, case, sort_key = 0):
         self.review_case.create(
-            case = case,
-            case_text_version = case.latest_text().case_text_version,
-            sort_key = sort_key,
+            case=case,
+            case_text_version=case.latest_text().case_text_version,
+            sort_key=sort_key,
         )
 
     def check_all_review_cases(self, review_case_id = None):
@@ -79,7 +81,7 @@ class TestReview(TCMSActionModel):
 
         return True
 
-    def get_absolute_url(self, request = None):
+    def get_absolute_url(self, request=None):
         # Upward compatibility code
         if request:
             return request.build_absolute_uri(
@@ -91,7 +93,7 @@ class TestReview(TCMSActionModel):
     def get_url_path(self):
         return reverse('tcms.apps.testreviews.views.get', args=[self.pk, ])
 
-    def mail(self, template, subject, context, request = None):
+    def mail(self, template, subject, context, request=None):
         from tcms.core.utils.mailto import mailto
 
         to = [self.author.email]
@@ -105,31 +107,32 @@ class TestReviewCase(TCMSActionModel):
     case = models.ForeignKey('testcases.TestCase', related_name='review_case')
     reviewer = models.ForeignKey(
         'auth.User',
-        related_name = 'review_case_reviewer',
-        blank = True, null = True
+        related_name='review_case_reviewer',
+        blank=True,
+        null=True
     )
     case_text_version = models.IntegerField()
-    running_date = models.DateTimeField(auto_now_add = True)
-    close_date = models.DateTimeField(null = True, blank = True)
-    is_current = models.BooleanField(default = False)
-    sort_key = models.IntegerField(default = 0)
+    running_date = models.DateTimeField(auto_now_add=True)
+    close_date = models.DateTimeField(null = True, blank=True)
+    is_current = models.BooleanField(default=False)
+    sort_key = models.IntegerField(default=0)
     class Meta:
         db_table = u'tcms_review_cases'
         ordering = ['sort_key', 'id']
 
-    def get_text_with_version(self, case_text_version = None):
+    def get_text_with_version(self, case_text_version=None):
         if case_text_version:
             try:
                 return TestCaseText.objects.get(
-                    case__case_id = self.case_id,
-                    case_text_version = case_text_version
+                    case__case_id=self.case_id,
+                    case_text_version=case_text_version
                 )
             except TestCaseText.DoesNotExist, error:
                 return NoneText
         try:
             return TestCaseText.objects.get(
-                case__case_id = self.case_id,
-                case_text_version = self.case_text_version
+                case__case_id=self.case_id,
+                case_text_version=self.case_text_version
             )
         except TestCaseText.DoesNotExist:
             return NoneText
@@ -142,4 +145,4 @@ class TestReviewCase(TCMSActionModel):
 
 
 # Signals handler
-signals.post_save.connect(post_review_saved, sender=TestReview)
+post_save.connect(review_watchers.post_review_saved, sender=TestReview)
