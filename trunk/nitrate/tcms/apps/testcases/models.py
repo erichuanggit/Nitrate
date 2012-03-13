@@ -16,18 +16,22 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
+# from stdlib
+from datetime import datetime
+
 # from django
 from django.core.urlresolvers import reverse
 from django.core.exceptions import MultipleObjectsReturned
 from django.conf import settings
 from django.db import models, connection, transaction
 from django.db.models import ObjectDoesNotExist
-
-# from stdlib
-from datetime import datetime
+from django.db.models.signals import post_save, post_delete
 
 # from tcms
 from tcms.core.models import TCMSActionModel, TimedeltaField
+
+#from signal listen
+from tcms.apps.testcases import signals as case_watchers
 
 try:
     from tcms.core.contrib.plugins_support.signals import register_model
@@ -626,9 +630,9 @@ class TestCaseEmailSettings(models.Model):
         pass
 
 def _listen():
-    from django.db.models.signals import post_save, post_delete
-    from tcms.apps.testcases import watchers as case_watchers
+    """ signals listen """
 
+    # case save/delete listen for email notify
     post_save.connect(case_watchers.on_case_save, TestCase)
     post_delete.connect(case_watchers.on_case_delete, TestCase)
 

@@ -29,6 +29,9 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.utils import simplejson
 from django.core.urlresolvers import reverse
 
+from tcms.apps.management.models import TCMSEnvGroup, TCMSEnvProperty, \
+        TCMSEnvGroupPropertyMap, TCMSEnvValue
+
 MODULE_NAME = "management"
 
 # Create your views here.
@@ -37,7 +40,6 @@ def environment_groups(request, template_name = 'environment/groups.html'):
     """
     Environements list
     """
-    from tcms.apps.management.models import TCMSEnvGroup, TCMSEnvGroupPropertyMap
 
     env_groups = TCMSEnvGroup.objects
     # Initial the response to browser
@@ -147,7 +149,6 @@ def environment_group_edit(request, template_name = 'environment/group_edit.html
     """
     Assign properties to environment group
     """
-    from tcms.apps.management.models import TCMSEnvGroup, TCMSEnvProperty, TCMSEnvGroupPropertyMap
 
     # Initial the response
     response = ''
@@ -220,7 +221,7 @@ def environment_properties(request, template_name = 'environment/property.html')
     """
     Edit environemnt properties and values belong to
     """
-    from tcms.apps.management.models import TCMSEnvProperty, TCMSEnvGroupPropertyMap
+
     # Initial the ajax response
     ajax_response = { 'response': 'ok' }
     message = ''
@@ -354,7 +355,6 @@ def environment_property_values(request, template_name = 'environment/ajax/prope
     """
     List values of property
     """
-    from tcms.apps.management.models import TCMSEnvProperty, TCMSEnvValue
     message = ''
     duplicated_property_value = []
 

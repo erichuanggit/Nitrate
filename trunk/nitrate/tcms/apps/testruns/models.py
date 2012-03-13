@@ -20,12 +20,12 @@ from datetime import datetime
 
 from django.core.urlresolvers import reverse
 from django.db import models, connection, transaction
-from django.db.models import signals
+from django.db.models.signals import post_save
 
 from tcms.core.models import TCMSActionModel, TimedeltaField
-from tcms.apps.testcases.models import TestCaseBug, TestCaseText, NoneText
 
-from tcms.apps.testruns.signals import post_run_saved
+from tcms.apps.testcases.models import TestCaseBug, TestCaseText, NoneText
+from tcms.apps.testruns import signals as run_watchers
 
 
 try:
@@ -59,11 +59,6 @@ class TestRun(TCMSActionModel):
     default_tester = models.ForeignKey(
         'auth.User', related_name='default_tester', null = True,
     )
-    #case = models.ManyToManyField(
-    #    'testcases.TestCase',
-    #    through='testcases.TestCaseRun',
-    #    related_name='run_case'
-    #)
 
     env_value = models.ManyToManyField(
         'management.TCMSEnvValue',
@@ -79,9 +74,6 @@ class TestRun(TCMSActionModel):
         'auth.User',
         through='testruns.TestRunCC',
     )
-
-    # Auto-generated attributes from back-references:
-    #   'caseruns' : query on TestCaseRuns (from TestCaseRuns.run)
 
     class Meta:
         db_table = u'test_runs'
@@ -125,10 +117,6 @@ class TestRun(TCMSActionModel):
 
         if query.get('build'):
             q = q.filter(build = query['build'])
-
-        # Old style environment search
-        #if query.get('env_id'):
-        #    q = q.filter(environment__environment_id = query.get('env_id'))
 
         # New environment search
         if query.get('env_group'):
@@ -622,7 +610,7 @@ class TCMSEnvRunValueMap(models.Model):
         db_table = u'tcms_env_run_value_map'
 
 # Signals handler
-signals.post_save.connect(post_run_saved, sender=TestRun)
+post_save.connect(run_watchers.post_run_saved, sender=TestRun)
 
 def make_caserun_status_id_attributes():
     '''
