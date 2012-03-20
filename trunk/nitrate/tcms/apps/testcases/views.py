@@ -52,7 +52,7 @@ MODULE_NAME = "testcases"
 # helper functions
 
 
-def _plan_from_request_or_none(request):
+def plan_from_request_or_none(request):
     tp_id = request.REQUEST.get("from_plan")
     if tp_id:
         tp = get_object_or_404(TestPlan, plan_id=tp_id)
@@ -61,7 +61,7 @@ def _plan_from_request_or_none(request):
     return tp
 
 
-def _update_case_email_settings(tc, request):
+def update_case_email_settings(tc, request):
     """Update testcase's email settings."""
     n_form = CaseNotifyForm(request.REQUEST)
     if n_form.is_valid():
@@ -83,7 +83,7 @@ def _update_case_email_settings(tc, request):
             tc.emailing.auto_to_case_tester = True
 
 
-def _group_case_bugs(bugs):
+def group_case_bugs(bugs):
     """Group bugs using bug_id."""
     bugs = sorted(bugs, key=lambda b: b.bug_id)
     bugs = itertools.groupby(bugs, lambda b: b.bug_id)
@@ -91,7 +91,7 @@ def _group_case_bugs(bugs):
     return bugs
 
 
-def _create_testcase(request, form, tp):
+def create_testcase(request, form, tp):
     """Create testcase"""
     tc = TestCase.create(author=request.user, values=form.cleaned_data)
     tc.add_text(case_text_version = 1,
@@ -154,7 +154,7 @@ def automated(request):
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcase'))
 def new(request, template_name='case/new.html'):
     """New testcase"""
-    tp = _plan_from_request_or_none(request)
+    tp = plan_from_request_or_none(request)
     # Initial the form parameters when write new case from plan
     if tp:
         default_form_parameters = {
@@ -174,7 +174,7 @@ def new(request, template_name='case/new.html'):
             form.populate()
 
         if form.is_valid():
-            tc = _create_testcase(request, form, tp)
+            tc = create_testcase(request, form, tp)
             class ReturnActions(object):
                 def __init__(self, case, plan):
                     self.__all__ = ('_addanother',
@@ -243,7 +243,7 @@ def new(request, template_name='case/new.html'):
 
     # Initial NewCaseForm for submit
     else:
-        tp = _plan_from_request_or_none(request)
+        tp = plan_from_request_or_none(request)
         form = NewCaseForm(initial=default_form_parameters)
         if tp:
             form.populate(product_id=tp.product_id)
@@ -277,7 +277,7 @@ def all(request, template_name="case/all.html"):
     else:
         SearchForm = SearchCaseForm
 
-    tp = _plan_from_request_or_none(request)
+    tp = plan_from_request_or_none(request)
     # sorting
     order_by = request.REQUEST.get('order_by', 'create_date')
     asc = bool(request.REQUEST.get('asc', None))
@@ -437,7 +437,7 @@ def get(request, case_id, template_name='case/get.html'):
         template_name = template_types.get(
                 request.REQUEST['template_type'], 'case')
 
-    grouped_case_bugs = tcr and _group_case_bugs(tcr.case.get_bugs())
+    grouped_case_bugs = tcr and group_case_bugs(tcr.case.get_bugs())
     # Render the page
     return direct_to_template(request, template_name, {
         'logs': logs,
@@ -521,7 +521,7 @@ def edit(request, case_id, template_name='case/edit.html'):
     except ObjectDoesNotExist, error:
         raise Http404
 
-    tp = _plan_from_request_or_none(request)
+    tp = plan_from_request_or_none(request)
 
     #CaseNotifyForm default to None
     n_form = None
@@ -596,7 +596,7 @@ def edit(request, case_id, template_name='case/edit.html'):
                         breakdown = form.cleaned_data['breakdown'])
 
             # Notification
-            _update_case_email_settings(tc, request)
+            update_case_email_settings(tc, request)
             # Returns
             if request.REQUEST.get('_continue'):
                 return HttpResponseRedirect('%s?from_plan=%s' % (
@@ -672,7 +672,7 @@ def text_history(request, case_id, template_name='case/history.html'):
     SUB_MODULE_NAME = 'cases'
 
     tc = get_object_or_404(TestCase, case_id=case_id)
-    tp = _plan_from_request_or_none(request)
+    tp = plan_from_request_or_none(request)
 
     tctxts = tc.text.all()
     return direct_to_template(request, template_name, {
@@ -698,7 +698,7 @@ def clone(request, template_name='case/clone.html'):
             next='javascript:window.history.go(-1)'
         ))
 
-    tp_src = _plan_from_request_or_none(request)
+    tp_src = plan_from_request_or_none(request)
     tp = None
     search_plan_form = SearchPlanForm()
 
@@ -1055,7 +1055,7 @@ def attachment(request, case_id, template_name='case/attachment.html'):
     SUB_MODULE_NAME = 'cases'
 
     tc = get_object_or_404(TestCase, case_id=case_id)
-    tp = _plan_from_request_or_none(request)
+    tp = plan_from_request_or_none(request)
 
     return direct_to_template(request, template_name, {
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
