@@ -16,31 +16,108 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-from datetime import datetime, timedelta
+import datetime
+import itertools
 
 from django.contrib.auth.decorators import user_passes_test
 from django.views.generic.simple import direct_to_template
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.utils import simplejson
+from django.shortcuts import get_object_or_404
 
 from tcms.core import forms
 from tcms.core.views import Prompt
-
-from models import TestCase, TestCaseStatus, TestCaseAttachment, TestCasePlan
-from models import TestCaseCategory
-from tcms.apps.testplans.models import TestPlan
-from itertools import groupby
+from tcms.core.utils.raw_sql import RawSQL
+from tcms.core.logs.models import TCMSLogModel
 from tcms.search.order import order_case_queryset
 from tcms.search import remove_from_request_path
 
+from tcms.apps.testcases.models import TestCase, TestCaseStatus, \
+        TestCaseAttachment, TestCasePlan, TestCaseCategory
+from tcms.apps.testplans.models import TestPlan
+from tcms.apps.testruns.models import TestCaseRunStatus
+from tcms.apps.management.models import Priority, TestTag
+
+from tcms.apps.testcases.forms import CaseAutomatedForm, NewCaseForm, \
+        SearchCaseForm, CaseFilterForm, EditCaseForm, CaseNotifyForm, \
+        CloneCaseForm, CaseComponentForm, CaseCategoryForm, CaseBugForm
+from tcms.apps.testplans.forms import SearchPlanForm
+
 MODULE_NAME = "testcases"
+
+
+#_____________________________________________________________________________
+# helper functions
+
+
+def plan_from_request_or_none(request):
+    tp_id = request.REQUEST.get("from_plan")
+    if tp_id:
+        tp = get_object_or_404(TestPlan, plan_id=tp_id)
+    else:
+        tp = None
+    return tp
+
+
+def update_case_email_settings(tc, request):
+    """Update testcase's email settings."""
+    n_form = CaseNotifyForm(request.REQUEST)
+    if n_form.is_valid():
+        tc.emailing.auto_to_run_manager = n_form.cleaned_data[
+                'managers_of_runs']
+        tc.emailing.auto_to_run_tester = n_form.cleaned_data[
+                'default_testers_of_runs']
+        tc.emailing.auto_to_case_run_assignee = n_form.cleaned_data[
+                'assignees_of_case_runs']
+        tc.emailing.auto_to_case_author = n_form.cleaned_data[
+                'author']
+        tc.emailing.notify_on_case_update = n_form.cleaned_data[
+                'notify_on_case_update']
+        tc.emailing.notify_on_case_delete = n_form.cleaned_data[
+                'notify_on_case_delete']
+        tc.emailing.save()
+        if (n_form.cleaned_data['default_tester_of_case'] and
+                tc.default_tester_id):
+            tc.emailing.auto_to_case_tester = True
+
+
+def group_case_bugs(bugs):
+    """Group bugs using bug_id."""
+    bugs = sorted(bugs, key=lambda b: b.bug_id)
+    bugs = itertools.groupby(bugs, lambda b: b.bug_id)
+    bugs = [(pk, list(_bugs)) for pk, _bugs in bugs]
+    return bugs
+
+
+def create_testcase(request, form, tp):
+    """Create testcase"""
+    tc = TestCase.create(author=request.user, values=form.cleaned_data)
+    tc.add_text(case_text_version = 1,
+                author=request.user,
+                action=form.cleaned_data['action'],
+                effect=form.cleaned_data['effect'],
+                setup=form.cleaned_data['setup'],
+                breakdown=form.cleaned_data['breakdown'])
+
+    # Assign the case to the plan
+    if tp:
+        tc.add_to_plan(plan=tp)
+
+    # Add components into the case
+    for component in form.cleaned_data['component']:
+        tc.add_component(component=component)
+    return tc
+
+
+#_____________________________________________________________________________
+# view functions
+
 
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
 def automated(request):
-    """
-    Change the automated status for cases
+    """Change the automated status for cases
 
     Parameters:
     - a: Actions
@@ -50,25 +127,22 @@ def automated(request):
 
     Returns:
     - Serialized JSON
-    """
-    from forms import CaseAutomatedForm
 
+    """
     ajax_response = {'rc': 0, 'response': 'ok'}
 
     form = CaseAutomatedForm(request.REQUEST)
-    #form.populate()
     if form.is_valid():
-        tcs = TestCase.objects.filter(
-            pk__in = request.REQUEST.getlist('case')
-        )
+        tcs = TestCase.objects.filter(pk__in=request.REQUEST.getlist('case'))
+        if not tcs:
+            raise Http404
 
         if form.cleaned_data['a'] == 'change':
             if isinstance(form.cleaned_data['is_automated'], int):
-                tcs.update(is_automated = form.cleaned_data['is_automated'])
-
+                tcs.update(is_automated=form.cleaned_data['is_automated'])
             if isinstance(form.cleaned_data['is_automated_proposed'], bool):
                 tcs.update(
-                    is_automated_proposed = form.cleaned_data['is_automated_proposed']
+                    is_automated_proposed=form.cleaned_data['is_automated_proposed']
                 )
     else:
         ajax_response['rc'] = 1
@@ -76,117 +150,82 @@ def automated(request):
 
     return HttpResponse(simplejson.dumps(ajax_response))
 
+
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcase'))
-def new(request, template_name = 'case/new.html'):
-    from tcms.apps.testplans.models import TestPlan
-    from forms import NewCaseForm
-
-    if request.REQUEST.get('from_plan'):
-        try:
-            tp = TestPlan.objects.get(plan_id = request.REQUEST['from_plan'])
-        except ObjectDoesNotExist, error:
-            tp = None
-    else:
-        tp = None
-
-    # Initial the form parameters
+def new(request, template_name='case/new.html'):
+    """New testcase"""
+    tp = plan_from_request_or_none(request)
+    # Initial the form parameters when write new case from plan
     if tp:
         default_form_parameters = {
             'product': tp.product_id,
-            'component': tp.component.defer('id').values_list('pk', flat = True),
+            'component': tp.component.defer('id').values_list('pk', flat=True),
             'is_automated': '0',
         }
+    # Initial the form parameters when write new case directly
     else:
-        default_form_parameters = { 'is_automated': '0' }
+        default_form_parameters = {'is_automated': '0'}
 
     if request.method == "POST":
         form = NewCaseForm(request.REQUEST)
         if request.REQUEST.get('product'):
-            form.populate(product_id = request.REQUEST['product'])
+            form.populate(product_id=request.REQUEST['product'])
         else:
             form.populate()
 
         if form.is_valid():
-            try:
-                tc = TestCase.create(
-                    author = request.user,
-                    values = form.cleaned_data
-                )
-
-                tc.add_text(
-                    case_text_version = 1,
-                    author = request.user,
-                    action = form.cleaned_data['action'],
-                    effect = form.cleaned_data['effect'],
-                    setup = form.cleaned_data['setup'],
-                    breakdown = form.cleaned_data['breakdown'],
-                )
-
-                # Add test tags to the case
-                #if request.user.has_perm('testcases.add_testcasetag'):
-                #    for tag in form.cleaned_data['tag']:
-                #        tc.add_tag(
-                #            tag = tag
-                #        )
-
-                # Assign the case to the plan
-                if tp:
-                    tc.add_to_plan(plan = tp)
-
-                # Add components into the case
-                for component in form.cleaned_data['component']:
-                    tc.add_component(component = component)
-            except:
-                raise
-
+            tc = create_testcase(request, form, tp)
             class ReturnActions(object):
                 def __init__(self, case, plan):
-                    self.__all__ = ('_addanother', '_continue', '_returntocase', '_returntoplan')
+                    self.__all__ = ('_addanother',
+                                    '_continue',
+                                    '_returntocase',
+                                    '_returntoplan')
                     self.case = case
                     self.plan = plan
 
                 def _continue(self):
                     if self.plan:
                         return HttpResponseRedirect('%s?from_plan=%s' % (
-                                reverse('tcms.apps.testcases.views.edit', args=[self.case.case_id, ]),
-                                self.plan.plan_id
-                            )
-                        )
+                                reverse('tcms.apps.testcases.views.edit',
+                                        args=[self.case.case_id, ]),
+                                self.plan.plan_id))
 
                     return HttpResponseRedirect(
-                        reverse('tcms.apps.testcases.views.edit', args=[tc.case_id, ]),
-                    )
+                            reverse('tcms.apps.testcases.views.edit',
+                                    args=[tc.case_id, ]),)
 
                 def _addanother(self):
                     form = NewCaseForm(initial=default_form_parameters)
 
                     if tp:
-                        form.populate(product_id = self.plan.product_id)
+                        form.populate(product_id=self.plan.product_id)
 
                     return form
 
                 def _returntocase(self):
                     if self.plan:
                         return HttpResponseRedirect('%s?from_plan=%s' % (
-                                reverse('tcms.apps.testcases.views.get', args=[self.case.pk, ]),
+                                reverse('tcms.apps.testcases.views.get',
+                                        args=[self.case.pk, ]),
                                 self.plan.plan_id
                             )
                         )
 
                     return HttpResponseRedirect(
-                        reverse('tcms.apps.testcases.views.get', args=[self.case.pk, ]),
-                    )
+                            reverse('tcms.apps.testcases.views.get',
+                                    args=[self.case.pk, ]),)
 
                 def _returntoplan(self):
                     if not self.plan:
                         raise Http404
 
                     return HttpResponseRedirect('%s#reviewcases' %
-                        reverse('tcms.apps.testplans.views.get', args=[self.plan.pk, ]),
-                    )
+                            reverse('tcms.apps.testplans.views.get',
+                                    args=[self.plan.pk, ]),)
 
             # Genrate the instance of actions
-            ras = ReturnActions(case = tc, plan = tp)
+            ras = ReturnActions(case=tc, plan=tp)
             for ra_str in ras.__all__:
                 if request.REQUEST.get(ra_str):
                     func = getattr(ras, ra_str)
@@ -201,41 +240,34 @@ def new(request, template_name = 'case/new.html'):
             else:
                 # Assume here is the form
                 form = result
-    else:
-        try:
-            tp = TestPlan.objects.get(plan_id = request.REQUEST.get('from_plan'))
-        except ObjectDoesNotExist, error:
-            tp = None
 
+    # Initial NewCaseForm for submit
+    else:
+        tp = plan_from_request_or_none(request)
         form = NewCaseForm(initial=default_form_parameters)
         if tp:
-            form.populate(product_id = tp.product_id)
+            form.populate(product_id=tp.product_id)
 
     return direct_to_template(request, template_name, {
         'test_plan': tp,
         'form': form
     })
 
+
 def all(request, template_name="case/all.html"):
-    """
-    Generate the case list in search case and case zone in plan
+    """Generate the case list in search case and case zone in plan
 
     Parameters:
     a: Action
        -- search: Search form submitted.
        -- initial: Initial the case filter
     from_plan: Plan ID
-       -- [number]: When the plan ID defined, it will build the case page in plan
+       -- [number]: When the plan ID defined, it will build the case
+    page in plan.
+
     """
-    from forms import SearchCaseForm, CaseFilterForm
-
-    from tcms.core.utils.raw_sql import RawSQL
-    from tcms.apps.testplans.models import TestPlan
-    from tcms.apps.management.models import Priority, TestTag
-
     # Intial the plan in plan details page
     if request.REQUEST.get('from_plan'):
-        tp = TestPlan.objects.get(pk = request.REQUEST['from_plan'])
         SearchForm = CaseFilterForm
         # Hacking for case plan
         if request.REQUEST.get('template_type') == 'case':
@@ -243,8 +275,9 @@ def all(request, template_name="case/all.html"):
         elif request.REQUEST.get('template_type') == 'review_case':
             template_name = 'plan/get_review_cases.html'
     else:
-        tp = TestPlan.objects.none()
         SearchForm = SearchCaseForm
+
+    tp = plan_from_request_or_none(request)
     # sorting
     order_by = request.REQUEST.get('order_by', 'create_date')
     asc = bool(request.REQUEST.get('asc', None))
@@ -254,24 +287,23 @@ def all(request, template_name="case/all.html"):
     else:
         # Hacking for case plan
         confirmed_status_name = 'CONFIRMED'
-        if request.REQUEST.get('template_type') == 'case': # 'c' is meaning component
-            d_status = TestCaseStatus.objects.filter(name = confirmed_status_name)
+        # 'c' is meaning component
+        if request.REQUEST.get('template_type') == 'case':
+            d_status = TestCaseStatus.objects.filter(name=confirmed_status_name)
         elif request.REQUEST.get('template_type') == 'review_case':
-            d_status = TestCaseStatus.objects.exclude(name = confirmed_status_name)
+            d_status = TestCaseStatus.objects.exclude(name=confirmed_status_name)
         else:
             d_status = TestCaseStatus.objects.all()
 
         d_status_ids = d_status.values_list('pk', flat=True)
 
-        search_form = SearchForm(initial={
-            'case_status': d_status_ids
-        })
+        search_form = SearchForm(initial={'case_status': d_status_ids})
 
     # Populate the form
     if request.REQUEST.get('product'):
-        search_form.populate(product_id = request.REQUEST['product'])
+        search_form.populate(product_id=request.REQUEST['product'])
     elif tp and tp.product_id:
-        search_form.populate(product_id = tp.product_id)
+        search_form.populate(product_id=tp.product_id)
     else:
         search_form.populate()
 
@@ -279,23 +311,21 @@ def all(request, template_name="case/all.html"):
     if request.REQUEST.get('a') in ('search', 'sort') and search_form.is_valid():
         tcs = TestCase.list(search_form.cleaned_data)
     elif request.REQUEST.get('a') == 'initial':
-        tcs = TestCase.objects.filter(case_status__in = d_status)
+        tcs = TestCase.objects.filter(case_status__in=d_status)
     else:
         tcs = TestCase.objects.none()
 
     # Search the relationship
     if tp:
-        tcs = tcs.filter(plan = tp)
+        tcs = tcs.filter(plan=tp)
 
-    tcs = tcs.select_related(
-        'author', 'default_tester', 'case_status',
-        'priority', 'category'
-    )
+    tcs = tcs.select_related('author',
+                             'default_tester',
+                             'case_status',
+                             'priority',
+                             'category')
 
-    tcs = tcs.extra(select={
-        'num_bug': RawSQL.num_case_bugs,
-    })
-
+    tcs = tcs.extra(select={'num_bug': RawSQL.num_case_bugs,})
     tcs = tcs.distinct()
     tcs = order_case_queryset(tcs, order_by, asc)
     # Resort the order
@@ -313,10 +343,10 @@ def all(request, template_name="case/all.html"):
     if request.REQUEST.get('case'):
         selected_case_ids = map(lambda f: int(f), request.REQUEST.getlist('case'))
     else:
-        selected_case_ids = tcs.values_list('pk', flat = True)
+        selected_case_ids = tcs.values_list('pk', flat=True)
 
     # Get the tags own by the cases
-    ttags = TestTag.objects.filter(testcase__in = tcs).distinct()
+    ttags = TestTag.objects.filter(testcase__in=tcs).distinct()
     # generating a query_url with order options
     query_url = remove_from_request_path(request, 'order_by')
     if asc:
@@ -335,18 +365,15 @@ def all(request, template_name="case/all.html"):
         'query_url': query_url,
     })
 
-def get(request, case_id, template_name = 'case/get.html'):
-    """Get the case content"""
-    from tcms.apps.testruns.models import TestCaseRunStatus
-    from tcms.core.utils.raw_sql import RawSQL
-    from tcms.core.logs.models import TCMSLogModel
 
+def get(request, case_id, template_name='case/get.html'):
+    """Get the case content"""
     # Get the case
     try:
         tc = TestCase.objects.select_related(
-            'author', 'default_tester', 'category__name',
-            'category__product__name', 'priority__name', 'case_status__name'
-        ).get(case_id = case_id)
+                'author', 'default_tester',
+                'category__name','category__product__name',
+                'priority__name', 'case_status__name').get(case_id=case_id)
     except ObjectDoesNotExist, error:
         raise Http404
 
@@ -357,39 +384,41 @@ def get(request, case_id, template_name = 'case/get.html'):
     log_id = str(case_id)
     logs = TCMSLogModel.objects.filter(object_pk=log_id)
 
-    logs = groupby(logs, lambda l: l.date)
+    logs = itertools.groupby(logs, lambda l: l.date)
     logs = [(day, list(actions)) for day, actions in logs]
     # Get the specific test plan
-    if request.GET.get('from_plan'):
+    plan_id_from_request = request.GET.get('from_plan')
+    if plan_id_from_request:
         try:
-            tp = tps.get(pk = request.REQUEST['from_plan'])
+            tp = tps.get(pk=plan_id_from_request)
         except TestPlan.DoesNotExist:
             return HttpResponse(Prompt.render(
-                request = request,
-                info_type = Prompt.Info,
-                info = '''This case has been removed from the plan, but you
+                request=request,
+                info_type=Prompt.Info,
+                info='''This case has been removed from the plan, but you
                           can view the case detail''',
-                next = reverse('tcms.apps.testcases.views.get', args = [case_id,]),
+                next=reverse('tcms.apps.testcases.views.get',
+                             args=[case_id,]),
             ))
     else:
         tp = None
 
     # Get the test case runs
     tcrs = tc.case_run.select_related(
-        'run__summary', 'tested_by', 'assignee', 'case__category__name',
-        'case__priority__name', 'case_run_status__name'
-    ).all()
+            'run__summary', 'tested_by',
+            'assignee', 'case__category__name',
+            'case__priority__name', 'case_run_status__name').all()
 
     tcrs = tcrs.extra(select={
         'num_bug': RawSQL.num_case_run_bugs,
     }).order_by('run__plan')
-    runs_ordered_by_plan = groupby(tcrs, lambda t: t.run.plan)
+    runs_ordered_by_plan = itertools.groupby(tcrs, lambda t: t.run.plan)
     # FIXME: Just don't know why Django template does not evaluate a generator,
     # and had to evaluate the groupby generator manually like below.
     runs_ordered_by_plan = [(k, list(v)) for k, v in runs_ordered_by_plan]
     # Get the specific test case run
     if request.REQUEST.get('case_run_id'):
-        tcr = tcrs.get(pk = request.REQUEST['case_run_id'])
+        tcr = tcrs.get(pk=request.REQUEST['case_run_id'])
     else:
         tcr = None
 
@@ -398,17 +427,16 @@ def get(request, case_id, template_name = 'case/get.html'):
 
     # Switch the templates for different module
     template_types = {
-        'case': 'case/get_details.html',
-        'review_case': 'case/get_details_review.html',
-        'case_run': 'case/get_details_case_run.html',
-        'case_case_run': 'case/get_details_case_case_run.html',
-        'execute_case_run': 'run/execute_case_run.html',
-    }
+            'case': 'case/get_details.html',
+            'review_case': 'case/get_details_review.html',
+            'case_run': 'case/get_details_case_run.html',
+            'case_case_run': 'case/get_details_case_case_run.html',
+            'execute_case_run': 'run/execute_case_run.html',}
 
     if request.REQUEST.get('template_type'):
         template_name = template_types.get(
-            request.REQUEST['template_type'], 'case'
-        )
+                request.REQUEST['template_type'], 'case')
+
     grouped_case_bugs = tcr and group_case_bugs(tcr.case.get_bugs())
     # Render the page
     return direct_to_template(request, template_name, {
@@ -426,29 +454,19 @@ def get(request, case_id, template_name = 'case/get.html'):
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
     })
 
-def group_case_bugs(bugs):
-    '''
-    Group bugs using bug_id
-    '''
-    bugs = sorted(bugs, key=lambda b: b.bug_id)
-    bugs = groupby(bugs, lambda b: b.bug_id)
-    bugs = [(pk, list(_bugs)) for pk, _bugs in bugs]
-    return bugs
 
-def printable(request, template_name = 'case/printable.html'):
+def printable(request, template_name='case/printable.html'):
     """Create the printable copy for plan/case"""
-    from tcms.apps.testplans.models import TestPlan
-
-    if not request.REQUEST.get('plan') and not request.REQUEST.get('case')\
-    and not request.REQUEST.get('case_status'):
+    if (not request.REQUEST.get('plan') and
+            not request.REQUEST.get('case') and
+            not request.REQUEST.get('case_status')):
         return HttpResponse(Prompt.render(
-            request = request,
-            info_type = Prompt.Info,
-            info = 'At least one plan is required.',
-        ))
+                request=request,
+                info_type=Prompt.Info,
+                info='At least one plan is required.',))
 
     if request.REQUEST.get('plan'):
-        tps = TestPlan.objects.filter(pk__in = request.REQUEST.getlist('plan'))
+        tps = TestPlan.objects.filter(pk__in=request.REQUEST.getlist('plan'))
     else:
         tps = TestPlan.objects.none()
 
@@ -458,10 +476,9 @@ def printable(request, template_name = 'case/printable.html'):
 
     internal_query_maps = (
         # [Web request string, database queryset]
-        ('plan', 'plan__pk__in'),
-        ('case', 'pk__in'),
-        ('case_status', 'case_status__pk__in')
-    )
+            ('plan', 'plan__pk__in'),
+            ('case', 'pk__in'),
+            ('case_status', 'case_status__pk__in'))
 
     query = {}
     for iqm in internal_query_maps:
@@ -471,47 +488,40 @@ def printable(request, template_name = 'case/printable.html'):
     # Disabled cases ignored in default
     if not query.get('case_status__pk__in'):
         query['case_status__pk__in'] = TestCaseStatus.objects.exclude(
-            name = 'DISABLED'
+            name='DISABLED'
         ).values_list('pk', flat=True)
 
     tcs = TestCase.objects.filter(**query)
     return direct_to_template(request, template_name, {
-        'test_plans': tps,
-        'test_cases': tcs,
-    })
+            'test_plans': tps,
+            'test_cases': tcs,})
 
-def export(request, template_name = 'case/export.xml'):
+
+def export(request, template_name='case/export.xml'):
     """Export the plan"""
-    from datetime import datetime
     if not request.REQUEST.get('plan') and not request.REQUEST.get('case')\
     and not request.REQUEST.get('case_status'):
         return HttpResponse(Prompt.render(
-            request = request,
-            info_type = Prompt.Info,
-            info = 'At least one target is required.',
-        ))
-    timestamp = datetime.now()
+                request=request,
+                info_type=Prompt.Info,
+                info='At least one target is required.',))
+    timestamp = datetime.datetime.now()
     timestamp_str = '%02i-%02i-%02i' \
         % (timestamp.year, timestamp.month, timestamp.day)
     response = printable(request, template_name)
     response['Content-Disposition'] = 'attachment; filename=tcms-testcases-%s.xml' % timestamp_str
     return response
 
-@user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
-def edit(request, case_id, template_name = 'case/edit.html'):
-    from forms import EditCaseForm, CaseNotifyForm
-    from signals import EditCaseNotifyThread
 
+@user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
+def edit(request, case_id, template_name='case/edit.html'):
+    """Edit case detail"""
     try:
         tc = TestCase.objects.select_related().get(case_id = case_id)
     except ObjectDoesNotExist, error:
         raise Http404
 
-    if request.REQUEST.get('from_plan'):
-        from tcms.apps.testplans.models import TestPlan
-        tp = TestPlan.objects.get(plan_id = request.REQUEST['from_plan'])
-    else:
-        tp = None
+    tp = plan_from_request_or_none(request)
 
     #CaseNotifyForm default to None
     n_form = None
@@ -519,19 +529,26 @@ def edit(request, case_id, template_name = 'case/edit.html'):
     if request.method == "POST":
         form = EditCaseForm(request.REQUEST)
         if request.REQUEST.get('product'):
-            form.populate(product_id = request.REQUEST['product'])
+            form.populate(product_id=request.REQUEST['product'])
         elif tp:
-            form.populate(product_id = tp.product_id)
+            form.populate(product_id=tp.product_id)
         else:
             form.populate()
 
         # Check the form and modify the case
         if form.is_valid():
             # Modify the contents
-            fields = ['summary', 'case_status', 'category', 'priority',
-                'notes', 'is_automated', 'is_automated_proposed', 'script',
-                'arguments', 'requirement', 'alias'
-            ]
+            fields = ['summary',
+                      'case_status',
+                      'category',
+                      'priority',
+                      'notes',
+                      'is_automated',
+                      'is_automated_proposed',
+                      'script',
+                      'arguments',
+                      'requirement',
+                      'alias']
 
             for field in fields:
                 if getattr(tc, field) != form.cleaned_data[field]:
@@ -563,11 +580,7 @@ def edit(request, case_id, template_name = 'case/edit.html'):
             except ObjectDoesNotExist, error:
                 pass
 
-            # FIXME: Buggy here, timedelta from form cleaned data need to convert.
-            #if tc.estimated_time != form.cleaned_data['estimated_time']:
-            #    tc.log_action(request.user, 'Case estimated time changed from %s to %s in edit page.' % (
-            #        tc.estimated_time, form.cleaned_data['estimated_time']
-            #    ))
+            # FIXME: Bug here, timedelta from form cleaned data need to convert.
             tc.estimated_time = form.cleaned_data['estimated_time']
             # IMPORTANT! tc.current_user is an instance attribute,
             # added so that in post_save, current logged-in user info
@@ -576,18 +589,11 @@ def edit(request, case_id, template_name = 'case/edit.html'):
             tc.current_user = request.user
             tc.save()
 
-            tc.add_text(
-                author = request.user,
-                action = form.cleaned_data['action'],
-                effect = form.cleaned_data['effect'],
-                setup = form.cleaned_data['setup'],
-                breakdown = form.cleaned_data['breakdown']
-            )
-
-            # Clear and Add components into the case
-            #tc.clear_components()
-            #for component in form.cleaned_data['component']:
-            #    tc.add_component(component = component)
+            tc.add_text(author = request.user,
+                        action = form.cleaned_data['action'],
+                        effect = form.cleaned_data['effect'],
+                        setup = form.cleaned_data['setup'],
+                        breakdown = form.cleaned_data['breakdown'])
 
             # Notification
             update_case_email_settings(tc, request)
@@ -603,11 +609,11 @@ def edit(request, case_id, template_name = 'case/edit.html'):
                     raise Http404
 
                 # Exclude the disabled cases
-                pk_list = tp.case.exclude(case_status__name = 'DISABLED')
+                pk_list = tp.case.exclude(case_status__name='DISABLED')
                 pk_list = pk_list.defer('case_id').values_list('pk', flat=True)
 
                 # Get the previous and next case
-                p_tc, n_tc = tc.get_previous_and_next(pk_list = pk_list)
+                p_tc, n_tc = tc.get_previous_and_next(pk_list=pk_list)
                 return HttpResponseRedirect('%s?from_plan=%s' % (
                     reverse('tcms.apps.testcases.views.edit', args=[n_tc.pk, ]),
                     tp.pk,
@@ -619,6 +625,7 @@ def edit(request, case_id, template_name = 'case/edit.html'):
             ))
     else:
         tctxt = tc.latest_text()
+        # Notification form initial
         n_form = CaseNotifyForm(initial= {
             'notify_on_case_delete': tc.emailing.notify_on_case_delete,
             'notify_on_case_update': tc.emailing.notify_on_case_update,
@@ -627,7 +634,7 @@ def edit(request, case_id, template_name = 'case/edit.html'):
             'managers_of_runs': tc.emailing.auto_to_run_manager,
             'default_testers_of_runs': tc.emailing.auto_to_run_tester,
             'assignees_of_case_runs': tc.emailing.auto_to_case_run_assignee,
-        })    # Notification form
+        })
         form = EditCaseForm(initial={
             'summary': tc.summary,
             'default_tester': tc.default_tester_id and tc.default_tester.email or None,
@@ -650,60 +657,22 @@ def edit(request, case_id, template_name = 'case/edit.html'):
             'breakdown': tctxt.breakdown,
         })
 
-        form.populate(product_id = tc.category.product_id)
+        form.populate(product_id=tc.category.product_id)
     return direct_to_template(request, template_name, {
-        'test_case': tc,
-        'test_plan': tp,
-        'form': form,
-        'notify_form': n_form,
-        'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
+            'test_case': tc,
+            'test_plan': tp,
+            'form': form,
+            'notify_form': n_form,
+            'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
     })
 
-def update_case_email_settings(tc, request):
-    from forms import CaseNotifyForm
-    n_form = CaseNotifyForm(request.REQUEST)
-    if n_form.is_valid():
-        n_to = [request.user.email, tc.author.email]
-        if n_form.cleaned_data['default_tester_of_case'] and tc.default_tester_id:
-            tc.emailing.auto_to_case_tester = True
-            # n_to.append(tc.default_tester.email)
-        if n_form.cleaned_data['managers_of_runs']:
-            tc.emailing.auto_to_run_manager = True
-            #n_to.extend(
-            #    tc.case_run.values_list('run__manager__email', flat=True)
-            #)
-        if n_form.cleaned_data['default_testers_of_runs']:
-            tc.emailing.auto_to_run_tester = True
-            #n_to.extend(
-            #    tc.case_run.values_list('run__default_tester__email', flat=True)
-            #)
-        if n_form.cleaned_data['assignees_of_case_runs']:
-            tc.emailing.auto_to_case_run_assignee = True
-            #n_to.extend(
-            #    tc.case_run.values_list('assignee__email', flat=True)
-            #)
-        if n_form.cleaned_data['author']:
-            tc.emailing.auto_to_case_author = True
-        if n_form.cleaned_data['notify_on_case_update']:
-            tc.emailing.notify_on_case_update = True
-        if n_form.cleaned_data['notify_on_case_delete']:
-            tc.emailing.notify_on_case_delete = True
-        tc.emailing.save()
 
 def text_history(request, case_id, template_name='case/history.html'):
     """View test plan text history"""
     SUB_MODULE_NAME = 'cases'
 
-    try:
-        tc = TestCase.objects.get(case_id = case_id)
-    except ObjectDoesNotExist, error:
-        raise Http404(error)
-
-    if request.GET.get('from_plan'):
-        from tcms.apps.testplans.models import TestPlan
-        tp = TestPlan.objects.get(plan_id = request.GET.get('from_plan'))
-    else:
-        tp = None
+    tc = get_object_or_404(TestCase, case_id=case_id)
+    tp = plan_from_request_or_none(request)
 
     tctxts = tc.text.all()
     return direct_to_template(request, template_name, {
@@ -715,45 +684,32 @@ def text_history(request, case_id, template_name='case/history.html'):
         'select_case_text_version': int(request.REQUEST.get('case_text_version', 0)),
     })
 
+
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcase'))
 def clone(request, template_name='case/clone.html'):
     """Clone one case or multiple case into other plan or plans"""
-    from tcms.apps.testplans.models import TestPlan
-    from tcms.apps.testcases.models import TestCasePlan
-    from tcms.apps.testplans.forms import SearchPlanForm
-    from tcms.apps.management.models import Product
-    from forms import CloneCaseForm
-
     SUB_MODULE_NAME = 'cases'
 
     if not request.REQUEST.get('case'):
         return HttpResponse(Prompt.render(
-            request = request,
-            info_type = Prompt.Info,
-            info = 'At least one case is required.',
-            next = 'javascript:window.history.go(-1)'
+            request=request,
+            info_type=Prompt.Info,
+            info='At least one case is required.',
+            next='javascript:window.history.go(-1)'
         ))
 
-    tp_src_id = request.REQUEST.get('from_plan')
-    if tp_src_id:
-        try:
-            tp_src = TestPlan.objects.get(plan_id=tp_src_id)
-        except ObjectDoesNotExist, error:
-            tp_src = None
-    else:
-        tp_src = None
-
+    tp_src = plan_from_request_or_none(request)
     tp = None
     search_plan_form = SearchPlanForm()
 
     # Do the clone action
     if request.method == 'POST':
         clone_form = CloneCaseForm(request.POST)
-        clone_form.populate(case_ids = request.REQUEST.getlist('case'))
+        clone_form.populate(case_ids=request.REQUEST.getlist('case'))
 
         if clone_form.is_valid():
-            for tc_src in clone_form.cleaned_data['case']:
-
+            tcs_src = clone_form.cleaned_data['case']
+            for tc_src in tcs_src:
                 if clone_form.cleaned_data['copy_case']:
                     tc_dest = TestCase.objects.create(
                         is_automated = tc_src.is_automated,
@@ -825,8 +781,6 @@ def clone(request, template_name='case/clone.html'):
 
                 # Add the cases to plan
                 for tp in clone_form.cleaned_data['plan']:
-                    # tp.add_case(case = tc_dest)
-
                     # Clone the categories to new product
                     if clone_form.cleaned_data['copy_case']:
                         try:
@@ -884,10 +838,10 @@ def clone(request, template_name='case/clone.html'):
 
             # Otherwise it will prompt to user the clone action is successful.
             return HttpResponse(Prompt.render(
-                request = request,
-                info_type = Prompt.Info,
-                info = 'Test case successful to clone, click following link to return to plans page.',
-                next = reverse('tcms.apps.testplans.views.all')
+                request=request,
+                info_type=Prompt.Info,
+                info='Test case successful to clone, click following link to return to plans page.',
+                next=reverse('tcms.apps.testplans.views.all')
             ))
     else:
         # Initial the clone case form
@@ -899,22 +853,22 @@ def clone(request, template_name='case/clone.html'):
             'copy_component': True,
             'copy_attachment': True,
         })
-        clone_form.populate(case_ids = request.REQUEST.getlist('case'))
+        clone_form.populate(case_ids=request.REQUEST.getlist('case'))
 
     # Generate search plan form
     if request.REQUEST.get('from_plan'):
-        tp = TestPlan.objects.get(plan_id = request.REQUEST['from_plan'])
-        search_plan_form = SearchPlanForm(initial={ 'product': tp.product_id, 'is_active': True })
-        search_plan_form.populate(product_id = tp.product_id)
+        tp = TestPlan.objects.get(plan_id=request.REQUEST['from_plan'])
+        search_plan_form = SearchPlanForm(initial={'product': tp.product_id, 'is_active': True})
+        search_plan_form.populate(product_id=tp.product_id)
 
     return direct_to_template(request, template_name, {
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_plan': tp,
-        # 'testcases': tcs,
         'search_form': search_plan_form,
         'clone_form': clone_form,
     })
+
 
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasecomponent'))
 def component(request):
@@ -923,8 +877,6 @@ def component(request):
     """
     # FIXME: It will update product/category/component at one time so far.
     # We may disconnect the component from case product in future.
-    from tcms.core import forms
-    from forms import CaseComponentForm
 
     class ComponentActions(object):
         """Component actions"""
@@ -1004,7 +956,7 @@ def component(request):
             for tc in self.tcs:
                 tc.clear_components()
                 for c in form.cleaned_data['o_component']:
-                    tc.add_component(component = c)
+                    tc.add_component(component=c)
 
             return self.render_ajax(self.ajax_response)
 
@@ -1029,6 +981,7 @@ def component(request):
     func = getattr(cas, request.REQUEST.get('a', 'render_form').lower())
     return func()
 
+
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasecomponent'))
 def category(request):
     """
@@ -1036,8 +989,6 @@ def category(request):
     """
     # FIXME: It will update product/category/component at one time so far.
     # We may disconnect the component from case product in future.
-    from tcms.core import forms
-    from forms import CaseCategoryForm
 
     class CategoryActions(object):
         """Category actions"""
@@ -1097,24 +1048,14 @@ def category(request):
     func = getattr(cas, request.REQUEST.get('a', 'render_form').lower())
     return func()
 
+
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcaseattachment'))
 def attachment(request, case_id, template_name='case/attachment.html'):
     """Manage test case attachments"""
-    from tcms.apps.testplans.models import TestPlan
     SUB_MODULE_NAME = 'cases'
 
-    try:
-        tc = TestCase.objects.get(case_id = case_id)
-    except ObjectDoesNotExist, error:
-        raise Http404(error)
-
-    if request.REQUEST.get('from_plan'):
-        try:
-            tp = TestPlan.objects.get(plan_id = request.REQUEST['from_plan'])
-        except ObjectDoesNotExist, error:
-            raise Http404(error)
-    else:
-        tp = None
+    tc = get_object_or_404(TestCase, case_id=case_id)
+    tp = plan_from_request_or_none(request)
 
     return direct_to_template(request, template_name, {
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
@@ -1123,16 +1064,15 @@ def attachment(request, case_id, template_name='case/attachment.html'):
         'testcase': tc,
     })
 
+
 def get_log(request, case_id, template_name="management/get_log.html"):
     """Get the case log"""
-    try:
-        tc = TestCase.objects.get(case_id = case_id)
-    except ObjectDoesNotExist, error:
-        raise Http404(error)
+    tc = get_object_or_404(TestCase, case_id=case_id)
 
     return direct_to_template(request, template_name, {
         'object': tc
     })
+
 
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcasebug'))
 def bug(request, case_id, template_name='case/get_bug.html'):
@@ -1140,12 +1080,7 @@ def bug(request, case_id, template_name='case/get_bug.html'):
     Process the bugs for cases
     """
     # FIXME: Rewrite these codes for Ajax.Request
-    from forms import CaseBugForm
-
-    try:
-        tc = TestCase.objects.get(case_id = case_id)
-    except ObjectDoesNotExist, error:
-        raise Http404(error)
+    tc = get_object_or_404(TestCase, case_id=case_id)
 
     class CaseBugActions(object):
         __all__ = ['get_form', 'render', 'add', 'remove']
@@ -1215,31 +1150,22 @@ def bug(request, case_id, template_name='case/get_bug.html'):
     func = getattr(case_bug_actions, request.REQUEST['handle'])
     return func()
 
+
 def plan(request, case_id):
     """
     Operating the case plan objects, such as add to remove plan from case
 
     Return: Hash
     """
-    from django.utils import simplejson
-    from tcms.apps.testplans.models import TestPlan
-
-    try:
-        tc = TestCase.objects.get(case_id = case_id)
-    except ObjectsDoesNotExist, error:
-        raise Http404(error)
-
+    tc = get_object_or_404(TestCase, case_id=case_id)
     if request.REQUEST.get('a'):
         # Search the plans from database
         if not request.REQUEST.getlist('plan_id'):
             return direct_to_template(request, 'case/get_plan.html', {
-                'testplans': tps,
                 'message': 'The case must specific one plan at leaset for some action',
             })
 
-        tps = TestPlan.objects.filter(
-            pk__in = request.REQUEST.getlist('plan_id')
-        )
+        tps = TestPlan.objects.filter(pk__in=request.REQUEST.getlist('plan_id'))
 
         if not tps:
             return direct_to_template(request, 'case/get_plan.html', {
@@ -1272,9 +1198,10 @@ def plan(request, case_id):
                 tc.remove_plan(tp)
 
     tps = tc.plan.all()
-    tps = tps.select_related(
-        'author__username', 'author__email', 'type__name', 'product__name'
-    )
+    tps = tps.select_related('author__username',
+                             'author__email',
+                             'type__name',
+                             'product__name')
 
     return direct_to_template(request, 'case/get_plan.html', {
         'test_case': tc,

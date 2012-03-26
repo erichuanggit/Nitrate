@@ -16,58 +16,71 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-from datetime import datetime
+import datetime
+import time
+import urllib
 
 from django.contrib.auth.decorators import user_passes_test
+from django.db.models import Q
+from django.contrib.auth.models import User
 from django.views.generic.simple import direct_to_template
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.utils import simplejson
+from django.conf import settings
+from django.shortcuts import get_object_or_404
 
 from tcms.core.views import Prompt
-from tcms.apps.testruns.models import TestRun, TestCaseRun, TestCaseRunStatus, TCMSEnvRunValueMap
+from tcms.core.utils.raw_sql import RawSQL
+from tcms.core.utils import clean_request
+from tcms.core.utils.counter import CaseRunStatusCounter
 from tcms.search.order import order_run_queryset
 from tcms.search import remove_from_request_path
+from tcms.search.forms import RunForm
+from tcms.search.query import SmartDjangoQuery
+from tcms.core.utils.bugtrackers import Bugzilla
+
+
+from tcms.apps.testcases.models import TestCase, TestCasePlan, TestCaseBug
+from tcms.apps.testplans.models import TestPlan
+from tcms.apps.testruns.models import TestRun, TestCaseRun, TestCaseRunStatus, \
+        TCMSEnvRunValueMap
+from tcms.apps.management.models import Version, Priority, TCMSEnvValue
+
+from tcms.apps.testcases.forms import CaseBugForm
+from tcms.apps.testruns.forms import NewRunForm, SearchRunForm, EditRunForm, \
+        RunCloneForm, MulitpleRunsCloneForm
 
 from tcms.settings import ERRATA_URL_PREFIX
 
+
 MODULE_NAME = "testruns"
 
+
 @user_passes_test(lambda u: u.has_perm('testruns.add_testrun'))
-def new(request, template_name = 'run/new.html'):
-    """
-    Display the create test run page
-    """
-    from tcms.apps.testruns.forms import NewRunForm
-    from tcms.apps.testruns.models import TestCaseRun
-    from tcms.apps.testplans.models import TestPlan
-    from tcms.apps.testcases.models import TestCase
-    from tcms.apps.management.models import Version
-    from tcms.core.views import Prompt
-    from tcms.apps.testcases.models import TestCasePlan
-
-
+def new(request, template_name='run/new.html'):
+    """Display the create test run page."""
     SUB_MODULE_NAME = "new_run"
 
     # If from_plan does not exist will redirect to plans for select a plan
     if not request.REQUEST.get('from_plan'):
         return HttpResponseRedirect(reverse('tcms.apps.testplans.views.all'))
 
-    plan_id = request.REQUEST['from_plan']
-
+    plan_id = request.REQUEST.get('from_plan')
     # Case is required by a test run
     if not request.REQUEST.get('case'):
         return HttpResponse(Prompt.render(
-            request = request,
-            info_type = Prompt.Info,
-            info = 'At least one case is required by a run.',
-            next = reverse('tcms.apps.testplans.views.get', args=[plan_id, ]),
+            request=request,
+            info_type=Prompt.Info,
+            info='At least one case is required by a run.',
+            next=reverse('tcms.apps.testplans.views.get', args=[plan_id, ]),
         ))
 
     # Ready to write cases to test plan
-    tcs = TestCase.objects.filter(case_id__in = request.REQUEST.getlist('case'))
-    tp = TestPlan.objects.select_related().get(plan_id = plan_id)
-    tcrs = TestCaseRun.objects.filter(case_run_id__in = request.REQUEST.getlist('case_run_id'))
+    tcs = TestCase.objects.filter(case_id__in=request.REQUEST.getlist('case'))
+    tp = TestPlan.objects.select_related().get(plan_id=plan_id)
+    tcrs = TestCaseRun.objects.filter(case_run_id__in=request.REQUEST.getlist('case_run_id'))
 
     num_unconfirmed_cases = 0
     for tc in tcs:
@@ -75,33 +88,33 @@ def new(request, template_name = 'run/new.html'):
         if not tc.case_status.is_confirmed():
             num_unconfirmed_cases += 1
 
-    if request.REQUEST.get('POSTING_TO_CREATE'): # Dirty work around here by using argument determination
-        form = NewRunForm(request.POST) # A form bound to the POST data
+    if request.REQUEST.get('POSTING_TO_CREATE'):
+        form = NewRunForm(request.POST)
         if request.REQUEST.get('product'):
-            form.populate(product_id = request.REQUEST['product'])
+            form.populate(product_id=request.REQUEST['product'])
         else:
-            form.populate(product_id = tp.product_id)
+            form.populate(product_id=tp.product_id)
 
         if form.is_valid(): # All validation rules pass
             # Process the data in form.cleaned_data
             default_tester = form.cleaned_data['default_tester']
 
             tr = TestRun.objects.create(
-                product_version = form.cleaned_data['product_version'],
-                plan_text_version = tp.latest_text() and tp.latest_text().plan_text_version or 0,
-                stop_date = None,
-                summary = form.cleaned_data.get('summary'),
-                notes = form.cleaned_data.get('notes'),
-                plan = tp,
-                build = form.cleaned_data['build'],
-                manager = form.cleaned_data['manager'],
-                default_tester = default_tester,
-                estimated_time = form.cleaned_data['estimated_time'],
-                errata_id = form.cleaned_data['errata_id'],
+                product_version=form.cleaned_data['product_version'],
+                plan_text_version=tp.latest_text() and tp.latest_text().plan_text_version or 0,
+                stop_date=None,
+                summary=form.cleaned_data.get('summary'),
+                notes=form.cleaned_data.get('notes'),
+                plan=tp,
+                build=form.cleaned_data['build'],
+                manager=form.cleaned_data['manager'],
+                default_tester=default_tester,
+                estimated_time=form.cleaned_data['estimated_time'],
+                errata_id=form.cleaned_data['errata_id'],
             )
 
             keep_status = form.cleaned_data['keep_status']
-            keep_assign= form.cleaned_data['keep_assignee']
+            keep_assign = form.cleaned_data['keep_assignee']
 
             loop = 1
 
@@ -113,37 +126,27 @@ def new(request, template_name = 'run/new.html'):
                         sortkey = tcp.sortkey
                     except ObjectDoesNotExist, error:
                         sortkey = loop * 10
-                    tr.add_case_run(
-                        case = case,
-                        sortkey = sortkey,
-                    )
+                    tr.add_case_run(case=case, sortkey=sortkey,)
                     loop += 1
 
             # Add case to the run
             for tcr in tcrs:
                 if (keep_status and keep_assign):
-                    tr.add_case_run(
-                        case = tcr.case,
-                        assignee = tcr.assignee,
-                        case_run_status = tcr.case_run_status,
-                        sortkey = tcr.sortkey or loop * 10
-                    )
+                    tr.add_case_run(case=tcr.case,
+                                    assignee=tcr.assignee,
+                                    case_run_status=tcr.case_run_status,
+                                    sortkey=tcr.sortkey or loop * 10)
                     loop += 1
                 elif keep_status and not keep_assign:
-                    tr.add_case_run(
-                        case = tcr.case,
-                        case_run_status = tcr.case_run_status,
-                        sortkey = tcr.sortkey or loop * 10
-                    )
+                    tr.add_case_run(case=tcr.case,
+                                    case_run_status=tcr.case_run_status,
+                                    sortkey=tcr.sortkey or loop * 10)
                     loop += 1
                 elif keep_assign and not keep_status:
-                    tr.add_case_run(
-                        case = tcr.case,
-                        assignee = tcr.assignee,
-                        sortkey = tcr.sortkey or loop * 10
-                    )
+                    tr.add_case_run(case=tcr.case,
+                                    assignee=tcr.assignee,
+                                    sortkey=tcr.sortkey or loop * 10)
                     loop += 1
-
 
             # Write the values into tcms_env_run_value_map table
             for key, value in request.REQUEST.items():
@@ -165,15 +168,16 @@ def new(request, template_name = 'run/new.html'):
                             raise
 
                         TCMSEnvRunValueMap.objects.create(
-                            run = tr,
-                            value_id = request.REQUEST.get(
+                            run=tr,
+                            value_id=request.REQUEST.get(
                                 'select_property_value_%s' % property_id
                             ),
                         )
 
             return HttpResponseRedirect(
                 reverse('tcms.apps.testruns.views.get', args=[tr.run_id, ])
-            )
+                )
+
     else:
         form = NewRunForm(initial={
             'summary': 'Test run for %s on %s' % (
@@ -185,7 +189,7 @@ def new(request, template_name = 'run/new.html'):
             'product': tp.product_id,
             'product_version': tp.get_version_id(),
         })
-        form.populate(product_id = tp.product_id)
+        form.populate(product_id=tp.product_id)
 
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
@@ -197,24 +201,28 @@ def new(request, template_name = 'run/new.html'):
         'num_unconfirmed_cases': num_unconfirmed_cases,
     })
 
+
 @user_passes_test(lambda u: u.has_perm('testruns.delete_testrun'))
 def delete(request, run_id):
-    """
-    Delete the test run
+    """Delete the test run
+
     - Maybe will be not use again
+
     """
     try:
         tr = TestRun.objects.select_related('manager', 'plan__author').get(
-            run_id = run_id
+            run_id=run_id
         )
     except ObjectDoesNotExist, error:
         raise Http404
 
     if not tr.belong_to(request.user):
-        return HttpResponse("<script>\
-            alert('Permission denied - The run is not belong to you.');history.go(-1);\
-            </script>"
-        )
+        return HttpResponse(Prompt.render(
+            request=request,
+            info_type=Prompt.Info,
+            info="Permission denied - The run is not belong to you.",
+            next='javascript:window.history.go(-1)'
+        ))
 
     if request.GET.get('sure', 'no') == 'no':
         return HttpResponse("<script>\n \
@@ -233,23 +241,23 @@ def delete(request, run_id):
                 reverse('tcms.apps.testplans.views.get', args=(plan_id, ))
             )
         except:
-            return HttpResponse("<script>\
-                alert('Delete failed');history.go(-1);\
-                </script>"
-            )
+            return HttpResponse(Prompt.render(
+                request=request,
+                info_type=Prompt.Info,
+                info="Delete failed.",
+                next='javascript:window.history.go(-1)'
+            ))
     else:
-        return HttpResponse("<script>\
-            alert('Nothing yet'); \
-            history.go(-1); \
-            </script>"
-        )
+        return HttpResponse(Prompt.render(
+            request=request,
+            info_type=Prompt.Info,
+            info="Nothing yet",
+            next='javascript:window.history.go(-1)'
+        ))
+
 
 def all(request, template_name = 'run/all.html'):
-    """
-    Read the test runs from database and display them
-    """
-    from tcms.apps.testruns.forms import SearchRunForm
-    from tcms.core.utils.raw_sql import RawSQL
+    """Read the test runs from database and display them."""
     SUB_MODULE_NAME = "runs"
 
     if request.REQUEST.get('manager'):
@@ -269,7 +277,7 @@ def all(request, template_name = 'run/all.html'):
         search_form = SearchRunForm(request.REQUEST)
 
         if request.REQUEST.get('product'):
-            search_form.populate(product_id = request.REQUEST['product'])
+            search_form.populate(product_id=request.REQUEST['product'])
         else:
             search_form.populate()
 
@@ -277,15 +285,14 @@ def all(request, template_name = 'run/all.html'):
             # It's a search here.
             query_result = True
             trs = TestRun.list(search_form.cleaned_data)
-            trs = trs.select_related(
-                'manager', 'default_tester', 'build', 'plan', 'build__product__name',
-            )
+            trs = trs.select_related('manager',
+                                     'default_tester',
+                                     'build', 'plan',
+                                     'build__product__name',)
 
             # Further optimize by adding caserun attributes:
             trs = trs.extra(
-                select={
-                    'env_groups': RawSQL.environment_group_for_run,
-                },
+                    select={'env_groups': RawSQL.environment_group_for_run,},
             )
             trs = order_run_queryset(trs, order_by, asc)
     else:
@@ -306,17 +313,14 @@ def all(request, template_name = 'run/all.html'):
         'query_url': query_url,
     })
 
-def get(request, run_id, template_name = 'run/get.html'):
-    from tcms.core.utils import clean_request
-    from tcms.core.utils.raw_sql import RawSQL
-    from tcms.core.utils.counter import CaseRunStatusCounter
-    from tcms.apps.testcases.models import TestCaseBug
-    from tcms.apps.management.models import Priority
+
+def get(request, run_id, template_name='run/get.html'):
+    """Display testrun's detail"""
     SUB_MODULE_NAME = "runs"
 
     # Get the test run
     try:
-        tr = TestRun.objects.select_related().get(run_id = run_id)
+        tr = TestRun.objects.select_related().get(run_id=run_id)
     except ObjectDoesNotExist, error:
         raise Http404
 
@@ -338,11 +342,10 @@ def get(request, run_id, template_name = 'run/get.html'):
         tcrs = tcrs.order_by(request.REQUEST['order_by'])
 
     tcrs = tcrs.select_related(
-        'run', 'case_run_status', 'build', 'environment',
-        'environment__product', 'case__components', 'tested_by',
-        'case__priority', 'case__category', 'case__author',
-        'case', 'assignee'
-    )
+            'run', 'case_run_status', 'build', 'environment',
+            'environment__product', 'case__components', 'tested_by',
+            'case__priority', 'case__category', 'case__author',
+            'case', 'assignee')
 
     # Get the bug count for each case run
     tcrs = tcrs.extra(select={
@@ -351,7 +354,7 @@ def get(request, run_id, template_name = 'run/get.html'):
     tcrs = tcrs.distinct()
     # Get the test case run bugs summary
     tcr_bugs = TestCaseBug.objects.select_related('bug_system').all()
-    tcr_bugs = tcr_bugs.filter(case_run__case_run_id__in = tcrs.values_list('case_run_id', flat=True))
+    tcr_bugs = tcr_bugs.filter(case_run__case_run_id__in=tcrs.values_list('case_run_id', flat=True))
     tcr_bugs = tcr_bugs.values_list('bug_id', flat=True)
     tcr_bugs = set(tcr_bugs)
     return direct_to_template(request, template_name, {
@@ -367,19 +370,15 @@ def get(request, run_id, template_name = 'run/get.html'):
         'errata_url_prefix': ERRATA_URL_PREFIX,
     })
 
-@user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
-def edit(request, run_id, template_name = 'run/edit.html'):
-    """
-    Edit test plan view
-    """
-    from tcms.apps.management.models import Version
-    from tcms.apps.testruns.forms import EditRunForm
 
+@user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
+def edit(request, run_id, template_name='run/edit.html'):
+    """Edit test plan view"""
     # Define the default sub module
     SUB_MODULE_NAME = 'runs'
 
     try:
-        tr = TestRun.objects.select_related().get(run_id = run_id)
+        tr = TestRun.objects.select_related().get(run_id=run_id)
     except ObjectDoesNotExist, error:
         raise Http404
 
@@ -387,9 +386,9 @@ def edit(request, run_id, template_name = 'run/edit.html'):
     if request.method == "POST":
         form = EditRunForm(request.REQUEST)
         if request.REQUEST.get('product'):
-            form.populate(product_id = request.REQUEST.get('product'))
+            form.populate(product_id=request.REQUEST.get('product'))
         else:
-            form.populate(product_id = tr.plan.product_id)
+            form.populate(product_id=tr.plan.product_id)
 
         #FIXME: Error handler
         if form.is_valid():
@@ -401,7 +400,7 @@ def edit(request, run_id, template_name = 'run/edit.html'):
             tr.build = form.cleaned_data['build']
             tr.product_version = form.cleaned_data['product_version']
             tr.notes = form.cleaned_data['notes']
-            tr.stop_date = request.REQUEST.get('finished') and datetime.now() or None
+            tr.stop_date = request.REQUEST.get('finished') and datetime.datetime.now() or None
             tr.estimated_time = form.cleaned_data['estimated_time']
             tr.errata_id = form.cleaned_data['errata_id']
             tr.save()
@@ -413,7 +412,8 @@ def edit(request, run_id, template_name = 'run/edit.html'):
         form = EditRunForm(initial={
             'summary': tr.summary,
             'manager': tr.manager.email,
-            'default_tester': tr.default_tester and tr.default_tester.email or None,
+            'default_tester': (tr.default_tester and
+                    tr.default_tester.email or None),
             'product': tr.build.product_id,
             'product_version': tr.get_version_id(),
             'build': tr.build_id,
@@ -422,7 +422,7 @@ def edit(request, run_id, template_name = 'run/edit.html'):
             'estimated_time': tr.estimated_time,
             'errata_id': tr.errata_id,
         })
-        form.populate(product_id = tr.build.product_id)
+        form.populate(product_id=tr.build.product_id)
 
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
@@ -431,32 +431,31 @@ def edit(request, run_id, template_name = 'run/edit.html'):
         'form': form,
     })
 
+
 @user_passes_test(lambda u: u.has_perm('testruns.change_testcaserun'))
-def execute(request, run_id, template_name = 'run/execute.html'):
+def execute(request, run_id, template_name='run/execute.html'):
     """Execute test run"""
     return get(request, run_id, template_name)
 
-def report(request, run_id, template_name = 'run/report.html'):
+
+def report(request, run_id, template_name='run/report.html'):
     return get(request, run_id, template_name)
+
 
 @user_passes_test(lambda u: u.has_perm('testruns.change_testcaserun'))
 def set_current(request, case_run_id):
     """Set the case to be current"""
-    from django.utils import simplejson
     try:
-        TestCaseRun.objects.get(pk = case_run_id).set_current()
+        TestCaseRun.objects.get(pk=case_run_id).set_current()
     except:
         pass
 
     return HttpResponse(simplejson.dumps({'rc': 0, 'response': 'ok'}))
 
+
 @user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
-def bug(request, case_run_id, template_name = 'run/execute_case_run.html'):
-    """
-    Process the bugs for case runs
-    """
-    from django.utils import simplejson
-    from tcms.apps.testcases.forms import CaseBugForm
+def bug(request, case_run_id, template_name='run/execute_case_run.html'):
+    """Process the bugs for case runs."""
 
     class CaseRunBugActions(object):
         __all__ = ['add', 'file', 'remove', 'render_form']
@@ -487,16 +486,13 @@ def bug(request, case_run_id, template_name = 'run/execute_case_run.html'):
 
             return self.ajax_response()
 
-        def ajax_response(self, response = None):
+        def ajax_response(self, response=None):
             if not response:
                 response = self.default_ajax_response
 
             return HttpResponse(simplejson.dumps(response))
 
         def file(self):
-            from django.conf import settings
-            from tcms.core.utils.bugtrackers import Bugzilla
-
             rh_bz = Bugzilla(settings.BUGZILLA_URL)
             url = rh_bz.make_url(self.case_run.run, self.case_run, self.case_run.case_text_version)
 
@@ -519,14 +515,6 @@ def bug(request, case_run_id, template_name = 'run/execute_case_run.html'):
 
             return self.ajax_response()
 
-        #def render(self, response = None):
-        #    return get_case_run(
-        #        request = self.request,
-        #        case_run_id = self.case_run.case_run_id,
-        #        run_id = self.case_run.run_id,
-        #        response = response,
-        #    )
-
         def render_form(self):
             form = CaseBugForm(initial={
                 'case_run': self.case_run.case_run_id,
@@ -538,34 +526,30 @@ def bug(request, case_run_id, template_name = 'run/execute_case_run.html'):
             return HttpResponse(form.as_p())
 
     try:
-        tcr = TestCaseRun.objects.get(case_run_id = case_run_id)
+        tcr = TestCaseRun.objects.get(case_run_id=case_run_id)
     except ObjectDoesNotExist, error:
-        raise Http404(error)
+        raise Http404
 
-    crba = CaseRunBugActions(
-        request = request,
-        case_run = tcr,
-        template_name = template_name
-    )
+    crba = CaseRunBugActions(request=request,
+                             case_run=tcr,
+                             template_name=template_name)
 
     if not request.REQUEST.get('a') in crba.__all__:
-        return crba.ajax_response(response = {'rc': 1, 'response': 'Unrecognizable actions'})
+        return crba.ajax_response(response={
+                                        'rc': 1,
+                                        'response': 'Unrecognizable actions'})
 
     func = getattr(crba, request.REQUEST['a'])
     return func()
 
-def clone_with_filteredCaseRun(request,run_id,template_name='run/clone.html'):
-    import urllib
-    from tcms.apps.testruns.forms import RunCloneForm
 
+def clone_with_filteredCaseRun(request,run_id,template_name='run/clone.html'):
+    """Clone cases from filter caserun"""
     SUB_MODULE_NAME = "runs"
-    try:
-        tr=TestRun.objects.get(run_id = run_id)
-    except ObjectDoesNotExist, error:
-        raise Http404(error)
+    tr = get_object_or_404(TestRun, run_id=run_id)
 
     if request.REQUEST.get('case_run'):
-        tcrs=tr.case_run.filter(pk__in = request.REQUEST.getlist('case_run'))
+        tcrs=tr.case_run.filter(pk__in=request.REQUEST.getlist('case_run'))
     else:
         tcrs=[]
 
@@ -579,9 +563,7 @@ def clone_with_filteredCaseRun(request,run_id,template_name='run/clone.html'):
     if not request.REQUEST.get('submit'):
         form=RunCloneForm(initial={
             'summary':tr.summary,
-            'notes':tr.notes,
-            'manager':tr.manager.email,
-            'product':tr.plan.product_id,
+            'notes':tr.notes, 'manager':tr.manager.email, 'product':tr.plan.product_id,
             'product_version':tr.get_version_id(),
             'build':tr.build_id,
             'default_tester':tr.default_tester_id and tr.default_tester.email or '',
@@ -601,13 +583,10 @@ def clone_with_filteredCaseRun(request,run_id,template_name='run/clone.html'):
 
 def clone(request, template_name='run/clone.html'):
     """Clone test run to another build"""
-    import urllib
-    from tcms.apps.testruns.forms import RunCloneForm, MulitpleRunsCloneForm
-
     SUB_MODULE_NAME = "runs"
 
     trs = TestRun.objects.select_related()
-    trs = trs.filter(pk__in = request.REQUEST.getlist('run'))
+    trs = trs.filter(pk__in=request.REQUEST.getlist('run'))
 
     if not trs:
         return HttpResponse(Prompt.render(
@@ -632,7 +611,7 @@ def clone(request, template_name='run/clone.html'):
             'use_newest_case_text': True,
             'errata_id': tr.errata_id,
         })
-        form.populate(product_id = tr.plan.product_id)
+        form.populate(product_id=tr.plan.product_id)
 
         return direct_to_template(request, template_name, {
             'module': MODULE_NAME,
@@ -647,33 +626,35 @@ def clone(request, template_name='run/clone.html'):
 
     if request.method == "POST":
         form = MulitpleRunsCloneForm(request.REQUEST)
-        form.populate(trs = trs, product_id = request.REQUEST.get('product'))
+        form.populate(trs=trs, product_id=request.REQUEST.get('product'))
         if form.is_valid():
             for tr in trs:
                 n_tr = TestRun.objects.create(
-                    product_version = form.cleaned_data['product_version'],
-                    plan_text_version = tr.plan_text_version,
-                    summary = tr.summary,
-                    notes = tr.notes,
-                    estimated_time = tr.estimated_time,
-                    plan = tr.plan,
-                    build = form.cleaned_data['build'],
-                    manager = form.cleaned_data['update_manager'] and form.cleaned_data['manager'] or tr.manager,
-                    default_tester = form.cleaned_data['update_default_tester'] and form.cleaned_data['default_tester'] or tr.default_tester,
-                )
+                    product_version=form.cleaned_data['product_version'],
+                    plan_text_version=tr.plan_text_version,
+                    summary=tr.summary,
+                    notes=tr.notes,
+                    estimated_time=tr.estimated_time,
+                    plan=tr.plan,
+                    build=form.cleaned_data['build'],
+                    manager=(form.cleaned_data['update_manager'] and
+                             form.cleaned_data['manager'] or
+                             tr.manager),
+                    default_tester=(form.cleaned_data['update_default_tester'] and
+                                    form.cleaned_data['default_tester'] or
+                                    tr.default_tester),)
 
                 for tcr in tr.case_run.all():
                     n_tr.add_case_run(
-                        case = tcr.case,
-                        #assignee = form.cleaned_data['update_assignee'] and form.cleaned_data['assignee'] or tcr.assignee,
-                        assignee =  tcr.assignee,
-                        case_text_version = (form.cleaned_data['update_case_text'] and
+                        case=tcr.case,
+                        assignee= tcr.assignee,
+                        case_text_version=(form.cleaned_data['update_case_text'] and
                                              bool(tcr.get_text_versions()) and
                                              tcr.get_text_versions()[0] or
                                              tcr.case_text_version),
-                        build = form.cleaned_data['build'],
-                        notes = tcr.notes,
-                        sortkey = tcr.sortkey,
+                        build=form.cleaned_data['build'],
+                        notes=tcr.notes,
+                        sortkey=tcr.sortkey,
                     )
 
                 for env_value in tr.env_value.all():
@@ -681,11 +662,11 @@ def clone(request, template_name='run/clone.html'):
 
                 if form.cleaned_data['clone_cc']:
                     for cc in tr.cc.all():
-                        n_tr.add_cc(user = cc)
+                        n_tr.add_cc(user=cc)
 
                 if form.cleaned_data['clone_tag']:
                     for tag in tr.tag.all():
-                        n_tr.add_tag(tag = tag)
+                        n_tr.add_tag(tag=tag)
 
             if len(trs) == 1:
                 return HttpResponseRedirect(
@@ -693,10 +674,9 @@ def clone(request, template_name='run/clone.html'):
                 )
 
             params = {
-                'product': form.cleaned_data['product'].pk,
-                'product_version': form.cleaned_data['product_version'].pk,
-                'build': form.cleaned_data['build'].pk
-            }
+                    'product': form.cleaned_data['product'].pk,
+                    'product_version': form.cleaned_data['product_version'].pk,
+                    'build': form.cleaned_data['build'].pk}
 
             return HttpResponseRedirect('%s?%s' % (
                 reverse('tcms.apps.testruns.views.all'),
@@ -704,18 +684,17 @@ def clone(request, template_name='run/clone.html'):
             ))
     else:
         form = MulitpleRunsCloneForm(initial={
-            'run': trs.values_list('pk', flat=True),
-            'manager': request.user,
-            'default_tester': request.user,
-            'assignee': request.user,
-            'update_manager': False,
-            'update_default_tester': True,
-            'update_assignee': True,
-            'update_case_text': True,
-            'clone_cc': True,
-            'clone_tag': True,
-        })
-        form.populate(trs = trs)
+                'run': trs.values_list('pk', flat=True),
+                'manager': request.user,
+                'default_tester': request.user,
+                'assignee': request.user,
+                'update_manager': False,
+                'update_default_tester': True,
+                'update_assignee': True,
+                'update_case_text': True,
+                'clone_cc': True,
+                'clone_tag': True,})
+        form.populate(trs=trs)
 
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
@@ -723,29 +702,24 @@ def clone(request, template_name='run/clone.html'):
         'clone_form': form,
     })
 
+
 def order_case(request, run_id):
-    """
-    Resort case with new order
-    """
+    """Resort case with new order"""
     # Current we should rewrite all of cases belong to the plan.
     # Because the cases sortkey in database is chaos,
     # Most of them are None.
-
-    try:
-        tr = TestRun.objects.get(run_id = run_id)
-    except ObjectDoesNotExist, error:
-        raise Http404(error)
+    tr = get_object_or_404(TestRun, run_id=run_id)
 
     if not request.REQUEST.get('case_run'):
         return HttpResponse(Prompt.render(
-            request = request,
-            info_type = Prompt.Info,
-            info = 'At least one case is required by re-oder in run.',
-            next = reverse('tcms.apps.testruns.views.get', args=[run_id, ]),
+                request = request,
+                info_type = Prompt.Info,
+                info = 'At least one case is required by re-oder in run.',
+                next = reverse('tcms.apps.testruns.views.get', args=[run_id, ]),
         ))
 
     case_run_ids = request.REQUEST.getlist('case_run')
-    tcrs = TestCaseRun.objects.filter(case_run_id__in = case_run_ids)
+    tcrs = TestCaseRun.objects.filter(case_run_id__in=case_run_ids)
 
     for tcr in tcrs:
         new_sort_key = (case_run_ids.index(str(tcr.case_run_id)) + 1) * 10
@@ -757,17 +731,14 @@ def order_case(request, run_id):
         reverse('tcms.apps.testruns.views.get', args=[run_id, ])
     )
 
+
 @user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
 def change_status(request, run_id):
     """Change test run finished or running"""
-    from datetime import datetime
-    try:
-        tr = TestRun.objects.get(run_id = run_id)
-    except ObjectDoesNotExist, error:
-        raise Http404(error)
+    tr = get_object_or_404(TestRun, run_id=run_id)
 
     if request.GET.get('finished') == '1':
-        tr.stop_date = datetime.now()
+        tr.stop_date = datetime.datetime.now()
     else:
         tr.stop_date = None
 
@@ -777,50 +748,49 @@ def change_status(request, run_id):
         reverse('tcms.apps.testruns.views.get', args=[run_id, ])
     )
 
+
 @user_passes_test(lambda u: u.has_perm('testruns.delete_testcaserun'))
 def remove_case_run(request, run_id):
     """Remove specific case run from the run"""
-    try:
-        tr = TestRun.objects.get(run_id = run_id)
-    except ObjectDoesNotExist, error:
-        raise Http404(error)
+    tr = get_object_or_404(TestRun, run_id=run_id)
 
-    case_runs = tr.case_run.filter(case_run_id__in = request.REQUEST.getlist('case_run'))
+    case_runs = tr.case_run.filter(case_run_id__in=request.REQUEST.getlist('case_run'))
 
     case_runs.delete()
 
     return HttpResponseRedirect(reverse('tcms.apps.testruns.views.get', args=[run_id]))
 
+
 @user_passes_test(lambda u: u.has_perm('testruns.add_testcaserun'))
 def assign_case(request, run_id, template_name="run/assign_case.html"):
-    """
-    Assign case to run
-    """
+    """Assign case to run"""
     SUB_MODULE_NAME = "runs"
 
-    from tcms.apps.testcases.models import TestCasePlan
-
     try:
-        tr = TestRun.objects.select_related('plan', 'manager__email', 'build')
-        tr = tr.get(run_id = run_id)
-        tp = tr.plan
+        tr = TestRun.objects.select_related(
+                'plan',
+                'manager__email',
+                'build').get(run_id=run_id)
     except ObjectDoesNotExist, error:
-        raise Http404(error)
+        raise Http404
 
-    tcs = tr.plan.case.select_related('author__email', 'category', 'priority')
-    ctcs = tcs.filter(case_status__name ='CONFIRMED')
-
+    tp = tr.plan
+    tcs = tr.plan.case.select_related('author__email',
+            'category',
+            'priority').filter(case_status__name='CONFIRMED')
     tcrs = tr.case_run.all()
-    etcrs_id = tcrs.values_list('case', flat=True) #Exist case ids
+    # Exist case ids
+    etcrs_id = tcrs.values_list('case', flat=True)
 
     if request.method == 'POST':
-        ncs_id = request.REQUEST.getlist('case') # New case ids
+        # New case ids
+        ncs_id = request.REQUEST.getlist('case')
 
         for nc_id in ncs_id:
             if nc_id in etcrs_id:
                 ncs_id.remove(nc_id)
 
-        ncs = tcs.filter(case_id__in = ncs_id)
+        ncs = tcs.filter(case_id__in=ncs_id)
 
         if request.REQUEST.get('_use_plan_sortkey'):
             for nc in ncs:
@@ -829,15 +799,10 @@ def assign_case(request, run_id, template_name="run/assign_case.html"):
                     sortkey = tcp.sortkey
                 except ObjectDoesNotExist, error:
                     sortkey = 0
-                tr.add_case_run(
-                    case = nc,
-                    sortkey = sortkey,
-                )
+                tr.add_case_run(case=nc, sortkey=sortkey,)
         else:
             for nc in ncs:
-                tr.add_case_run(
-                    case = nc,
-                )
+                tr.add_case_run(case=nc,)
 
         return HttpResponseRedirect(reverse('tcms.apps.testruns.views.get', args=[tr.run_id, ]))
 
@@ -850,19 +815,14 @@ def assign_case(request, run_id, template_name="run/assign_case.html"):
         'exist_case_run_ids': etcrs_id,
     })
 
+
 def cc(request, run_id):
     """
     Operating the test run cc objects, such as add to remove cc from run
 
     Return: Hash
     """
-    from django.db.models import Q
-    from django.contrib.auth.models import User
-
-    try:
-        tr = TestRun.objects.get(run_id = run_id)
-    except ObjectDoesNotExist, error:
-        raise Http404(error)
+    tr = get_object_or_404(TestRun, run_id=run_id)
 
     if request.REQUEST.get('do'):
         if not request.REQUEST.get('user'):
@@ -873,8 +833,8 @@ def cc(request, run_id):
 
         try:
             user = User.objects.get(
-                Q(username = request.REQUEST['user'])
-                | Q(email = request.REQUEST['user'])
+                Q(username=request.REQUEST['user'])
+                | Q(email=request.REQUEST['user'])
             )
         except ObjectDoesNotExist, error:
             return direct_to_template(request, 'run/get_cc.html', {
@@ -882,31 +842,26 @@ def cc(request, run_id):
                 'message': 'The user you typed does not exist in database'
             })
         if request.REQUEST['do'] == 'add':
-            tr.add_cc(user = user)
+            tr.add_cc(user=user)
 
         if request.REQUEST['do'] == 'remove':
-            tr.remove_cc(user = user)
+            tr.remove_cc(user=user)
 
-    return direct_to_template(request, 'run/get_cc.html', {
-        'test_run': tr,
-    })
+    return direct_to_template(request,
+                              'run/get_cc.html',
+                              {'test_run': tr,})
+
 
 def update_case_run_text(request, run_id):
-    """
-    Update the IDLE cases to newest text
-    """
-    from tcms.core.views import Prompt
-    try:
-        tr = TestRun.objects.get(run_id = run_id)
-    except ObjectDoesNotExist, error:
-        raise Http404(error)
+    """Update the IDLE cases to newest text"""
+    tr = get_object_or_404(TestRun, run_id=run_id)
 
     if request.REQUEST.get('case_run'):
-        tcrs = tr.case_run.filter(pk__in = request.REQUEST.getlist('case_run'))
+        tcrs = tr.case_run.filter(pk__in=request.REQUEST.getlist('case_run'))
     else:
         tcrs = tr.case_run.all()
 
-    tcrs = tcrs.filter(case_run_status__name = 'IDLE')
+    tcrs = tcrs.filter(case_run_status__name='IDLE')
 
     count = 0
     updated_tcrs = ''
@@ -926,22 +881,23 @@ def update_case_run_text(request, run_id):
     del tr, tcrs, count, updated_tcrs
 
     return HttpResponse(Prompt.render(
-        request = request,
-        info_type = Prompt.Info,
-        info = info,
-        next = reverse('tcms.apps.testruns.views.get', args=[run_id,]),
+        request=request,
+        info_type=Prompt.Info,
+        info=info,
+        next=reverse('tcms.apps.testruns.views.get', args=[run_id,]),
     ))
 
+
 def export(request, run_id, template_name = 'run/export.csv'):
-    import time
+
     timestamp_str = time.strftime('%Y-%m-%d')
     case_runs = request.REQUEST.getlist('case_run')
     #Export selected case runs
     if case_runs:
-        tcrs = TestCaseRun.objects.filter(case_run_id__in = case_runs)
+        tcrs = TestCaseRun.objects.filter(case_run_id__in=case_runs)
     #Export all case runs
     else:
-        tcrs = TestCaseRun.objects.filter(run = run_id)
+        tcrs = TestCaseRun.objects.filter(run=run_id)
     response = direct_to_template(request, template_name, {
         'tcrs': tcrs,
     })
@@ -950,12 +906,10 @@ def export(request, run_id, template_name = 'run/export.csv'):
 
     return response
 
+
 def env_value(request):
     """Run environment property edit function"""
-    from django.utils import simplejson
-    from tcms.apps.management.models import TCMSEnvValue
-
-    trs = TestRun.objects.filter(run_id__in = request.REQUEST.getlist('run_id'))
+    trs = TestRun.objects.filter(run_id__in=request.REQUEST.getlist('run_id'))
 
     class RunEnvActions(object):
         def __init__(self, requet, trs):
@@ -971,7 +925,7 @@ def env_value(request):
             return False
 
         def get_env_value(self, env_value_id):
-            return TCMSEnvValue.objects.get(id = env_value_id)
+            return TCMSEnvValue.objects.get(id=env_value_id)
 
         def add(self):
             chk_perm = self.has_no_perm('add')
@@ -1077,12 +1031,7 @@ def env_value(request):
         raise
 
 def caseruns(request, templ='report/caseruns.html'):
-    '''
-    View that search caseruns.
-    '''
-    from tcms.search.forms import RunForm
-    from tcms.search.query import SmartDjangoQuery
-    from tcms.apps.testruns.models import TestRun
+    """View that search caseruns."""
     queries = request.GET
     r_form = RunForm(queries)
     r_form.populate(queries)
@@ -1103,8 +1052,9 @@ def get_caseruns_of_runs(runs, kwargs=None):
         tester
         plan tag
     '''
-    from tcms.apps.testruns.models import TestCaseRun
-    if kwargs is None: kwargs = {}
+
+    if kwargs is None:
+        kwargs = {}
     plan_tag = kwargs.get('plan_tag', None)
     if plan_tag:
         runs = runs.filter(plan__tag__name=plan_tag)
