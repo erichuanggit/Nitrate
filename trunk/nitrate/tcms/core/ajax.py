@@ -21,6 +21,7 @@ Shared functions for plan/case/run.
 
 Most of these functions are use for Ajax.
 """
+import datetime
 from django.db import models
 from django.db.models import Q
 from django.http import HttpResponse
@@ -29,18 +30,18 @@ from django.views.generic.simple import direct_to_template
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.core import serializers
 
 from tcms.apps.testplans.models import TestPlan, TestCasePlan
 from tcms.apps.testcases.models import TestCase, TestCaseTag, TestCaseBugSystem as BugSystem
 from tcms.apps.testruns.models import TestRun, TestCaseRun, TestRunTag
-from tcms.apps.management.models import TestTag
+from tcms.apps.management.models import TestTag, TestTag
 from tcms.core.utils import get_string_combinations
 from tcms.core.helpers.comments import add_comment
 
 from tcms.apps.testcases.models import TestCaseCategory
 from tcms.apps.management.models import Component, TestBuild, Version
 
-import datetime
 
 def check_permission(request, ctype):
     perm = '%s.change_%s' % tuple(ctype.split('.'))
@@ -59,7 +60,6 @@ def strip_parameters(request, skip_parameters):
 
 def info(request):
     """Ajax responsor for misc information"""
-    from django.core import serializers
 
     class Objects(object):
         __all__ = [
@@ -173,7 +173,7 @@ def form(request):
 
     # Get the form
     q_app, q_form = q_app_form.split('.')[0], q_app_form.split('.')[1]
-    exec('from tcms.%s.forms import %s as form' % (q_app, q_form))
+    exec('from tcms.apps.%s.forms import %s as form' % (q_app, q_form))
     form = form(initial=parameters)
 
     # Generate the HTML and reponse
@@ -182,9 +182,6 @@ def form(request):
 
 def tag(request, template_name="management/get_tag.html"):
     """Get tags for test plan or test case"""
-    from django.utils import simplejson
-    from django.core import serializers
-    from tcms.apps.management.models import TestTag
 
     class Objects(object):
         __all__ = ['plan', 'case', 'run']
