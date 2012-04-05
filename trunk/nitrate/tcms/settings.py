@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Nitrate is copyright 2010 Red Hat, Inc.
-# 
+#
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -9,10 +9,10 @@
 # the hope that it will be useful, but WITHOUT ANY WARRANTY; without
 # even the implied warranties of TITLE, NON-INFRINGEMENT,
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
-# 
+#
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
@@ -123,16 +123,16 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'django.contrib.comments',
     'kobo.django.xmlrpc',
-    'tcms.profiles',
+    'tcms.apps.profiles',
     'tcms.core',
     'tcms.core.contrib.auth',
     'tcms.core.contrib.comments',
     'tcms.core.logs',
-    'tcms.management',
-    'tcms.testcases',
-    'tcms.testplans',
-    'tcms.testruns',
-    'tcms.testreviews',
+    'tcms.apps.management',
+    'tcms.apps.testcases',
+    'tcms.apps.testplans',
+    'tcms.apps.testruns',
+    'tcms.apps.testreviews',
     'tcms.core.lib.django-pagination.pagination',
 
     'tcms.integration.djqpid',
@@ -268,7 +268,7 @@ MAX_UPLOAD_SIZE = 5242880
 
 # This one, if set, is shown on the login screen.
 # It is shown to unauthenticated users
-#MOTD_LOGIN = """<p>This is a development instance of the TCMS</p> 
+#MOTD_LOGIN = """<p>This is a development instance of the TCMS</p>
 # <p>(this is MOTD_LOGIN)</p>"""
 
 # The URLS will be list in footer
