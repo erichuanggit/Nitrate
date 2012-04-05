@@ -778,6 +778,7 @@ def assign_case(request, run_id, template_name="run/assign_case.html"):
     tcs = tr.plan.case.select_related('author__email',
             'category',
             'priority').filter(case_status__name='CONFIRMED')
+    ctcs = tcs.filter(case_status__name='CONFIRMED')
     tcrs = tr.case_run.all()
     # Exist case ids
     etcrs_id = tcrs.values_list('case', flat=True)
