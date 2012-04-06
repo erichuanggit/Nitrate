@@ -180,6 +180,19 @@ Nitrate.TestCases.Details.on_load = function()
     $$('.expandable').invoke('observe', 'click', toggle_case_run);
 }
 
+/*
+ * Resize all editors within the webpage after they are rendered.
+ * This is used to avoid a bug of TinyMCE in Firefox 11.
+ */
+function resize_tinymce_editors()
+{
+    jQ('.mceEditor .mceIframeContainer iframe').each(
+	function(item) {
+	    var elem = jQ(this);
+	    elem.height(elem.height() + 1);
+	});
+}
+
 Nitrate.TestCases.Create.on_load = function()
 {
     // bind_component_selector_to_product(false, false, $('id_product'), $('id_component'));
@@ -187,14 +200,18 @@ Nitrate.TestCases.Create.on_load = function()
     
     SelectFilter.init("id_component", "component", 0, "/admin_media/");
     bindRefreshComponentCategoryByProduct($('id_refresh_product'));
+
+    resize_tinymce_editors();
 }
 
 Nitrate.TestCases.Edit.on_load = function()
 {
     bind_category_selector_to_product(false, false, $('id_product'), $('id_category'));
     // bind_component_selector_to_product(false, false, $('id_product'), $('id_component'));
-    SelectFilter.init("id_component", "component", 0, "/admin_media/");
+    //SelectFilter.init("id_component", "component", 0, "/admin_media/");
     // bindRefreshComponentCategoryByProduct($('id_refresh_product'));
+
+    resize_tinymce_editors();
 }
 
 Nitrate.TestCases.Clone.on_load = function()
