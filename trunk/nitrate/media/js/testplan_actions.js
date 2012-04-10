@@ -713,7 +713,12 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             elements.invoke('observe', 'click', function(e) {
                 if(filter.style.display == 'none')
                     fireEvent(form.adjacent('.filtercase')[0], 'click');
-                form.tag__name__in.value = this.innerHTML;
+                /*if(form.tag__name__in.value){
+                    form.tag__name__in.value = form.tag__name__in.value + ',' + this.innerHTML;
+                }else{
+                    form.tag__name__in.value = this.innerHTML;
+                }*/
+                form.tag__name__in.value = form.tag__name__in.value?(form.tag__name__in.value + ',' + this.innerHTML):this.innerHTML;
             })
         }
         
