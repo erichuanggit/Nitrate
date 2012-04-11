@@ -18,6 +18,7 @@
 
 import datetime
 import time
+import csv
 import urllib
 
 from django.contrib.auth.decorators import user_passes_test
@@ -41,7 +42,6 @@ from tcms.search.forms import RunForm
 from tcms.search.query import SmartDjangoQuery
 from tcms.core.utils.bugtrackers import Bugzilla
 
-
 from tcms.apps.testcases.models import TestCase, TestCasePlan, TestCaseBug
 from tcms.apps.testplans.models import TestPlan
 from tcms.apps.testruns.models import TestRun, TestCaseRun, TestCaseRunStatus, \
@@ -51,9 +51,7 @@ from tcms.apps.management.models import Version, Priority, TCMSEnvValue
 from tcms.apps.testcases.forms import CaseBugForm
 from tcms.apps.testruns.forms import NewRunForm, SearchRunForm, EditRunForm, \
         RunCloneForm, MulitpleRunsCloneForm
-
-from tcms.settings import ERRATA_URL_PREFIX
-
+from tcms.apps.testruns.helpers.serializer import TCR2File
 
 MODULE_NAME = "testruns"
 
@@ -367,7 +365,7 @@ def get(request, run_id, template_name='run/get.html'):
         'test_case_run_bugs': tcr_bugs,
         'test_case_run_status': TestCaseRunStatus.objects.order_by('pk'),
         'priorities': Priority.objects.all(),
-        'errata_url_prefix': ERRATA_URL_PREFIX,
+        'errata_url_prefix': settings.ERRATA_URL_PREFIX,
     })
 
 
@@ -889,24 +887,26 @@ def update_case_run_text(request, run_id):
     ))
 
 
-def export(request, run_id, template_name = 'run/export.csv'):
-
+def export(request, run_id):
     timestamp_str = time.strftime('%Y-%m-%d')
     case_runs = request.REQUEST.getlist('case_run')
+    format = request.REQUEST.get('format', 'csv')
     #Export selected case runs
     if case_runs:
         tcrs = TestCaseRun.objects.filter(case_run_id__in=case_runs)
     #Export all case runs
     else:
         tcrs = TestCaseRun.objects.filter(run=run_id)
-    response = direct_to_template(request, template_name, {
-        'tcrs': tcrs,
-    })
-
-    response['Content-Disposition'] = 'attachment; filename=tcms-testcase-runs-%s.csv' % timestamp_str
+    response = HttpResponse()
+    writer = TCR2File(tcrs)
+    if format == 'csv':
+        writer.write_to_csv(response)
+        response['Content-Disposition'] = 'attachment; filename=tcms-testcase-runs-%s.csv' % timestamp_str
+    else:
+        writer.write_to_xml(response)
+        response['Content-Disposition'] = 'attachment; filename=tcms-testcase-runs-%s.xml' % timestamp_str
 
     return response
-
 
 def env_value(request):
     """Run environment property edit function"""

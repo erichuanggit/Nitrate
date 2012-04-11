@@ -62,7 +62,8 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 		<input type="button" value="Delete" title="Delete the run" onclick="window.location.href='{% url tcms.apps.testruns.views.delete test_run.pk %}'">
 		{% endifequal %}
 		{% endifequal %}
-		<input type="button" value="Export" title="Export cases in this run" onclick="window.location.href='{% url tcms.apps.testruns.views.export test_run.pk %}?' + $('id_form_case_runs').serialize();" >
+		<input type="button" value="Export To CSV" title="Export cases in this run" onclick="window.location.href='{% url tcms.apps.testruns.views.export test_run.pk %}?format=csv&' + $('id_form_case_runs').serialize();" >
+		<input type="button" value="Export To XML" title="Export cases in this run" onclick="window.location.href='{% url tcms.apps.testruns.views.export test_run.pk %}?format=xml&' + $('id_form_case_runs').serialize();" >
 		{% endif %}
 	</div>
 	<h2 id="display_title">{{ test_run.summary }}</h2>
