@@ -60,7 +60,6 @@ def plan_from_request_or_none(request):
         tp = None
     return tp
 
-
 def update_case_email_settings(tc, request):
     """Update testcase's email settings."""
     n_form = CaseNotifyForm(request.REQUEST)
@@ -82,14 +81,12 @@ def update_case_email_settings(tc, request):
                 tc.default_tester_id):
             tc.emailing.auto_to_case_tester = True
 
-
 def group_case_bugs(bugs):
     """Group bugs using bug_id."""
     bugs = sorted(bugs, key=lambda b: b.bug_id)
     bugs = itertools.groupby(bugs, lambda b: b.bug_id)
     bugs = [(pk, list(_bugs)) for pk, _bugs in bugs]
     return bugs
-
 
 def create_testcase(request, form, tp):
     """Create testcase"""
@@ -109,11 +106,6 @@ def create_testcase(request, form, tp):
     for component in form.cleaned_data['component']:
         tc.add_component(component=component)
     return tc
-
-
-#_____________________________________________________________________________
-# view functions
-
 
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
 def automated(request):
@@ -149,7 +141,6 @@ def automated(request):
         ajax_response['response'] = forms.errors_to_list(form)
 
     return HttpResponse(simplejson.dumps(ajax_response))
-
 
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcase'))
 def new(request, template_name='case/new.html'):
@@ -252,7 +243,6 @@ def new(request, template_name='case/new.html'):
         'test_plan': tp,
         'form': form
     })
-
 
 def all(request, template_name="case/all.html"):
     """Generate the case list in search case and case zone in plan
@@ -365,7 +355,6 @@ def all(request, template_name="case/all.html"):
         'query_url': query_url,
     })
 
-
 def get(request, case_id, template_name='case/get.html'):
     """Get the case content"""
     # Get the case
@@ -454,7 +443,6 @@ def get(request, case_id, template_name='case/get.html'):
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
     })
 
-
 def printable(request, template_name='case/printable.html'):
     """Create the printable copy for plan/case"""
     if (not request.REQUEST.get('plan') and
@@ -496,7 +484,6 @@ def printable(request, template_name='case/printable.html'):
             'test_plans': tps,
             'test_cases': tcs,})
 
-
 def export(request, template_name='case/export.xml'):
     """Export the plan"""
     if not request.REQUEST.get('plan') and not request.REQUEST.get('case')\
@@ -511,7 +498,6 @@ def export(request, template_name='case/export.xml'):
     response = printable(request, template_name)
     response['Content-Disposition'] = 'attachment; filename=tcms-testcases-%s.xml' % timestamp_str
     return response
-
 
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
 def edit(request, case_id, template_name='case/edit.html'):
@@ -666,7 +652,6 @@ def edit(request, case_id, template_name='case/edit.html'):
             'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
     })
 
-
 def text_history(request, case_id, template_name='case/history.html'):
     """View test plan text history"""
     SUB_MODULE_NAME = 'cases'
@@ -683,7 +668,6 @@ def text_history(request, case_id, template_name='case/history.html'):
         'test_case_texts': tctxts,
         'select_case_text_version': int(request.REQUEST.get('case_text_version', 0)),
     })
-
 
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcase'))
 def clone(request, template_name='case/clone.html'):
@@ -869,7 +853,6 @@ def clone(request, template_name='case/clone.html'):
         'clone_form': clone_form,
     })
 
-
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasecomponent'))
 def component(request):
     """
@@ -981,7 +964,6 @@ def component(request):
     func = getattr(cas, request.REQUEST.get('a', 'render_form').lower())
     return func()
 
-
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasecomponent'))
 def category(request):
     """
@@ -1048,7 +1030,6 @@ def category(request):
     func = getattr(cas, request.REQUEST.get('a', 'render_form').lower())
     return func()
 
-
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcaseattachment'))
 def attachment(request, case_id, template_name='case/attachment.html'):
     """Manage test case attachments"""
@@ -1064,7 +1045,6 @@ def attachment(request, case_id, template_name='case/attachment.html'):
         'testcase': tc,
     })
 
-
 def get_log(request, case_id, template_name="management/get_log.html"):
     """Get the case log"""
     tc = get_object_or_404(TestCase, case_id=case_id)
@@ -1072,7 +1052,6 @@ def get_log(request, case_id, template_name="management/get_log.html"):
     return direct_to_template(request, template_name, {
         'object': tc
     })
-
 
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcasebug'))
 def bug(request, case_id, template_name='case/get_bug.html'):
@@ -1149,7 +1128,6 @@ def bug(request, case_id, template_name='case/get_bug.html'):
 
     func = getattr(case_bug_actions, request.REQUEST['handle'])
     return func()
-
 
 def plan(request, case_id):
     """
