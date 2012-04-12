@@ -1070,8 +1070,9 @@ ul.data_content_title li{ display:inline-block; margin-left:3px;}
 .caserunDetail .caseInfo .container .content ul{padding-left:20px;}
 .caserunDetail .caseInfo .container .content ol{padding-left:20px;}
 .caserunDetail .caseInfo .container .content li{padding-left:0px; margin-left:0px;}
-.caserunDetail .caseInfo ul{padding:5px 0 0 0;}
-.caserunDetail .caseInfo ul li{padding:0 0 0 9px; margin:0px; line-height:21px;}
+.caserunDetail .caseInfo .container .content ul{padding:5px 0 0 0;}
+.caserunDetail .caseInfo .container .content ul li{padding:0 0 0 9px; margin:0px; line-height:21px;}
+.caserunDetail .caseInfo .container .content ul.ul-format li{background:url(../images/list_style_type01.png) no-repeat 0px 9px; list-style:none; padding-left:12px;}
 .caserunDetail .commentdelete{float:none; display:inline; background:url(../images/remove_small.png) 0px 5px no-repeat; padding:0; margin:0; cursor:pointer; width:9px; height:15px;}
 
 /* width of column */
