@@ -118,4 +118,18 @@
 </div>
 -->
 
-
+<div id="addlink_dialog" title="Add Test Log">
+    <p>All these fields are required.</p>
+    <form>
+        <fieldset style="padding:0; border:0; margin-top:25px;">
+            <label for="testlog_name" style="display:block">Name <span style="color:red">*</span> (64 characters at most)</label>
+            <input type="text" id="testlog_name" name="testlog_name" size="64"
+                class="text ui-widget-content ui-corner-all"
+                style="margin-bottom:12px; width:95%; padding: .4em; display:block"/>
+            <label for="testlog_url" style="display:block">URL <span style="color:red">*</span></label>
+            <textarea id="testlog_url" name="testlog_url" rows="3"
+                class="text ui-widget-content ui-corner-all"
+                style="width:95%; display:block"></textarea>
+        </fieldset>
+    </form>
+</div>

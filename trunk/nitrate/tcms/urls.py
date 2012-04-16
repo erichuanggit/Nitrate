@@ -131,6 +131,10 @@ urlpatterns = patterns('',
     (r'^caserun/comment-many/', 'tcms.core.ajax.comment_case_runs'),
     (r'^caserun/update-bugs-for-many/', 'tcms.core.ajax.update_bugs_to_caseruns'),
 
+    (r'^linkref/add/$', 'tcms.core.contrib.linkreference.views.add'),
+    (r'^linkref/get/$', 'tcms.core.contrib.linkreference.views.get'),
+    (r'^linkref/remove/(?P<link_id>\d+)/$', 'tcms.core.contrib.linkreference.views.remove'),
+
     # Management zone
     #(r'^management/$', 'tcms.apps.management.views.index'),
     (r'^environment/groups/$', 'tcms.apps.management.views.environment_groups'),
