@@ -88,8 +88,10 @@ class XMLRPCSerializer(object):
                 )
             if isinstance(field, ForeignKey):
                 fk_id = "%s_id" % field.name
-                response[fk_id] = getattr(self.model, fk_id)
-                if value is not None:
+                if value is None:
+                    response[fk_id] = None
+                else:
+                    response[fk_id] = getattr(self.model, fk_id)
                     value = str(value)
             response[field.name] = value
         for field in opts.local_many_to_many:
