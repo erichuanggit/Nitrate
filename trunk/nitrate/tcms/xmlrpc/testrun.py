@@ -14,16 +14,18 @@
 # distribution and at <http://www.gnu.org/licenses>.
 #
 # Authors:
-#   Xuqing Kuang <xkuang@redhat.com>
+#   Xuqing Kuang <xkuang@redhat.com>, Chenxiong Qi <cqi@redhat.com>
 
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
 from django.core.exceptions import ObjectDoesNotExist
+from tcms.apps.testcases.models import TestCase
 from tcms.apps.testruns.models import TestRun, TestCaseRun
 from tcms.apps.management.models import TestTag
 from utils import pre_process_ids
 
 __all__ = (
     'add_cases',
+    'remove_cases',
     'add_tag',
     'create',
     'env_value',
@@ -67,7 +69,6 @@ def add_cases(request, run_ids, case_ids):
     # Add case ids list '1234, 5678' to run list '56789, 12345' with String
     >>> TestRun.add_cases('56789, 12345', '1234, 5678')
     """
-    from tcms.apps.testcases.models import TestCase
     trs = TestRun.objects.filter(run_id__in = pre_process_ids(run_ids))
     tcs = TestCase.objects.filter(case_id__in = pre_process_ids(case_ids))
 
@@ -76,6 +77,48 @@ def add_cases(request, run_ids, case_ids):
             tr.add_case_run(case = tc)
 
     return
+
+@log_call
+@user_passes_test(lambda u: u.has_perm('testruns.delete_testcaserun'))
+def remove_cases(request, run_ids, case_ids):
+    """
+    Description: Remove one or more cases from the selected test runs.
+
+    Params:      $run_ids - Integer/Array/String: An integer representing the ID in the database
+                                                  an array of IDs, or a comma separated list of IDs.
+
+                 $case_ids - Integer/Array/String: An integer or alias representing the ID in the database,
+                                                  an arry of case_ids or aliases, or a string of comma separated case_ids.
+
+    Returns:     Array: empty on success
+
+    Exception:   When any exception is thrown on the server side, it will be
+                 returned as JSON, which contains two items:
+
+                 - status: integer, 0 if all succeed, otherwise an integer that
+                   is greater than 0 will be returned.
+
+                 - message: str, any message specific to the error on the server
+
+    Example:
+    # Remove case 54321 from run 1234
+    >>> TestRun.remove_cases(1234, 54321)
+    # Remove case ids list [1234, 5678] from run list [56789, 12345]
+    >>> TestRun.remove_cases([56789, 12345], [1234, 5678])
+    # Remove case ids list '1234, 5678' from run list '56789, 12345' with String
+    >>> TestRun.remove_cases('56789, 12345', '1234, 5678')
+    """
+
+    try:
+        trs = TestRun.objects.filter(run_id__in=pre_process_ids(run_ids))
+
+        for tr in trs:
+            crs = TestCaseRun.objects.filter(run=tr, case__in=pre_process_ids(case_ids))
+            crs.delete()
+
+    except Exception, err:
+        message = '%s: %s' % (err.__class__.__name__, err.message)
+        return { 'status': 1, 'message': message }
 
 @log_call
 @user_passes_test(lambda u: u.has_perm('testruns.add_testruntag'))
