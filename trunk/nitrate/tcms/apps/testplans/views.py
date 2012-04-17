@@ -38,7 +38,6 @@ from tcms.apps.management.models import Product, TCMSEnvGroup, Version, \
         TestTag, Component
 from tcms.apps.testplans.models import TestPlan, TestPlanComponent
 from tcms.apps.testruns.models import TestRun, TestCaseRun
-from tcms.apps.management.models import Version
 
 from tcms.core.models import TCMSLog
 from tcms.search.order import order_plan_queryset
