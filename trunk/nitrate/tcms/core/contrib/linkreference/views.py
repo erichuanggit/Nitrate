@@ -8,7 +8,7 @@ from responses import HttpJSONResponse, HttpJSONResponseBadRequest
 
 from django.contrib.auth.decorators import user_passes_test
 from django.views.decorators.http import require_GET, require_POST
-from django.utils.simplejson import simplejson as json
+from django.utils import simplejson as json
 
 from tcms.apps.testruns.models import TestCaseRun
 
