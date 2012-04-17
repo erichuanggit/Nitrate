@@ -176,7 +176,7 @@ class TestCase(TCMSActionModel):
         """
         Create the case element based on models/forms.
         """
-        return cls.objects.create(
+        case = cls.objects.create(
             author = author,
             is_automated = values['is_automated'],
             is_automated_proposed = values['is_automated_proposed'],
@@ -193,6 +193,10 @@ class TestCase(TCMSActionModel):
             default_tester = values['default_tester'],
             notes = values['notes'],
         )
+        tags = values.get('tag')
+        if tags:
+            map(lambda c: case.add_tag(c), tags)
+        return case
 
     @classmethod
     def update(cls, case_ids, values):
@@ -334,6 +338,19 @@ class TestCase(TCMSActionModel):
             )
         except:
             raise
+
+    def update_tags(self, new_tags):
+        '''
+        Update case.tag
+        so that case.tag == new_tags
+        '''
+        if not new_tags: return
+        owning_tags = set(self.tag.all())
+        new_tags = set(new_tags)
+        tags_to_remove = owning_tags.difference(new_tags)
+        tags_to_add = new_tags.difference(owning_tags)
+        map(lambda c: self.add_tag(c), tags_to_add)
+        map(lambda c: self.remove_tag(c), tags_to_remove)
 
     def add_text(
         self,

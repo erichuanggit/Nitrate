@@ -370,6 +370,14 @@ class TestTag(TCMSActionModel):
         from tcms.core.utils import string_to_list
         return string_to_list(string)
 
+    @classmethod
+    def get_or_create_many_by_name(cls, names):
+        tags = []
+        for name in names:
+            new_tag = cls.objects.get_or_create(name=name)[0]
+            tags.append(new_tag)
+        return tags
+
 # Test attachements file zone
 
 class TestAttachment(models.Model):
