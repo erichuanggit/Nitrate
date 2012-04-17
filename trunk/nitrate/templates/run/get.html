@@ -16,6 +16,17 @@ Nitrate.TestRuns.CaseRunStatus.push('{{ crs.name|lower }}');
 {% endfor %}
 Nitrate.Utils.after_page_load(Nitrate.TestRuns.Details.on_load);
 </script>
+{% comment %} jquery ui library for creating dialog widget {% endcomment %}
+<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/jquery/jquery-ui-1.8.18.custom.min.js'></script>
+<script type="text/javascript">
+jQ(function() {
+    initialize_addlink_dialog('TestCaseRun');
+});
+</script>
+{% endblock %}
+
+{% block custom_stylesheet %}
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/jquery/ui/cupertino/jquery-ui-1.8.18.custom.css" />
 {% endblock %}
 
 {% block content_type %}

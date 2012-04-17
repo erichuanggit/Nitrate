@@ -486,10 +486,11 @@ function addCaseRunBug(title_container, container, case_id, case_run_id, callbac
 {
     // FIXME: Popup dialog to select the bug system
     bug_id = prompt('Please input the bug id.');
-    bug_id = bug_id.replace(/ /g, '');
-    
-    if(!bug_id)
+
+    if(bug_id == null)
         return false
+
+    bug_id = bug_id.replace(/ /g, '');
     
     if(parseInt(bug_id) != bug_id) {
         alert('Wrong number.');
@@ -1082,3 +1083,119 @@ jQ(document).ready(function(){
     // URL updating bugs: /caserun/update-bugs-for-many/
     // URL commenting bugs: /caserun/comment-many/
 });
+
+function get_addlink_dialog()
+{
+    return jQ('#addlink_dialog');
+}
+
+/*
+ * Do AJAX request to backend to remove a link
+ *
+ * - sender: 
+ * - link_id: the ID of an arbitrary link.
+ */
+function removeLink(sender, link_id)
+{
+    jQ.ajax({
+	url: '/linkref/remove/' + link_id + '/',
+	type: 'GET',
+	dataType: 'json',
+	success: function(data, textStatus, jqXHR) {
+	    var li_node = sender.parentNode;
+	    li_node.parentNode.removeChild(li_node);
+	},
+	error: function(jqXHR, textStatus, errorThrown) {
+	    var data = JSON.parse(jqXHR.responseText);
+	    alert(data.message);
+	},
+    });
+}
+
+/*
+ * Add link to case run
+ *
+ * - sender: the Add link button, which is pressed to fire this event.
+ * - target_id: to which TestCaseRun the new link will be linked.
+ */
+function addLinkToCaseRun(sender, case_id, case_run_id)
+{
+    var dialog_p = get_addlink_dialog();
+
+    dialog_p.dialog('option', 'target_id', case_run_id);
+    // These two options are used for reloading TestCaseRun when successfully.
+    container = jQ(sender).parents('.case_content.hide')[0];
+    dialog_p.dialog('option', 'container', container);
+    title_container = container.previous();
+    dialog_p.dialog('option', 'title_container', title_container);
+    dialog_p.dialog('option', 'case_id', case_id);
+
+    dialog_p.dialog('open');
+}
+
+/*
+ * Initialize dialog for getting information about new link, which is attached
+ * to an arbitrary instance of TestCaseRun
+ *
+ * - link_target: string, the name of Model to whose instance new link will be
+ *   linked.
+ */
+function initialize_addlink_dialog(link_target)
+{
+    var dialog_p = get_addlink_dialog();
+
+    dialog_p.dialog({
+	autoOpen: false,
+	modal: true,
+	resizable: false,
+	height: 300,
+	width: 400,
+	buttons: {
+	    "OK": function() {
+		// TODO: validate name and url
+		var name = jQ('#testlog_name').attr('value');
+		var url = jQ('#testlog_url').attr('value');
+		var target = jQ(this).dialog('option', 'target');
+		var target_id = jQ(this).dialog('option', 'target_id');
+
+		jQ.ajax({
+		    url: '/linkref/add/',
+		    type: 'POST',
+		    data: { name: name, url: url, target: target, target_id: target_id },
+		    dataType: 'json',
+		    success: function(data, textStatus, jqXHR) {
+			dialog_p.dialog('close');
+
+			// Begin to construct case run area
+			container = dialog_p.dialog('option', 'container');
+			title_container = dialog_p.dialog('option', 'title_container');
+			case_id = dialog_p.dialog('option', 'case_id');
+			constructCaseRunZone(container, title_container, case_id);
+		    },
+		    error: function (jqXHR, textStatus, errorThrown) {
+			var data = JSON.parse(jqXHR.responseText);
+			alert(data.message);
+		    },
+		});
+	    },
+	    "Cancel": function() {
+		jQ(this).dialog('close');
+	    }
+	},
+	beforeClose: function() {
+	    // clean name and url for next input
+	    jQ('#testlog_name').attr('value', '');
+	    jQ('#testlog_url').attr('value', '');
+
+	    return true;
+	},
+
+	// Customize variables
+	// Used for adding links to an instance of TestCaseRun
+	target: link_target,
+	/* ATTENTION: target_id can be determined when open this dialog, and
+	 * this must be set
+	 */
+	target_id: null,
+    });
+}

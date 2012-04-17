@@ -21,11 +21,13 @@ from datetime import datetime
 from django.core.urlresolvers import reverse
 from django.db import models, connection, transaction
 from django.db.models.signals import post_save
+from django.contrib.contenttypes import generic
 
 from tcms.core.models import TCMSActionModel, TimedeltaField
 
 from tcms.apps.testcases.models import TestCaseBug, TestCaseText, NoneText
 from tcms.apps.testruns import signals as run_watchers
+from tcms.core.contrib.linkreference.models import LinkReference
 
 
 try:
@@ -485,6 +487,8 @@ class TestCaseRun(TCMSActionModel):
     case_run_status = models.ForeignKey(TestCaseRunStatus)
     build = models.ForeignKey('management.TestBuild')
     environment_id = models.IntegerField(default=0)
+
+    links = generic.GenericRelation(LinkReference, object_id_field='object_pk')
 
     class Meta:
         db_table = u'test_case_runs'
