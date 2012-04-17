@@ -23,6 +23,7 @@ A serializer to import/export between model objects and file formats.
 import csv
 from lxml import etree
 
+
 class TCR2File(object):
     '''
     Write TestCaseRun queryset into CSV or XML.
@@ -53,16 +54,20 @@ class TCR2File(object):
         Wrap log links into a single cell by
         joining log links.
         '''
-        return 'N/A'
+        log_links = tcr.links.all()
+        return ' '.join(
+            tcr.links.values_list('url', flat=True)
+        )
 
     def bug_ids(self, tcr):
         '''
         Wrap bugs into a single cell by
         joining bug IDs.
         '''
-        return ' '.join(
-            tcr.case.case_bug.values_list('pk', flat=True)
-        )
+        return ' '.join((
+            str(pk) for pk in
+            tcr.case.case_bug.values_list('bug_id', flat=True)
+        ))
 
     def tcrs_in_rows(self):
         if self.rows: return self.rows
@@ -79,17 +84,23 @@ class TCR2File(object):
 
     def write_to_xml(self, fileobj):
         root = etree.Element(self.root)
-        attr_keys = [
-            k.lower().replace(' ', '_')
-            for k in self.headers
-        ]
-        for row in self.tcrs_in_rows():
+        for tcr in self.tcrs:
             sub_elem = etree.Element('testcaserun')
-            count = 0
-            for k, v in zip(attr_keys, row):
-                try:
-                    sub_elem.set(k, '%s' % str(v))
-                except ValueError:
-                    pass
+            sub_elem.set('case_run_id', str(tcr.pk))
+            sub_elem.set('case_id', str(tcr.case.pk))
+            sub_elem.set('category', tcr.case.category.name)
+            sub_elem.set('status', str(tcr.case_run_status))
+            sub_elem.set('summary', tcr.case.summary)
+            sub_elem.set('scripts', tcr.case.script)
+            sub_elem.set('automated', str(tcr.case.is_automated))
+            log_sub_elem = etree.Element('loglinks')
+            for log in tcr.links.all():
+                log.sub_elem.set('name', log.name)
+                log.sub_elem.set('url', log.url)
+            sub_elem.append(log_sub_elem)
+            bug_sub_elem = etree.Element('bugs')
+            for bug in tcr.case.case_bug.all():
+                bug_sub_elem.set('bug', str(bug.bug_id))
+            sub_elem.append(bug_sub_elem)
             root.append(sub_elem)
         fileobj.write(etree.tostring(root))
