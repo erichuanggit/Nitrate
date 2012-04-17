@@ -99,7 +99,6 @@ class CaseModelForm(forms.ModelForm):
     #
     #    if tc_count == 0:
     #        return data
-    #
     #    raise forms.ValidationError('Duplicated alias exist in database.')
 
     def clean_is_automated(self):
@@ -209,9 +208,11 @@ class BaseCaseForm(forms.Form):
     #    raise forms.ValidationError('Duplicated alias exist in database.')
 
     def clean_tag(self):
-        return TestTag.objects.filter(
-            name__in = TestTag.string_to_list(self.cleaned_data['tag'])
-        )
+        tags = []
+        if self.cleaned_data['tag']:
+            tag_names = TestTag.string_to_list(self.cleaned_data['tag'])
+            tags = TestTag.get_or_create_many_by_name(tag_names)
+        return tags
 
     def populate(self, product_id = None):
         # We can dynamically set choices for a form field:
