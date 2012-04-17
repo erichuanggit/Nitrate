@@ -33,7 +33,7 @@ __all__ = (
     'get_product',
     'get_tags',
     'get_test_cases',
-    'get_allcases_tags',
+    'get_all_cases_tags',
     'get_test_runs',
     'get_text',
     'lookup_type_id_by_name',
@@ -291,7 +291,7 @@ def get_tags(request, plan_id):
     query = {'id__in': tag_ids}
     return TestTag.to_xmlrpc(query)
 
-def get_allcases_tags(request, plan_id):
+def get_all_cases_tags(request, plan_id):
     """
     Description: Get the list of tags attached to this plan's testcases.
 
@@ -300,7 +300,7 @@ def get_allcases_tags(request, plan_id):
     Returns:     Array: An array of tag object hashes.
 
     Example:
-    >>> TestPlan.get_allcases_tags(137)
+    >>> TestPlan.get_all_cases_tags(137)
     """
     from tcms.apps.management.models import TestTag
     try:

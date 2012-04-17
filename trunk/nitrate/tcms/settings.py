@@ -183,6 +183,7 @@ XMLRPC_METHODS = {
         ('tcms.xmlrpc.testrun', 'TestRun'),
         ('tcms.xmlrpc.user', 'User'),
         ('tcms.xmlrpc.version', 'Version'),
+        ('tcms.xmlrpc.tag', 'Tag'),
     ),
 }
 
