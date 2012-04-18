@@ -19,10 +19,25 @@
 # from django
 from django.conf import settings
 from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.template import loader, Context, RequestContext
 
 # from stdlib
 import threading
+
+class NotifyEmailMessage(EmailMessage):
+
+    def __init__(self, cc=[], *args, **kwargs):
+
+        super(EmailMessage, self).__init__(*args, **kwargs)
+        self.cc = cc
+
+    def message(self):
+        ''' Override parent's to add CC header '''
+
+        msg = super(EmailMessage, self).message()
+        msg['CC'] = ', '.join(self.cc)
+        return msg
 
 def mailto(template_name, subject, to_mail, context = None, request = None, from_mail = None):
     """
@@ -50,15 +65,16 @@ def mailto(template_name, subject, to_mail, context = None, request = None, from
         if settings.DEBUG:
             raise
 
-def send_email_using_threading(template_name, subject, context=None, recipients=None, sender=settings.EMAIL_FROM):
+def send_email_using_threading(template_name, subject, context=None, recipients=None, sender=settings.EMAIL_FROM, cc=[]):
     t = loader.get_template(template_name)
     body = t.render(Context(context))
     if settings.DEBUG:
         recipients = settings.EMAILS_FOR_DEBUG
-        print body
-    email_thread = threading.Thread(target=send_mail, 
-        args=[subject, body, sender, recipients],
-        kwargs={'fail_silently': True})
+
+    email_msg = NotifyEmailMessage(subject=subject, body=body,
+                                   from_email=sender, to=recipients)
+
+    email_thread = threading.Thread(target=email_msg.send, args=[True,])
     # This is to tell Python not to wait for the thread to return
     email_thread.setDaemon(True)
     email_thread.start()

@@ -3,6 +3,15 @@
 {% block subtitle %}Edit test case - {{ test_case.summary }}{% endblock %}
 
 {% block custom_stylesheet %}
+<style type="text/css">
+#testcase_cc_list {
+    margin-top: 3px;
+}
+
+#id_cc_list {
+    width: 100%;
+}
+</style>
 {% endblock %}
 
 {% block custom_javascript %}
@@ -171,9 +180,14 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
                     {{ notify_form.assignees_of_case_runs }}{{ notify_form.assignees_of_case_runs.label }}
                     <br />
                 </div>
+                <div id="testcase_cc">
+                    <label for="id_cc_list">{{ notify_form.cc_list.label }} ({% if notify_form.cc_list.required %}<span style="color:red">*</span>{% else %}optional{% endif %})</label>
+                    {{ notify_form.cc_list }}
+                    <span>{{ notify_form.cc_list.help_text }}</span>
+                </div>
             </fieldset>
             <div id="control_box" class="submit-row">
-                <div class="errors">{{ form.errors }}</div>
+                <div class="errors">{{ form.errors }}{{ notify_form.errors }}</div>
                 <input type="submit" value="Save" />
                 <input type="submit" name="_continue" value="Save and continue editing"/>
                 {% if test_plan %}

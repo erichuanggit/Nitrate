@@ -2,6 +2,9 @@ import unittest
 from django.test.client import Client
 #from django.test import TestCase
 
+from django.forms import ValidationError
+from fields import MultipleEmailField
+
 class CaseTests(unittest.TestCase):
 
     def setUp(self):
@@ -119,6 +122,55 @@ class CaseTests(unittest.TestCase):
         except AssertionError, e:
             self.assertEquals(response.status_code, 302)
 
+class Test_MultipleEmailField(unittest.TestCase):
+
+    def setUp(self):
+        self.default_delimiter = ','
+        self.field = MultipleEmailField(delimiter=self.default_delimiter)
+
+        self.all_valid_emails = (
+            'cqi@redhat.com', 'cqi@yahoo.com', 'chen@gmail.com', )
+        self.include_invalid_emails = (
+            '', ' cqi@redhat.com', 'chen@sina.com', )
+
+    def test_to_python(self):
+        value = 'cqi@redhat.com'
+        pyobj = self.field.to_python(value)
+        self.assertEqual(pyobj, ['cqi@redhat.com'])
+
+        value = 'cqi@redhat.com,,cqi@gmail.com,'
+        pyobj = self.field.to_python(value)
+        self.assertEqual(pyobj, ['cqi@redhat.com', 'cqi@gmail.com'])
+
+        for value in ('', None, []):
+            pyobj = self.field.to_python(value)
+            self.assertEqual(pyobj, [])
+
+    def test_clean(self):
+
+        value = 'cqi@redhat.com'
+        data = self.field.clean(value)
+        self.assertEqual(data, ['cqi@redhat.com'])
+
+        value = 'cqi@redhat.com,cqi@gmail.com'
+        data = self.field.clean(value)
+        self.assertEqual(data, ['cqi@redhat.com', 'cqi@gmail.com'])
+
+        value = ',cqi@redhat.com, ,cqi@gmail.com, \n'
+        data = self.field.clean(value)
+        self.assertEqual(data, ['cqi@redhat.com', 'cqi@gmail.com'])
+
+        value = ',cqi,cqi@redhat.com, \n,cqi@gmail.com, '
+        self.assertRaises(ValidationError, self.field.clean, value)
+
+        value = ''
+        self.field.required = True
+        self.assertRaises(ValidationError, self.field.clean, value)
+
+        value = ''
+        self.field.required = False
+        data = self.field.clean(value)
+        self.assertEqual(data, [])
 
 if __name__ == '__main__':
     unittest.main()

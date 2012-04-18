@@ -14,12 +14,14 @@
 # distribution and at <http://www.gnu.org/licenses>.
 #
 # Authors:
-#   Xuqing Kuang <xkuang@redhat.com>
+#   Xuqing Kuang <xkuang@redhat.com>, Chenxiong Qi <cqi@redhat.com>
 
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
 from django.core.exceptions import ObjectDoesNotExist
 from tcms.apps.testcases.models import TestCase
 from utils import pre_process_ids, compare_list
+
+from django.forms import EmailField, ValidationError
 
 __all__ = (
     'add_comment',
@@ -53,6 +55,9 @@ __all__ = (
     'lookup_priority_id_by_name',
     'lookup_status_name_by_id',
     'lookup_status_id_by_name',
+    'notification_add_cc',
+    'notification_get_cc_list',
+    'notification_remove_cc',
     'remove_component',
     'remove_tag',
     'store_text',
@@ -1048,3 +1053,128 @@ def update(request, case_ids, values):
     query = {'pk__in': tcs.values_list('pk', flat = True)}
     return TestCase.to_xmlrpc(query)
 
+def validate_cc_list(cc_list):
+    '''Validate each email in cc_list argument
+
+    This is called by ``notification_*`` methods internally.
+
+    No return value, and if any email in cc_list is not valid, ValidationError
+    will be raised.
+    '''
+
+    if not isinstance(cc_list, list):
+        raise TypeError('cc_list should be a list object.')
+
+    field = EmailField(required=True)
+    invalid_emails = []
+
+    for item in cc_list:
+        try:
+            field.clean(item)
+        except ValidationError, err:
+            invalid_emails.append(item)
+
+    if invalid_emails:
+        raise ValidationError(
+            field.error_messages['invalid'] % {
+                'value': ', '.join(invalid_emails)})
+
+@log_call
+@user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
+def notification_add_cc(request, case_ids, cc_list):
+    '''
+    Description: Add email addresses to the notification CC list of specific TestCases
+
+    Params:      $case_ids - Integer/Array: one or more TestCase IDs
+
+                 $cc_list - Array: one or more Email addresses, which will be
+                            added to each TestCase indicated by the case_ids.
+
+    Returns:     JSON. When succeed, status is 0, and message maybe empty or
+                 anything else that depends on the implementation. If something
+                 wrong, status will be 1 and message will be a short description
+                 to the error.
+    '''
+
+    try:
+        validate_cc_list(cc_list)
+    except (TypeError, ValidationError), err:
+        return { 'status': 1,
+                 'message': '%s: %s' % (err.__class__.__name__, str(err)) }
+
+    try:
+        tc_ids = pre_process_ids(case_ids)
+
+        for tc in TestCase.objects.filter(pk__in=tc_ids):
+            # First, find those that do not exist yet.
+            existing_cc = tc.emailing.get_cc_list()
+            adding_cc = list(set(cc_list) - set(existing_cc))
+
+            tc.emailing.add_cc(adding_cc)
+
+    except (TypeError, ValueError, Exception), err:
+        return { 'status': 1,
+                 'message': '%s: %s' % (err.__class__.__name__, str(err))}
+
+    return { 'status': 0, 'message': 'Succeed' }
+
+@log_call
+@user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
+def notification_remove_cc(request, case_ids, cc_list):
+    '''
+    Description: Remove email addresses from the notification CC list of specific TestCases
+
+    Params:      $case_ids - Integer/Array: one or more TestCase IDs
+
+                 $cc_list - Array: contians the email addresses that will
+                            be removed from each TestCase indicated by case_ids.
+
+    Returns:     JSON. When succeed, status is 0, and message maybe empty or
+                 anything else that depends on the implementation. If something
+                 wrong, status will be 1 and message will be a short description
+                 to the error.
+    '''
+
+    try:
+        validate_cc_list(cc_list)
+    except (TypeError, ValidationError), err:
+        return { 'status': 1,
+                 'message': '%s: %s' % (err.__class__.__name__, str(err))}
+
+    try:
+        tc_ids = pre_process_ids(case_ids)
+
+        for tc in TestCase.objects.filter(pk__in=tc_ids):
+            tc.emailing.cc_list.filter(email__in=cc_list).delete()
+    except (TypeError, ValueError, Exception), err:
+        return { 'status': 1,
+                 'message': '%s: %s' % (err.__class__.__name__, str(err))}
+
+    return { 'status': 0, 'message': 'Succeed' }
+
+@log_call
+@user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
+def notification_get_cc_list(request, case_ids):
+    '''
+    Description: Return whole CC list of each TestCase
+
+    Params:      $case_ids - Integer/Array: one or more TestCase IDs
+
+    Returns:     An dictionary object with case_id as key and a list of CC as the value
+                 Each case_id will be converted to a str object in the result.
+    '''
+
+    result = {}
+
+    try:
+        tc_ids = pre_process_ids(case_ids)
+
+        for tc in TestCase.objects.filter(pk__in=tc_ids):
+            cc_list = tc.emailing.get_cc_list()
+            result[str(tc.pk)] = cc_list
+
+    except (TypeError, ValueError, Exception), err:
+        return { 'status': 1,
+                 'message': '%s: %s' % (err.__class__.__name__, str(err))}
+
+    return result
