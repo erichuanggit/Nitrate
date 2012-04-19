@@ -447,6 +447,8 @@ fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-
 .data_row{ clear:both; width:100%; float:left; margin:5px 0px;}
 .data_row .name input{ width:300px;}
 .data_row ul li{ display:inline; list-style:none}
+.data_row ul.list_ul{float:left;}
+.data_row ul.list_ul li{display:block;}
 .data_row .automatedlist{ margin-top:-16px; margin-left:245px;}
 .editor-side .data_row>label{ margin-left:10px; float:left; width:120px; color:#333;}
 .form{ margin-left:10px;}
@@ -792,7 +794,7 @@ ul.data_content_title li{ display:inline-block; margin-left:3px;}
 /* 图标开始 */
 
 .disablelink, .enablelink,.spadelink , .editlink, .deletelink, .sortlink,.updatelink,.updategrey,.comment_add,.bug_add{background:transparent url(../images/operation.png) no-repeat;text-decoration:none;height:16px;line-height:16px;cursor:pointer; }
-.addlink{padding:0px;cursor:pointer; background:transparent url(../images/operation_ico.png) no-repeat 0px 0px; padding-left:12px;}
+.addlink{padding:0px;cursor:pointer; background:transparent url(../images/operation_ico.png) no-repeat 0px 5px; padding-left:12px;}
 .updatelink{ padding-left:16px; cursor:pointer; background-position:0px -984px;}
 .updategrey{ padding-left:16px; cursor:pointer; background-position:0px -1000px; color:graytext}
 .editlink{padding:0px 18px;background-position: 0 -124px;}
