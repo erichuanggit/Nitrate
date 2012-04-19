@@ -536,38 +536,38 @@ def update_testcase(request, tc, tc_form):
                     field, getattr(tc, field), tc_form.cleaned_data[field]
                     ))
             setattr(tc, field, tc_form.cleaned_data[field])
-            try:
-                if tc.default_tester != tc_form.cleaned_data['default_tester']:
-                    tc.log_action(request.user, 'Case default tester changed from %s to %s in edit page.' % (
-                            tc.default_tester_id and tc.default_tester, tc_form.cleaned_data['default_tester']
-                            ))
-                    tc.default_tester = tc_form.cleaned_data['default_tester']
-            except ObjectDoesNotExist, error:
-                pass
-            tc.update_tags(form.cleaned_data.get('tag'))
-            try:
-                fields_text = ['action', 'effect', 'setup', 'breakdown']
-                latest_text = tc.latest_text()
+    try:
+        if tc.default_tester != tc_form.cleaned_data['default_tester']:
+            tc.log_action(request.user, 'Case default tester changed from %s to %s in edit page.' % (
+                    tc.default_tester_id and tc.default_tester, tc_form.cleaned_data['default_tester']
+                    ))
+            tc.default_tester = tc_form.cleaned_data['default_tester']
+    except ObjectDoesNotExist, error:
+        pass
+    tc.update_tags(tc_form.cleaned_data.get('tag'))
+    try:
+        fields_text = ['action', 'effect', 'setup', 'breakdown']
+        latest_text = tc.latest_text()
 
-                for field in fields_text:
-                    form_cleaned = tc_form.cleaned_data[field]
-                    if not (getattr(latest_text, field) or form_cleaned):
-                        continue
-                    if (getattr(latest_text, field) != tc_form_cleaned):
-                        tc.log_action(request.user, ' Case %s changed from %s to %s in edit page.' % (
-                                field, getattr(latest_text, field) or None, form_cleaned or None
-                                ))
-            except ObjectDoesNotExist, error:
-                pass
+        for field in fields_text:
+            form_cleaned = tc_form.cleaned_data[field]
+            if not (getattr(latest_text, field) or form_cleaned):
+                continue
+            if (getattr(latest_text, field) != tc_form_cleaned):
+                tc.log_action(request.user, ' Case %s changed from %s to %s in edit page.' % (
+                        field, getattr(latest_text, field) or None, form_cleaned or None
+                        ))
+    except ObjectDoesNotExist, error:
+        pass
 
-            # FIXME: Bug here, timedelta from form cleaned data need to convert.
-            tc.estimated_time = tc_form.cleaned_data['estimated_time']
-            # IMPORTANT! tc.current_user is an instance attribute,
-            # added so that in post_save, current logged-in user info
-            # can be accessed.
-            # Instance attribute is usually not a desirable solution.
-            tc.current_user = request.user
-            tc.save()
+    # FIXME: Bug here, timedelta from form cleaned data need to convert.
+    tc.estimated_time = tc_form.cleaned_data['estimated_time']
+    # IMPORTANT! tc.current_user is an instance attribute,
+    # added so that in post_save, current logged-in user info
+    # can be accessed.
+    # Instance attribute is usually not a desirable solution.
+    tc.current_user = request.user
+    tc.save()
 
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
 def edit(request, case_id, template_name='case/edit.html'):
