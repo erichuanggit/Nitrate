@@ -106,6 +106,10 @@
 					{% endfor %}
 				</select>
 			</div>
+			<div class="listinfo">
+				<span class="title"><label for="id_tags">Tag&nbsp;:</label></span>
+				<input id="id_tag" type="text" name="case__tag__name" value="{{ REQUEST_CONTENTS.case_tag__name }}" />
+			</div>
 		</div>
 		<div class='clear'></div>
 		<div class='button_box2'>
@@ -114,6 +118,17 @@
 	</div>
 	</div>
 </form>
+
+ <div class="mixbar fixed">
+    <div class="tit" style="width: 50px; float: left; height: 100%; margin: 0px; text-align: center;">Tags:</div>
+        <div style="margin-left: 50px; line-height:22px;" class="taglist">
+            {% for tag in case_own_tags %}
+            {{ tag }}&nbsp;&nbsp;<span class="grey">-</span>&nbsp;&nbsp;
+            {% empty %}
+            <span class="grey">No tags in cases</span>
+            {% endfor %}
+        </div>
+</div>
 
 {% include "run/table_caseruns.html" %}
 

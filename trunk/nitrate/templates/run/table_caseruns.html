@@ -14,6 +14,7 @@
 			<th>Summary</th>
 			<th width="80">Tester</th>
 			<th width="80">Assignee</th>
+            <th width="150">Automated </th>
 			<th width="100">Category</th>
 			<th width="60">Priority</th>
 			<th width="40">Bugs</th>
@@ -56,6 +57,7 @@
 				None
 				{% endif %}
 			</td>
+            <td class="expandable">{{ test_case_run.case.get_is_automated_status }}</td>
 			<td class="expandable">{{ test_case_run.case.category }}</td>
 			<td class="expandable">{{ test_case_run.case.priority }}</td>
 			<td class="expandable"><span {% if test_case_run.num_bug %}class="have_bug"{% endif %}>{{ test_case_run.num_bug }}</span></td>

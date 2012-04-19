@@ -46,7 +46,8 @@ from tcms.apps.testcases.models import TestCase, TestCasePlan, TestCaseBug
 from tcms.apps.testplans.models import TestPlan
 from tcms.apps.testruns.models import TestRun, TestCaseRun, TestCaseRunStatus, \
         TCMSEnvRunValueMap
-from tcms.apps.management.models import Version, Priority, TCMSEnvValue
+from tcms.apps.management.models import Version, Priority, TCMSEnvValue, \
+        TestTag
 
 from tcms.apps.testcases.forms import CaseBugForm
 from tcms.apps.testruns.forms import NewRunForm, SearchRunForm, EditRunForm, \
@@ -324,7 +325,8 @@ def get(request, run_id, template_name='run/get.html'):
 
     # Get the test case runs belong to the run
     tcrs = tr.case_run.all()
-
+    # Get the list of testcases belong to the run
+    tcs = [tcr.case_id for tcr in tcrs]
     # Count the status
     status_counter = CaseRunStatusCounter(tcrs)
 
@@ -355,6 +357,8 @@ def get(request, run_id, template_name='run/get.html'):
     tcr_bugs = tcr_bugs.filter(case_run__case_run_id__in=tcrs.values_list('case_run_id', flat=True))
     tcr_bugs = tcr_bugs.values_list('bug_id', flat=True)
     tcr_bugs = set(tcr_bugs)
+    # Get tag list of testcases
+    ttags = TestTag.objects.filter(testcase__in=tcs).distinct()
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
@@ -365,6 +369,7 @@ def get(request, run_id, template_name='run/get.html'):
         'test_case_run_bugs': tcr_bugs,
         'test_case_run_status': TestCaseRunStatus.objects.order_by('pk'),
         'priorities': Priority.objects.all(),
+        'case_own_tags': ttags,
         'errata_url_prefix': settings.ERRATA_URL_PREFIX,
     })
 
