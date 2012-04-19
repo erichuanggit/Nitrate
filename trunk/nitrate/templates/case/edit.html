@@ -5,11 +5,11 @@
 {% block custom_stylesheet %}
 <style type="text/css">
 #testcase_cc_list {
-    margin-top: 3px;
+	margin-top: 3px;
 }
 
 #id_cc_list {
-    width: 100%;
+	width: 100%;
 }
 </style>
 {% endblock %}
@@ -134,70 +134,70 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
 							{{ form.is_automated.error }}
 							{{ form.is_automated_proposed.error }}
 						</div>
-                    </div>
-                    <div class="data_row">
-                        <label >Requirement</label>
-                        <div id="form_requirement"  >{{ form.requirement }}</div>
-                    </div>
-                    <div class="data_row">
-                        <label >Script</label>
-                        <div id="form_script" >{{ form.script }}</div>
-                    </div>
-                    <div class="data_row">
-                        <label >Alias</label>
-                        <div  >{{ form.alias }}</div>
-                    </div>
-                    <div class="data_row">
-                        <label>Priority</label>
-                        <span id="form_priority" >{{ form.priority }}</span>
-                    </div>
-                    
-                </div>
-            </fieldset>
-            <fieldset class="no-border background-light-grey">
-                <div class="editor-side">
-                    <h4 class="strong">Setup</h4>
-                    <div class="form" id="form_setup">{{ form.setup }}</div>
-                    <h4 class="strong">Actions</h4>
-                    <div class="form" id="form_action">{{ form.action }}</div>
-                </div>
-                <div class="editor-side">
-                    <h4 class="strong">Break down</h4>
-                    <div class="" id="form_breakdown">{{ form.breakdown }}</div>
-                    <h4 class="strong">Expected Results</h4>
-                    <div class="" id="form_effect">{{ form.effect }}</div>
-                </div>
-            </fieldset>
-            <fieldset class="no-border notification">
-                <label class="strong">Send new case instance after editing <label class="grey">(The author of this case will receive the notification by default)</label>:</label>
-                <div>
-                    {{ notify_form.notify_on_case_update }}{{ notify_form.notify_on_case_update.label }}
-                    {{ notify_form.notify_on_case_delete }}{{ notify_form.notify_on_case_delete.label }}
-                    {{ notify_form.author }}{{ notify_form.author.label }}
-                    {{ notify_form.default_tester_of_case }}{{ notify_form.default_tester_of_case.label }}
-                    {{ notify_form.managers_of_runs }}{{ notify_form.managers_of_runs.label }}
-                    {{ notify_form.default_testers_of_runs }}{{ notify_form.default_testers_of_runs.label }}
-                    {{ notify_form.assignees_of_case_runs }}{{ notify_form.assignees_of_case_runs.label }}
-                    <br />
-                </div>
-                <div id="testcase_cc">
-                    <label for="id_cc_list">{{ notify_form.cc_list.label }} ({% if notify_form.cc_list.required %}<span style="color:red">*</span>{% else %}optional{% endif %})</label>
-                    {{ notify_form.cc_list }}
-                    <span>{{ notify_form.cc_list.help_text }}</span>
-                </div>
-            </fieldset>
-            <div id="control_box" class="submit-row">
-                <div class="errors">{{ form.errors }}{{ notify_form.errors }}</div>
-                <input type="submit" value="Save" />
-                <input type="submit" name="_continue" value="Save and continue editing"/>
-                {% if test_plan %}
-                <input type="submit" name="_continuenext" value="Save and edit next enabled case in plan {{ test_plan.pk }}"/>
-                {% endif %}
-                <input type="reset" value="Reset" />
-                <input type="button" value="Back" onclick="javascript:history.go(-1)" />
-            </div>
-        </div>
-    </form>
+					</div>
+					<div class="data_row">
+						<label >Requirement</label>
+						<div id="form_requirement"  >{{ form.requirement }}</div>
+					</div>
+					<div class="data_row">
+						<label >Script</label>
+						<div id="form_script" >{{ form.script }}</div>
+					</div>
+					<div class="data_row">
+						<label >Alias</label>
+						<div  >{{ form.alias }}</div>
+					</div>
+					<div class="data_row">
+						<label>Priority</label>
+						<span id="form_priority" >{{ form.priority }}</span>
+					</div>
+					
+				</div>
+			</fieldset>
+			<fieldset class="no-border background-light-grey">
+				<div class="editor-side">
+					<h4 class="strong">Setup</h4>
+					<div class="form" id="form_setup">{{ form.setup }}</div>
+					<h4 class="strong">Actions</h4>
+					<div class="form" id="form_action">{{ form.action }}</div>
+				</div>
+				<div class="editor-side">
+					<h4 class="strong">Break down</h4>
+					<div class="" id="form_breakdown">{{ form.breakdown }}</div>
+					<h4 class="strong">Expected Results</h4>
+					<div class="" id="form_effect">{{ form.effect }}</div>
+				</div>
+			</fieldset>
+			<fieldset class="no-border notification">
+				<label class="strong">Send new case instance after editing <label class="grey">(The author of this case will receive the notification by default)</label>:</label>
+				<div>
+					{{ notify_form.notify_on_case_update }}{{ notify_form.notify_on_case_update.label }}
+					{{ notify_form.notify_on_case_delete }}{{ notify_form.notify_on_case_delete.label }}
+					{{ notify_form.author }}{{ notify_form.author.label }}
+					{{ notify_form.default_tester_of_case }}{{ notify_form.default_tester_of_case.label }}
+					{{ notify_form.managers_of_runs }}{{ notify_form.managers_of_runs.label }}
+					{{ notify_form.default_testers_of_runs }}{{ notify_form.default_testers_of_runs.label }}
+					{{ notify_form.assignees_of_case_runs }}{{ notify_form.assignees_of_case_runs.label }}
+					<br />
+				</div>
+				<div id="testcase_cc">
+					<label for="id_cc_list">{{ notify_form.cc_list.label }} ({% if notify_form.cc_list.required %}<span style="color:red">*</span>{% else %}optional{% endif %})</label>
+					{{ notify_form.cc_list }}
+					<span>{{ notify_form.cc_list.help_text }}</span>
+				</div>
+			</fieldset>
+			<div id="control_box" class="submit-row">
+				<div class="errors">{{ form.errors }}{{ notify_form.errors }}</div>
+				<input type="submit" value="Save" />
+				<input type="submit" name="_continue" value="Save and continue editing"/>
+				{% if test_plan %}
+				<input type="submit" name="_continuenext" value="Save and edit next enabled case in plan {{ test_plan.pk }}"/>
+				{% endif %}
+				<input type="reset" value="Reset" />
+				<input type="button" value="Back" onclick="javascript:history.go(-1)" />
+			</div>
+		</div>
+	</form>
 </div>
 {% endblock %}
 
