@@ -14,10 +14,11 @@
 # distribution and at <http://www.gnu.org/licenses>.
 #
 # Authors:
-#   Xuqing Kuang <xkuang@redhat.com>
+#   Xuqing Kuang <xkuang@redhat.com>, Chenxiong Qi <cqi@redhat.com>
 
 # from stdlib
 from datetime import datetime
+from itertools import ifilter
 
 # from django
 from django.core.urlresolvers import reverse
@@ -26,9 +27,11 @@ from django.conf import settings
 from django.db import models, connection, transaction
 from django.db.models import ObjectDoesNotExist
 from django.db.models.signals import post_save, post_delete
+from django.contrib.contenttypes import generic
 
 # from tcms
 from tcms.core.models import TCMSActionModel, TimedeltaField
+from tcms.core.models import TCMSContentTypeBaseModel
 
 #from signal listen
 from tcms.apps.testcases import signals as case_watchers
@@ -633,6 +636,35 @@ class TestCaseBug(TCMSActionModel):
     def get_url(self):
         return self.bug_system.url_reg_exp % self.bug_id
 
+class Contact(TCMSContentTypeBaseModel):
+    ''' A Contact that can be added into Email settings' CC list '''
+
+    name = models.CharField(max_length=50)
+    email = models.EmailField(db_index=True)
+    date_joined = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        db_table = u'tcms_contacts'
+
+    @classmethod
+    def create(cls, email, content_object, name=None):
+        ''' Factory method to create a new Contact '''
+
+        if not name:
+            store_name = email.split('@')[0]
+        else:
+            store_name = name
+
+        c = cls(name=store_name,
+                email=email,
+                content_object=content_object,
+                site_id=settings.SITE_ID)
+        c.save()
+        return c
+
 class TestCaseEmailSettings(models.Model):
     case = models.OneToOneField(TestCase, related_name='email_settings')
     notify_on_case_update = models.BooleanField(default=False)
@@ -643,8 +675,71 @@ class TestCaseEmailSettings(models.Model):
     auto_to_run_tester  = models.BooleanField(default=False)
     auto_to_case_run_assignee = models.BooleanField(default=False)
 
+    cc_list = generic.GenericRelation(Contact, object_id_field='object_pk')
+
     class Meta:
         pass
+
+    def add_cc(self, email_addrs):
+        '''Add email addresses to CC list
+
+        Arguments:
+        - email_addrs: str or list, holding one or more email addresses
+        '''
+
+        emailaddr_list = []
+        if not isinstance(email_addrs, list):
+            emailaddr_list.append(email_addr)
+        else:
+            emailaddr_list = list(email_addrs)
+
+        for email_addr in emailaddr_list:
+            Contact.create(email=email_addr, content_object=self)
+
+    def get_cc_list(self):
+        ''' Return the whole CC list '''
+
+        return [c.email for c in self.cc_list.all()]
+
+    def remove_cc(self, email_addrs):
+        '''Remove one or more email addresses from EmailSettings' CC list
+
+        If any email_addr is unknown, remove_cc will keep quiet.
+
+        Arguments:
+        - email_addrs: str or list, holding one or more email addresses
+        '''
+
+        emailaddr_list = []
+        if not isinstance(email_addrs, list):
+            emailaddr_list.append(email_addrs)
+        else:
+            emailaddr_list = list(email_addrs)
+
+        self.cc_list.filter(email__in=emailaddr_list).delete()
+
+    def filter_new_emails(self, origin_emails, new_emails):
+        ''' Find out the new email addresses to be added '''
+
+        return list(set(new_emails) - set(origin_emails))
+
+    def filter_unnecessary_emails(self, origin_emails, new_emails):
+        ''' Find out the unnecessary addresses to be delete '''
+
+        return list(set(origin_emails) - set(new_emails))
+
+    def update_cc_list(self, email_addrs):
+        '''Add the new emails and delete unnecessary ones
+
+        Arguments:
+        - email_addrs: list, a instance of list holding emails user input via UI
+        '''
+
+        origin_emails = self.get_cc_list()
+
+        emails_to_delete = self.filter_unnecessary_emails(origin_emails, email_addrs)
+        self.remove_cc(emails_to_delete)
+        self.add_cc(self.filter_new_emails(origin_emails, email_addrs))
 
 def _listen():
     """ signals listen """

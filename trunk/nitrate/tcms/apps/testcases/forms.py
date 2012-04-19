@@ -30,6 +30,8 @@ from tcms.apps.management.models import Priority, Product, Component, Version, T
 from models import TestCase, TestCaseCategory, TestCaseStatus
 from models import TestCaseBug, AUTOMATED_CHOICES as FULL_AUTOMATED_CHOICES
 
+from fields import MultipleEmailField
+
 AUTOMATED_CHOICES = (
     (0, 'Manual'),
     (1, 'Auto'),
@@ -246,6 +248,14 @@ class CaseNotifyForm(forms.Form):
     assignees_of_case_runs = forms.BooleanField(required = False)
     notify_on_case_update = forms.BooleanField(required=False)
     notify_on_case_delete = forms.BooleanField(required=False)
+
+    cc_list = MultipleEmailField(
+        required=False,
+        label=u'CC to',
+        help_text=u'It will send notification email to each Email address ' \
+            'within CC list. Email addresses within CC list are ' \
+            'separated by comma.',
+        widget=forms.Textarea(attrs={ 'rows': 1, }))
 
 # =========== Forms for  XML-RPC functions ==============
 

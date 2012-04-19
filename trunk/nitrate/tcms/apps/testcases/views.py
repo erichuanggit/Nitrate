@@ -14,7 +14,7 @@
 # distribution and at <http://www.gnu.org/licenses>.
 #
 # Authors:
-#   Xuqing Kuang <xkuang@redhat.com>
+#   Xuqing Kuang <xkuang@redhat.com>, Chenxiong Qi <cqi@redhat.com>
 
 import datetime
 import itertools
@@ -45,6 +45,8 @@ from tcms.apps.testcases.forms import CaseAutomatedForm, NewCaseForm, \
         CloneCaseForm, CaseComponentForm, CaseCategoryForm, CaseBugForm
 from tcms.apps.testplans.forms import SearchPlanForm
 
+from fields import CC_LIST_DEFAULT_DELIMITER
+
 MODULE_NAME = "testcases"
 
 
@@ -60,26 +62,30 @@ def plan_from_request_or_none(request):
         tp = None
     return tp
 
-def update_case_email_settings(tc, request):
+def update_case_email_settings(tc, n_form):
     """Update testcase's email settings."""
-    n_form = CaseNotifyForm(request.REQUEST)
-    if n_form.is_valid():
-        tc.emailing.auto_to_run_manager = n_form.cleaned_data[
-                'managers_of_runs']
-        tc.emailing.auto_to_run_tester = n_form.cleaned_data[
-                'default_testers_of_runs']
-        tc.emailing.auto_to_case_run_assignee = n_form.cleaned_data[
-                'assignees_of_case_runs']
-        tc.emailing.auto_to_case_author = n_form.cleaned_data[
-                'author']
-        tc.emailing.notify_on_case_update = n_form.cleaned_data[
-                'notify_on_case_update']
-        tc.emailing.notify_on_case_delete = n_form.cleaned_data[
-                'notify_on_case_delete']
-        tc.emailing.save()
-        if (n_form.cleaned_data['default_tester_of_case'] and
-                tc.default_tester_id):
-            tc.emailing.auto_to_case_tester = True
+
+    tc.emailing.auto_to_run_manager = n_form.cleaned_data[
+        'managers_of_runs']
+    tc.emailing.auto_to_run_tester = n_form.cleaned_data[
+        'default_testers_of_runs']
+    tc.emailing.auto_to_case_run_assignee = n_form.cleaned_data[
+        'assignees_of_case_runs']
+    tc.emailing.auto_to_case_author = n_form.cleaned_data[
+        'author']
+    tc.emailing.notify_on_case_update = n_form.cleaned_data[
+        'notify_on_case_update']
+    tc.emailing.notify_on_case_delete = n_form.cleaned_data[
+        'notify_on_case_delete']
+    tc.emailing.save()
+
+    default_tester = n_form.cleaned_data['default_tester_of_case']
+    if (default_tester and tc.default_tester_id):
+        tc.emailing.auto_to_case_tester = True
+
+    # Continue to update CC list
+    valid_emails = n_form.cleaned_data['cc_list']
+    tc.emailing.update_cc_list(valid_emails)
 
 def group_case_bugs(bugs):
     """Group bugs using bug_id."""
@@ -501,6 +507,68 @@ def export(request, template_name='case/export.xml'):
     response['Content-Disposition'] = 'attachment; filename=tcms-testcases-%s.xml' % timestamp_str
     return response
 
+def update_testcase(request, tc, tc_form):
+    '''Updating information of specific TestCase
+
+    This is called by views.edit internally. Don't call this directly.
+
+    Arguments:
+    - tc: instance of a TestCase being updated
+    - tc_form: instance of django.forms.Form, holding validated data.
+    '''
+
+    # Modify the contents
+    fields = ['summary',
+              'case_status',
+              'category',
+              'priority',
+              'notes',
+              'is_automated',
+              'is_automated_proposed',
+              'script',
+              'arguments',
+              'requirement',
+              'alias']
+
+    for field in fields:
+        if getattr(tc, field) != tc_form.cleaned_data[field]:
+            tc.log_action(request.user, 'Case %s changed from %s to %s in edit page.' % (
+                    field, getattr(tc, field), tc_form.cleaned_data[field]
+                    ))
+            setattr(tc, field, tc_form.cleaned_data[field])
+            try:
+                if tc.default_tester != tc_form.cleaned_data['default_tester']:
+                    tc.log_action(request.user, 'Case default tester changed from %s to %s in edit page.' % (
+                            tc.default_tester_id and tc.default_tester, tc_form.cleaned_data['default_tester']
+                            ))
+                    tc.default_tester = tc_form.cleaned_data['default_tester']
+            except ObjectDoesNotExist, error:
+                pass
+            tc.update_tags(form.cleaned_data.get('tag'))
+            try:
+                fields_text = ['action', 'effect', 'setup', 'breakdown']
+                latest_text = tc.latest_text()
+
+                for field in fields_text:
+                    form_cleaned = tc_form.cleaned_data[field]
+                    if not (getattr(latest_text, field) or form_cleaned):
+                        continue
+                    if (getattr(latest_text, field) != tc_form_cleaned):
+                        tc.log_action(request.user, ' Case %s changed from %s to %s in edit page.' % (
+                                field, getattr(latest_text, field) or None, form_cleaned or None
+                                ))
+            except ObjectDoesNotExist, error:
+                pass
+
+            # FIXME: Bug here, timedelta from form cleaned data need to convert.
+            tc.estimated_time = tc_form.cleaned_data['estimated_time']
+            # IMPORTANT! tc.current_user is an instance attribute,
+            # added so that in post_save, current logged-in user info
+            # can be accessed.
+            # Instance attribute is usually not a desirable solution.
+            tc.current_user = request.user
+            tc.save()
+
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
 def edit(request, case_id, template_name='case/edit.html'):
     """Edit case detail"""
@@ -511,9 +579,6 @@ def edit(request, case_id, template_name='case/edit.html'):
 
     tp = plan_from_request_or_none(request)
 
-    #CaseNotifyForm default to None
-    n_form = None
-    # If the form is submitted
     if request.method == "POST":
         form = EditCaseForm(request.REQUEST)
         if request.REQUEST.get('product'):
@@ -523,59 +588,11 @@ def edit(request, case_id, template_name='case/edit.html'):
         else:
             form.populate()
 
-        # Check the form and modify the case
-        if form.is_valid():
-            # Modify the contents
-            fields = ['summary',
-                      'case_status',
-                      'category',
-                      'priority',
-                      'notes',
-                      'is_automated',
-                      'is_automated_proposed',
-                      'script',
-                      'arguments',
-                      'requirement',
-                      'alias']
+        n_form = CaseNotifyForm(request.REQUEST)
 
-            for field in fields:
-                if getattr(tc, field) != form.cleaned_data[field]:
-                    tc.log_action(request.user, 'Case %s changed from %s to %s in edit page.' % (
-                        field, getattr(tc, field), form.cleaned_data[field]
-                    ))
-                    setattr(tc, field, form.cleaned_data[field])
-            try:
-                if tc.default_tester != form.cleaned_data['default_tester']:
-                    tc.log_action(request.user, 'Case default tester changed from %s to %s in edit page.' % (
-                        tc.default_tester_id and tc.default_tester, form.cleaned_data['default_tester']
-                    ))
-                    tc.default_tester = form.cleaned_data['default_tester']
-            except ObjectDoesNotExist, error:
-                pass
-            tc.update_tags(form.cleaned_data.get('tag'))
-            try:
-                fields_text = ['action', 'effect', 'setup', 'breakdown']
-                latest_text = tc.latest_text()
+        if form.is_valid() and n_form.is_valid():
 
-                for field in fields_text:
-                    form_cleaned = form.cleaned_data[field]
-                    if not (getattr(latest_text, field) or form_cleaned):
-                        continue
-                    if (getattr(latest_text, field) != form_cleaned):
-                        tc.log_action(request.user, ' Case %s changed from %s to %s in edit page.' % (
-                            field, getattr(latest_text, field) or None, form_cleaned or None
-                        ))
-            except ObjectDoesNotExist, error:
-                pass
-
-            # FIXME: Bug here, timedelta from form cleaned data need to convert.
-            tc.estimated_time = form.cleaned_data['estimated_time']
-            # IMPORTANT! tc.current_user is an instance attribute,
-            # added so that in post_save, current logged-in user info
-            # can be accessed.
-            # Instance attribute is usually not a desirable solution.
-            tc.current_user = request.user
-            tc.save()
+            update_testcase(request, tc, form)
 
             tc.add_text(author = request.user,
                         action = form.cleaned_data['action'],
@@ -584,7 +601,8 @@ def edit(request, case_id, template_name='case/edit.html'):
                         breakdown = form.cleaned_data['breakdown'])
 
             # Notification
-            update_case_email_settings(tc, request)
+            update_case_email_settings(tc, n_form)
+
             # Returns
             if request.REQUEST.get('_continue'):
                 return HttpResponseRedirect('%s?from_plan=%s' % (
@@ -611,6 +629,7 @@ def edit(request, case_id, template_name='case/edit.html'):
                 reverse('tcms.apps.testcases.views.get', args=[case_id, ]),
                 request.REQUEST.get('from_plan', None),
             ))
+
     else:
         tctxt = tc.latest_text()
         # Notification form initial
@@ -622,6 +641,7 @@ def edit(request, case_id, template_name='case/edit.html'):
             'managers_of_runs': tc.emailing.auto_to_run_manager,
             'default_testers_of_runs': tc.emailing.auto_to_run_tester,
             'assignees_of_case_runs': tc.emailing.auto_to_case_run_assignee,
+            'cc_list': CC_LIST_DEFAULT_DELIMITER.join(tc.emailing.get_cc_list()),
         })
         form = EditCaseForm(initial={
             'summary': tc.summary,
@@ -647,6 +667,7 @@ def edit(request, case_id, template_name='case/edit.html'):
         })
 
         form.populate(product_id=tc.category.product_id)
+
     return direct_to_template(request, template_name, {
             'test_case': tc,
             'test_plan': tp,
