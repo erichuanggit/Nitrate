@@ -25,20 +25,6 @@ from django.template import loader, Context, RequestContext
 # from stdlib
 import threading
 
-class NotifyEmailMessage(EmailMessage):
-
-    def __init__(self, cc=[], *args, **kwargs):
-
-        super(NotifyEmailMessage, self).__init__(*args, **kwargs)
-        self.cc = cc
-
-    def message(self):
-        ''' Override parent's to add CC header '''
-
-        msg = super(EmailMessage, self).message()
-        msg['CC'] = ', '.join(self.cc)
-        return msg
-
 def mailto(template_name, subject, to_mail, context = None, request = None, from_mail = None):
     """
     Based on Django's send_mail, to send notify email
@@ -71,8 +57,8 @@ def send_email_using_threading(template_name, subject, context=None, recipients=
     if settings.DEBUG:
         recipients = settings.EMAILS_FOR_DEBUG
 
-    email_msg = NotifyEmailMessage(subject=subject, body=body,
-                                   from_email=sender, to=recipients, cc=cc)
+    email_msg = EmailMessage(subject=subject, body=body,
+                             from_email=sender, to=recipients, bcc=cc)
 
     email_thread = threading.Thread(target=email_msg.send, args=[True,])
     # This is to tell Python not to wait for the thread to return
