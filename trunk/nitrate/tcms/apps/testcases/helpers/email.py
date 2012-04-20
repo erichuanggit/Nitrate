@@ -24,7 +24,7 @@ from tcms.core.utils.mailto import send_email_using_threading
 
 def email_case_update(case):
     recipients = get_case_notification_recipients(case)
-    cc = case.get_cc_list()
+    cc = case.emailing.get_cc_list()
     if len(recipients) == 0:
         return
     subject = 'TestCase %s has been updated.' % case.pk
@@ -38,7 +38,7 @@ def email_case_update(case):
 
 def email_case_deletion(case):
     recipients = get_case_notification_recipients(case)
-    cc = case.get_cc_list()
+    cc = case.emailing.get_cc_list()
     if len(recipients) == 0:
         return
     subject = 'TestCase %s has been deleted.' % case.pk

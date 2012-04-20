@@ -29,7 +29,7 @@ class NotifyEmailMessage(EmailMessage):
 
     def __init__(self, cc=[], *args, **kwargs):
 
-        super(EmailMessage, self).__init__(*args, **kwargs)
+        super(NotifyEmailMessage, self).__init__(*args, **kwargs)
         self.cc = cc
 
     def message(self):
@@ -72,7 +72,7 @@ def send_email_using_threading(template_name, subject, context=None, recipients=
         recipients = settings.EMAILS_FOR_DEBUG
 
     email_msg = NotifyEmailMessage(subject=subject, body=body,
-                                   from_email=sender, to=recipients)
+                                   from_email=sender, to=recipients, cc=cc)
 
     email_thread = threading.Thread(target=email_msg.send, args=[True,])
     # This is to tell Python not to wait for the thread to return
