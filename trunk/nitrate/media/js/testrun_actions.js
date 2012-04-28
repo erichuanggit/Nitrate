@@ -979,7 +979,6 @@ Author: ctang@redhat.com - 22 March 2011
 function updateBugs(action){
     var bug_ids = prompt("Specify bug IDs, using comma to seperate multiple IDs.");
     if(!bug_ids){
-        alert(default_messages.alert.no_bugs_specified);
         return false;
     }
     var runs = serializeCaseRunFromInputList($('id_table_cases'));
