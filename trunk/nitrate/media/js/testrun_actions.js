@@ -1008,23 +1008,24 @@ function updateBugs(action){
 
 function showCommentForm(){
     var dialog = getDialog();
+    var runs = serializeCaseRunFromInputList($('id_table_cases'));
     var comment_form = '<ul>' +
                             '<li><b>Comments: </b></li>' +
                             '<li><textarea name="comments" id="commentText" style="width:100%;height:100px;"></textarea></li>' + 
                             '<li><button id="btnComment">Confirm</button> <button id="btnCancelComment">Cancel</button>' +
                             ' <span id="commentsErr"></span>' +
                         '</ul>';
+    if(!runs.length){
+         return alert(default_messages.alert.no_case_selected);
+    }
     dialog.update(comment_form);
     var commentText = jQ('#commentText');
     var commentsErr = jQ('#commentsErr');
     jQ('#btnComment').live('click', function(){
         var error;
         var comments = jQ.trim(commentText.val());
-        var runs = serializeCaseRunFromInputList($('id_table_cases'));
         if(!comments)
             error = 'No comments given.';
-        if(!runs)
-            error = default_messages.alert.no_case_selected;
         if(error){
             commentsErr.html(error);
             return false;
