@@ -754,8 +754,8 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 
                 if(!this.value)
                     return false;
-                
-                if(!params['case'] && params['case'].length == 0){
+
+                if(params['case'].length == 0){
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
@@ -788,7 +788,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     return false;
                 
 
-                if(!params['case'] && params['case'].length == 0){
+                if(params['case'].length == 0){
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
