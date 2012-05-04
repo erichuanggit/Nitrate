@@ -61,7 +61,7 @@ jQ(function() {
 		{% endif %}
 		
 		{% if perms.testruns.add_testrun %}
-		<input type="button" value="Clone" title="Clone test run to other test build" onclick="postToURL('{% url tcms.apps.testruns.views.clone_with_filteredCaseRun test_run.pk %}', serializeCaseRunFromInputList('id_table_cases','case_run'))" />
+		<input type="button" value="Clone" title="Clone test run to other test build" onclick="postToURL('{% url tcms.apps.testruns.views.new_run_with_caseruns test_run.pk %}', serializeCaseRunFromInputList('id_table_cases','case_run'))" />
 		{% else %}
 		<input type="button" value="Clone" disabled="true"/>
 		{% endif %}
