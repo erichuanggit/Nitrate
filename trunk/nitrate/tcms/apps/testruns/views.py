@@ -117,7 +117,7 @@ def new(request, template_name='run/new.html'):
 
             loop = 1
 
-            # not reserve assignee and status
+            # not reserve assignee and status, assignee will default set to default_tester
             if not keep_assign and not keep_status:
                 for case in form.cleaned_data['case']:
                     try:
@@ -125,7 +125,14 @@ def new(request, template_name='run/new.html'):
                         sortkey = tcp.sortkey
                     except ObjectDoesNotExist, error:
                         sortkey = loop * 10
-                    tr.add_case_run(case=case, sortkey=sortkey,)
+                    try:
+                        assignee_tester = User.objects.get(username=default_tester)
+                    except ObjectDoesNotExist, error:
+                        assignee_tester = None
+
+                    tr.add_case_run(case=case,
+                                    sortkey=sortkey,
+                                    assignee=assignee_tester)
                     loop += 1
 
             # Add case to the run
@@ -546,7 +553,7 @@ def bug(request, case_run_id, template_name='run/execute_case_run.html'):
     return func()
 
 
-def clone_with_filteredCaseRun(request,run_id,template_name='run/clone.html'):
+def new_run_with_caseruns(request,run_id,template_name='run/clone.html'):
     """Clone cases from filter caserun"""
     SUB_MODULE_NAME = "runs"
     tr = get_object_or_404(TestRun, run_id=run_id)

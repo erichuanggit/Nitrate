@@ -107,7 +107,7 @@ def create(request, values):
       | default_product_version | Integer        | Required  |                                    |
       | text                    | String         | Required  | Plan documents, HTML acceptable.   |
       | parent                  | Integer        | Optional  | Parent plan ID                     |
-      | is_active               | Boolean        | Optional  | 0: Archived 1: Active (Default 1)  |
+      | is_active               | Boolean        | Optional  | 0: Archived 1: Active (Default 0)  |
       +-------------------------+----------------+-----------+------------------------------------+
 
     Returns:     The newly created object hash.
