@@ -49,6 +49,21 @@
 				And the response changes to hash not a array of hash, not just a array only.
 			</li>
 		</ul>
+
+		<h2>How to handle ForeignKey arguments</h2>
+
+		<p>In addition to the basic types such as Integers, Strings, Boolean, there is a relationship type called ForeignKey.</p>
+		<p>The syntax of using ForeignKey in our XMLRPC API is quite simple:</p>
+		<pre>foreignkey + '__' + fieldname + '__' + query_syntax.</pre>
+
+		<p>Taking TestCase.filter() for example, if the query is based on a default_tester's username starts with 'John', the syntax will look like this:</p>
+		<pre>TestCase.filter({'user__username__startswith': 'John'})</pre>
+
+		<p>In which case, the foreignkey is 'user', fieldname is 'username', and query_syntax is 'startswith', they are joined together using double underscores '__'.</p>
+
+		<p>For all the XMLRPC API, we have listed the available ForeignKey, however, for the available foreignkey field names that can be used in a query, please check out Nitrate source code on <a href="https://fedorahosted.org/nitrate/browser/trunk/nitrate/tcms" target="_blank">fedora</a>. The definitions are located in files named 'models.py'; for a detailed query syntax documentation, please check out the Django documentation:</p>
+		<a href="https://docs.djangoproject.com/en/1.2/topics/db/queries/#field-lookups" target="_blank">https://docs.djangoproject.com/en/1.2/topics/db/queries/#field-lookups</a>
+
 		
 		<h2>Available methods</h2>
 		<ul>
