@@ -602,9 +602,8 @@ function editValue(form,hidebox,selectid,submitid)
                        })
         
         set_up_choices($(selectid),values,0);
-        
-        }
-        
+    }
+
     var failure = function(t) {
         alert("Update values failed");
     }
@@ -626,6 +625,7 @@ function editValue(form,hidebox,selectid,submitid)
 function submitValue(run_id,value,hidebox,select_field,submitid){
     
     var new_value = select_field.options[select_field.selectedIndex].innerHTML;
+    var old_value = $$('input[name=current_run_env]')[0].value;
     var success = function(t) {
         returnobj = t.responseText.evalJSON(true);
         if(returnobj.rc == 0){
@@ -635,6 +635,7 @@ function submitValue(run_id,value,hidebox,select_field,submitid){
             $(hidebox).show();
             select_field.hide();
             $(submitid).hide();
+            $$('input[name=current_run_env]')[0].value = select_field.value;
         } else {
             alert(returnobj.response);
         }
@@ -643,13 +644,13 @@ function submitValue(run_id,value,hidebox,select_field,submitid){
     var failure = function(t) {
         alert("Edit value failed");
     }
-    
+
     var url  = '/runs/env_value/';
     new Ajax.Request(url, {
         method:'get',
         parameters: {
             'a': 'change',
-            'old_env_value_id': value,
+            'old_env_value_id': old_value,
             'new_env_value_id': select_field.value,
             'run_id' : run_id,
         }, 

@@ -4,6 +4,7 @@
 						<form class="" id="id_form_value_{{ run_env_value.pk }}">
 							<span class="lab">
 							<input type="hidden" value="{{ run_env_value.property_id }}" name="env_property_id"/>
+							<input type="hidden" value="{{ run_env_value.pk }}" name="current_run_env"/>
 							{{ run_env_value.property }}: 
 							
 							<span id="id_env_value_{{ run_env_value.pk }}" style="display:">{{ run_env_value.value }}</span>
