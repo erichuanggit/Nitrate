@@ -553,7 +553,7 @@ def update_testcase(request, tc, tc_form):
             form_cleaned = tc_form.cleaned_data[field]
             if not (getattr(latest_text, field) or form_cleaned):
                 continue
-            if (getattr(latest_text, field) != tc_form_cleaned):
+            if (getattr(latest_text, field) != form_cleaned):
                 tc.log_action(request.user, ' Case %s changed from %s to %s in edit page.' % (
                         field, getattr(latest_text, field) or None, form_cleaned or None
                         ))

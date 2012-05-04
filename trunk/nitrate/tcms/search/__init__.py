@@ -221,7 +221,7 @@ def fmt_queries(*queries):
         for k, v in query.iteritems():
             k = k.replace('p_product', 'product').replace('p_', 'product ').replace('cs_', 'case ')\
             .replace('pl_', 'plan ').replace('r_', 'run ').replace('_', ' ')
-            if v:
+            if isinstance(v, bool) or v:
                 if isinstance(v, QuerySet):
                     try:
                         v = ', '.join([o.name for o in v])
