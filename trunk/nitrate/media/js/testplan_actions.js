@@ -1289,7 +1289,7 @@ function changeCaseMember(container, field, case_ids, callback)
     
     var parameters = {
           'info_type': 'users',
-          'email__startswith': p,
+          'username': p,
     }
     
     getInfoAndUpdateObject(

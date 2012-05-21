@@ -887,7 +887,7 @@ function changeCaseRunAssignee()
     
     var parameters = {
           'info_type': 'users',
-          'email__startswith': p,
+          'username': p,
     }
     getInfoAndUpdateObject(
         parameters,
