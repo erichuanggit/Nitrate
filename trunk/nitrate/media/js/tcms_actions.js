@@ -99,7 +99,7 @@ Event.observe(window, 'load', function(e) {
 var default_messages = {
     'alert': {
         'no_case_selected': 'No cases selected! Please select at least one case.',
-        'ajax_failure': 'Commnucation with server got some unknown errors.',
+        'ajax_failure': 'Communication with server got some unknown errors.',
         'tree_reloaded': 'The tree has been reloaded.',
         'last_case_run': 'It is the last case run',
         'bookmark_added': 'Bookmark added.',
