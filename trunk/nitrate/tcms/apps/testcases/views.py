@@ -614,8 +614,12 @@ def edit(request, case_id, template_name='case/edit.html'):
                 if not tp:
                     raise Http404
 
-                # Exclude the disabled cases
-                pk_list = tp.case.exclude(case_status__name='DISABLED')
+                #find out test case list which belong to the same classification
+                confirm_status_name = 'CONFIRMED'
+                if tc.case_status.name == confirm_status_name:
+                    pk_list = tp.case.filter(case_status__name=confirm_status_name)
+                else:
+                    pk_list = tp.case.exclude(case_status__name=confirm_status_name)
                 pk_list = pk_list.defer('case_id').values_list('pk', flat=True)
 
                 # Get the previous and next case
@@ -624,6 +628,19 @@ def edit(request, case_id, template_name='case/edit.html'):
                     reverse('tcms.apps.testcases.views.edit', args=[n_tc.pk, ]),
                     tp.pk,
                 ))
+
+            if request.REQUEST.get('_returntoplan'):
+                if not tp:
+                    raise Http404
+                confirm_status_name = 'CONFIRMED'
+                if tc.case_status.name == confirm_status_name:
+                    return HttpResponseRedirect('%s#testcases' % (
+                        reverse('tcms.apps.testplans.views.get', args=[tp.pk, ]),
+                    ))
+                else:
+                    return HttpResponseRedirect('%s#reviewcases' % (
+                        reverse('tcms.apps.testplans.views.get', args=[tp.pk, ]),
+                    ))
 
             return HttpResponseRedirect('%s?from_plan=%s' % (
                 reverse('tcms.apps.testcases.views.get', args=[case_id, ]),

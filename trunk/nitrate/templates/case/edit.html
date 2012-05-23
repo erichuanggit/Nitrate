@@ -191,10 +191,11 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
 			</fieldset>
 			<div id="control_box" class="submit-row">
 				<div class="errors">{{ form.errors }}{{ notify_form.errors }}</div>
-				<input type="submit" value="Save" />
+				<input type="submit" value="Save"/>
 				<input type="submit" name="_continue" value="Save and continue editing"/>
 				{% if test_plan %}
-				<input type="submit" name="_continuenext" value="Save and edit next enabled case in plan {{ test_plan.pk }}"/>
+				<input type="submit" name="_returntoplan" value="Save and return to plan" />
+				<input type="submit" name="_continuenext" value="Save and edit next case"/>
 				{% endif %}
 				<input type="reset" value="Reset" />
 				<input type="button" value="Back" onclick="javascript:history.go(-1)" />
