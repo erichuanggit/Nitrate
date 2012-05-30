@@ -19,7 +19,7 @@
 import datetime
 import urllib
 
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponsePermanentRedirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.views.generic.simple import direct_to_template
@@ -28,6 +28,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.simplejson import dumps as json_dumps
 from django.shortcuts import get_object_or_404
 from django.core import serializers
+from django.template.defaultfilters import slugify
 
 from tcms.core.views import Prompt
 from tcms.core.utils.raw_sql import RawSQL
@@ -266,7 +267,7 @@ def all(request, template_name='plan/all.html'):
     })
 
 
-def get(request, plan_id, template_name = 'plan/get.html'):
+def get(request, plan_id, slug=None, template_name = 'plan/get.html'):
     """Display the plan details."""
     SUB_MODULE_NAME = 'plans'
 
@@ -275,6 +276,10 @@ def get(request, plan_id, template_name = 'plan/get.html'):
         tp.latest_text = tp.latest_text()
     except ObjectDoesNotExist, error:
         raise Http404
+
+    #redirect if has a cheated slug
+    if slug != slugify(tp.name):
+        return HttpResponsePermanentRedirect(tp.get_absolute_url())
 
     # Generate the run list of plan
     tp_trs = tp.run.select_related('build', 'manager', 'default_tester')
@@ -444,7 +449,7 @@ def edit(request, plan_id, template_name='plan/edit.html'):
             # Update plan email settings
             update_plan_email_settings(tp, form)
             return HttpResponseRedirect(
-                reverse('tcms.apps.testplans.views.get', args=[plan_id, ])
+                reverse('tcms.apps.testplans.views.get', args=[plan_id, slugify(tp.name)])
             )
     else:
         # Generate a blank form

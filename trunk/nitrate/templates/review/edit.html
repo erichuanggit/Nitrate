@@ -20,7 +20,7 @@
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
 		>> <a href="{% url tcms.apps.testplans.views.all %}">Plans</a>
-		>> <a href="{% url tcms.apps.testplans.views.get testplan.plan_id %}">{{ testplan.plan_id}}:{{ testplan }}</a>
+		>> <a href="{{ test_plan.get_absolute_url }}">{{ testplan.plan_id}}:{{ testplan }}</a>
 		>><a href="">Test review :{{ test_review.summary }}</a>
 		>>Edit
 	</div>

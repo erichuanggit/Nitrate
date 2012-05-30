@@ -31,14 +31,14 @@
 	{% if perms.testcases.add_testcasebug %}
 	<tr>
 		<td colspan="4" style="padding:0;">
-			<form id="id_case_bug_form" action="{% url tcms.apps.testcases.views.bug test_case.case_id %}" method="get" onsubmit="return false;">
+			<form id="id_case_bug_form" action="{% url tcms.apps.testcases.views.bug test_case.case_id %}" method="get">
 				<div class="addtag">
 					<span class="tit">Add Bug</span>
 					<input type="hidden" name="handle" value="add" />
 					<input type="hidden" name="case" value="{{ test_case.case_id }}" />
 					<input type="hidden" name="case_run" value="" />
 					<input type="hidden" name="bug_system" value="1" />
-					<input type="text" size="20" name="bug_id" onkeydown="if(event.keyCode==13) addCaseBug(this.up(1))"/>
+					<input type="text" size="20" name="bug_id" />
 					<a href="#bug" class="addlink" onclick="addCaseBug(this.up(1))">Add</a>
 				</div>
 			</form>

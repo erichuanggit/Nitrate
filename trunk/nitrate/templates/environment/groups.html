@@ -58,7 +58,7 @@ Nitrate.Utils.after_page_load(Nitrate.Management.Environment.on_load);
 			{% for env in environments %}
 			<tr class="{% cycle odd even %}" id="{{ env.id }}" >
 				<th align="center" height="26px">
-					<label class=" {% if env.is_active %}{% else %}disable line-through{% endif %}">
+					<label class=" {% if env.is_active %}{% else %}disable{% endif %}">
 						{% if perms.management.change_tcmsenvgroup %}
 						<a href="{% url tcms.apps.management.views.environment_group_edit %}?id={{ env.id }}" >
 							{{ env.name }}
