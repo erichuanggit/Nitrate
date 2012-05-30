@@ -200,6 +200,15 @@ class Version(TCMSActionModel):
     
     def __unicode__(self):
         return self.value
+
+    #update version when edit or create
+    def save(self, *args, **kwargs):
+        """Save version and update the relative test plans"""
+        super(Version, self).save(*args, **kwargs) # Call the "real" save() method.
+        test_plan_list = self.testplan_set.all()
+        for tp in test_plan_list:
+            tp.default_product_version = self.value
+            tp.save()
     
     @classmethod
     def id_to_string(cls, id):
