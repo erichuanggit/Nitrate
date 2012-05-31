@@ -1025,6 +1025,7 @@ def update(request, case_ids, values):
         | summary               | String         | Optional                                |
         | requirement           | String         | Optional                                |
         | alias                 | String         | Optional                                |
+        | notes                 | String         | Optional                                |
         +-----------------------+----------------+-----------------------------------------+
 
     Example:
