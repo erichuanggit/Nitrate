@@ -204,7 +204,12 @@ def add_to_run(request, case_ids, run_ids):
     run_ids = pre_process_ids(run_ids)
 
     trs = TestRun.objects.filter(run_id__in = run_ids)
+    if not trs:
+        raise ValueError, 'Invalid run_ids'
+
     tcs = TestCase.objects.filter(case_id__in = case_ids)
+    if not tcs:
+        raise ValueError, 'Invalid case_ids'
 
     for tr in trs:
         for tc in tcs:
