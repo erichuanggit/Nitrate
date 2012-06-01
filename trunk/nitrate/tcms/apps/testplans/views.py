@@ -256,6 +256,9 @@ def all(request, template_name='plan/all.html'):
         query_url = remove_from_request_path(request, 'asc')
     else:
         query_url = '%s&asc=True' % query_url
+    page_type = request.REQUEST.get('page_type', 'pagination')
+    query_url = remove_from_request_path(request, 'page_type')
+    query_url = remove_from_request_path(request, 'page')
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
@@ -263,6 +266,7 @@ def all(request, template_name='plan/all.html'):
         'query_result' : query_result,
         'search_plan_form' : search_form,
         'query_url': query_url,
+        'page_type': page_type
     })
 
 
@@ -807,7 +811,7 @@ def cases(request, plan_id):
 
             if not request.REQUEST.get('case'):
                 ajax_response['rc'] = 1
-                ajax_response['reponse'] = 'At least one case is required to delete.'
+                ajax_response['reponse'] = 'At least one case is required to re-order.'
                 return HttpResponse(json_dumps(ajax_response))
 
             tc_pks = request.REQUEST.getlist('case')
