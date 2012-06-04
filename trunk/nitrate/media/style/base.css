@@ -791,7 +791,7 @@ ul.data_content_title li{ display:inline-block; margin-left:3px;}
 .progress-failed{ height:21px; background:url(../images/process_bg.png) repeat-x 0px -42px; color:#D7670B; float:right; }
 .progress-passed{ height:21px; background:url(../images/process_bg.png) repeat-x 0px -21px; color:#000; float:right; }
 
-/* 图标开始 */
+/* ico start */
 
 .disablelink, .enablelink,.spadelink , .editlink, .deletelink, .sortlink,.updatelink,.updategrey,.comment_add,.bug_add{background:transparent url(../images/operation.png) no-repeat;text-decoration:none;height:16px;line-height:16px;cursor:pointer; }
 .addlink{padding:0px;cursor:pointer; background:transparent url(../images/operation_ico.png) no-repeat 0px 5px; padding-left:12px;}
@@ -841,7 +841,7 @@ ul.data_content_title li{ display:inline-block; margin-left:3px;}
 .blockedBlue9{background:url("../images/operation_ico.png") no-repeat 3px -234px;}
 .errorBlue9{background:url("../images/operation_ico.png") no-repeat 3px -324px;}
 .waivedBlue9{background:url("../images/operation_ico.png") no-repeat 3px -384px;}
-/* 图标结束 */
+/* ico end */
 
  /********************************list: cases list /runs list ***********************/
 .list { width : 100%; table-layout:fixed; background:#fff; clear:left; }
@@ -940,7 +940,7 @@ ul.data_content_title li{ display:inline-block; margin-left:3px;}
 .btn_waived[disabled="True"]{background-position:0px -46px;}
 
 /* plan icon */
-.icon_plan{background-image:url(../images/ico_plan.png); background-repeat:no-repeat; background-color:transparent; display:block; border:0px; cursor:pointer; font-size:12px; margin-right:5px; padding-left:16px;}
+.icon_plan{background-image:url(../images/ico_plan.png); background-repeat:no-repeat; background-color:transparent; display:block; border:0px; cursor:pointer; font-size:12px; margin-right:5px; padding-left:16px; line-height:18px; }
 
 .toolbar_case{background-position:0px 0px;}
 .toolbar_run{background-position:0px -345px;}
@@ -954,6 +954,7 @@ ul.data_content_title li{ display:inline-block; margin-left:3px;}
 .component_disabled{background-position:0px -644px; color:graytext;}
 .assignee{background-position:0px -575px;}
 .assigneedisable{ background-position:0px -598px; color:graytext;}
+
 
 .category{background-position:0px -1011px;}
 
@@ -992,6 +993,7 @@ ul.data_content_title li{ display:inline-block; margin-left:3px;}
 .add_node{background-position:0px -966px; padding-left:16px;}
 .edit_node{background-position:0px -23px; padding-left:16px;}
 .remove_node{background-position:0px -989px; padding-left:16px;}
+.sort_list{background-position:0px -1032px;}
 
 .noContentOrange{text-align:center; color:#FF6600; padding:15px 0 20px 0;}
 

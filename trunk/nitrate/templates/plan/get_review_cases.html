@@ -1,5 +1,6 @@
 {% load ifin %}
 {% load comments %}
+{% load testcase_tags %}
 <form action="{% url tcms.apps.testcases.views.all %}" method="get">
 	<input type="hidden" name="template_type" value="review_case" />
 	<input type="hidden" name="case_sort_by" value="{{ REQUEST_CONTENTS.case_sort_by }}" />
@@ -38,6 +39,11 @@
 						<li><input type="button" class="delete icon_plan" value="Remove" title="Remove selected cases from this plan" onclick="unlinkCasePlan(this.up(7), serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
 						{% else %}
 						<li><input type="button" class="delete icon_plan" value="Remove" title="Remove selected cases from this plan" disabled="true"/></li>
+						{% endif %}
+						{% if perms.testcases.change_testcase %}
+						<li><input type="button" class="sort_list icon_plan" value="Set Sort Number" title="Set sort number of selected cases from this plan"/></li>
+						{% else %}
+						<li><input type="button" class="sort_list icon_plan" value="Set Sort Number" title="Set sort number of selected cases from this plan" disabled="true"/></li>
 						{% endif %}
 					</ul>
 				</li>
@@ -211,7 +217,8 @@
 			<td class="col_priority_content expandable" align="center">{{ test_case.priority }}</td>
 			<td valign="top" width="8%" class="col_category_content expandable" style="display:none">{{ test_case.category }}</td>
 			<td class="col_sortkey_content" align="center">
-				<a href="javascript:void(0);" class="mark case_sortkey">{{ test_case.sortkey }}</a>
+				<a href="javascript:void(0);" class="mark case_sortkey">{{ test_case|sortkey:test_plan }}</a>
+				<span style="display:none">{{test_case|testcaseplan:test_plan}}</span>
 			</td>
 			<td align="center" >
 				{% if perms.testcases.change_testcase %}
