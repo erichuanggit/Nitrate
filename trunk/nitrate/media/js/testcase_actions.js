@@ -374,13 +374,20 @@ function blindupAllCases(element)
         element.src="/media/images/t1.gif";
     }
 }
-
 function changeCaseOrder(parameters, callback)
 {
-    nsk = prompt('Enter your new order number', parameters['sortkey'])   // New sort key
-    
+    if(parameters.hasOwnProperty('sortkey') == true){
+        nsk = prompt('Enter your new order number', parameters['sortkey']);   // New sort key
+        if(nsk == parameters['sortkey']) {
+            alert('Nothing changed');
+            return false;
+        }
+    }
+    else
+        nsk = prompt('Enter your new order number');
+
     if(!nsk)
-    return false
+        return false
     
     if(nsk != parseInt(nsk)) {
         alert('The value must be an integer number and limit between 0 to 32300.');
@@ -391,12 +398,6 @@ function changeCaseOrder(parameters, callback)
         alert('The value must be an integer number and limit between 0 to 32300.');
         return false;
     }
-    
-    if(nsk == parameters['sortkey']) {
-        alert('Nothing changed');
-        return false;
-    }
-    
     var ctype = 'testcases.testcaseplan';
     var object_pk = parameters['testcaseplan'];
     var field = 'sortkey';
@@ -746,6 +747,17 @@ function serializeCaseFromInputList(table)
         case_ids.push(elements[i].value);
     };
     return case_ids
+}
+function serializeSortFromInputList(table)
+{
+    var elements = $(table).adjacent('input[name="case"]:checked');
+    var case_plan_ids = new Array();
+    for(var i=0; i<elements.length; i++){
+        var case_plan_element = elements[i].up(0).siblings()[10].adjacent('span')[0];
+        if (typeof(case_plan_element.innerHTML) == 'string')
+        case_plan_ids.push(case_plan_element.innerHTML);
+    };
+    return case_plan_ids
 }
 
 function serialzeCaseForm(form, table, serialized)

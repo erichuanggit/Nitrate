@@ -351,7 +351,6 @@ Nitrate.TestPlans.Details.on_load = function()
             t.removeClassName('tab_focus');
         })
         this.parentNode.addClassName('tab_focus');
-        
         var tab_array = this.href.toArray();
         var tab = '';
         for (var i = tab_array.indexOf('#') + 1; i < tab_array.length; i++)
@@ -730,15 +729,15 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 var callback = function(t) {
                     returnobj = t.responseText.evalJSON(true);
                     if(returnobj.rc != 0) {
-                        alert(returnobj.response);
-                        return false;
+                        alert(returnobj.reponse);
                     }
                     //parameters.a = 'initial';
                     params.a = 'search';
                     constructPlanDetailsCasesZone(container, plan_id, params);
+                    
                     //sort cases by sortkey after drag and drop.
                     $$('a.sort_by_sortkey').each(function(e){
-						fireEvent(e, 'click');
+                                               fireEvent(e, 'click');
                     })
                 }
                 resortCasesDragAndDrop(container, this, form, table, params, callback);
@@ -945,7 +944,6 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                         alert(returnobj.response);
                         return false
                     };
-                    
                     constructPlanDetailsCasesZone(container, plan_id, parameters);
                 }
                 
@@ -953,7 +951,25 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 changeCaseMember(table, field, case_pks, callback);
             })
         }
-        
+
+        if(form.adjacent('input.sort_list').length != 0) {
+            var element = form.adjacent('input.sort_list')[0];
+            element.observe('click', function(e) {
+                var case_plan_pks = serializeSortFromInputList(table);
+                if(case_plan_pks.length == 0) {
+                    alert(default_messages.alert.no_case_selected);
+                    return false;
+                }
+                var params = {
+                    'testcaseplan': case_plan_pks
+                };
+                var callback = function(t) {
+                    constructPlanDetailsCasesZone(container, plan_id, parameters);
+                };
+                changeCaseOrder(params, callback);
+            })
+        }
+
         if(form.adjacent('input.btn_reviewer').length > 0) {
             var element = form.adjacent('input.btn_reviewer')[0];
             element.observe('click', function(e) {

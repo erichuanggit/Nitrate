@@ -827,7 +827,6 @@ function postToURL(path, params, method) {
 function constructTagZone(container, parameters)
 {
     $(container).update('<div class="ajax_loading"></div>');
-    
     var complete = function(t) {
         new Ajax.Autocompleter("id_tags", "id_tags_autocomplete", getURLParam().url_get_product_info, {
             minChars: 2,
@@ -1365,3 +1364,4 @@ function exportCase(url, case_ids){
     }
     postToURL(url, case_ids);
 }
+
