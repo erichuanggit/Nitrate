@@ -4,8 +4,13 @@
 			<tr>
 				<th>Tag</th>
 				<th>Plans</th>
+				{% if object.plan_id %}
+				<th>Cases (in current plan)</th>
+				<th>Runs (in current plan)</th>
+				{% else %}
 				<th>Cases</th>
 				<th>Runs</th>
+				{% endif %}
 				<th>Action</th>
 			</tr>
 		</thead>
@@ -14,8 +19,13 @@
 			<tr class="{% cycle 'even' 'odd'%}">
 				<td><span class="tagvalue">{{ tag }}</span></td>
 				<td><a href="{% url tcms.apps.testplans.views.all %}?action=search&tag__name__in={{ tag }}" title="{{ tag.num_plans }} plans tagged {{ tag }}">{{ tag.num_plans }}</a></td>
+				{% if object.plan_id %}
+				<td><a href="{% url tcms.apps.testcases.views.all %}?a=search&tag__name__in={{ tag }}&plan={{ object.plan_id }}"  title="{{ tag.num_cases }} cases tagged {{ tag }}">{{ tag.num_cases }}</a></td>
+				<td><a href="{% url tcms.apps.testruns.views.all %}?action=search&tag__name__in={{ tag }}&plan={{ object.plan_id }}"  title="{{ tag.num_runs }} runs tagged {{ tag }}">{{ tag.num_runs }}</a></td>
+				{% else %}
 				<td><a href="{% url tcms.apps.testcases.views.all %}?a=search&tag__name__in={{ tag }}"  title="{{ tag.num_cases }} cases tagged {{ tag }}">{{ tag.num_cases }}</a></td>
-				<td><a href="{% url tcms.apps.testruns.views.all %}?action=search&tag__name__in={{ tag }}"	 title="{{ tag.num_runs }} runs tagged {{ tag }}">{{ tag.num_runs }}</a></td>
+				<td><a href="{% url tcms.apps.testruns.views.all %}?action=search&tag__name__in={{ tag }}"  title="{{ tag.num_runs }} runs tagged {{ tag }}">{{ tag.num_runs }}</a></td>
+				{% endif %}
 				{% if object.plan_id and perms.testplans.delete_testplantag %}
 				<td><a href="#tag" class="remove" title="remmove tag from this plan" onclick="removeTag(this.up(5), '{{ tag }}')">Remove</a>
 				<a href="#tag" class="edit" title="edit tag" onclick="editTag(this.up(5), '{{ tag }}')">Edit</a>
