@@ -316,3 +316,5 @@ KRB5_REALM = ''
 # A valid Errata URL:
 # https://errata.devel.redhat.com/errata/stateview/{Errata ID}
 ERRATA_URL_PREFIX = 'https://errata.devel.redhat.com/errata/stateview'
+# user guide url:
+USER_GUIDE_URL = 'https://riddler.bne.redhat.com/TCMS-User_Guide/index.html'

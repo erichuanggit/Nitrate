@@ -47,9 +47,7 @@
 					{% if user.is_authenticated %}
 					<a href="{% url tcms.apps.profiles.views.profile user.username %}">Welcome, {{ user }}</a>
 					{% if AUTH_BACKEND.can_logout %}
-					[
-					<a href="{% url tcms.core.contrib.auth.views.logout %}?next={{ request.path }}">Logout</a>
-					]
+					<span>[</span><a href="{% url tcms.core.contrib.auth.views.logout %}?next={{ request.path }}">Logout</a><span>]</span>
 					{% endif %}
 					{% else %}
 					Welcome, Guest.
@@ -62,6 +60,7 @@
 					{% endif %}
 					]
 					{% endif %}
+					<a class="sprites userguide" href="{{ SETTINGS.USER_GUIDE_URL }}" target="_blank">User Guide</a>
 				</label>
 			</div>
 			{% include 'menu.html' %}
