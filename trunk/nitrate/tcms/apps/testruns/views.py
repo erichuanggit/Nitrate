@@ -18,7 +18,6 @@
 
 import datetime
 import time
-import csv
 import urllib
 
 from django.contrib.auth.decorators import user_passes_test
@@ -27,7 +26,7 @@ from django.contrib.auth.models import User
 from django.views.generic.simple import direct_to_template
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import simplejson
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -46,7 +45,7 @@ from tcms.apps.testcases.models import TestCase, TestCasePlan, TestCaseBug
 from tcms.apps.testplans.models import TestPlan
 from tcms.apps.testruns.models import TestRun, TestCaseRun, TestCaseRunStatus, \
         TCMSEnvRunValueMap
-from tcms.apps.management.models import Version, Priority, TCMSEnvValue, \
+from tcms.apps.management.models import Priority, TCMSEnvValue, \
         TestTag
 
 from tcms.apps.testcases.forms import CaseBugForm
