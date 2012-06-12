@@ -344,7 +344,7 @@ def all(request, template_name="case/all.html"):
         selected_case_ids = tcs.values_list('pk', flat=True)
 
     # Get the tags own by the cases
-    ttags = TestTag.objects.filter(testcase__in=tcs).distinct()
+    ttags = TestTag.objects.filter(testcase__in=tcs).order_by('name').distinct()
     # generating a query_url with order options
     query_url = remove_from_request_path(request, 'order_by')
     if asc:
