@@ -185,11 +185,13 @@ def new(request, template_name='run/new.html'):
                 )
 
     else:
+        estimated_time = reduce(lambda x, y: x + y, [tc.estimated_time for tc in tcs])
         form = NewRunForm(initial={
             'summary': 'Test run for %s on %s' % (
                 tp.name,
                 tp.env_group.all() and tp.env_group.all()[0] or 'Unknown environment'
             ),
+            'estimated_time': estimated_time,
             'manager': tp.author.email,
             'default_tester': request.user.email,
             'product': tp.product_id,
@@ -569,6 +571,7 @@ def new_run_with_caseruns(request,run_id,template_name='run/clone.html'):
                     info_type=Prompt.Info,
                     info='At least one case is required by a run',
                     next = request.META.get('HTTP_REFERER', '/')))
+    estimated_time = reduce(lambda x, y: x + y, [tcr.case.estimated_time for tcr in tcrs])
 
     if not request.REQUEST.get('submit'):
         form=RunCloneForm(initial={
@@ -577,6 +580,7 @@ def new_run_with_caseruns(request,run_id,template_name='run/clone.html'):
             'product_version':tr.get_version_id(),
             'build':tr.build_id,
             'default_tester':tr.default_tester_id and tr.default_tester.email or '',
+            'estimated_time': estimated_time,
             'use_newest_case_text':True,
         })
 
