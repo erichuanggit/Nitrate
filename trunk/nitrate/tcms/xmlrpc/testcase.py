@@ -19,6 +19,7 @@
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
 from django.core.exceptions import ObjectDoesNotExist
 from tcms.apps.testcases.models import TestCase
+from tcms.apps.management.models import TestTag
 from utils import pre_process_ids, compare_list
 
 from django.forms import EmailField, ValidationError
@@ -572,6 +573,14 @@ def get(request, case_id):
 
     response = tc.serialize()
     response['text'] = tc_latest_text
+    #get the xmlrpc tags
+    tag_ids = tc.tag.values_list('id', flat=True)
+    query = {'id__in': tag_ids}
+    tags = TestTag.to_xmlrpc(query)
+    #cut 'id' attribute off, only leave 'name' here
+    tags_without_id = map(lambda x:x["name"], tags)
+    #replace tag_id list in the serialize return data
+    response["tag"] = tags_without_id
     return response
 
 def get_bug_systems(request, id):
@@ -715,7 +724,6 @@ def get_tags(request, case_id):
     Example:
     >>> TestCase.get_tags(12345)
     """
-    from tcms.apps.management.models import TestTag
     try:
         tc = TestCase.objects.get(case_id = case_id)
     except:

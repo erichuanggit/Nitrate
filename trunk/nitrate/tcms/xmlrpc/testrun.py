@@ -340,7 +340,20 @@ def get(request, run_id):
     Example:
     >>> TestRun.get(1193)
     """
-    return TestRun.objects.get(run_id = run_id).serialize()
+    try:
+        tr = TestRun.objects.get(run_id = run_id)
+    except TestRun.DoesNotExist, error:
+        return error
+    response = tr.serialize()
+    #get the xmlrpc tags
+    tag_ids = tr.tag.values_list('id', flat=True)
+    query = {'id__in': tag_ids}
+    tags = TestTag.to_xmlrpc(query)
+    #cut 'id' attribute off, only leave 'name' here
+    tags_without_id = map(lambda x:x["name"], tags)
+    #replace tag_id list in the serialize return data
+    response["tag"] = tags_without_id
+    return response
 
 def get_bugs(request, run_ids):
     """

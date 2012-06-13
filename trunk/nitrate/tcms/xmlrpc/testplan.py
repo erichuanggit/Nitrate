@@ -18,6 +18,7 @@
 
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
 from tcms.apps.testplans.models import TestPlan, TestPlanType
+from tcms.apps.management.models import TestTag
 from utils import pre_process_ids
 
 __all__ = (
@@ -219,8 +220,16 @@ def get(request, plan_id):
         tp = TestPlan.objects.get(plan_id = plan_id)
     except TestPlan.DoesNotExist, error:
         return error
-
-    return tp.serialize()
+    response = tp.serialize()
+    #get the xmlrpc tags
+    tag_ids = tp.tag.values_list('id', flat=True)
+    query = {'id__in': tag_ids}
+    tags = TestTag.to_xmlrpc(query)
+    #cut 'id' attribute off, only leave 'name' here
+    tags_without_id = map(lambda x:x["name"], tags)
+    #replace tag_id list in the serialize return data
+    response["tag"] = tags_without_id
+    return response
 
 def get_change_history(request, plan_id):
     """
@@ -281,7 +290,6 @@ def get_tags(request, plan_id):
     Example:
     >>> TestPlan.get_tags(137)
     """
-    from tcms.apps.management.models import TestTag
     try:
         tp = TestPlan.objects.get(plan_id = plan_id)
     except:
