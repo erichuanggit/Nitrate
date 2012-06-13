@@ -349,7 +349,7 @@ def all(request, template_name="case/all.html"):
     # generating a query_url with order options
     query_url = remove_from_request_path(request, 'order_by')
     if asc:
-        query_url = remove_from_request_path(request, 'asc')
+        query_url = remove_from_request_path(query_url, 'asc')
     else:
         query_url = '%s&asc=True' % query_url
     return direct_to_template(request, template_name, {
