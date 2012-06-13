@@ -25,7 +25,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Create.on_load);
 		<a href="{% url tcms.core.views.index %}">Home</a>
 		{% if test_plan %}
 		>> <a href="{% url tcms.apps.testplans.views.all %}">Planning</a>
-		>> <a href="{% url tcms.apps.testplans.views.get test_plan.plan_id %}">{{ test_plan.name }}</a>
+		>> <a href="{{ test_plan.get_absolute_url }}">{{ test_plan.name }}</a>
 		{% else %}
 		>> <a href="{% url tcms.apps.testcases.views.all %}">Testing</a>
 		{% endif %}
@@ -161,7 +161,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Create.on_load);
 				{% if test_plan %}
 				<input type="submit" name="_addanother" value="Save and add another" />
 				<input type="submit" name="_returntoplan" value="Save and return to plan" />
-				<input type="button" value="Cancel" onclick="window.location.href='{% url tcms.apps.testplans.views.get test_plan.plan_id %}'" />
+				<input type="button" value="Cancel" onclick="window.location.href='{{ test_plan.get_absolute_url }}'" />
 				{% else %}
 				<input type="button" value="cancel" onclick="window.history.go(-1);">
 				{% endif %}

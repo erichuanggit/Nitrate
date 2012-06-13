@@ -25,10 +25,12 @@ from django.core.cache import cache
 from django.utils.safestring import mark_safe, SafeData
 from django.db.models.signals import post_save, post_delete
 from django.conf import settings
+from django.db import models
+from django.template.defaultfilters import slugify
 
 from tcms.core.models import TCMSActionModel
 
-from tcms.apps.management.models import TCMSEnvPlanMap
+from tcms.apps.management.models import TCMSEnvPlanMap, Version
 from tcms.apps.testcases.models import TestCasePlan
 
 # single listen
@@ -249,24 +251,21 @@ class TestPlan(TCMSActionModel):
             (self.plan_id, case.case_id)
         )
 
-    def get_absolute_url(self, request = None):
-        # Upward compatibility code
-        if request:
-            return request.build_absolute_uri(
-                reverse('tcms.apps.testplans.views.get', args=[self.pk, ])
-            )
-
-        return self.get_url(request)
-
+    @models.permalink
+    def get_absolute_url(self):
+        return ('test_plan_url', (), {
+            'plan_id': self.plan_id,
+            'slug': slugify(self.name),
+        })
+    
     def get_url_path(self, request = None):
-        return reverse('tcms.apps.testplans.views.get', args=[self.pk, ])
+        return self.get_absolute_url()
 
     def get_default_product_version(self):
         """
         Workaround the schema problem with default_product_version
         Get a 'Versions' object based on a string query
         """
-        from tcms.apps.management.models import Version
         try:
             return Version.objects.get(
                 product = self.product,

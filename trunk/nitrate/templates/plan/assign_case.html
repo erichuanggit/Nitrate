@@ -24,7 +24,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.AssignCases.on_load);
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
 		>> <a href="{% url tcms.apps.testplans.views.all %}">Planning</a>
-		>> <a href="{% url tcms.apps.testplans.views.get testplan.plan_id %}">{{ testplan.plan_id }}: {{ testplan.name }}</a>
+		>> <a href="{{ test_plan.get_absolute_url }}">{{ testplan.plan_id }}: {{ testplan.name }}</a>
 		>> Manage Test Cases
 	</div>
 	<h2>{{ testplan.name }}</h2>

@@ -18,7 +18,7 @@
 </thead><tbody>
 {% for plan, test_case_runs in runs_ordered_by_plan %}
 
-<tr><td colspan="12" class="listGroupBlue">Plan:<span style="padding:0 0 0 6px;"><a href="{% url tcms.apps.testplans.views.get plan.pk %}">[{{ plan.pk }}] {{ plan.name }}</a></span></td></tr>
+<tr><td colspan="12" class="listGroupBlue">Plan:<span style="padding:0 0 0 6px;"><a href="{{ plan.get_absolute_url }}">[{{ plan.pk }}] {{ plan.name }}</a></span></td></tr>
 
 	
 		{% for test_case_run in test_case_runs %}
