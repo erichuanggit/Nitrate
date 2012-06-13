@@ -88,7 +88,6 @@
 						<span class="strong">#{{ forloop.counter }}</span>
 						<span class="strong">{{ comment.user.email }}</span>
 						<span class="grey">{{ comment.submit_date }}</span>
-						<input class='btn_remove_comment commentdelete sprites' value='Delete Comment' type='button'>
 						<br/>
 						{{ comment.comment|redhat_urlize|linebreaksbr }}
 						{% endifequal %}
