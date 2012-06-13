@@ -320,12 +320,11 @@ def all(request, template_name="case/all.html"):
                              'case_status',
                              'priority',
                              'category')
-
     tcs = tcs.extra(select={'num_bug': RawSQL.num_case_bugs,})
     tcs = tcs.distinct()
     tcs = order_case_queryset(tcs, order_by, asc)
     # default sorted by sortkey
-    tcs = tcs.order_by('testcaseplan__sortkey')
+    #tcs = tcs.order_by('testcaseplan__sortkey')
     # Resort the order
     # if sorted by 'sortkey'(foreign key field)
     case_sort_by = request.REQUEST.get('case_sort_by')
