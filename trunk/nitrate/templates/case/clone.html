@@ -46,9 +46,11 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Clone.on_load);
 							<input type="submit" value="Filter plan" />
 						</div>
 					</form>
-				</div>
+					</div>
+				{% if submit_action %}
 				{{ clone_form.plan.errors }}
-                </div>
+				{% endif %}
+				</div>
 			</div>
 			<form id="id_clone_form" action="{% url tcms.apps.testcases.views.clone %}" method="post">
 				{{ form.case_id }}

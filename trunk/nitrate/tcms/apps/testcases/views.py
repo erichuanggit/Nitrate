@@ -886,12 +886,14 @@ def clone(request, template_name='case/clone.html'):
         search_plan_form = SearchPlanForm(initial={'product': tp.product_id, 'is_active': True})
         search_plan_form.populate(product_id=tp.product_id)
 
+    submit_action = request.REQUEST.get('submit', None)
     return direct_to_template(request, template_name, {
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_plan': tp,
         'search_form': search_plan_form,
         'clone_form': clone_form,
+        'submit_action': submit_action,
     })
 
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasecomponent'))
