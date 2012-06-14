@@ -65,18 +65,20 @@ def plan_from_request_or_none(request):
 def update_case_email_settings(tc, n_form):
     """Update testcase's email settings."""
 
+    tc.emailing.notify_on_case_update = n_form.cleaned_data[
+        'notify_on_case_update']
+    tc.emailing.notify_on_case_delete = n_form.cleaned_data[
+        'notify_on_case_delete']
+    tc.emailing.auto_to_case_author = n_form.cleaned_data[
+        'author']
+    tc.emailing.auto_to_case_tester = n_form.cleaned_data[
+        'default_tester_of_case']
     tc.emailing.auto_to_run_manager = n_form.cleaned_data[
         'managers_of_runs']
     tc.emailing.auto_to_run_tester = n_form.cleaned_data[
         'default_testers_of_runs']
     tc.emailing.auto_to_case_run_assignee = n_form.cleaned_data[
         'assignees_of_case_runs']
-    tc.emailing.auto_to_case_author = n_form.cleaned_data[
-        'author']
-    tc.emailing.notify_on_case_update = n_form.cleaned_data[
-        'notify_on_case_update']
-    tc.emailing.notify_on_case_delete = n_form.cleaned_data[
-        'notify_on_case_delete']
     tc.emailing.save()
 
     default_tester = n_form.cleaned_data['default_tester_of_case']
@@ -651,8 +653,8 @@ def edit(request, case_id, template_name='case/edit.html'):
         tctxt = tc.latest_text()
         # Notification form initial
         n_form = CaseNotifyForm(initial= {
-            'notify_on_case_delete': tc.emailing.notify_on_case_delete,
             'notify_on_case_update': tc.emailing.notify_on_case_update,
+            'notify_on_case_delete': tc.emailing.notify_on_case_delete,
             'author': tc.emailing.auto_to_case_author,
             'default_tester_of_case': tc.emailing.auto_to_case_tester,
             'managers_of_runs': tc.emailing.auto_to_run_manager,
