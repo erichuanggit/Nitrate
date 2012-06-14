@@ -221,7 +221,7 @@ class XMLRPCUpdateRunForm(XMLRPCNewRunForm):
     )
     build = forms.ModelChoiceField(
         label='Build',
-        queryset=TestBuild.objects.none(),
+        queryset=TestBuild.objects.all(),
         required=False
     )
 
