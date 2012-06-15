@@ -1021,7 +1021,7 @@ def update(request, case_ids, values):
         | product               | Integer        | Optional(Required if changes category)  |
         | category              | Integer        | Optional                                |
         | priority              | Integer        | Optional                                |
-        | default_tester        | String         | Optional                                |
+        | default_tester        | String/Integer | Optional(str - user_name, int - user_id)|
         | estimated_time        | String         | Optional                                |
         | is_automated          | Integer        | Optional(0 - Manual, 1 - Auto, 2 - Both)|
         | is_automated_proposed | Boolean        | Optional                                |
