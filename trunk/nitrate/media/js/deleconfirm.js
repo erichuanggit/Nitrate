@@ -14,6 +14,7 @@ new Ajax.Request(url,{
     returnobj=response.responseText.evalJSON(true);
     if(returnobj.rc==0){
     $(""+attachment_id).remove();
+    jQ('#attachment_count').text(parseInt(jQ('#attachment_count').text())-1);
     }   
      else if (returnobj.response='auth_failure'){
     alert("Permission denied!");

@@ -300,7 +300,7 @@ function toggleTestCaseContents(template_type, container, content_container, obj
     }
 }
 
-function changeTestCaseStatus(selector, case_id)
+function changeTestCaseStatus(selector, case_id, be_confirmed, was_confirmed)
 {
     var value = selector.value;
     var label = selector.previous();
@@ -315,8 +315,19 @@ function changeTestCaseStatus(selector, case_id)
         }
         
         label.innerHTML = case_status;
-        label.show(); 
+        label.show();
         selector.hide();
+
+        if(be_confirmed){
+            jQ('#run_case_count').text(parseInt(jQ('#run_case_count').text())+1);
+            jQ('#review_case_count').text(parseInt(jQ('#review_case_count').text())-1);
+            jQ('#'+case_id).remove();
+        }
+        if(was_confirmed){
+            jQ('#run_case_count').text(parseInt(jQ('#run_case_count').text())-1);
+            jQ('#review_case_count').text(parseInt(jQ('#review_case_count').text())+1);
+            jQ('#'+case_id).remove();
+        }
     }
     
     changeCasesStatus(case_id, value, success);
@@ -500,6 +511,7 @@ function addCaseBug(form, callback)
         
         if(callback)
             callback();
+        jQ('#case_bug_count').text(jQ('table#bugs').attr('count'));
     }
     
     new Ajax.Updater('bug', form.action, {
@@ -524,6 +536,7 @@ function removeCaseBug(id, case_id, callback)
             alert($('response').innerHTML);
             return false;
         }
+        jQ('#case_bug_count').text(jQ('table#bugs').attr('count'));
     }
     
     new Ajax.Updater('bug', '/case/' + case_id + '/bug/', {
@@ -556,6 +569,7 @@ function constructPlanCaseZone(container, case_id, parameters)
                 
                 constructPlanCaseZone(container, case_id, p);
                 clearDialog();
+                jQ('#plan_count').text(jQ('table#testplans').attr('count'));
             }
             
             var p = this.serialize(true)
@@ -584,7 +598,8 @@ function removePlanFromCase(container, plan_id, case_id)
         a: 'remove',
         plan_id: plan_id,
     };
-    constructPlanCaseZone(container, case_id, parameters)
+    constructPlanCaseZone(container, case_id, parameters);
+    jQ('#plan_count').text(jQ('table#testplans').attr('count'));
 }
 
 function taggleAllCasesCheckbox(container)

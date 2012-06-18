@@ -848,6 +848,8 @@ function constructTagZone(container, parameters)
             
             // this.adjacent('input[name="tags"]').invoke('focus');
         })
+        var count = jQ('tbody#tag').attr('count');
+        jQ('#tag_count').text(count);
     }
     
     var url = new String('/management/tags/');

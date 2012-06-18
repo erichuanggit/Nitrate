@@ -1027,7 +1027,6 @@ def component(request, template_name='plan/get_component.html'):
                     serializers.serialize(request.REQUEST['type'], obj)
                 )
 
-
             return direct_to_template(request, template_name, {
                 'test_plan': self.tps[0],
             })

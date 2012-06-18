@@ -1093,9 +1093,10 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         })
         
         table.adjacent('.change_status_selector').invoke('observe', 'change', function(e) {
-            var title = this.up(1); // Container
-            var case_id = title.getElementsBySelector('input[name="case"]')[0].value;
-            changeTestCaseStatus(this, case_id);
+            var be_confirmed = (this.value == '2');
+            var was_confirmed = (this.up(0).attributes['status'].value == "CONFIRMED");
+            var case_id = this.up(1).id;
+            changeTestCaseStatus(this, case_id, be_confirmed, was_confirmed);
         })
         
         // Display/Hide the case content
@@ -1204,13 +1205,15 @@ function constructPlanComponentsZone(container, parameters, callback)
             var p = $('id_form_plan_components').serialize(true);
             p['component'] = component.value;
             p['a'] = 'remove';
-            
-            constructPlanComponentsZone(container, p, callback)
+            constructPlanComponentsZone(container, p, callback);
         })
         
         $('id_checkbox_all_component').observe('click', function(e) {
             clickedSelectAll(this, this.up(4), 'component');
-        })
+        });
+
+        var c_count = jQ('tbody#component').attr('count');
+        jQ('#component_count').text(c_count);
     }
     
     new Ajax.Updater(container, url, {

@@ -294,7 +294,6 @@ def tag(request, template_name="management/get_tag.html"):
             'tags': tags,
             'object': obj[0],
         })
-
     return HttpResponse('')
 
 def get_value_by_type(val, v_type):
