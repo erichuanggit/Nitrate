@@ -516,7 +516,6 @@ def clone(request, template_name='plan/clone.html'):
             info='The plan you specific does not exist in database',
             next='javascript:window.history.go(-1)',
         ))
-
     # Clone the plan if the form is submitted
     if request.method == "POST":
         clone_form = ClonePlanForm(request.REQUEST)
@@ -534,7 +533,7 @@ def clone(request, template_name='plan/clone.html'):
                     create_date=tp.create_date,
                     is_active=tp.is_active,
                     extra_link=tp.extra_link,
-                    parent=tp,
+                    parent=clone_form.cleaned_data['set_parent'] and tp or None,
                 )
 
                 # Copy the plan documents
@@ -661,6 +660,7 @@ def clone(request, template_name='plan/clone.html'):
             clone_form = ClonePlanForm(initial = {
                 'product': tps[0].product.id,
                 'default_product_version': tps[0].get_version_id(),
+                'set_parent': True,
                 'copy_texts': True,
                 'copy_attachements': True,
                 'copy_environment_group': True,
@@ -673,6 +673,7 @@ def clone(request, template_name='plan/clone.html'):
             clone_form.populate(product_id=tps[0].product.id)
         else:
             clone_form = ClonePlanForm(initial = {
+                'set_parent': True,
                 'copy_texts': True,
                 'copy_attachements': True,
                 'link_testcases': True,

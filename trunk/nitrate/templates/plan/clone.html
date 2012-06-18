@@ -77,6 +77,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Clone.on_load);
 					<td><label class="strong">Copy Settings</label> </td>
 					<td>
 						<ul class="ul-no-format">
+							<li>{{ clone_form.set_parent }}{{ clone_form.set_parent.label }} ({{ clone_form.set_parent.help_text }})</li>
 							<li>{{ clone_form.keep_orignal_author }}{{ clone_form.keep_orignal_author.label }} ({{ clone_form.keep_orignal_author.help_text }})</li>
 							<li>{{ clone_form.copy_texts }}{{ clone_form.copy_texts.label }} ({{ clone_form.copy_texts.help_text }})</li>
 							<li>{{ clone_form.copy_attachements }}{{ clone_form.copy_attachements.label }} ({{ clone_form.copy_attachements.help_text }})</li>
