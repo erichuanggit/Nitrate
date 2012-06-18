@@ -336,8 +336,12 @@ def get_test_cases(request, plan_id):
     >>> TestPlan.get_test_cases(137)
     """
     from tcms.apps.testcases.models import TestCase
-    query = {'plan': plan_id}
-    return TestCase.to_xmlrpc(query)
+    from tcms.apps.testplans.models import TestPlan
+    from tcms.core.utils.xmlrpc import XMLRPCSerializer
+
+    tp = TestPlan.objects.get(pk=plan_id)
+    tcs = TestCase.objects.filter(plan=tp).order_by('testcaseplan__sortkey')
+    return XMLRPCSerializer(tcs).serialize_queryset()
 
 def get_test_runs(request, plan_id):
     """
