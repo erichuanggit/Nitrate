@@ -143,8 +143,6 @@ def add_tag(request, run_ids, tags):
     # Add tag list ['foo', 'bar'] to run list [12345, 67890] with String
     >>> TestPlan.add_tag('12345, 67890', 'foo, bar')
     """
-    from tcms.apps.management.models import TestTag
-
     trs = TestRun.objects.filter(pk__in = pre_process_ids(value = run_ids))
     tags = TestTag.string_to_list(tags)
 
@@ -435,7 +433,6 @@ def get_tags(request, run_id):
     Example:
     >>> TestRun.get_tags(1193)
     """
-    from tcms.apps.management.models import TestTag
     try:
         tr = TestRun.objects.get(run_id = run_id)
     except:
@@ -480,7 +477,6 @@ def get_test_cases(request, run_id):
     Example:
     >>> TestRun.get_test_cases(1193)
     """
-    from tcms.apps.testcases.models import TestCase
     tr = TestRun.objects.get(run_id = run_id)
     tc_ids = tr.case_run.values_list('case_id', flat = True)
     query = {'case_id__in': tc_ids}
@@ -521,7 +517,6 @@ def remove_tag(request, run_ids, tags):
     # Remove tag 'foo' and 'bar' from run list '56789, 12345' with String
     >>> TestRun.remove_tag('56789, 12345', 'foo, bar')
     """
-    from tcms.apps.management.models import TestTag
     trs = TestRun.objects.filter(
         run_id__in = pre_process_ids(value = run_ids)
     )
