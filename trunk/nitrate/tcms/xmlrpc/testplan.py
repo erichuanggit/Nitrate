@@ -19,6 +19,7 @@
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
 from tcms.apps.testplans.models import TestPlan, TestPlanType
 from tcms.apps.management.models import TestTag
+from django.core.exceptions import ObjectDoesNotExist
 from utils import pre_process_ids
 
 __all__ = (
@@ -67,7 +68,6 @@ def add_tag(request, plan_ids, tags):
     # Add tag list ['foo', 'bar'] to plan list [12345, 67890] with String
     >>> TestPlan.add_tag('12345, 67890', 'foo, bar')
     """
-    from tcms.apps.management.models import TestTag
     tps = TestPlan.objects.filter(
         plan_id__in = pre_process_ids(value = plan_ids)
     )
@@ -310,7 +310,6 @@ def get_all_cases_tags(request, plan_id):
     Example:
     >>> TestPlan.get_all_cases_tags(137)
     """
-    from tcms.apps.management.models import TestTag
     try:
         tp = TestPlan.objects.get(plan_id = plan_id)
     except:
