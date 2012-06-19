@@ -16,10 +16,9 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-from datetime import datetime
 
 from django.core.urlresolvers import reverse
-from django.db import models, connection, transaction
+from django.db import models, connection
 from django.db.models.signals import post_save
 from django.contrib.contenttypes import generic
 
