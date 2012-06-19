@@ -433,7 +433,7 @@ class TestCase(TCMSActionModel):
         return (self.is_automated, )
 
     def get_is_automated_status(self):
-        return self.get_is_automated() + (self.is_automated_proposed and '(Autoproposed)' or '')
+        return self.get_is_automated() + (self.is_automated_proposed and ' (Autoproposed)' or '')
 
     def get_previous_and_next(self, pk_list):
         pk_list = list(pk_list)
