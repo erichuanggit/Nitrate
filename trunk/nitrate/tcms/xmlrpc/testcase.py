@@ -162,8 +162,6 @@ def add_tag(request, case_ids, tags):
     # Add tag list ['foo', 'bar'] to cases list [12345, 67890] with String
     >>> TestCase.add_tag('12345, 67890', 'foo, bar')
     """
-    from tcms.apps.management.models import TestTag
-
     tcs = TestCase.objects.filter(
         case_id__in = pre_process_ids(value = case_ids)
     )
@@ -412,7 +410,6 @@ def create(request, values):
     """
     from tcms.core import forms
     from tcms.apps.testcases.forms import XMLRPCNewCaseForm
-    from tcms.apps.management.models import TestTag
 
     if not (values.get('category') or values.get('summary')):
         raise ValueError()
@@ -426,7 +423,7 @@ def create(request, values):
 
     if form.is_valid():
         # Create the case
-        tc = TestCase.create( author = request.user, values = form.cleaned_data)
+        tc = TestCase.create(author = request.user, values = form.cleaned_data)
 
         # Add case text to the case
         tc.add_text(
@@ -550,7 +547,6 @@ def filter_count(request, values = {}):
     Example:
     # See TestCase.filter()
     """
-    from tcms.apps.testcases.models import TestCase
     return TestCase.objects.filter(**values).count()
 
 def get(request, case_id):
@@ -751,7 +747,6 @@ def get_text(request, case_id, case_text_version = None):
     # Get all case text with version 4
     >>> TestCase.get_text(12345, 4)
     """
-    from tcms.apps.testcases.models import TestCaseText
     try:
         tc = TestCase.objects.get(case_id = case_id)
     except:
@@ -918,8 +913,6 @@ def remove_tag(request, case_ids, tags):
     # Remove tag 'foo' and 'bar' from cases list '56789, 12345' with String
     >>> TestCase.remove_tag('56789, 12345', 'foo, bar')
     """
-    from tcms.apps.management.models import TestTag
-
     tcs = TestCase.objects.filter(
         case_id__in = pre_process_ids(value = case_ids)
     )
