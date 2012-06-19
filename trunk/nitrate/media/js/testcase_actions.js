@@ -199,8 +199,21 @@ Nitrate.TestCases.Create.on_load = function()
     // bind_category_selector_to_product(false, false, $('id_product'), $('id_category'));
     
     SelectFilter.init("id_component", "component", 0, "/admin_media/");
-    bindRefreshComponentCategoryByProduct($('id_refresh_product'));
-
+    jQ('#id_product').change(function () {
+        var from = 'id_component_from';
+        var to = 'id_component_to';
+        var from_field = $(from);
+        var to_field = $(to);
+        to_field.update('');
+        getComponentsByProductId(false, $('id_product'), from_field, function() {
+            SelectBox.cache[from] = new Array();
+            SelectBox.cache[to] = new Array();
+            for (var i = 0; (node = from_field.options[i]); i++) {
+                SelectBox.cache[from].push({value: node.value, text: node.text, displayed: 1});
+            }
+        });
+        getCategorisByProductId(false, $('id_product'), $('id_category'));
+    });
     resize_tinymce_editors();
 }
 
@@ -209,7 +222,6 @@ Nitrate.TestCases.Edit.on_load = function()
     bind_category_selector_to_product(false, false, $('id_product'), $('id_category'));
     // bind_component_selector_to_product(false, false, $('id_product'), $('id_component'));
     //SelectFilter.init("id_component", "component", 0, "/admin_media/");
-    // bindRefreshComponentCategoryByProduct($('id_refresh_product'));
 
     resize_tinymce_editors();
 }
@@ -573,27 +585,6 @@ function removePlanFromCase(container, plan_id, case_id)
         plan_id: plan_id,
     };
     constructPlanCaseZone(container, case_id, parameters)
-}
-
-function bindRefreshComponentCategoryByProduct(btn_refresh) {
-    btn_refresh.observe('click', function(e) {
-        var from = 'id_component_from';
-        var to = 'id_component_to';
-        var from_field = $(from);
-        var to_field = $(to);
-        
-        to_field.update('');
-        
-        getComponentsByProductId(false, $('id_product'), from_field, function() {
-            SelectBox.cache[from] = new Array();
-            SelectBox.cache[to] = new Array();
-            
-            for (var i = 0; (node = from_field.options[i]); i++) {
-                SelectBox.cache[from].push({value: node.value, text: node.text, displayed: 1});
-            }
-        });
-        getCategorisByProductId(false, $('id_product'), $('id_category'));
-    })
 }
 
 function taggleAllCasesCheckbox(container)
