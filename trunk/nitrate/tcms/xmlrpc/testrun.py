@@ -576,11 +576,11 @@ def update(request, run_ids, values):
     from tcms.core import forms
     from tcms.apps.testruns.forms import XMLRPCUpdateRunForm
 
-    if (values.get('product_version') or values.get('build')) and not values.get('product'):
-        raise ValueError('Field "product" is required by build or product_version')
+    if (values.get('product_version') and not values.get('product')):
+        raise ValueError('Field "product" is required by product_version')
 
     form = XMLRPCUpdateRunForm(values)
-    if values.get('product_version') or values.get('build'):
+    if values.get('product_version'):
         form.populate(product_id = values['product'])
 
     if form.is_valid():
