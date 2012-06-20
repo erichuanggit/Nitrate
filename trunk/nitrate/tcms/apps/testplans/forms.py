@@ -498,6 +498,11 @@ class ClonePlanForm(BasePlanForm):
         help_text = 'Unchecking will make me the default tester of copied cases',
         required = False
     )
+    set_parent = forms.BooleanField(
+        label = 'Set source plan as parent',
+        help_text = 'Check it to set the source plan as parent of new cloned plan.',
+        required = False
+    )
 
 # =========== Forms for XML-RPC functions ==============
 
