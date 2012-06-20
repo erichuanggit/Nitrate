@@ -178,6 +178,7 @@ XMLRPC_METHODS = {
         ('tcms.xmlrpc.product', 'Product'),
         ('tcms.xmlrpc.testcase', 'TestCase'),
         ('tcms.xmlrpc.testcaserun', 'TestCaseRun'),
+        ('tcms.xmlrpc.testcaseplan', 'TestCasePlan'),
         ('tcms.xmlrpc.testopia', 'Testopia'),
         ('tcms.xmlrpc.testplan', 'TestPlan'),
         ('tcms.xmlrpc.testrun', 'TestRun'),

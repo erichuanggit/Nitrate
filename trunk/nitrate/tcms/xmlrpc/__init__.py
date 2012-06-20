@@ -24,7 +24,7 @@ See https://wiki.mozilla.org/Testopia:Documentation:XMLRPC for testopia docs.
 """
 
 __all__ = (
-    'auth', 'build', 'testcase', 'testcaserun', 'testopia', 'testplan',
+    'auth', 'build', 'testcase', 'testcaserun', 'testcaseplan', 'testopia', 'testplan',
     'testrun', 'user', 'version', 'tag',
 )
 
