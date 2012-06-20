@@ -88,7 +88,13 @@ Nitrate.TestPlans.Instance = {
 			</div>-->
 			<div class="listinfo">
 				<div class="title grey">Owner&nbsp;:</div>
-				<div id="display_author"  class="name" ><a href="{% url tcms.apps.profiles.views.profile test_plan.owner.username|default:"unknown" %}">{{ test_plan.owner }}</a></div>
+				<div id="display_author"  class="name" >
+				{% if test_plan.owner %}
+				<a href="{% url tcms.apps.profiles.views.profile test_plan.owner.username|default:"unknown" %}">{{ test_plan.owner }}</a>
+				{% else %}
+				{{ test_plan.owner }}
+				{% endif %}
+				</div>
 			</div>
 			<div class="listinfo">
 				<div class="title grey">Product&nbsp;:</div>
