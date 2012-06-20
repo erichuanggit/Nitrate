@@ -593,7 +593,7 @@ def update(request, run_ids, values):
             trs.update(build = form.cleaned_data['build'])
 
         if form.cleaned_data['errata_id']:
-            trs.update(build = form.cleaned_data['errata_id'])
+            trs.update(errata_id = form.cleaned_data['errata_id'])
 
         if form.cleaned_data['manager']:
             trs.update(manager = form.cleaned_data['manager'])
