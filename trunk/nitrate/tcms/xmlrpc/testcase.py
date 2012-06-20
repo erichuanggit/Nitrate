@@ -777,7 +777,7 @@ def get_priority(request, id):
 
 @log_call
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcaseplan'))
-def link_plan(request, case_ids, plan_ids, force = True):
+def link_plan(request, case_ids, plan_ids):
     """"
     Description: Link test cases to the given plan.
 
@@ -786,8 +786,6 @@ def link_plan(request, case_ids, plan_ids, force = True):
 
                  $plan_ids - Integer/Array/String: An integer representing the ID in the database,
                              an array of plan_ids, or a string of comma separated plan_ids.
-
-                 $force    - Boolean: Ignore the errors, default to True.
 
     Returns:     Array: empty on success or an array of hashes with failure
                         codes if a failure occurs
@@ -809,15 +807,15 @@ def link_plan(request, case_ids, plan_ids, force = True):
     tps = TestPlan.objects.filter(pk__in = plan_ids)
 
     # Check the non-exist case ids.
-    if not force and len(tcs) < len(case_ids):
+    if len(tcs) < len(case_ids):
         raise ObjectDoesNotExist(
-            compare_list(case_ids, tcs.values_list('pk', flat=True))
+            "TestCase",compare_list(case_ids, tcs.values_list('pk', flat=True))
         )
 
     # Check the non-exist plan ids.
-    if not force and len(tps) < len(plan_ids):
+    if len(tps) < len(plan_ids):
         raise ObjectDoesNotExist(
-            compare_list(case_ids, tcs.values_list('pk', flat=True))
+            "TestPlan",compare_list(plan_ids, tps.values_list('pk', flat=True))
         )
 
     # Link the plans to cases
