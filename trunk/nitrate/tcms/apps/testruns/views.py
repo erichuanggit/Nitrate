@@ -366,7 +366,7 @@ def get(request, run_id, template_name='run/get.html'):
     tcr_bugs = tcr_bugs.values_list('bug_id', flat=True)
     tcr_bugs = set(tcr_bugs)
     # Get tag list of testcases
-    ttags = TestTag.objects.filter(testcase__in=tcs).distinct()
+    ttags = TestTag.objects.filter(testcase__in=tcs).order_by('name').distinct()
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
