@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Nitrate is copyright 2010 Red Hat, Inc.
+# Nitrate is copyright 2010-2012 Red Hat, Inc.
 #
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -30,6 +30,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils import simplejson
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
+from django.template import RequestContext
 
 from tcms.core.views import Prompt
 from tcms.core.utils.raw_sql import RawSQL
@@ -311,6 +313,7 @@ def all(request, template_name = 'run/all.html'):
         query_url = remove_from_request_path(query_url, 'asc')
     else:
         query_url = '%s&asc=True' % query_url
+
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
@@ -320,6 +323,137 @@ def all(request, template_name = 'run/all.html'):
         'query_url': query_url,
     })
 
+def ajax_search(request, template_name ='run/common/json_runs.txt'):
+    """Read the test runs from database and display them."""
+    SUB_MODULE_NAME = "runs"
+
+    if request.REQUEST.get('manager'):
+        if request.user.is_authenticated() and (
+            request.REQUEST.get('people') == request.user.username
+            or request.REQUEST.get('people') == request.user.email
+        ):
+            SUB_MODULE_NAME = "my_runs"
+
+    # Initial the values will be use if it's not a search
+    query_result = False
+    trs = None
+    # If it's a search
+    if request.REQUEST.items():
+        search_form = SearchRunForm(request.REQUEST)
+
+        if request.REQUEST.get('product'):
+            search_form.populate(product_id=request.REQUEST['product'])
+        else:
+            search_form.populate()
+
+        if search_form.is_valid():
+            # It's a search here.
+            query_result = True
+            trs = TestRun.list(search_form.cleaned_data)
+            trs = trs.select_related('manager',
+                                     'default_tester',
+                                     'build', 'plan',
+                                     'build__product__name',)
+
+            # Further optimize by adding caserun attributes:
+            trs = trs.extra(
+                    select={'env_groups': RawSQL.environment_group_for_run,},
+            )
+    else:
+        search_form = SearchRunForm()
+        # search_form.populate()
+
+    #columnIndexNameMap is required for correct sorting behavior, 5 should be product, but we use run.build.product
+    columnIndexNameMap = { 0: '', 1: 'run_id', 2: 'summary', 3: 'manager__username', 4: 'default_tester__username',
+                          5: 'plan', 6: 'build__product__name', 7: 'product_version', 8: 'env_groups',
+                          9: 'total_num_caseruns', 10: 'stop_date', 11: 'completed'}
+    return ajax_response(request, trs, columnIndexNameMap, jsonTemplatePath='run/common/json_runs.txt')
+
+def ajax_response(request, querySet, columnIndexNameMap, jsonTemplatePath='run/common/json_runs.txt', *args):
+    """
+    json template for the ajax request for searching runs.
+    """
+    cols = int(request.GET.get('iColumns',0)) # Get the number of columns
+    iDisplayLength =  min(int(request.GET.get('iDisplayLength',10)),100)     #Safety measure. If someone messes with iDisplayLength manually, we clip it to the max value of 100.
+    startRecord = int(request.GET.get('iDisplayStart',0)) # Where the data starts from (page)
+    endRecord = startRecord + iDisplayLength  # where the data ends (end of page)
+
+    # Pass sColumns
+    keys = columnIndexNameMap.keys()
+    keys.sort()
+    colitems = [columnIndexNameMap[key] for key in keys]
+    sColumns = ",".join(map(str,colitems))
+
+    # Ordering data
+    iSortingCols =  int(request.GET.get('iSortingCols',0))
+    asortingCols = []
+
+    bsort_by_case_num = False
+    bdesc_on_case_num = False
+    bsort_by_status = False
+    bdesc_on_status = False
+    bsort_by_completed = False
+    bdesc_on_completed = False
+    if iSortingCols:
+        for sortedColIndex in range(0, iSortingCols):
+            sortedColID = int(request.GET.get('iSortCol_'+str(sortedColIndex),0))
+            if request.GET.get('bSortable_{0}'.format(sortedColID), 'false')  == 'true':  # make sure the column is sortable first
+                sortedColName = columnIndexNameMap[sortedColID]
+                sortingDirection = request.GET.get('sSortDir_'+str(sortedColIndex), 'asc')
+                if sortedColName == 'total_num_caseruns':
+                    bsort_by_case_num = True
+                    if sortingDirection == 'desc':
+                        bdesc_on_case_num = True
+                elif sortedColName == 'stop_date':
+                    bsort_by_status = True
+                    if sortingDirection == 'desc':
+                        bdesc_on_status = True
+                elif sortedColName == 'completed':
+                    bsort_by_completed = True
+                    if sortingDirection == 'desc':
+                        bdesc_on_completed = True
+                else:
+                    if sortingDirection == 'desc':
+                        sortedColName = '-'+sortedColName
+                    asortingCols.append(sortedColName)
+        if len(asortingCols):
+            querySet = querySet.order_by(*asortingCols)
+
+    iTotalRecords = iTotalDisplayRecords = querySet.count() #count how many records match the final criteria
+    #add custom column sort
+    if bsort_by_case_num:
+        querySet = sorted(querySet, key = lambda p: p.total_num_caseruns, reverse=bdesc_on_case_num)
+    if bsort_by_status:
+        querySet = sorted(querySet, key = lambda p: (p.stop_date and 1 or 0), reverse=bdesc_on_status)
+    if bsort_by_completed:
+        querySet = sorted(querySet, key = lambda p: (p.completed_case_run_percent*10000-p.failed_case_run_percent), reverse=bdesc_on_completed)
+    #get the slice
+    querySet = querySet[startRecord:endRecord]
+
+    sEcho = int(request.GET.get('sEcho',0)) # required echo response
+
+    if jsonTemplatePath:
+        jsonString = render_to_string(jsonTemplatePath, locals(), context_instance=RequestContext(request)) #prepare the JSON with the response, consider using : from django.template.defaultfilters import escapejs
+        response = HttpResponse(jsonString, mimetype="application/javascript")
+    else:
+        aaData = []
+        a = querySet.values()
+        for row in a:
+            rowkeys = row.keys()
+            rowvalues = row.values()
+            rowlist = []
+            for col in range(0,len(colitems)):
+                for idx, val in enumerate(rowkeys):
+                    if val == colitems[col]:
+                        rowlist.append(str(rowvalues[idx]))
+            aaData.append(rowlist)
+            response_dict = {}
+            response_dict.update({'aaData':aaData})
+            response_dict.update({'sEcho': sEcho, 'iTotalRecords': iTotalRecords, 'iTotalDisplayRecords':iTotalDisplayRecords, 'sColumns':sColumns})
+            response =  HttpResponse(simplejson.dumps(response_dict), mimetype='application/javascript')
+#    prevent from caching datatables result
+#    add_never_cache_headers(response)
+    return response
 
 def get(request, run_id, template_name='run/get.html'):
     """Display testrun's detail"""

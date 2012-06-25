@@ -329,10 +329,10 @@ class TestRun(TCMSActionModel):
     def get_percentage(self, count):
         case_run_count = self.total_num_caseruns
         if case_run_count == 0:
-            return None
+            return 0
         percent = float(count)/case_run_count*100
         if not percent:
-            percent = None
+            percent = 0
         else:
             percent = round(percent, 2)
         return percent

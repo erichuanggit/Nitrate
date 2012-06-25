@@ -14,14 +14,6 @@ Nitrate.TestCases.List.on_load = function()
             clickedSelectAll(this, this.up(4), 'case')
         });
     };
-    //if($('testcases_table')) {
-        //TableKit.Sortable.init('testcases_table',
-        //{
-            //rowEvenClass : 'roweven',
-            //rowOddClass : 'rowodd',
-            //nosortClass : 'nosort'
-        //});
-    //};
     
     $('id_blind_all_link').observe('click', function(e) {
         //FIXME
@@ -50,20 +42,50 @@ Nitrate.TestCases.List.on_load = function()
             };
         }
     })
-        
-    var toggle_case = function(e) {
-        var c = this.up(); // Container
-        var c_container = c.next(); // Content Containers
-        var case_id = c.getElementsBySelector('input[name="case"]')[0].value;
-        
-        var type = 'case';
-        toggleTestCaseContents(type, c, c_container, case_id);
-    }
     
-    $$('.expandable').invoke('observe', 'click', toggle_case);
     if(window.location.hash == '#expandall'){
         blinddownAllCases();
     }
+
+    var oTable;
+    oTable = jQ('#testcases_table').dataTable({
+        "iDisplayLength": 20,
+        "sPaginationType": "full_numbers",
+        "bFilter": false,
+        "bLengthChange": false,
+        "aaSorting": [[ 2, "desc" ]],
+        "bProcessing": true,
+        "bServerSide": true,
+        "sAjaxSource": "/cases/ajax/"+this.window.location.search,
+        "aoColumns": [
+          {"bSortable": false,"sClass": "expandable" },
+          {"bSortable": false },
+          {"sType": "html","sClass": "expandable"},
+          {"sType": "html","sClass": "expandable"},
+          {"sType": "html","sClass": "expandable"},
+          {"sClass": "expandable"},
+          {"sClass": "expandable"},
+          {"sClass": "expandable"},
+          {"sClass": "expandable"},
+          {"sClass": "expandable"},
+          {"sClass": "expandable"},
+        ]
+    });
+    jQ("#testcases_table tbody tr td.expandable").live("click", function() {
+        var tr = this.up();
+        var case_id = tr.getElementsBySelector('input[name="case"]')[0].value;
+        var detail_td = '<tr class="case_content hide" style="display: none;"><td colspan="11"><div id="id_loading_' + case_id + '" class="ajax_loading"></div></td></tr>'
+        var blind_icon = tr.getElementsBySelector('.blind_icon')[0]
+        if ( oTable.fnIsOpen(tr) ) {
+            $(blind_icon).removeClassName('collapse');
+            $(blind_icon).addClassName('expand');
+            $(blind_icon).src = "/media/images/t1.gif";
+            oTable.fnClose( tr );
+        } else {
+          oTable.fnOpen( tr, detail_td, "info_row" );
+          toggleTestCaseContents("case", tr, tr.next(), case_id);
+        }
+    });
 }
 
 Nitrate.TestCases.Details.on_load = function()
@@ -157,15 +179,6 @@ Nitrate.TestCases.Details.on_load = function()
     });
     
     bindSelectAllCheckbox($('id_checkbox_all_components'), $('id_form_case_component'), 'component');
-
-   // if($('id_table_cases')) {
-     //   TableKit.Sortable.init('id_table_cases',
-       // {
-         //   rowEvenClass : 'roweven',
-           // rowOddClass : 'rowodd',
-            //nosortClass : 'nosort'
-        //});
-    //};
 
     var toggle_case_run = function(e) {
         var c = this.up(); // Container
@@ -270,7 +283,7 @@ function toggleTestCaseContents(template_type, container, content_container, obj
     if(typeof(content_container) != 'object')
     var content_container = $(content_container)
     
-    content_container.toggle();
+    // content_container.toggle();
     
     if ($('id_loading_' + object_pk)) {
         var url = getURLParam(object_pk).url_case_details;
@@ -788,10 +801,3 @@ function toggleDiv(link, divId){
         link.html(hide);
     }
 }
-
-/*
-jQ('a.add_remove').click(function(){
-    var editing = !$(this).hasClass('done');
-    jQ(this).html(editing ? 'Show All' : 'Hide All').toggleClass('done');
-}
-*/

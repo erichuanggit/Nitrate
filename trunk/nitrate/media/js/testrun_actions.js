@@ -8,6 +8,7 @@ Nitrate.TestRuns.Clone = {};
 Nitrate.TestRuns.ChooseRuns = {};
 Nitrate.TestRuns.AssignCase = {}
 
+
 Nitrate.TestRuns.List.on_load = function()
 {
     bind_version_selector_to_product(true, $('id_product'));
@@ -55,7 +56,32 @@ Nitrate.TestRuns.List.on_load = function()
             };
         });
     };
-	
+
+    var oTable;
+    oTable = jQ('#testruns_table').dataTable({
+        "iDisplayLength": 20,
+        "sPaginationType": "full_numbers",
+        "bFilter": false,
+        "bLengthChange": false,
+        "aaSorting": [[ 1, "desc" ]],
+        "bProcessing": true,
+        "bServerSide": true,
+        "sAjaxSource": "/runs/ajax/"+this.window.location.search,
+        "aoColumns": [
+          {"bSortable": false },
+          null,
+          {"sType": "html"},
+          {"sType": "html"},
+          {"sType": "html"},
+          {"bVisible": false},
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+        ]
+        });
 }
 
 Nitrate.TestRuns.Details.on_load = function()

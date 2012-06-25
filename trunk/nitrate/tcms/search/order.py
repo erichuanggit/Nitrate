@@ -69,9 +69,9 @@ def order_run_queryset(runs, field, asc=False):
     '''
     orderable_fields = (
         'run_id', 'summary', 'manager__username',
-        'default_tester__username', 'environment_id',
-        'plan__product__name', 'product_version',
-        'total_num_cases', 'plan__name'
+        'default_tester__username', 'env_groups',
+        'build__product__name', 'product_version',
+        'plan__name'
     )
     if field in orderable_fields:
         order_by = field

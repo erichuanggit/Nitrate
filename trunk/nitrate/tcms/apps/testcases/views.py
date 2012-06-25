@@ -26,6 +26,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.utils import simplejson
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
+from django.template import RequestContext
 
 from tcms.core import forms
 from tcms.core.views import Prompt
@@ -352,6 +354,7 @@ def all(request, template_name="case/all.html"):
         query_url = remove_from_request_path(query_url, 'asc')
     else:
         query_url = '%s&asc=True' % query_url
+
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'test_cases': tcs,
@@ -363,6 +366,126 @@ def all(request, template_name="case/all.html"):
         'case_own_tags': ttags,
         'query_url': query_url,
     })
+
+def ajax_search(request, template_name='case/common/json_cases.txt'):
+    """Generate the case list in search case and case zone in plan
+    """
+    SearchForm = SearchCaseForm
+
+    tp = plan_from_request_or_none(request)
+    # Initial the form and template
+    if request.REQUEST.get('a') in ('search', 'sort'):
+        search_form = SearchForm(request.REQUEST)
+    else:
+        # Hacking for case plan
+        confirmed_status_name = 'CONFIRMED'
+        # 'c' is meaning component
+        if request.REQUEST.get('template_type') == 'case':
+            d_status = TestCaseStatus.objects.filter(name=confirmed_status_name)
+        elif request.REQUEST.get('template_type') == 'review_case':
+            d_status = TestCaseStatus.objects.exclude(name=confirmed_status_name)
+        else:
+            d_status = TestCaseStatus.objects.all()
+
+        d_status_ids = d_status.values_list('pk', flat=True)
+
+        search_form = SearchForm(initial={'case_status': d_status_ids})
+
+    # Populate the form
+    if request.REQUEST.get('product'):
+        search_form.populate(product_id=request.REQUEST['product'])
+    elif tp and tp.product_id:
+        search_form.populate(product_id=tp.product_id)
+    else:
+        search_form.populate()
+
+    # Query the database when search
+    if request.REQUEST.get('a') in ('search', 'sort') and search_form.is_valid():
+        tcs = TestCase.list(search_form.cleaned_data)
+    elif request.REQUEST.get('a') == 'initial':
+        tcs = TestCase.objects.filter(case_status__in=d_status)
+    else:
+        tcs = TestCase.objects.none()
+
+    # Search the relationship
+    if tp:
+        tcs = tcs.filter(plan=tp)
+
+    tcs = tcs.select_related('author',
+                             'default_tester',
+                             'case_status',
+                             'priority',
+                             'category')
+    tcs = tcs.extra(select={'num_bug': RawSQL.num_case_bugs,})
+
+    #columnIndexNameMap is required for correct sorting behavior, 5 should be product, but we use run.build.product
+    columnIndexNameMap = { 0: '', 1: '', 2: 'case_id', 3: 'summary', 4: 'author__username',
+                          5: 'default_tester__username', 6: 'is_automated', 7: 'case_status__name', 8: 'category__name',
+                          9: 'priority__value', 10: 'create_date'}
+    return ajax_response(request, tcs, tp, columnIndexNameMap, jsonTemplatePath='case/common/json_cases.txt')
+
+def ajax_response(request, querySet, testplan, columnIndexNameMap, jsonTemplatePath='case/common/json_cases.txt', *args):
+    """
+    json template for the ajax request for searching.
+    """
+    cols = int(request.GET.get('iColumns',0)) # Get the number of columns
+    iDisplayLength =  min(int(request.GET.get('iDisplayLength',20)),100)     #Safety measure. If someone messes with iDisplayLength manually, we clip it to the max value of 100.
+    startRecord = int(request.GET.get('iDisplayStart',0)) # Where the data starts from (page)
+    endRecord = startRecord + iDisplayLength  # where the data ends (end of page)
+
+    # Pass sColumns
+    keys = columnIndexNameMap.keys()
+    keys.sort()
+    colitems = [columnIndexNameMap[key] for key in keys]
+    sColumns = ",".join(map(str,colitems))
+
+    # Ordering data
+    iSortingCols =  int(request.GET.get('iSortingCols',0))
+    asortingCols = []
+
+    if iSortingCols:
+        for sortedColIndex in range(0, iSortingCols):
+            sortedColID = int(request.GET.get('iSortCol_'+str(sortedColIndex),0))
+            if request.GET.get('bSortable_{0}'.format(sortedColID), 'false')  == 'true':  # make sure the column is sortable first
+                sortedColName = columnIndexNameMap[sortedColID]
+                sortingDirection = request.GET.get('sSortDir_'+str(sortedColIndex), 'asc')
+                if sortingDirection == 'desc':
+                    sortedColName = '-'+sortedColName
+                asortingCols.append(sortedColName)
+        if len(asortingCols):
+            querySet = querySet.order_by(*asortingCols)
+
+    iTotalRecords = iTotalDisplayRecords = querySet.count() #count how many records match the final criteria
+    #get the slice
+    querySet = querySet[startRecord:endRecord]
+
+    sEcho = int(request.GET.get('sEcho',0)) # required echo response
+
+    if jsonTemplatePath:
+        try:
+            jsonString = render_to_string(jsonTemplatePath, locals(), context_instance=RequestContext(request)) #prepare the JSON with the response, consider using : from django.template.defaultfilters import escapejs
+            response = HttpResponse(jsonString, mimetype="application/javascript")
+        except Exception, e:
+            print e
+    else:
+        aaData = []
+        a = querySet.values()
+        for row in a:
+            rowkeys = row.keys()
+            rowvalues = row.values()
+            rowlist = []
+            for col in range(0,len(colitems)):
+                for idx, val in enumerate(rowkeys):
+                    if val == colitems[col]:
+                        rowlist.append(str(rowvalues[idx]))
+            aaData.append(rowlist)
+            response_dict = {}
+            response_dict.update({'aaData':aaData})
+            response_dict.update({'sEcho': sEcho, 'iTotalRecords': iTotalRecords, 'iTotalDisplayRecords':iTotalDisplayRecords, 'sColumns':sColumns})
+            response =  HttpResponse(simplejson.dumps(response_dict), mimetype='application/javascript')
+#    prevent from caching datatables result
+#    add_never_cache_headers(response)
+    return response
 
 def get(request, case_id, template_name='case/get.html'):
     """Get the case content"""

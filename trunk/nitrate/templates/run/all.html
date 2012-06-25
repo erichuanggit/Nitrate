@@ -1,7 +1,5 @@
 {% extends "tcms_base.html" %}
 
-{% load pagination_tags %}
-
 {% block subtitle %}Test runs{% endblock %}
 
 {% block custom_stylesheet %}
@@ -10,6 +8,7 @@
 {% block custom_javascript %}
 <script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/fastinit.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/tablekit.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/jquery.dataTables.js"></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testrun_actions.js'></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/management_actions.js'></script>
 <script type="text/javascript">
@@ -48,18 +47,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 	</form>
 	<form id='runs_form'>
 	{% if test_runs %}
-	{% autopaginate test_runs %}
 	<div id="contentTab" class="mixbar">
 		{# <span class="tit">{{ test_runs.count }} Test Runs</span> #}
 		<span class="tit"><a href="{% url tcms.apps.testruns.views.all %}?case_run__assignee={{ user.email }}">View My Assigned Runs</a></span>
 		<input type="button" value="Clone" title="clone selected test runs" onclick="postToURL('{% url tcms.apps.testruns.views.clone %}', this.form.serialize(true), 'get')" />
-		
-		<span class="right-action">
-			{% paginate %}
-		</span>
 	</div>
 	{% include "run/common/run_filtered.html" %}
-	{% paginate %}
 	
 	{% else %}
 	{% if query_result %}

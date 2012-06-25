@@ -314,15 +314,15 @@ Nitrate.TestPlans.List.on_load = function()
             clickedSelectAll(this, $('plans_form'), 'plan');
         });
     };
-    
-    if($('testplans_table')) {
-        TableKit.Sortable.init('testplans_table',
-        {
-            rowEvenClass : 'roweven',
-            rowOddClass : 'rowodd',
-            nosortClass : 'nosort'
-        });
-    };
+//     
+    // if($('testplans_table')) {
+        // TableKit.Sortable.init('testplans_table',
+        // {
+            // rowEvenClass : 'roweven',
+            // rowOddClass : 'rowodd',
+            // nosortClass : 'nosort'
+        // });
+    // };
     
     if($('column_add')) {
         $('column_add').observe('change', function(t) {
@@ -348,6 +348,32 @@ Nitrate.TestPlans.List.on_load = function()
             this.up(1).removeClassName('selection_row');
         };
     });
+
+    var oTable;
+    oTable = jQ('#testplans_table').dataTable({
+        "iDisplayLength": 20,
+        "sPaginationType": "full_numbers",
+        "bFilter": false,
+        // "bLengthChange": false,
+        "aLengthMenu": [[10, 20, 50, -1], [10, 20, 50, "All"]],
+        "aaSorting": [[ 1, "desc" ]],
+        "bProcessing": true,
+        "bServerSide": true,
+        "sAjaxSource": "/plans/ajax/"+this.window.location.search,
+        "aoColumns": [
+          {"bSortable": false },
+          null,
+          {"sType": "html"},
+          {"sType": "html"},
+          {"sType": "html"},
+          null,
+          {"bVisible": false},
+          null,
+          null,
+          null,
+          {"bSortable": false }
+        ]
+        });
 }
 
 Nitrate.TestPlans.Details.on_load = function()
