@@ -1,0 +1,18 @@
+Report -
+
+user:  {{ request.user.username }}
+client_ip:  {{ request.META.REMOTE_ADDR }}
+method:  {{ request.method }}
+path:  {{ request.path }}
+
+submitted data:
+{% for key, value in request.REQUEST.iteritems %}{{key}}: {{ value}}
+{% endfor %}
+
+query:  {{ query }}
+query args:  {{ query_args }}
+
+traceback -
+{% for line in stack_info %}{% for cell in line %}{{cell}}, {% endfor %}
+
+{% endfor %}

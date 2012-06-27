@@ -14,10 +14,26 @@
 # distribution and at <http://www.gnu.org/licenses>.
 # 
 # Authors:
-#   Xuqing Kuang <xkuang@redhat.com>
+#   Xuqing Kuang <xkuang@redhat.com> Chaobin Tang <ctang@redhat.com>
 
 # Because of Csrf breaks XML-RPC access, so we need to disable it.
+
+import threading
+
+
+_thread_locals = threading.local()
+
 class CsrfDisableMiddleware(object):
     def process_view(self, request, callback, callback_args, callback_kwargs):
         setattr(request, '_dont_enforce_csrf_checks', True)
 
+
+
+class RememberRequestMiddleware(object):
+
+    def process_request(self, request):
+        _thread_locals.request = request
+
+    @classmethod
+    def get_current_request(cls):
+        return getattr(_thread_locals, 'request', None)
