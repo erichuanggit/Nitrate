@@ -6,11 +6,13 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.template import loader, Context
 from tcms.core.middleware import RememberRequestMiddleware
-import traceback, logging
+import traceback, logging, re
 
 
 ON = False
 Log = None
+
+PATTERN = re.compile(r'.*DELETE\s+FROM\s+`?test_case_texts`?.*', re.I)
 
 def init_log():
     global Log
@@ -77,7 +79,8 @@ def is_suspicious(query, args):
     'DELETE FROM `test_case_texts` WHERE `case_text_version` IN (1)'
     '''
     suspicious = False
-    if query.find('DELETE FROM `test_case_texts`') >= 0:
+    match = PATTERN.match(query)
+    if match is not None:
         suspicious = True
     return suspicious
 
