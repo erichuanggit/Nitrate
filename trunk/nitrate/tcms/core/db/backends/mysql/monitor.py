@@ -66,7 +66,10 @@ def log_suspicious_operations(content):
     2. traceback
     3. query
     '''
-    Log.info(content)
+    try:
+        Log.info(content)
+    except:
+        pass
 
 def is_suspicious(query, args):
     '''
