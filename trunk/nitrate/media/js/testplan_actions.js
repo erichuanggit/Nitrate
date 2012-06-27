@@ -717,7 +717,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 }else{
                     form.tag__name__in.value = this.innerHTML;
                 }*/
-                form.tag__name__in.value = form.tag__name__in.value?(form.tag__name__in.value + ',' + this.innerHTML):this.innerHTML;
+                form.tag__name__in.value = form.tag__name__in.value?(form.tag__name__in.value + ',' + this.textContent):this.textContent;
             })
         }
         
