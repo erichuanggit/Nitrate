@@ -191,6 +191,23 @@ Nitrate.TestCases.Details.on_load = function()
     }
     
     $$('.expandable').invoke('observe', 'click', toggle_case_run);
+
+    jQ('#testplans_table').dataTable({
+        "bFilter": false,
+        "bLengthChange": false,
+        "bPaginate": false,
+        "bInfo": false,
+        "aaSorting": [[ 0, "desc" ]],
+        "aoColumns": [
+          null,
+          null,
+          {"sType": "html"},
+          {"sType": "html"},
+          {"sType": "html"},
+          null,
+          {"bSortable": false},
+        ]
+    });
 }
 
 /*
@@ -521,12 +538,12 @@ function addCaseBug(form, callback)
             alert($('response').innerHTML);
             return false;
         };
-        
+
         if(callback)
             callback();
         jQ('#case_bug_count').text(jQ('table#bugs').attr('count'));
     }
-    
+
     new Ajax.Updater('bug', form.action, {
         method: form.method,
         parameters: $(form).serialize(true),
@@ -538,12 +555,12 @@ function removeCaseBug(id, case_id, callback)
 {
     if(!confirm('Are you sure to remove the bug?'))
         return false;
-    
+
     var parameteres = {
         'handle': 'remove',
         id: id,
     }
-    
+
     var complete = function(t) {
         if($('response')) {
             alert($('response').innerHTML);
@@ -551,7 +568,7 @@ function removeCaseBug(id, case_id, callback)
         }
         jQ('#case_bug_count').text(jQ('table#bugs').attr('count'));
     }
-    
+
     new Ajax.Updater('bug', '/case/' + case_id + '/bug/', {
         method: 'get',
         parameters: parameteres,
@@ -562,11 +579,11 @@ function removeCaseBug(id, case_id, callback)
 function constructPlanCaseZone(container, case_id, parameters)
 {
     // $(container).update('<div class="ajax_loading"></div>');
-    
+
     var complete = function(t) {
         $('id_plan_form').observe('submit', function(e) {
             e.stop();
-            
+
             var callback = function(e) {
                 e.stop();
                 var plan_ids = this.serialize(true)['plan_id'];
@@ -574,25 +591,41 @@ function constructPlanCaseZone(container, case_id, parameters)
                     alert('You must specific one plan at least!');
                     return false;
                 }
-                
+
                 var p = {
                     a: 'add',
                     plan_id: plan_ids,
                 };
-                
+
                 constructPlanCaseZone(container, case_id, p);
                 clearDialog();
-                jQ('#plan_count').text(jQ('table#testplans').attr('count'));
+                jQ('#plan_count').text(jQ('table#testplans_table').attr('count'));
             }
-            
+
             var p = this.serialize(true)
             if (!p.pk__in) {
                 alert('Plan is required');
                 return false;
             };
-            
+
             previewPlan(p, getURLParam(case_id).url_case_plan, callback);
         })
+        jQ('#testplans_table').dataTable({
+            "bFilter": false,
+            "bLengthChange": false,
+            "bPaginate": false,
+            "bInfo": false,
+            "aaSorting": [[ 0, "desc" ]],
+            "aoColumns": [
+              null,
+              null,
+              {"sType": "html"},
+              {"sType": "html"},
+              {"sType": "html"},
+              null,
+              {"bSortable": false},
+            ]
+        });
     }
     var url = getURLParam(case_id).url_case_plan;
     new Ajax.Updater(container, url, {
@@ -612,7 +645,7 @@ function removePlanFromCase(container, plan_id, case_id)
         plan_id: plan_id,
     };
     constructPlanCaseZone(container, case_id, parameters);
-    jQ('#plan_count').text(jQ('table#testplans').attr('count'));
+    jQ('#plan_count').text(jQ('table#testplans_table').attr('count'));
 }
 
 function taggleAllCasesCheckbox(container)
@@ -632,11 +665,11 @@ function renderComponentForm(container, parameters, form_observe)
     if(!container)
     var container = getDialog();
     container.show();
-    
+
     var callback = function(t) {
         var action = getURLParam().url_cases_component;
         var notice = 'Press "Ctrl" to select multiple default component';
-        
+
         var h = new Element('input', {'type': 'hidden', 'name': 'a', 'value': 'add'});
         var a = new Element('input', {'type': 'submit', 'value': 'Add'});
         //var r = new Element('input', {'type': 'submit', 'value': 'Remove'});
@@ -644,18 +677,18 @@ function renderComponentForm(container, parameters, form_observe)
         c.appendChild(h);
         c.appendChild(a);
         //c.appendChild(r);
-        
+
         a.observe('click', function(e) { h.value = 'add'});
         //r.observe('click', function(e) {h.value = 'remove'});
-        
+
         var f = constructForm(d.innerHTML, action, form_observe, notice, c);
         container.update(f);
-        
+
         bind_component_selector_to_product(false, false, $('id_product'), $('id_o_component'));
     }
-    
+
     var url = getURLParam().url_cases_component;
-    
+
     new Ajax.Updater(d, url, {
         method: 'post',
         parameters: parameters,
@@ -671,11 +704,11 @@ function renderCategoryForm(container, parameters, form_observe)
     if(!container)
     var container = getDialog();
     container.show();
-    
+
     var callback = function(t) {
         var action = getURLParam().url_cases_category;
         var notice = 'Select Category';
-        
+
         var h = new Element('input', {'type': 'hidden', 'name': 'a', 'value': 'add'});
         var a = new Element('input', {'type': 'submit', 'value': 'Select'});
         //var r = new Element('input', {'type': 'submit', 'value': 'Remove'});
@@ -683,18 +716,18 @@ function renderCategoryForm(container, parameters, form_observe)
         c.appendChild(h);
         c.appendChild(a);
         //c.appendChild(r);
-        
+
         a.observe('click', function(e) { h.value = 'update'});
         //r.observe('click', function(e) {h.value = 'remove'});
-        
+
         var f = constructForm(d.innerHTML, action, form_observe, notice, c);
         container.update(f);
-        
+
         bind_category_selector_to_product(false, false, $('id_product'), $('id_o_category'));
     }
-    
+
     var url = getURLParam().url_cases_category;
-    
+
     new Ajax.Updater(d, url, {
         method: 'post',
         parameters: parameters,
@@ -741,7 +774,7 @@ function constructCaseAutomatedForm(container, parameters, callback)
                 alert('Nothing selected');
                 return false;
             }
-            
+
             var params = this.serialize(true);
             params['case'] = parameters['case'];
             new Ajax.Request(getURLParam().url_cases_automated, {
@@ -753,7 +786,7 @@ function constructCaseAutomatedForm(container, parameters, callback)
         var f = constructForm(returntext, action, form_observe);
         container.update(f);
     }
-    
+
     getForm(d, 'testcases.CaseAutomatedForm', parameters, c);
 }
 
