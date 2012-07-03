@@ -14,9 +14,9 @@
 			<input type="button" value="Export" title="Export the cases for selected plans." onclick="postToURL('{% url tcms.apps.testcases.views.export %}', this.form.serialize(true))" />
 		</span>
 			{% if page_type == 'pagination' %}
-			<a href='{{query_url}}&page_type=show_all' class="switch_show_page_mode" name="show_all_results">Show All Results</a>
+			<a href='{{query_url_page_type}}&page_type=show_all' class="switch_show_page_mode" name="show_all_results">Show All Results</a>
 			{% else %}
-			<a href='{{query_url}}&page_type=pagination' class="switch_show_page_mode" name="pagination">Pagination</a>
+			<a href='{{query_url_page_type}}&page_type=pagination' class="switch_show_page_mode" name="pagination">Pagination</a>
 			<span class="right-action">({{test_plans.count}}/{{test_plans.count}})</span>
 			{% endif %}
 		<span class="right-action">

@@ -254,12 +254,13 @@ def all(request, template_name='plan/all.html'):
 
     query_url = remove_from_request_path(request, 'order_by')
     if asc:
-        query_url = remove_from_request_path(request, 'asc')
+        query_url = remove_from_request_path(query_url, 'asc')
     else:
         query_url = '%s&asc=True' % query_url
     page_type = request.REQUEST.get('page_type', 'pagination')
-    query_url = remove_from_request_path(request, 'page_type')
-    query_url = remove_from_request_path(request, 'page')
+    query_url_page_type = remove_from_request_path(request, 'page_type')
+    if query_url_page_type:
+        query_url_page_type = remove_from_request_path(query_url_page_type, 'page')
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
@@ -267,6 +268,7 @@ def all(request, template_name='plan/all.html'):
         'query_result' : query_result,
         'search_plan_form' : search_form,
         'query_url': query_url,
+        'query_url_page_type': query_url_page_type,
         'page_type': page_type
     })
 

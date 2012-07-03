@@ -24,15 +24,15 @@
 				<th width="20" class="nosort">
 					<input type="checkbox" id="id_checkbox_all_case" title="Select all/Select none">
 				</th>
-				<th class="widthID"><a href="{{query_url}}&order_by=case_id">ID</a></th>
-				<th><a href="{{query_url}}&order_by=summary">Summary</a></th>
-				<th width="100"><a href="{{query_url}}&order_by=author__username">Author</a></th>
-				<th width="130">Default Tester</th>
-				<th width="160"><a href="{{query_url}}&order_by=is_automated">Automated</a></th>
-				<th width="90" ><a href="{{query_url}}&order_by=case_status">Status</a></th>
-				<th width="120"><a href="{{query_url}}&order_by=category">Category</a></th>
-				<th width="60"><a href="{{query_url}}&order_by=priority">Priority</th>
-				<th width="140" colspan='2'><a href="{{query_url}}&order_by=create_date">Created</a></th>
+				<th class="widthID"><a href="{{query_url}}&order_by=case_id" title="Sort by Case Id">ID</a></th>
+				<th><a href="{{query_url}}&order_by=summary" title="Sort by Summary">Summary</a></th>
+				<th width="100"><a href="{{query_url}}&order_by=author__username" title="Sort by Author">Author</a></th>
+				<th width="130"><a href="{{query_url}}&order_by=default_tester__username" title="Sort by Default Tester">Default Tester</th>
+				<th width="140"><a href="{{query_url}}&order_by=is_automated" title="Sort by Automated">Automated</a></th>
+				<th width="90" ><a href="{{query_url}}&order_by=case_status" title="Sort by Case Status">Status</a></th>
+				<th width="120"><a href="{{query_url}}&order_by=category__name" title="Sort by Category">Category</a></th>
+				<th width="60"><a href="{{query_url}}&order_by=priority" title="Sort by Priority">Priority</th>
+				<th width="140" colspan='2'><a href="{{query_url}}&order_by=create_date" title="Sort by Create Date">Created</a></th>
 			</tr>
 		</thead>
 		<tbody>
