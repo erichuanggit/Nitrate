@@ -97,21 +97,43 @@ Nitrate.TestPlans.TreeView = {
     },
     up: function(e) {
         var tree = Nitrate.TestPlans.TreeView;
-        
-        var p = {
+        var parent_obj, brother_obj; 
+
+        var parent_param = {
             pk: tree.data[0].fields.parent,
             t: 'ajax'
         };
         
-        var c = function(t) {
+        var parent_callback = function(t) {
             var returnobj = t.responseText.evalJSON(true);
-            var parent_obj = {0: returnobj[0], length: 1};
-            parent_obj[0].children = tree.data;
+            parent_obj = {0: returnobj[0], length: 1};
+        }; 
+        tree.filter(parent_param, parent_callback);
+
+        var brother_param = {
+            parent__pk: tree.data[0].fields.parent,
+            t: 'ajax'
+        };
+
+        var brother_callback = function(t){
+            var returnobj = t.responseText.evalJSON(true);
+            brother_obj = returnobj;
+        };
+
+        tree.filter(brother_param, brother_callback);
+
+        if (parent_obj && brother_obj.length) {
+            parent_obj[0].children = brother_obj;
+            var brother_numbers = brother_obj.length;
+            for (i = 0; i < brother_numbers; i++) {
+                if (parent_obj[0].children[i].pk == tree.data[0].pk) {
+                   parent_obj[0].children[i] = tree.data[0];
+                   break;
+                }
+            }
             tree.data = parent_obj;
             tree.render_page();
         }
-        
-        tree.filter(p, c);
     },
     blind: function(e) {
         var tree = Nitrate.TestPlans.TreeView;
