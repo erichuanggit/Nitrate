@@ -468,18 +468,18 @@ def update(request, plan_ids, values):
     Params:      $plan_ids - Integer: A single TestPlan ID.
 
                  $values - Hash of keys matching TestPlan fields and the new values
-                            to set each field to.
-                 +-------------------------+----------------+
-                 | Field                   | Type           |
-                 +-------------------------+----------------+
-                 | name                    | String         |
-                 | type                    | Integer        |
-                 | product                 | Integer        |
-                 | default_product_version | Integer        |
-                 | parent                  | Integer        |
-                 | is_active               | Boolean        |
-                 | env_group               | Integer        |
-                 +-------------------------+----------------+
+                           to set each field to.
+       +------------------------+----------------+------------------------------------+
+      | Field                   | Type           | Description                        |
+      +-------------------------+----------------+------------------------------------+
+      | product                 | Integer        | ID of product                      |
+      | name                    | String         |                                    |
+      | type                    | Integer        | ID of plan type                    |
+      | default_product_version | Integer        |                                    |
+      | parent                  | Integer        | Parent plan ID                     |
+      | is_active               | Boolean        | 0: Archived 1: Active (Default 0)  |
+      | env_group               | Integer        |                                    |
+      +-------------------------+----------------+------------------------------------+
 
     Returns:     Hash: The updated test plan object.
 
