@@ -359,6 +359,22 @@ class ReportSQL(object):
     custom_search_case_runs_count = 'SELECT COUNT(DISTINCT case_run_id) \
         FROM test_case_runs \
         WHERE test_case_runs.build_id = test_builds.build_id'
+
+    # added by zheliu
+    custom_search_case_runs_count_under_run = 'SELECT COUNT(DISTINCT tcrs.case_run_id) \
+        FROM test_case_runs tcrs \
+        LEFT JOIN test_runs trs ON tcrs.run_id = trs.run_id \
+        LEFT JOIN test_builds tbs ON trs.build_id = tbs.build_id \
+        WHERE trs.build_id = test_builds.build_id AND tcrs.run_id = trs.run_id \
+        GROUP BY tbs.build_id'
+
+    custom_search_case_runs_count_by_status_under_run = 'SELECT COUNT(DISTINCT tcrs.case_run_id) \
+        FROM test_case_runs tcrs \
+        LEFT JOIN test_runs trs ON tcrs.run_id = trs.run_id \
+        LEFT JOIN test_builds tbs ON trs.build_id = tbs.build_id \
+        WHERE trs.build_id = test_builds.build_id \
+        AND tcrs.run_id = trs.run_id \
+        AND tcrs.case_run_status_id = %s'
     
     custom_search_case_runs_count_by_status = 'SELECT COUNT(DISTINCT case_run_id) \
         FROM test_case_runs \

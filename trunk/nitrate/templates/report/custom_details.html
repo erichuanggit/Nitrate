@@ -32,7 +32,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
     <table cellpadding="0" cellspacing="0" class="table_noborder" border="0">
     	{% for build in builds %}
         <tr>
-            <td><strong>{{ build }}</strong>Plan<span class="red">{{ build.plans_count }}</span> Run<span class="red">{{ build.runs_count }}</span>Manual Cases<span class="red">{{manual_count|percentage:total_count}}({{manual_count}}/{{total_count}})</span>Automated Cases<span class="red">{{auto_count|percentage:total_count}}({{auto_count}}/{{total_count}})</span>Manual/Automated<span class="red">{{both_count|percentage:total_count}}({{both_count}}/{{total_count}})</span></td>
+            <td><strong>{{ build }}</strong>Plan<span class="red">{{ build.plans_count|default_if_none:0 }}</span> Run<span class="red">{{ build.runs_count|default_if_none:0 }}</span>Manual Cases<span class="red">{{manual_count|percentage:total_count}}({{manual_count}}/{{total_count}})</span>Automated Cases<span class="red">{{auto_count|percentage:total_count}}({{auto_count}}/{{total_count}})</span>Manual/Automated<span class="red">{{both_count|percentage:total_count}}({{both_count}}/{{total_count}})</span></td>
             <td width="110">Passed Case-Run</td>
             <td width="100"><div class="progress-bar">
                 <div class="progress-inner" style="width:auto;	margin-right:-50px;text-align:cente">
@@ -150,15 +150,15 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
             {% for build in builds %}
             <tr>
             <td colspan="2" align="right" style="padding-right:10px;">Total</td>
-            <td>{{ build.case_runs_idle_count }}</td>
-            <td>{{ build.case_runs_running_count }}</td>
-            <td>{{ build.case_runs_paused_count }}</td>
-            <td>{{ build.case_runs_passed_count }}</td>
-            <td>{{ build.case_runs_failed_count }}</td>
-            <td>{{ build.case_runs_blocked_count }}</td>
-            <td>{{ build.case_runs_error_count }}</td>
-            <td>{{ build.case_runs_waived_count }}</td>
-            <td>{{ build.case_runs_count }}</td>
+            <td>{{ build.case_runs_idle_count|default_if_none:0 }}</td>
+            <td>{{ build.case_runs_running_count|default_if_none:0 }}</td>
+            <td>{{ build.case_runs_paused_count|default_if_none:0 }}</td>
+            <td>{{ build.case_runs_passed_count|default_if_none:0 }}</td>
+            <td>{{ build.case_runs_failed_count|default_if_none:0 }}</td>
+            <td>{{ build.case_runs_blocked_count|default_if_none:0 }}</td>
+            <td>{{ build.case_runs_error_count|default_if_none:0 }}</td>
+            <td>{{ build.case_runs_waived_count|default_if_none:0 }}</td>
+            <td>{{ build.case_runs_count|default_if_none:0 }}</td>
             </tr>
             {% endfor %}
 		</tbody>
