@@ -58,6 +58,7 @@ class TestPlan(TCMSActionModel):
     """
     plan_id = models.AutoField(max_length=11, primary_key=True)
     default_product_version = models.TextField()
+    product_version = models.ForeignKey(Version, blank=True, null=True)
     name = models.CharField(max_length=255)
     create_date = models.DateTimeField(db_column='creation_date', auto_now_add=True)
     is_active = models.BooleanField(db_column='isactive', default=True)
@@ -105,6 +106,17 @@ class TestPlan(TCMSActionModel):
 
     def __unicode__(self):
         return self.name
+
+    #update version when edit or create
+    def save(self, *args, **kwargs):
+        """Save testplan and relate the default_product_version with Verion object.
+        """
+        new_version, is_created = Version.objects.get_or_create(
+            product = self.product,
+            value = self.default_product_version
+        )
+        self.product_version = new_version
+        super(TestPlan, self).save(*args, **kwargs) # Call the "real" save() method.
 
     @classmethod
     def list(cls, query = None):
@@ -266,13 +278,7 @@ class TestPlan(TCMSActionModel):
         Workaround the schema problem with default_product_version
         Get a 'Versions' object based on a string query
         """
-        try:
-            return Version.objects.get(
-                product = self.product,
-                value = self.default_product_version
-            )
-        except ObjectDoesNotExist:
-            return None
+        return self.product_version
 
     def get_version_id(self):
         """

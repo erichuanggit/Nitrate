@@ -128,3 +128,6 @@ CREATE TRIGGER case_run_status_trigger_delete
         WHERE run_id = OLD.run_id;
     END|
 DELIMITER ';'|
+
+-- TCMS 3.8, added a new column for test_plans
+ALTER TABLE test_plans ADD column product_version_id mediumint(9) DEFAULT null ;
