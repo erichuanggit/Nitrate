@@ -1342,7 +1342,7 @@ function popupAddAnotherWindow(triggeringLink, parameters)
 {
     var name = triggeringLink.id.replace(/^add_/, '');
     name = id_to_windowname(name);
-    href = triggeringLink.href
+    href = triggeringLink.href;
     if (href.indexOf('?') == -1) {
         href += '?_popup=1';
     } else {

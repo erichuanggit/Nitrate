@@ -13,6 +13,7 @@
 <script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/tablesort.js"></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testrun_actions.js'></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
+<script type="text/javascript" src="/admin_media/js/admin/RelatedObjectLookups.js"></script>
 <script type="text/javascript">
 Nitrate.Utils.after_page_load(Nitrate.TestRuns.Clone.on_load);
 </script>
@@ -64,11 +65,15 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Clone.on_load);
 				</tr>
 				<tr>
 					<td><label>Product Version</label></td>
-					<td>{{ clone_form.product_version }}</td>
+					<td>{{ clone_form.product_version }}<span class="errors">{{ clone_form.product_version.errors }}</span>
+						<a href="{{ ADMIN_PREFIX }}/management/version/add/" class="addlink" onclick="return popupAddAnotherWindow(this, 'product');" id="add_id_product_version">Add Product Version</a>
+					</td>
 				</tr>
 				<tr>
 					<td><label class="strong" for="id_build_id">Build </label></td>
-					<td>{{ clone_form.build }}<div class="errors">{{ clone_form.build.errors }}</div></td>
+					<td>{{ clone_form.build }}<span class="errors">{{ clone_form.build.errors }}</span>
+						<a href="{{ ADMIN_PREFIX }}/management/testbuild/add/" class="addlink" onclick="return popupAddAnotherWindow(this, 'product');" id="add_id_build">Add Build</a>
+					</td>
 				</tr>
 				<tr>
 					<td><label for="id_errata_id">Errata</label></td>
