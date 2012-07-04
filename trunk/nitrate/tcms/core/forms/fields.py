@@ -41,19 +41,23 @@ class UserField(forms.CharField):
                 raise ValidationError('A user name or user ID is required.')
             else:
                 return None
-        if isinstance(value, str):
-            value = value.strip()
-            try:
-                return User.objects.get((Q(email=value) | Q(username=value)))
-            except User.DoesNotExist:
-                raise ValidationError('Unknown user: "%s"' % value)
-        elif isinstance(value, int):
+        if isinstance(value, int):
             try:
                 return User.objects.get(pk=value)
             except User.DoesNotExist:
                 raise ValidationError('Unknown user_id: "%s"' % value)
         else:
-            raise ValidationError('Unknown user: "%s"' % value)
+            value = value.strip()
+            if value.isdigit():
+                try:
+                    return User.objects.get(pk=value)
+                except User.DoesNotExist:
+                    raise ValidationError('Unknown user_id: "%s"' % value)
+            else:
+                try:
+                    return User.objects.get((Q(email=value) | Q(username=value)))
+                except User.DoesNotExist:
+                    raise ValidationError('Unknown user: "%s"' % value)
 
 
 class TimedeltaFormField(forms.Field):
