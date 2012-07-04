@@ -22,7 +22,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 from tcms.apps.testruns.models import TestRun, TestCaseRun
-from tcms.apps.management.models import Classification, Product
+from tcms.apps.management.models import Classification, Product, Component
 from tcms.core.utils import calc_percent
 from tcms.core.utils.counter import CaseRunStatusCounter, RunsCounter
 from tcms.core.utils.raw_sql import ReportSQL as RawSQL
@@ -228,7 +228,10 @@ def component(request, product_id, template_name='report/component.html'):
             if row[0]:
                 total += row[1]
 
-        case_run_counter = CaseRunStatusCounter([])
+        component = Component.objects.get(id=request.GET.get('component_id'))
+        tcs = component.testcase_set.all()
+        tcrs = TestCaseRun.objects.filter(case__in=tcs)
+        case_run_counter = CaseRunStatusCounter(tcrs)
         for row in rows:
             if row[0]:
                 setattr(case_run_counter, row[0], row[1])
