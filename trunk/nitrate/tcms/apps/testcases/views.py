@@ -446,7 +446,7 @@ def ajax_response(request, querySet, testplan, columnIndexNameMap, jsonTemplateP
     if iSortingCols:
         for sortedColIndex in range(0, iSortingCols):
             sortedColID = int(request.GET.get('iSortCol_'+str(sortedColIndex),0))
-            if request.GET.get('bSortable_{0}'.format(sortedColID), 'false')  == 'true':  # make sure the column is sortable first
+            if request.GET.get('bSortable_%s'%sortedColID, 'false')  == 'true':  # make sure the column is sortable first
                 sortedColName = columnIndexNameMap[sortedColID]
                 sortingDirection = request.GET.get('sSortDir_'+str(sortedColIndex), 'asc')
                 if sortingDirection == 'desc':
