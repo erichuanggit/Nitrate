@@ -23,6 +23,8 @@
         "9":"<a href='{{ test_plan.get_absolute_url }}#testruns' title='{{ test_plan.num_runs }} test runs'>{{ test_plan.num_runs }}</a>",
         {% if perms.testplans.change_testplan %}
             "10":"<a class='editlink' href='{% url tcms.apps.testplans.views.edit test_plan.plan_id %}'>Edit</a>"
+        {% else %}
+            "10":""
         {% endif %}
         }
     {% if not forloop.last %}
