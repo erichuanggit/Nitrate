@@ -1077,12 +1077,41 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         if(form.adjacent('input.tag_delete').length > 0) {
             var element = form.adjacent('input.tag_delete')[0];
             element.observe('click',function(e) {
+                var c = getDialog();
+                var params = {
+                    'case': serializeCaseFromInputList(table)
+                    };
                 if(serializeCaseFromInputList(table).length == 0){
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                
-                constructBatchTagProcessDialog(plan_id);
+                var form_observe = function(e) {
+                    e.stop();
+
+                    var params = this.serialize(true);
+                    params['case'] = serializeCaseFromInputList(table);
+                    if(params['case'].length == 0){
+                        alert(default_messages.alert.no_case_selected);
+                        return false;
+                    }
+
+                    var url = getURLParam().url_cases_tag;
+                    var callback = function(t) {
+                        returnobj = t.responseText.evalJSON(true);
+
+                        if (returnobj.rc != 0) {
+                            alert(returnobj.response);
+                            return false;
+                        }
+                        parameters['case'] = params['case']
+                        constructPlanDetailsCasesZone(container, plan_id, parameters);
+                        clearDialog(c);
+                    }
+
+                    updateCaseTag(url, params, callback);
+                }
+                renderTagForm(c, params, form_observe);
+                })
                 
                 // Observe the batch tag form submit
                 $('id_batch_tag_form').observe('submit',function(e) {
@@ -1096,8 +1125,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     var format = 'serialized';
                     removeBatchTag(params, tag_callback, format)
                  })
-            })
-        }
+            }
         
         
         // Observe the change sortkey

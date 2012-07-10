@@ -42,7 +42,8 @@ from tcms.apps.management.models import Priority, TestTag
 
 from tcms.apps.testcases.forms import CaseAutomatedForm, NewCaseForm, \
         SearchCaseForm, CaseFilterForm, EditCaseForm, CaseNotifyForm, \
-        CloneCaseForm, CaseComponentForm, CaseCategoryForm, CaseBugForm
+        CloneCaseForm, CaseComponentForm, CaseCategoryForm, CaseBugForm, \
+        CaseTagForm
 from tcms.apps.testplans.forms import SearchPlanForm
 
 from fields import CC_LIST_DEFAULT_DELIMITER
@@ -896,6 +897,34 @@ def clone(request, template_name='case/clone.html'):
         'clone_form': clone_form,
         'submit_action': submit_action,
     })
+def tag(request):
+    """
+    Management test case tags
+    """
+    ajax_response = {'rc': 0, 'response': 'ok', 'errors_list':[]}
+    tcs = TestCase.objects.filter(pk__in=request.REQUEST.getlist('case'))
+    if not tcs:
+        raise Http404
+
+    if request.REQUEST.get('a'):
+        case_ids = request.POST.getlist('case')
+        tag_ids = request.POST.getlist('o_tag')
+        tcs = TestCase.objects.filter(pk__in=case_ids)
+        tags = TestTag.objects.filter(pk__in=tag_ids)
+        for tc in tcs:
+            for tag in tags:
+                try:
+                    tc.remove_tag(tag=tag)
+                except:
+                    ajax_response = ajax_response['errors_list'].append({
+                            'case': tc.pk,
+                            'component': t.pk
+                    })
+                    return HttpResponse(simplejson.dumps(ajax_response))
+        return HttpResponse(simplejson.dumps(ajax_response))
+    form = CaseTagForm(initial={'tag': request.REQUEST.get('o_tag')})
+    form.populate(case_ids=tcs)
+    return HttpResponse(form.as_p())
 
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasecomponent'))
 def component(request):

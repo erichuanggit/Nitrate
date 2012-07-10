@@ -613,6 +613,37 @@ function taggleAllCasesCheckbox(container)
     }
 }
 
+function renderTagForm(container, parameters, form_observe)
+{
+    var d = new Element('div');
+    if(!container)
+    var container = getDialog();
+    container.show();
+
+    var callback = function(t) {
+        var action = getURLParam().url_cases_tag;
+        var notice = 'Press "Ctrl" to select multiple default component';
+
+        var h = new Element('input', {'type': 'hidden', 'name': 'a', 'value': 'remove'});
+        var a = new Element('input', {'type': 'submit', 'value': 'Remove'});
+        var c = new Element('label');
+        c.appendChild(h);
+        c.appendChild(a);
+        a.observe('click', function(e) { h.value = 'remove'});
+        var f = constructForm(d.innerHTML, action, form_observe, notice, c);
+        container.update(f);
+        bind_component_selector_to_product(false, false, $('id_product'), $('id_o_component'));
+    }
+    var url = getURLParam().url_cases_tag;
+    new Ajax.Updater(d, url, {
+        method: 'post',
+        parameters: parameters,
+        onComplete: callback,
+        onFailure: html_failure,
+    })
+}
+
+
 function renderComponentForm(container, parameters, form_observe)
 {
     var d = new Element('div');
@@ -687,6 +718,16 @@ function renderCategoryForm(container, parameters, form_observe)
         parameters: parameters,
         onComplete: callback,
         onFailure: html_failure,
+    })
+}
+
+function updateCaseTag(url, parameters, callback)
+{
+    new Ajax.Request(url, {
+        method: 'post',
+        parameters: parameters,
+        onSuccess: callback,
+        onFailure: json_failure
     })
 }
 
