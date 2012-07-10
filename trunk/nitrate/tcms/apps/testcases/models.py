@@ -512,18 +512,16 @@ class TestCase(TCMSActionModel):
     emailing = property(_get_email_conf)
 
 class TestCaseText(TCMSActionModel):
+
     case = models.ForeignKey(TestCase, related_name='text')
-    case_text_version = models.IntegerField(
-        max_length=9, unique=True, primary_key=True
-    )
-    author = models.ForeignKey(
-        'auth.User', db_column='who'
-    )
+    case_text_version = models.IntegerField(max_length=9)
+    author = models.ForeignKey('auth.User', db_column='who')
     create_date = models.DateTimeField(db_column='creation_ts', auto_now_add=True)
     action = models.TextField(blank=True)
     effect = models.TextField(blank=True)
     setup = models.TextField(blank=True)
     breakdown = models.TextField(blank=True)
+
     class Meta:
         db_table = u'test_case_texts'
         ordering = ['case', '-case_text_version']
