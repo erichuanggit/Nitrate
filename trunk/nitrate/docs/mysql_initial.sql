@@ -128,3 +128,10 @@ CREATE TRIGGER case_run_status_trigger_delete
         WHERE run_id = OLD.run_id;
     END|
 DELIMITER ';'|
+
+-- TCMS 3.7
+-- Due to Django's lack of support for united primary keys,
+-- add primary key for tables that are not having primary keys
+-- but just unite keys
+ALTER TABLE test_case_texts ADD COLUMN id int(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT;
+ALTER TABLE test_plan_texts ADD COLUMN id int(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT;

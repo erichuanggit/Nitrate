@@ -10,7 +10,7 @@ Refer to https://bugzilla.redhat.com/show_bug.cgi?id=589633
 '''
 
 import os, random
-os.environ['DJANGO_SETTINGS_MODULE'] = 'tcms.mysettings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'tcms.product_settings'
 
 from tcms.apps.testplans.models import TestPlan
 
