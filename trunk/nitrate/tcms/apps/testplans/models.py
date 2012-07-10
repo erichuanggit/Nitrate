@@ -305,25 +305,21 @@ class TestPlan(TCMSActionModel):
     emailing = property(_get_email_conf)
 
 class TestPlanText(TCMSActionModel):
-    plan = models.ForeignKey(
-        TestPlan,
-        related_name='text',
-        db_index=True,
-        primary_key=True
-    )
-    plan_text_version = models.IntegerField(max_length=11, db_index=True)
+
+    plan = models.ForeignKey(TestPlan, related_name='text')
+    plan_text_version = models.IntegerField(max_length=11)
     author = models.ForeignKey('auth.User', db_column='who')
     create_date = models.DateTimeField(auto_now_add=True, db_column='creation_ts')
     plan_text = models.TextField(blank=True)
+
     class Meta:
         db_table = u'test_plan_texts'
         ordering = ['plan', '-plan_text_version']
         unique_together = ('plan', 'plan_text_version')
+
     def get_plain_text(self):
         from tcms.core.utils.html import html2text
-
         self.plan_text = html2text(self.plan_text)
-
         return self
 
 class TestPlanPermission(models.Model):
