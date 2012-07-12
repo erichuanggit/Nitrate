@@ -272,18 +272,11 @@ def tag(request, template_name="management/get_tag.html"):
     # Response the single operation
     if len(obj) == 1:
         tags = obj[0].tag.all()
-        if isinstance(obj[0], TestPlan):
-            plan = obj[0]
-            for tag in tags:
-                tag.num_plans = TestPlan.objects.filter(tag__pk=tag.pk).count()
-                tag.num_cases = plan.case.filter(tag__pk=tag.pk).count()
-                tag.num_runs = plan.run.filter(tag__pk=tag.pk).count()
-        else:
-            tags = tags.extra(select={
-                'num_plans': 'SELECT COUNT(*) FROM test_plan_tags WHERE test_tags.tag_id = test_plan_tags.tag_id',
-                'num_cases': 'SELECT COUNT(*) FROM test_case_tags WHERE test_tags.tag_id = test_case_tags.tag_id',
-                'num_runs': 'SELECT COUNT(*) FROM test_run_tags WHERE test_tags.tag_id = test_run_tags.tag_id',
-            })
+        tags = tags.extra(select={
+            'num_plans': 'SELECT COUNT(*) FROM test_plan_tags WHERE test_tags.tag_id = test_plan_tags.tag_id',
+            'num_cases': 'SELECT COUNT(*) FROM test_case_tags WHERE test_tags.tag_id = test_case_tags.tag_id',
+            'num_runs': 'SELECT COUNT(*) FROM test_run_tags WHERE test_tags.tag_id = test_run_tags.tag_id',
+        })
 
         return direct_to_template(request, template_name, {
             'tags': tags,
