@@ -779,14 +779,8 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     if(returnobj.rc != 0) {
                         alert(returnobj.reponse);
                     }
-                    //parameters.a = 'initial';
-                    params.a = 'search';
+                    params.a = 'initial';
                     constructPlanDetailsCasesZone(container, plan_id, params);
-                    
-                    //sort cases by sortkey after drag and drop.
-                    $$('a.sort_by_sortkey').each(function(e){
-                                               fireEvent(e, 'click');
-                    })
                 }
                 resortCasesDragAndDrop(container, this, form, table, params, callback);
             });
@@ -964,7 +958,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                             alert(returnobj.response);
                             return false;
                         }
-                        parameters['case'] = params['case']
+                        parameters['case'] = params['case'];
                         constructPlanDetailsCasesZone(container, plan_id, parameters);
                         clearDialog(c);
                     }
@@ -992,6 +986,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                         alert(returnobj.response);
                         return false
                     };
+                    parameters['case'] = case_pks;
                     constructPlanDetailsCasesZone(container, plan_id, parameters);
                 }
                 
@@ -1003,7 +998,8 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         if(form.adjacent('input.sort_list').length != 0) {
             var element = form.adjacent('input.sort_list')[0];
             element.observe('click', function(e) {
-                var case_plan_pks = serializeSortFromInputList(table);
+                var case_plan_pks = serializeCasePlanIDFromInputList(table);
+                var case_pks = serializeCaseFromInputList(table);
                 if(case_plan_pks.length == 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
@@ -1012,6 +1008,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     'testcaseplan': case_plan_pks
                 };
                 var callback = function(t) {
+                    parameters['case'] = case_pks;
                     constructPlanDetailsCasesZone(container, plan_id, parameters);
                 };
                 changeCaseOrder(params, callback);
@@ -1542,7 +1539,7 @@ function resortCasesDragAndDrop(container, button, form, table, parameters, call
         });
         
         parameters.a = 'order_cases';
-        
+        parameters.case_sort_by = 'sortkey'; 
         var url = new String('cases/');
         new Ajax.Request(url, {
             method: 'post',
