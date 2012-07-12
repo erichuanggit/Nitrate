@@ -7,7 +7,7 @@
     [
         "<input type='checkbox' name='run' value='{{ test_run.pk }}'>",
         "<a href='{% url tcms.apps.testruns.views.get test_run.run_id %}' >{{ test_run.run_id }}</a>",
-        "<a href='{% url tcms.apps.testruns.views.get test_run.run_id %}' >{{ test_run.summary|escapejs|striptags }}</a>",
+        "<a href='{% url tcms.apps.testruns.views.get test_run.run_id %}' >{{ test_run.summary|escapejs }}</a>",
         "<a href='{% url tcms.apps.profiles.views.profile test_run.manager.username %}'>{{ test_run.manager }}</a>",
         {% if test_run.default_tester_id %}
             "<a href='{% url tcms.apps.profiles.views.profile test_run.default_tester.username %}'>{{test_run.default_tester}}</a>"
