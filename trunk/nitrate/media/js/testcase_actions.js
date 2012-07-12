@@ -229,6 +229,21 @@ Nitrate.TestCases.Create.on_load = function()
     // bind_category_selector_to_product(false, false, $('id_product'), $('id_category'));
     
     SelectFilter.init("id_component", "component", 0, "/admin_media/");
+    //init category and components
+    getCategorisByProductId(false, $('id_product'), $('id_category'));
+    var from = 'id_component_from';
+    var to = 'id_component_to';
+    var from_field = $(from);
+    var to_field = $(to);
+    to_field.update('');
+    getComponentsByProductId(false, $('id_product'), from_field, function() {
+        SelectBox.cache[from] = new Array();
+        SelectBox.cache[to] = new Array();
+        for (var i = 0; (node = from_field.options[i]); i++) {
+            SelectBox.cache[from].push({value: node.value, text: node.text, displayed: 1});
+        }
+    });
+    // bind change on product to update component and category
     jQ('#id_product').change(function () {
         var from = 'id_component_from';
         var to = 'id_component_to';
