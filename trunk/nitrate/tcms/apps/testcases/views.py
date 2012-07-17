@@ -530,7 +530,6 @@ def get(request, case_id, template_name='case/get.html'):
             'run__summary', 'tested_by',
             'assignee', 'case__category__name',
             'case__priority__name', 'case_run_status__name').all()
-
     tcrs = tcrs.extra(select={
         'num_bug': RawSQL.num_case_run_bugs,
     }).order_by('run__plan')
@@ -538,22 +537,34 @@ def get(request, case_id, template_name='case/get.html'):
     # FIXME: Just don't know why Django template does not evaluate a generator,
     # and had to evaluate the groupby generator manually like below.
     runs_ordered_by_plan = [(k, list(v)) for k, v in runs_ordered_by_plan]
+    case_run_plans = [k for k, v in runs_ordered_by_plan]
     # Get the specific test case run
     if request.REQUEST.get('case_run_id'):
         tcr = tcrs.get(pk=request.REQUEST['case_run_id'])
     else:
         tcr = None
+    case_run_plan_id = request.REQUEST.get('case_run_plan_id', None)
+    if case_run_plan_id:
+        for item in runs_ordered_by_plan:
+            if item[0].pk == long(case_run_plan_id):
+                case_runs_by_plan = item[1]
+                break
+            else:
+                continue
+    else:
+        case_runs_by_plan = None
 
     # Get the case texts
     tc_text = tc.get_text_with_version(request.REQUEST.get('case_text_version'))
-
     # Switch the templates for different module
     template_types = {
             'case': 'case/get_details.html',
             'review_case': 'case/get_details_review.html',
             'case_run': 'case/get_details_case_run.html',
+            'case_run_list': 'case/get_case_runs_by_plan.html',
             'case_case_run': 'case/get_details_case_case_run.html',
-            'execute_case_run': 'run/execute_case_run.html',}
+            'execute_case_run': 'run/execute_case_run.html',
+            }
 
     if request.REQUEST.get('template_type'):
         template_name = template_types.get(
@@ -567,7 +578,8 @@ def get(request, case_id, template_name='case/get.html'):
         'test_plan': tp,
         'test_plans': tps,
         'test_case_runs': tcrs,
-        'runs_ordered_by_plan': runs_ordered_by_plan,
+        'case_run_plans' : case_run_plans,
+        'test_case_runs_by_plan': case_runs_by_plan,
         'test_case_run': tcr,
         'grouped_case_bugs': grouped_case_bugs,
         'test_case_text': tc_text,

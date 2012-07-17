@@ -189,7 +189,23 @@ Nitrate.TestCases.Details.on_load = function()
         toggleTestCaseContents(type, c, c_container, case_id, case_text_version, case_run_id);
     }
     
-    $$('.expandable').invoke('observe', 'click', toggle_case_run);
+    var toggle_case_runs_by_plan = function(e) {
+        var c = this.up();
+        var case_id = c.getElementsByTagName('input')[0].value;
+        var params = {
+            'type' : 'case_run_list',
+            'container': c,
+            'c_container': c.next(),
+            'case_id': case_id,
+            'case_run_plan_id': c.id
+        }
+        var callback = function(e) {
+            $$('#table_case_runs_by_plan .expandable').invoke('observe', 'click', toggle_case_run);
+        }
+        toggleCaseRunsByPlan(params, callback);
+    }
+    $$('.plan_expandable').invoke('observe', 'click', toggle_case_runs_by_plan);
+    
 
     jQ('#testplans_table').dataTable({
         "bFilter": false,
@@ -925,8 +941,49 @@ function toggleDiv(link, divId){
         link.html(hide);
     }
 }
+
 function addCaseBugViaEnterKey(element, e){
     if (e.keyCode == 13)
         addCaseBug(element);
 }
 
+function toggleCaseRunsByPlan(params, callback)
+{
+    var container = params.container;
+    var content_container = params.c_container;
+    var case_run_plan_id = params.case_run_plan_id;
+    var case_id = params.case_id;
+    if (typeof(container) != 'object')
+        container = $(container);
+    
+    if(typeof(content_container) != 'object')
+        content_container = $(content_container);
+    
+    content_container.toggle();
+    
+    if ($('id_loading_' + case_run_plan_id)) {
+        var url = getURLParam(case_id).url_case_details;
+        var parameters = {
+            template_type: params.type,
+            case_run_plan_id: case_run_plan_id,
+        };
+        
+        new Ajax.Updater(content_container, url, {
+            method: 'get',
+            parameters: parameters,
+            onComplete: callback,
+            onFailure: html_failure
+        });
+    };
+    
+    var blind_icon = container.getElementsByTagName('img')[0];
+    if (content_container.getStyle('display') == 'none') {
+        $(blind_icon).removeClassName('collapse');
+        $(blind_icon).addClassName('expand');
+        $(blind_icon).src = "/media/images/t1.gif";
+    } else {
+        $(blind_icon).removeClassName('expand');
+        $(blind_icon).addClassName('collapse');
+        $(blind_icon).src = "/media/images/t2.gif";
+    }
+}
