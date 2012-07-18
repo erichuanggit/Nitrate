@@ -199,7 +199,7 @@ Nitrate.TestCases.Details.on_load = function()
         "bInfo": false,
         "aaSorting": [[ 0, "desc" ]],
         "aoColumns": [
-          null,
+          {"sType": "num-html"},
           null,
           {"sType": "html"},
           {"sType": "html"},
@@ -632,7 +632,7 @@ function constructPlanCaseZone(container, case_id, parameters)
             "bInfo": false,
             "aaSorting": [[ 0, "desc" ]],
             "aoColumns": [
-              null,
+              {"sType": "num-html"},
               null,
               {"sType": "html"},
               {"sType": "html"},
