@@ -114,6 +114,10 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Create.on_load);
 						<label>Arguments</label>
 						{{ form.arguments }}<div class="errors">{{ form.arguments.errors }}</div>
 					</div>
+                    <div class="data_row">
+                        <label>Reference Link</label>
+                        {{ form.extra_link }}<div class="errors">{{ form.extra_link.errors }}</div>
+                    </div>
 					<div class="data_row">
 						<label class="lab">Tags</label>
 						{{ form.tag }}

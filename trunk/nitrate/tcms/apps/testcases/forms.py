@@ -143,6 +143,12 @@ class BaseCaseForm(forms.Form):
     script = forms.CharField(label = "Script", required = False)
     arguments = forms.CharField(label = "Arguments", required = False)
     alias = forms.CharField(label = "Alias", required = False)
+    extra_link = forms.URLField(
+        label = 'Extra link',
+        max_length = 1024,
+        verify_exists = False,
+        required = False
+    )
     # sortkey = forms.IntegerField(label = 'Sortkey', required = False)
     case_status = forms.ModelChoiceField(
         label = "Case status",

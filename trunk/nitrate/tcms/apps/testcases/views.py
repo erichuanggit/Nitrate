@@ -652,6 +652,7 @@ def update_testcase(request, tc, tc_form):
               'is_automated_proposed',
               'script',
               'arguments',
+              'extra_link',
               'requirement',
               'alias']
 
@@ -793,6 +794,7 @@ def edit(request, case_id, template_name='case/edit.html'):
             'is_automated_proposed': tc.is_automated_proposed,
             'script': tc.script,
             'arguments': tc.arguments,
+            'extra_link': tc.extra_link,
             'alias': tc.alias,
             'case_status': tc.case_status_id,
             'priority': tc.priority_id,
@@ -866,6 +868,7 @@ def clone(request, template_name='case/clone.html'):
                         is_automated_proposed = tc_src.is_automated_proposed,
                         script = tc_src.script,
                         arguments = tc_src.arguments,
+                        extra_link = tc_src.extra_link,
                         summary = tc_src.summary,
                         requirement = tc_src.requirement,
                         alias = tc_src.alias,
