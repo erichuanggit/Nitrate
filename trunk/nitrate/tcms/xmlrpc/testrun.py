@@ -477,10 +477,21 @@ def get_test_cases(request, run_id):
     Example:
     >>> TestRun.get_test_cases(1193)
     """
-    tr = TestRun.objects.get(run_id = run_id)
-    tc_ids = tr.case_run.values_list('case_id', flat = True)
-    query = {'case_id__in': tc_ids}
-    return TestCase.to_xmlrpc(query)
+    from tcms.apps.testcases.models import TestCase
+    from tcms.core.utils.xmlrpc import XMLRPCSerializer
+
+    try:
+        tr = TestRun.objects.get(run_id=run_id)
+    except ObjectDoesNotExist:
+        raise
+
+    tc_ids = tr.case_run.values_list('case_id', flat=True)
+    tc_tcs = dict(tr.case_run.values_list('case_id', 'case_run_id'))
+    tcs = TestCase.objects.filter(case_id__in=tc_ids)
+    tcs_serializer = XMLRPCSerializer(tcs).serialize_queryset()
+    for case in tcs_serializer:
+        case['case_run_id'] = tc_tcs[case['case_id']]
+    return tcs_serializer
 
 def get_test_plan(request, run_id):
     """
