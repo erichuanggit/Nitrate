@@ -712,7 +712,10 @@ def clone(request, template_name='plan/clone.html'):
                                     default_tester = None
                             else:
                                 default_tester = request.user
-
+                            tc_category, b_created = TestCaseCategory.objects.get_or_create(
+                                name = tpcase_src.category.name,
+                                product = clone_form.cleaned_data['product']
+                                    )
                             tpcase_dest = TestCase.objects.create(
                                 create_date=tpcase_src.create_date,
                                 is_automated=tpcase_src.is_automated,
@@ -722,8 +725,8 @@ def clone(request, template_name='plan/clone.html'):
                                 requirement=tpcase_src.requirement,
                                 alias=tpcase_src.alias,
                                 estimated_time=tpcase_src.estimated_time,
-                                case_status=tpcase_src.case_status,
-                                category=tpcase_src.category,
+                                case_status=TestCaseStatus.get_PROPOSED(),
+                                category=tc_category,
                                 priority=tpcase_src.priority,
                                 author=author,
                                 default_tester=default_tester,
