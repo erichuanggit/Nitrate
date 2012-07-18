@@ -17,12 +17,14 @@
 #   Xuqing Kuang <xkuang@redhat.com>
 
 from django.db import models
-
+from django.contrib.auth.models import User
 from fields import TimedeltaField, BlobValueWrapper, BlobField
 from base import TCMSContentTypeBaseModel, UrlMixin
 
 from tcms.core.utils.xmlrpc import XMLRPCSerializer
 from tcms.core.logs.views import TCMSLog
+
+User._meta.ordering = ['username']
 
 class TCMSActionModel(models.Model, UrlMixin):
     """
