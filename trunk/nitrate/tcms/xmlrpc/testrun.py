@@ -603,10 +603,11 @@ def update(request, run_ids, values):
 
         if form.cleaned_data['manager']:
             trs.update(manager = form.cleaned_data['manager'])
-
-        if form.cleaned_data['default_tester']:
-            trs.update(default_tester = form.cleaned_data['default_tester'])
-
+        if values.has_key('default_tester'):
+            if values.get('default_tester') and form.cleaned_data['default_tester']:
+                trs.update(default_tester = form.cleaned_data['default_tester'])
+            else:
+                trs.update(default_tester = None)
         if form.cleaned_data['summary']:
             trs.update(summary = form.cleaned_data['summary'])
 
