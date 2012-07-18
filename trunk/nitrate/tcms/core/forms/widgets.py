@@ -114,7 +114,7 @@ TinyMCEWidget = TinyMCE(mce_attrs = {
     'theme_advanced_toolbar_location': "top",
     'theme_advanced_toolbar_align': "left",
     'theme_advanced_statusbar_location': "none",
-    'theme_advanced_buttons1': "formatselect,bold,italic,underline,bullist,numlist,link,unlink,image,search,|,outdent,indent,hr,fullscreen,|,help,code",
+    'theme_advanced_buttons1': "formatselect,bold,italic,underline,bullist,numlist,link,unlink,image,search,|,outdent,indent,hr,fullscreen,|,help",
     'theme_advanced_buttons2':"tablecontrols",
     'theme_advanced_buttons3':"",
     #'theme_advanced_buttons1': 'formatselect,styleselect,|,bold,italic,underline,|,bullist,numlist,blockquote,|,undo,redo,|,link,unlink,|,image,|,fullscreen,|,grappelli_adv',
