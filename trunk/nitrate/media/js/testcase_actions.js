@@ -83,7 +83,7 @@ Nitrate.TestCases.List.on_load = function()
             oTable.fnClose( tr );
         } else {
           oTable.fnOpen( tr, detail_td, "info_row" );
-          toggleTestCaseContents("case", tr, tr.next(), case_id);
+          getTestCaseContents("case", tr, tr.next(), case_id);
         }
     });
 }
@@ -306,6 +306,41 @@ Nitrate.TestCases.Clone.on_load = function()
     })
     };
 }
+function getTestCaseContents(template_type, container, content_container, object_pk, case_text_version, case_run_id, callback)
+{
+    if (typeof(container) != 'object')
+    var container = $(container)
+
+    if(typeof(content_container) != 'object')
+    var content_container = $(content_container)
+
+    if ($('id_loading_' + object_pk)) {
+        var url = getURLParam(object_pk).url_case_details;
+        var parameters = {
+            template_type: template_type,
+            case_text_version: case_text_version,
+            case_run_id: case_run_id,
+        };
+
+        new Ajax.Updater(content_container, url, {
+            method: 'get',
+            parameters: parameters,
+            onComplete: callback,
+            onFailure: html_failure
+        });
+    };
+
+    var blind_icon = container.getElementsBySelector('.blind_icon')[0]
+    if (content_container.getStyle('display') == 'none') {
+        $(blind_icon).removeClassName('collapse');
+        $(blind_icon).addClassName('expand');
+        $(blind_icon).src = "/media/images/t1.gif";
+    } else {
+        $(blind_icon).removeClassName('expand');
+        $(blind_icon).addClassName('collapse');
+        $(blind_icon).src = "/media/images/t2.gif";
+    }
+}
 
 function toggleTestCaseContents(template_type, container, content_container, object_pk, case_text_version, case_run_id, callback)
 {
@@ -315,7 +350,7 @@ function toggleTestCaseContents(template_type, container, content_container, obj
     if(typeof(content_container) != 'object')
     var content_container = $(content_container)
     
-    // content_container.toggle();
+    content_container.toggle();
     
     if ($('id_loading_' + object_pk)) {
         var url = getURLParam(object_pk).url_case_details;
