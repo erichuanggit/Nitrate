@@ -367,7 +367,7 @@ function toggleTestCaseContents(template_type, container, content_container, obj
         });
     };
     
-    var blind_icon = container.getElementsBySelector('.blind_icon')[0]
+    var blind_icon = container.getElementsByTagName('img')[0];
     if (content_container.getStyle('display') == 'none') {
         $(blind_icon).removeClassName('collapse');
         $(blind_icon).addClassName('expand');
@@ -849,12 +849,13 @@ function serializeCaseFromInputList(table)
     };
     return case_ids
 }
-function serializeSortFromInputList(table)
+function serializeCasePlanIDFromInputList(table)
 {
     var elements = $(table).adjacent('input[name="case"]:checked');
     var case_plan_ids = new Array();
     for(var i=0; i<elements.length; i++){
-        var case_plan_element = elements[i].up(0).siblings()[10].adjacent('span')[0];
+        var tr_element = elements[i].up(1);
+        var case_plan_element = tr_element.getElementsByClassName('col_sortkey_content')[0].getElementsByTagName('span')[0];
         if (typeof(case_plan_element.innerHTML) == 'string')
         case_plan_ids.push(case_plan_element.innerHTML);
     };
