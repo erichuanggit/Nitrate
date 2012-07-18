@@ -93,7 +93,6 @@ Nitrate.TestCases.Details.on_load = function()
     var case_id = Nitrate.TestCases.Instance.pk;
     constructTagZone('tag', { 'case': case_id });
     constructPlanCaseZone($('plan'), case_id);
-    
     $$('li.tab a').invoke('observe', 'click', function(i) {
         $$('div.tab_list').invoke('hide');
         $$('li.tab').invoke('removeClassName', 'tab_focus');
@@ -884,3 +883,8 @@ function toggleDiv(link, divId){
         link.html(hide);
     }
 }
+function addCaseBugViaEnterKey(element, e){
+    if (e.keyCode == 13)
+        addCaseBug(element);
+}
+

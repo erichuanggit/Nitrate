@@ -38,7 +38,8 @@
 					<input type="hidden" name="case" value="{{ test_case.case_id }}" />
 					<input type="hidden" name="case_run" value="" />
 					<input type="hidden" name="bug_system" value="1" />
-					<input type="text" size="20" name="bug_id" />
+					<input id="id_bugs" type="text" size="20" name="bug_id" onkeydown="addCaseBugViaEnterKey(this.up(1), event)" />
+					<input style="display:none">
 					<a href="#bug" class="addlink" onclick="addCaseBug(this.up(1))">Add</a>
 				</div>
 			</form>
