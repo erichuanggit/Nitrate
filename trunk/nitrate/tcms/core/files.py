@@ -44,6 +44,7 @@ def upload_file(request):
             stored_file_name = os.path.join(
                 settings.FILE_UPLOAD_DIR, stored_name
             ).replace('\\','/')
+            stored_file_name = stored_file_name.encode('utf-8')
 
             if upload_file._size > settings.MAX_UPLOAD_SIZE:
                 return HttpResponse(Prompt.render(
@@ -179,7 +180,7 @@ def check_file(request, file_id):
                 raise Http404(error)
 
     response = HttpResponse(contents, mimetype=str(attachment.mime_type))
-    response['Content-Disposition'] = 'attachment; filename=%s' % attachment.file_name
+    response['Content-Disposition'] = 'attachment; filename=%s' % attachment.file_name.encode('utf-8')
     return response
 
 def able_to_delete_attachment(request,file_id):
