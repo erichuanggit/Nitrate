@@ -539,3 +539,14 @@ class CaseCategoryForm(forms.Form):
         else:
             #self.fields['category'].queryset = TestCaseCategory.objects.all()
             self.fields['o_category'].queryset = TestCaseCategory.objects.all()
+class CaseTagForm(forms.Form):
+    o_tag = forms.ModelMultipleChoiceField(
+        label="Tags",
+        queryset=TestTag.objects.none(),
+        required=False,
+    )
+    def populate(self, case_ids=None):
+        if case_ids:
+            self.fields['o_tag'].queryset = TestTag.objects.filter(testcase__in=case_ids).order_by('name').distinct()
+        else:
+            self.fields['o_category'].queryset = TestCaseCategory.objects.all()
