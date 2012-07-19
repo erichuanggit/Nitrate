@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # 
-# Nitrate is copyright 2010 Red Hat, Inc.
+# Nitrate is copyright 2010-2012 Red Hat, Inc.
 # 
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -220,4 +220,8 @@ class ModAuthKerbBackend(RemoteUserBackend):
         For more info, reference clean_username function in 
         django/auth/backends.py
         """
-        return username.replace('@' + settings.KRB5_REALM, '')
+        username = username.replace('@' + settings.KRB5_REALM, '')
+        username_tuple = username.split('/')
+        if len(username_tuple) > 1:
+            username = username_tuple[1]
+        return len(username) > 30 and username[:30] or username
