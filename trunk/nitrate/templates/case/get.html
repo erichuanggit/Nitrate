@@ -151,6 +151,19 @@ Nitrate.TestCases.Instance = {
 						<span id="display_script">{{ test_case.arguments|default:'None' }}</span>
 					</div>
 				</div>
+
+                                <div class="listinfo">
+                    <div class="title grey"><span>Reference Link&nbsp;:</span></div>
+                    <div class="name {% if not test_case.extra_link %}grey{% endif %}">
+                        <span id="display_script">
+                        {% if test_case.extra_link %}
+                            <a href="{{ test_case.extra_link }}">{{ test_case.extra_link }}</a>
+                        {% else %}
+                        None
+                        {% endif %}
+                        </span>
+                    </div>
+                </div>
 			</div>
 			<div class="clear"></div>
 			<div class="listinfo">
