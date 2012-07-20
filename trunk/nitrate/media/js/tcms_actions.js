@@ -105,7 +105,8 @@ var default_messages = {
         'bookmark_added': 'Bookmark added.',
         'no_run_selected': 'No run selected.',
         'invalid_bug_id': 'Please input a valid bug id.',
-        'no_bugs_specified': 'Please specify bug ID'
+        'no_bugs_specified': 'Please specify bug ID',
+        'no_plan_specified': 'Please specify one plan at least.'
     },
     'confirm': {
         'change_case_status': 'Are you sure you want to change the status?',
