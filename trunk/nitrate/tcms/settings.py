@@ -138,6 +138,8 @@ INSTALLED_APPS = (
     'tcms.integration.djqpid',
     'tcms.integration.apps.errata',
     'tcms.core.contrib.linkreference',
+
+    'tcms.integration.apps.bugzilla',
 )
 
 # RequestContext settings
