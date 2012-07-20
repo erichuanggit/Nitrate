@@ -31,6 +31,7 @@ from django.core import serializers
 from django.template.defaultfilters import slugify
 from django.template.loader import render_to_string
 from django.template import RequestContext
+from django.conf import settings
 
 from tcms.core.views import Prompt
 from tcms.core.utils.raw_sql import RawSQL
@@ -827,11 +828,16 @@ def attachment(request, plan_id, template_name='plan/attachment.html'):
     """Manage attached files"""
     SUB_MODULE_NAME = 'plans'
 
+    file_size_limit = settings.MAX_UPLOAD_SIZE
+    limit_readable = int(file_size_limit)/2**20 #Mb
+
     tp = get_object_or_404(TestPlan, plan_id=plan_id)
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
-        'test_plan': tp ,
+        'test_plan': tp,
+        'limit': file_size_limit,
+        'limit_readable': str(limit_readable) + "Mb",
     })
 
 

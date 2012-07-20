@@ -5,6 +5,7 @@ Nitrate.TestPlans.Details = {};
 Nitrate.TestPlans.Edit = {};
 Nitrate.TestPlans.SearchCase = {};
 Nitrate.TestPlans.Clone = {};
+Nitrate.TestPlans.Attachment = {};
 
 Nitrate.TestPlans.TreeView = {
     pk: new Number(),
@@ -530,6 +531,22 @@ Nitrate.TestPlans.Clone.on_load = function()
     if($('id_product') && !$F('id_default_product_version')){
         fireEvent($('id_product'),'change');
     }
+}
+
+Nitrate.TestPlans.Attachment.on_load = function()
+{
+    jQ(document).ready(function() {
+       jQ("#upload_file").change(function ()
+       {
+         var iSize = jQ("#upload_file")[0].files[0].size;
+         var limit = parseInt(jQ('#upload_file').attr('limit'));
+
+         if (iSize > limit)
+         {
+             alert("Your attachment's size is beyond limit.");
+         }
+      });
+    });
 }
 
 function getTestPlanParam()
