@@ -229,6 +229,15 @@ Nitrate.TestRuns.Edit.on_load = function()
 {
     bind_version_selector_to_product(false);
     bind_build_selector_to_product(false);
+    $('id_auto_update_run_status').observe('click', function(){
+        if ($('id_auto_update_run_status').checked == true){
+            $('id_finished').checked = false;
+            $('id_finished').disable();
+        }else{
+            if ($('id_finished').disabled == true)
+                $('id_finished').enable();
+        }
+    })
 }
 
 Nitrate.TestRuns.Execute.on_load = function()

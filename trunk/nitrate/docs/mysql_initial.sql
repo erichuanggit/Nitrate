@@ -132,3 +132,4 @@ DELIMITER ';'|
 -- TCMS 3.8, added a new column for test_plans
 ALTER TABLE test_plans ADD column product_version_id mediumint(9) DEFAULT null ;
 ALTER TABLE test_cases ADD column extra_link varchar(1024) DEFAULT null ;
+ALTER TABLE test_runs ADD column auto_update_run_status boolean DEFAULT false;       
