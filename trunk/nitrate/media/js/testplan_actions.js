@@ -1164,7 +1164,6 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     updateCaseTag(url, params, callback);
                 }
                 renderTagForm(c, params, form_observe);
-                })
                 
                 // Observe the batch tag form submit
                 $('id_batch_tag_form').observe('submit',function(e) {
@@ -1178,6 +1177,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     var format = 'serialized';
                     removeBatchTag(params, tag_callback, format)
                  })
+            })
             }
         
         
