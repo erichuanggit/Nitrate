@@ -404,7 +404,9 @@ def view_test_run_report(request):
         'per_tester_report': 'report/caserun_report_per_tester.html',
         'per_priority_report': 'report/caserun_report_per_priority.html',
         'per_plan_tag_report': 'report/testrun_report_per_plan_tag.html',
+        'per_plan_build_report': 'report/testrun_report_per_plan_build.html',
         'runs_with_rates_per_plan_tag': 'report/testrun_report_by_plan_tag_with_rates.html',
+        'runs_with_rates_per_plan_build': 'report/testrun_report_by_plan_build_with_rates.html',
     }
     errors  = None
     queries = request.GET

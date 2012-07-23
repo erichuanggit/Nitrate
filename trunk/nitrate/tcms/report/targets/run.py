@@ -104,8 +104,12 @@ def get_reports(runs, report_type, group_by_builds=False):
         report = test_run_report_by_case_priority(runs)
     if report_type == 'per_plan_tag_report':
         report = test_run_report_by_plan_tag(runs)
+    if report_type == 'per_plan_build_report':
+        report = test_run_report_by_plan_build(runs)
     if report_type == 'runs_with_rates_per_plan_tag':
         report = percentages_on_runs_under_plan_tag(runs)
+    if report_type == 'runs_with_rates_per_plan_build':
+        report = percentages_on_runs_under_plan_build(runs)
     return report
 
 def test_run_report_by_build(runs, inner_group=None):
@@ -155,6 +159,17 @@ def test_run_report_by_plan_tag(runs):
         report.append((tag, len(_runs), plans_count, caserun_count, runs_grouped_by_build))
     return report
 
+def test_run_report_by_plan_build(runs):
+    runs    = annotate_runs_with_case_run_count_by_status(runs)
+    runs_grouped_by_plan = group_runs_by_plan(runs)
+    report = []
+    for plan, _runs in runs_grouped_by_plan.iteritems():
+        runs_grouped_by_build = test_run_report_by_build(_runs)
+        plans_count = len(set(r.plan_id for r in _runs))
+        caserun_count = TestCaseRun.objects.filter(run__in=_runs).count()
+        report.append((plan, len(_runs), plans_count, caserun_count, runs_grouped_by_build))
+    return report
+
 def group_caserun_by_tester(caseruns):
     caseruns    = sorted(caseruns, key=lambda csr: csr.tested_by_id)
     caseruns    = groupby(caseruns, key=lambda csr: csr.tested_by)
@@ -179,6 +194,16 @@ def percentages_on_runs_under_plan_tag(runs):
         runs_count = len(_runs)
         passed, failed = get_runs_rate(_runs)
         report.append((plan_tag, plans_count, runs_count, passed, failed))
+    return report
+
+def percentages_on_runs_under_plan_build(runs):
+    report = []
+    grouped_runs_by_plan = group_runs_by_plan(runs)
+    for plan, _runs in grouped_runs_by_plan.iteritems():
+        runs_count = len(_runs)
+        builds_count = len(set(r.build_id for r in _runs))
+        passed, failed = get_runs_rate(_runs)
+        report.append((plan, builds_count, runs_count, passed, failed))
     return report
 
 def get_runs_rate(runs):
@@ -223,6 +248,12 @@ def group_runs_by_plan_tag(runs):
             continue
         map(lambda t: tag_run_map.setdefault(t, []).append(run), run_tags)
     return tag_run_map
+
+def group_runs_by_plan(runs):
+    plan_run_map = {}
+    for run in runs:
+        (lambda t: plan_run_map.setdefault(t, []).append(run))(run.plan)
+    return plan_run_map
 
 if __name__ == '__main__':
     import doctest
