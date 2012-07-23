@@ -394,7 +394,7 @@ function toggleTestCaseContents(template_type, container, content_container, obj
     }
 }
 
-function changeTestCaseStatus(selector, case_id, be_confirmed, was_confirmed)
+function changeTestCaseStatus(plan_id, selector, case_id)
 {
     var value = selector.value;
     var label = selector.previous();
@@ -412,19 +412,13 @@ function changeTestCaseStatus(selector, case_id, be_confirmed, was_confirmed)
         label.show();
         selector.hide();
 
-        if(be_confirmed){
-            jQ('#run_case_count').text(parseInt(jQ('#run_case_count').text())+1);
-            jQ('#review_case_count').text(parseInt(jQ('#review_case_count').text())-1);
-            jQ('#'+case_id).remove();
-        }
-        if(was_confirmed){
-            jQ('#run_case_count').text(parseInt(jQ('#run_case_count').text())-1);
-            jQ('#review_case_count').text(parseInt(jQ('#review_case_count').text())+1);
-            jQ('#'+case_id).remove();
-        }
+        jQ('#run_case_count').text(returnobj.run_case_count);
+        jQ('#case_count').text(returnobj.case_count);
+        jQ('#review_case_count').text(returnobj.review_case_count);
+        jQ('#'+case_id).remove();
     }
     
-    changeCasesStatus(case_id, value, success);
+    changeCasesStatus(plan_id, case_id, value, success);
 }
 
 function toggleAllCheckBoxes(element, container, name)
@@ -524,12 +518,13 @@ function changeCaseOrder(parameters, callback)
     updateObject(ctype, object_pk, field, value, vtype, callback);
 }
 
-function changeCasesStatus(object_pk, value, callback)
+function changeCasesStatus(plan_id, object_pk, value, callback)
 {
+    var plan_id = plan_id;
     var ctype = 'testcases.testcase';
     var field = 'case_status';
     var vtype = 'int';
-    updateObject(ctype, object_pk, field, value, vtype, callback);
+    updateCaseStatus(plan_id, ctype, object_pk, field, value, vtype, callback);
 }
 
 function changeCasePriority(object_pk, value, callback)
