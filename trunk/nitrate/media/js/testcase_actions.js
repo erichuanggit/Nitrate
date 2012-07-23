@@ -205,13 +205,12 @@ Nitrate.TestCases.Details.on_load = function()
         toggleCaseRunsByPlan(params, callback);
     }
     $$('.plan_expandable').invoke('observe', 'click', toggle_case_runs_by_plan);
-    
-
     jQ('#testplans_table').dataTable({
         "bFilter": false,
         "bLengthChange": false,
         "bPaginate": false,
         "bInfo": false,
+        "bAutoWidth": false,
         "aaSorting": [[ 0, "desc" ]],
         "aoColumns": [
           {"sType": "num-html"},
@@ -644,7 +643,6 @@ function removeCaseBug(id, case_id, callback)
 function constructPlanCaseZone(container, case_id, parameters)
 {
     // $(container).update('<div class="ajax_loading"></div>');
-
     var complete = function(t) {
         $('id_plan_form').observe('submit', function(e) {
             e.stop();
@@ -653,7 +651,7 @@ function constructPlanCaseZone(container, case_id, parameters)
                 e.stop();
                 var plan_ids = this.serialize(true)['plan_id'];
                 if (!plan_ids) {
-                    alert('You must specific one plan at least!');
+                    alert(default_messages.alert.no_plan_specified);
                     return false;
                 }
 
@@ -669,28 +667,31 @@ function constructPlanCaseZone(container, case_id, parameters)
 
             var p = this.serialize(true)
             if (!p.pk__in) {
-                alert('Plan is required');
+                alert(default_messages.alert.no_plan_specified);
                 return false;
             };
 
             previewPlan(p, getURLParam(case_id).url_case_plan, callback);
         })
-        jQ('#testplans_table').dataTable({
-            "bFilter": false,
-            "bLengthChange": false,
-            "bPaginate": false,
-            "bInfo": false,
-            "aaSorting": [[ 0, "desc" ]],
-            "aoColumns": [
-              {"sType": "num-html"},
-              null,
-              {"sType": "html"},
-              {"sType": "html"},
-              {"sType": "html"},
-              null,
-              {"bSortable": false},
-            ]
-        });
+        if(jQ('#testplans_table td a').length > 0){
+            jQ('#testplans_table').dataTable({
+                "bFilter": false,
+                "bLengthChange": false,
+                "bPaginate": false,
+                "bInfo": false,
+                "bAutoWidth": false,
+                "aaSorting": [[ 0, "desc" ]],
+                "aoColumns": [
+                  {"sType": "num-html"},
+                  null,
+                  {"sType": "html"},
+                  {"sType": "html"},
+                  {"sType": "html"},
+                  null,
+                  {"bSortable": false},
+                ]
+            });
+        }
     }
     var url = getURLParam(case_id).url_case_plan;
     new Ajax.Updater(container, url, {
