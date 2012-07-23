@@ -823,13 +823,16 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     
                     if(returnobj.rc == 0) {
                         constructPlanDetailsCasesZone(container, plan_id, params);
+                        jQ('#run_case_count').text(returnobj.run_case_count);
+                        jQ('#case_count').text(returnobj.case_count);
+                        jQ('#review_case_count').text(returnobj.review_case_count);
                     } else {
                         alert(returnobj.response);
                         return false;
                     }
                 }
                 
-                changeCasesStatus(params['case'], this.value, callback);
+                changeCasesStatus(plan_id, params['case'], this.value, callback);
             })
         }
         
@@ -1179,10 +1182,8 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         })
         
         table.adjacent('.change_status_selector').invoke('observe', 'change', function(e) {
-            var be_confirmed = (this.value == '2');
-            var was_confirmed = (this.up(0).attributes['status'].value == "CONFIRMED");
             var case_id = this.up(1).id;
-            changeTestCaseStatus(this, case_id, be_confirmed, was_confirmed);
+            changeTestCaseStatus(plan_id, this, case_id);
         })
         
         // Display/Hide the case content

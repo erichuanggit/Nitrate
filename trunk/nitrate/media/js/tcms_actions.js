@@ -1115,6 +1115,44 @@ function getForm(container, app_form, parameters, callback, format)
     });
 }
 
+function updateCaseStatus(plan_id, content_type, object_pk, field, value, value_type, callback)
+{
+    if (!value_type)
+        var value_type = 'str';
+
+    var url = new String('/ajax/update/case-status');
+    var success = function(t) {
+        var returnobj = t.responseText.evalJSON();
+
+        if (returnobj == 0) {
+            return callback(t, returnobj);
+        } else {
+            alert(returnobj.response);
+            return false;
+        }
+    }
+
+    if (typeof(object_pk) == 'object'){
+        object_pk = object_pk.join(',');
+    }
+
+    var parameters = {
+        plan_id: plan_id,
+        content_type: content_type,
+        object_pk: object_pk,
+        field: field,
+        value: value,
+        value_type: value_type,
+    }
+
+    new Ajax.Request(url, {
+        method: 'post',
+        parameters: parameters,
+        onSuccess: callback,
+        onFailure: json_failure
+    })
+}
+
 function updateObject(content_type, object_pk, field, value, value_type, callback)
 {
     if (!value_type)

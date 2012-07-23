@@ -432,6 +432,87 @@ def update(request):
         targets.update(tested_by = request.user)
     return say_yes()
 
+def update_case_status(request):
+    '''
+    Update Test Case Status, return Plan's case count in json for update in real-time.
+    '''
+    error = None
+    now = datetime.datetime.now()
+
+    data    = request.REQUEST.copy()
+    plan_id = data.get('plan_id')
+    ctype   = data.get("content_type")
+    vtype   = data.get('value_type', 'str')
+    object_pk_str = data.get("object_pk")
+    field     = data.get('field')
+    value     = data.get('value')
+
+    object_pk = [int(a) for a in object_pk_str.split(',')]
+
+    if not field or not value or not object_pk or not ctype:
+        return say_no('Following fields are required - content_type, object_pk, field and value.')
+
+    # Convert the value type
+    # FIXME: Django bug here: update() keywords must be strings
+    field = str(field)
+
+    value, error = get_value_by_type(value, vtype)
+    if error: return say_no(error)
+    has_perms = check_permission(request,ctype)
+    if not has_perms: return say_no('Permission Dinied.')
+
+    model = models.get_model(*ctype.split(".", 1))
+    targets = model._default_manager.filter(pk__in=object_pk)
+
+    if not targets: return say_no('No record found')
+    if not hasattr(targets[0], field):
+        return say_no('%s has no field %s' % (ctype, field))
+
+    if hasattr(targets[0], 'log_action'):
+        for t in targets:
+            try:
+                t.log_action(
+                    who = request.user,
+                    action = 'Field %s changed from %s to %s.' % (
+                        field, getattr(t, field), value
+                    )
+                )
+            except (AttributeError, User.DoesNotExist):
+                pass
+    targets.update(**{field: value})
+
+    if hasattr(model, 'mail_scene'):
+        from tcms.core.utils.mailto import mailto
+        mail_context = model.mail_scene(
+            objects = targets, field = field, value = value, ctype = ctype, object_pk = object_pk,
+        )
+        if mail_context:
+            mail_context['request'] = request
+            try:
+                mailto(**mail_context)
+            except:
+                pass
+
+    try:
+        plan = TestPlan.objects.get(plan_id=plan_id)
+    except Exception, e:
+        return say_no("No plan record found.")
+    # Initial the case counter
+    confirm_status_name = 'CONFIRMED'
+    plan.run_case = plan.case.filter(case_status__name=confirm_status_name)
+    plan.review_case = plan.case.exclude(case_status__name=confirm_status_name)
+    run_case_count = plan.run_case.count()
+    case_count = plan.case.count()
+    review_case_count = plan.review_case.count()
+    return HttpResponse(
+        simplejson.dumps({
+           'rc': 0, 'response': 'ok',
+           'run_case_count': run_case_count,
+           'case_count': case_count,
+           'review_case_count': review_case_count
+        })
+    )
+
 def comment_case_runs(request):
     '''
     Add comment to one or more caseruns at a time.
