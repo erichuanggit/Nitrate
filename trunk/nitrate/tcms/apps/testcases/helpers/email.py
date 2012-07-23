@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # Nitrate is copyright 2010 Red Hat, Inc.
-# 
+#
 # Nitrate is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -9,7 +9,7 @@
 # the hope that it will be useful, but WITHOUT ANY WARRANTY; without
 # even the implied warranties of TITLE, NON-INFRINGEMENT,
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
+#
 # The GPL text is available in the file COPYING that accompanies this
 # distribution and at <http://www.gnu.org/licenses>.
 
@@ -52,7 +52,7 @@ def get_case_notification_recipients(case):
     recipients = set()
     if case.emailing.auto_to_case_author:
         recipients.add(case.author.email)
-    if case.emailing.auto_to_case_tester:
+    if case.emailing.auto_to_case_tester and case.default_tester:
         recipients.add(case.default_tester.email)
     if case.emailing.auto_to_run_manager:
         managers = case.case_run.values_list('run__manager__email', flat=True)

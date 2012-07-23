@@ -143,8 +143,6 @@ def add_tag(request, run_ids, tags):
     # Add tag list ['foo', 'bar'] to run list [12345, 67890] with String
     >>> TestPlan.add_tag('12345, 67890', 'foo, bar')
     """
-    from tcms.apps.management.models import TestTag
-
     trs = TestRun.objects.filter(pk__in = pre_process_ids(value = run_ids))
     tags = TestTag.string_to_list(tags)
 
@@ -340,7 +338,20 @@ def get(request, run_id):
     Example:
     >>> TestRun.get(1193)
     """
-    return TestRun.objects.get(run_id = run_id).serialize()
+    try:
+        tr = TestRun.objects.get(run_id = run_id)
+    except TestRun.DoesNotExist, error:
+        return error
+    response = tr.serialize()
+    #get the xmlrpc tags
+    tag_ids = tr.tag.values_list('id', flat=True)
+    query = {'id__in': tag_ids}
+    tags = TestTag.to_xmlrpc(query)
+    #cut 'id' attribute off, only leave 'name' here
+    tags_without_id = map(lambda x:x["name"], tags)
+    #replace tag_id list in the serialize return data
+    response["tag"] = tags_without_id
+    return response
 
 def get_bugs(request, run_ids):
     """
@@ -422,7 +433,6 @@ def get_tags(request, run_id):
     Example:
     >>> TestRun.get_tags(1193)
     """
-    from tcms.apps.management.models import TestTag
     try:
         tr = TestRun.objects.get(run_id = run_id)
     except:
@@ -468,10 +478,20 @@ def get_test_cases(request, run_id):
     >>> TestRun.get_test_cases(1193)
     """
     from tcms.apps.testcases.models import TestCase
-    tr = TestRun.objects.get(run_id = run_id)
-    tc_ids = tr.case_run.values_list('case_id', flat = True)
-    query = {'case_id__in': tc_ids}
-    return TestCase.to_xmlrpc(query)
+    from tcms.core.utils.xmlrpc import XMLRPCSerializer
+
+    try:
+        tr = TestRun.objects.get(run_id=run_id)
+    except ObjectDoesNotExist:
+        raise
+
+    tc_ids = tr.case_run.values_list('case_id', flat=True)
+    tc_tcs = dict(tr.case_run.values_list('case_id', 'case_run_id'))
+    tcs = TestCase.objects.filter(case_id__in=tc_ids)
+    tcs_serializer = XMLRPCSerializer(tcs).serialize_queryset()
+    for case in tcs_serializer:
+        case['case_run_id'] = tc_tcs[case['case_id']]
+    return tcs_serializer
 
 def get_test_plan(request, run_id):
     """
@@ -508,7 +528,6 @@ def remove_tag(request, run_ids, tags):
     # Remove tag 'foo' and 'bar' from run list '56789, 12345' with String
     >>> TestRun.remove_tag('56789, 12345', 'foo, bar')
     """
-    from tcms.apps.management.models import TestTag
     trs = TestRun.objects.filter(
         run_id__in = pre_process_ids(value = run_ids)
     )
@@ -563,11 +582,11 @@ def update(request, run_ids, values):
     from tcms.core import forms
     from tcms.apps.testruns.forms import XMLRPCUpdateRunForm
 
-    if (values.get('product_version') or values.get('build')) and not values.get('product'):
-        raise ValueError('Field "product" is required by build or product_version')
+    if (values.get('product_version') and not values.get('product')):
+        raise ValueError('Field "product" is required by product_version')
 
     form = XMLRPCUpdateRunForm(values)
-    if values.get('product_version') or values.get('build'):
+    if values.get('product_version'):
         form.populate(product_id = values['product'])
 
     if form.is_valid():
@@ -580,14 +599,15 @@ def update(request, run_ids, values):
             trs.update(build = form.cleaned_data['build'])
 
         if form.cleaned_data['errata_id']:
-            trs.update(build = form.cleaned_data['errata_id'])
+            trs.update(errata_id = form.cleaned_data['errata_id'])
 
         if form.cleaned_data['manager']:
             trs.update(manager = form.cleaned_data['manager'])
-
-        if form.cleaned_data['default_tester']:
-            trs.update(default_tester = form.cleaned_data['default_tester'])
-
+        if values.has_key('default_tester'):
+            if values.get('default_tester') and form.cleaned_data['default_tester']:
+                trs.update(default_tester = form.cleaned_data['default_tester'])
+            else:
+                trs.update(default_tester = None)
         if form.cleaned_data['summary']:
             trs.update(summary = form.cleaned_data['summary'])
 

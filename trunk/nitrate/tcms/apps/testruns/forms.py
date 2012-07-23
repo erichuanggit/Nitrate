@@ -121,6 +121,13 @@ class BaseRunForm(forms.Form):
         label = 'Errata_id',
         required = False,
     )
+    auto_update_run_status = forms.BooleanField(
+        label = 'Set Status Automatically', widget = forms.CheckboxInput(),
+        help_text = 'Check to update test run status automatically',
+        required = False,
+        initial = False
+    )
+
     def populate(self, product_id):
         # We can dynamically set choices for a form field:
         # Seen at: http://my.opera.com/jacob7908/blog/2009/06/19/django-choicefield-queryset (Chinese)
@@ -221,7 +228,7 @@ class XMLRPCUpdateRunForm(XMLRPCNewRunForm):
     )
     build = forms.ModelChoiceField(
         label='Build',
-        queryset=TestBuild.objects.none(),
+        queryset=TestBuild.objects.all(),
         required=False
     )
 

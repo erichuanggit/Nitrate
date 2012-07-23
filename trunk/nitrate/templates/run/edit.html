@@ -33,7 +33,7 @@
 		<a href="{% url tcms.core.views.index %}">Home</a>
 		{% if request.REQUEST.from_plan %}
 		>> <a href="{% url tcms.apps.testplans.views.all %}">Planning</a>
-		>> <a href="{% url tcms.apps.testplans.views.get test_run.plan.plan_id %}">Test Plan :{{ test_run.plan.plan_id }}: {{ test_run.plan }}</a>
+		>> <a href="{{ test_run.plan.get_absolute_url }}">Test Plan :{{ test_run.plan.plan_id }}: {{ test_run.plan }}</a>
 		{% else %}
 		>> <a href="{% url tcms.apps.testruns.views.all %}">Test Runs</a>
 		{% endif %}
@@ -126,7 +126,7 @@
 							<p>
 								Environment group must be set for this test plan (<b>{{ test_run.plan.product }}</b>:
 								<b>{{ test_run.product_version }}</b>:
-								<b><a href="{% url tcms.apps.testplans.views.get test_run.plan.plan_id %}">{{ test_run.plan }}</a></b>
+								<b><a href="{{ test_run.plan.get_absolute_url }}">{{ test_run.plan }}</a></b>
 								) before you will be able to select environments for this test run.If you do not have permission to edit this plan,
 								please contact the author of this plan, mailto
 								<a href="mailto:{{ testplan.author.email }}">{{ test_run.plan.author.email }}</a>
@@ -145,6 +145,13 @@
 				<td class="note">
 					{{ form.finished }}
 					<span class="system_help">Check to finish this test run directly.</span>
+				</td>
+			</tr>
+			<tr>
+				<td><label>{{ form.auto_update_run_status.label }}</span></td>
+				<td class="note">
+					{{ form.auto_update_run_status }}
+					<span class="system_help">{{form.auto_update_run_status.help_text}}</span>
 				</td>
 			</tr>
 		</table>

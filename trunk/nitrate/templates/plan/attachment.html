@@ -18,7 +18,7 @@
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/deleconfirm.js'></script>
 <script type="text/javascript">
-Nitrate.Utils.after_page_load(Nitrate.TestPlans.Details.on_load);
+Nitrate.Utils.after_page_load(Nitrate.TestPlans.Attachment.on_load);
 </script>
 {% endblock %}
 
@@ -28,7 +28,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Details.on_load);
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
 		>> <a href="{% url tcms.apps.testplans.views.all %}">Planning</a>
-		>> <a href="{% url tcms.apps.testplans.views.get test_plan.plan_id %}">{{ test_plan.name }}</a>
+		>> <a href="{{ test_plan.get_absolute_url }}">{{ test_plan.name }}</a>
 		>> Add Attachment
 	</div>
 	<input id="id_plan_id" type="hidden" name="plan_id" value="{{ test_plan.plan_id }}">
@@ -40,12 +40,12 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Details.on_load);
 				<div class="mixbar">
 					<span class="tit">Upload New Attachment</span>
 					<input type="hidden" name="to_plan_id" value="{{ test_plan.plan_id }}" />
-					<input type="file" name="upload_file" />
+					<input type="file" name="upload_file" id="upload_file" limit="{{ limit }}"/>
 					<input type="submit" value="Upload" />
 					<input type="button" value="Back" onclick="javascript:history.go(-1)" />
 				
 				<span class="right-action">
-					Attachment can't be deleted.
+					Note: Each attachment size limit is {{ limit_readable }}.
 				</span>
 			</div>
 			</form>

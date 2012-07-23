@@ -138,6 +138,8 @@ INSTALLED_APPS = (
     'tcms.integration.djqpid',
     'tcms.integration.apps.errata',
     'tcms.core.contrib.linkreference',
+
+    'tcms.integration.apps.bugzilla',
 )
 
 # RequestContext settings
@@ -178,6 +180,7 @@ XMLRPC_METHODS = {
         ('tcms.xmlrpc.product', 'Product'),
         ('tcms.xmlrpc.testcase', 'TestCase'),
         ('tcms.xmlrpc.testcaserun', 'TestCaseRun'),
+        ('tcms.xmlrpc.testcaseplan', 'TestCasePlan'),
         ('tcms.xmlrpc.testopia', 'Testopia'),
         ('tcms.xmlrpc.testplan', 'TestPlan'),
         ('tcms.xmlrpc.testrun', 'TestRun'),
@@ -316,3 +319,5 @@ KRB5_REALM = ''
 # A valid Errata URL:
 # https://errata.devel.redhat.com/errata/stateview/{Errata ID}
 ERRATA_URL_PREFIX = 'https://errata.devel.redhat.com/errata/stateview'
+# user guide url:
+USER_GUIDE_URL = 'https://riddler.bne.redhat.com/TCMS-User_Guide/index.html'

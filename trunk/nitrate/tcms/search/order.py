@@ -69,9 +69,9 @@ def order_run_queryset(runs, field, asc=False):
     '''
     orderable_fields = (
         'run_id', 'summary', 'manager__username',
-        'default_tester__username', 'environment_id',
-        'plan__product__name', 'product_version',
-        'total_num_cases', 'plan__name'
+        'default_tester__username', 'env_groups',
+        'build__product__name', 'product_version',
+        'plan__name'
     )
     if field in orderable_fields:
         order_by = field
@@ -86,8 +86,10 @@ def order_case_queryset(cases, field, asc=False):
     by calling order_by on it.
     '''
     orderable_fields = (
-        'case_id', 'author__username', 'priority',
-        'category', 'case_status', 'create_date'
+        'case_id', 'summary', 'author__username', 
+        'default_tester__username', 'priority',
+        'is_automated', 'category__name', 'case_status',
+        'create_date'
     )
     if field in orderable_fields:
         order_by = field

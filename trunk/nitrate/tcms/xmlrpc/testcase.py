@@ -19,6 +19,7 @@
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
 from django.core.exceptions import ObjectDoesNotExist
 from tcms.apps.testcases.models import TestCase
+from tcms.apps.management.models import TestTag
 from utils import pre_process_ids, compare_list
 
 from django.forms import EmailField, ValidationError
@@ -161,8 +162,6 @@ def add_tag(request, case_ids, tags):
     # Add tag list ['foo', 'bar'] to cases list [12345, 67890] with String
     >>> TestCase.add_tag('12345, 67890', 'foo, bar')
     """
-    from tcms.apps.management.models import TestTag
-
     tcs = TestCase.objects.filter(
         case_id__in = pre_process_ids(value = case_ids)
     )
@@ -204,7 +203,12 @@ def add_to_run(request, case_ids, run_ids):
     run_ids = pre_process_ids(run_ids)
 
     trs = TestRun.objects.filter(run_id__in = run_ids)
+    if not trs:
+        raise ValueError, 'Invalid run_ids'
+
     tcs = TestCase.objects.filter(case_id__in = case_ids)
+    if not tcs:
+        raise ValueError, 'Invalid case_ids'
 
     for tr in trs:
         for tc in tcs:
@@ -406,7 +410,6 @@ def create(request, values):
     """
     from tcms.core import forms
     from tcms.apps.testcases.forms import XMLRPCNewCaseForm
-    from tcms.apps.management.models import TestTag
 
     if not (values.get('category') or values.get('summary')):
         raise ValueError()
@@ -420,7 +423,7 @@ def create(request, values):
 
     if form.is_valid():
         # Create the case
-        tc = TestCase.create( author = request.user, values = form.cleaned_data)
+        tc = TestCase.create(author = request.user, values = form.cleaned_data)
 
         # Add case text to the case
         tc.add_text(
@@ -544,7 +547,6 @@ def filter_count(request, values = {}):
     Example:
     # See TestCase.filter()
     """
-    from tcms.apps.testcases.models import TestCase
     return TestCase.objects.filter(**values).count()
 
 def get(request, case_id):
@@ -567,6 +569,14 @@ def get(request, case_id):
 
     response = tc.serialize()
     response['text'] = tc_latest_text
+    #get the xmlrpc tags
+    tag_ids = tc.tag.values_list('id', flat=True)
+    query = {'id__in': tag_ids}
+    tags = TestTag.to_xmlrpc(query)
+    #cut 'id' attribute off, only leave 'name' here
+    tags_without_id = map(lambda x:x["name"], tags)
+    #replace tag_id list in the serialize return data
+    response["tag"] = tags_without_id
     return response
 
 def get_bug_systems(request, id):
@@ -710,7 +720,6 @@ def get_tags(request, case_id):
     Example:
     >>> TestCase.get_tags(12345)
     """
-    from tcms.apps.management.models import TestTag
     try:
         tc = TestCase.objects.get(case_id = case_id)
     except:
@@ -738,7 +747,6 @@ def get_text(request, case_id, case_text_version = None):
     # Get all case text with version 4
     >>> TestCase.get_text(12345, 4)
     """
-    from tcms.apps.testcases.models import TestCaseText
     try:
         tc = TestCase.objects.get(case_id = case_id)
     except:
@@ -764,7 +772,7 @@ def get_priority(request, id):
 
 @log_call
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcaseplan'))
-def link_plan(request, case_ids, plan_ids, force = True):
+def link_plan(request, case_ids, plan_ids):
     """"
     Description: Link test cases to the given plan.
 
@@ -773,8 +781,6 @@ def link_plan(request, case_ids, plan_ids, force = True):
 
                  $plan_ids - Integer/Array/String: An integer representing the ID in the database,
                              an array of plan_ids, or a string of comma separated plan_ids.
-
-                 $force    - Boolean: Ignore the errors, default to True.
 
     Returns:     Array: empty on success or an array of hashes with failure
                         codes if a failure occurs
@@ -796,15 +802,15 @@ def link_plan(request, case_ids, plan_ids, force = True):
     tps = TestPlan.objects.filter(pk__in = plan_ids)
 
     # Check the non-exist case ids.
-    if not force and len(tcs) < len(case_ids):
+    if len(tcs) < len(case_ids):
         raise ObjectDoesNotExist(
-            compare_list(case_ids, tcs.values_list('pk', flat=True))
+            "TestCase",compare_list(case_ids, tcs.values_list('pk', flat=True))
         )
 
     # Check the non-exist plan ids.
-    if not force and len(tps) < len(plan_ids):
+    if len(tps) < len(plan_ids):
         raise ObjectDoesNotExist(
-            compare_list(case_ids, tcs.values_list('pk', flat=True))
+            "TestPlan",compare_list(plan_ids, tps.values_list('pk', flat=True))
         )
 
     # Link the plans to cases
@@ -905,8 +911,6 @@ def remove_tag(request, case_ids, tags):
     # Remove tag 'foo' and 'bar' from cases list '56789, 12345' with String
     >>> TestCase.remove_tag('56789, 12345', 'foo, bar')
     """
-    from tcms.apps.management.models import TestTag
-
     tcs = TestCase.objects.filter(
         case_id__in = pre_process_ids(value = case_ids)
     )
@@ -1016,7 +1020,7 @@ def update(request, case_ids, values):
         | product               | Integer        | Optional(Required if changes category)  |
         | category              | Integer        | Optional                                |
         | priority              | Integer        | Optional                                |
-        | default_tester        | String         | Optional                                |
+        | default_tester        | String/Integer | Optional(str - user_name, int - user_id)|
         | estimated_time        | String         | Optional                                |
         | is_automated          | Integer        | Optional(0 - Manual, 1 - Auto, 2 - Both)|
         | is_automated_proposed | Boolean        | Optional                                |
@@ -1025,6 +1029,7 @@ def update(request, case_ids, values):
         | summary               | String         | Optional                                |
         | requirement           | String         | Optional                                |
         | alias                 | String         | Optional                                |
+        | notes                 | String         | Optional                                |
         +-----------------------+----------------+-----------------------------------------+
 
     Example:

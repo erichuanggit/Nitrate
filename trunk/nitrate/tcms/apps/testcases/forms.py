@@ -143,6 +143,12 @@ class BaseCaseForm(forms.Form):
     script = forms.CharField(label = "Script", required = False)
     arguments = forms.CharField(label = "Arguments", required = False)
     alias = forms.CharField(label = "Alias", required = False)
+    extra_link = forms.URLField(
+        label = 'Extra link',
+        max_length = 1024,
+        verify_exists = False,
+        required = False
+    )
     # sortkey = forms.IntegerField(label = 'Sortkey', required = False)
     case_status = forms.ModelChoiceField(
         label = "Case status",
@@ -538,4 +544,15 @@ class CaseCategoryForm(forms.Form):
             self.fields['o_category'].queryset = TestCaseCategory.objects.filter(product__id = product_id)
         else:
             #self.fields['category'].queryset = TestCaseCategory.objects.all()
+            self.fields['o_category'].queryset = TestCaseCategory.objects.all()
+class CaseTagForm(forms.Form):
+    o_tag = forms.ModelMultipleChoiceField(
+        label="Tags",
+        queryset=TestTag.objects.none(),
+        required=False,
+    )
+    def populate(self, case_ids=None):
+        if case_ids:
+            self.fields['o_tag'].queryset = TestTag.objects.filter(testcase__in=case_ids).order_by('name').distinct()
+        else:
             self.fields['o_category'].queryset = TestCaseCategory.objects.all()

@@ -294,7 +294,7 @@ class NitrateXmlrpc(object):
         elif url.startswith('http://'):
             self._transport = CookieTransport()
         else:
-            raise "Unrecognized URL scheme"
+            raise NitrateError("Unrecognized URL scheme")
         
         self._transport.cookiejar = CookieJar()
         # print "COOKIES:", self._transport.cookiejar._cookies
@@ -401,7 +401,7 @@ class NitrateXmlrpc(object):
         If args is empty, then we raise an error.
         """
         if not args:
-            raise NitrateError, "At least one variable must be set."
+            raise NitrateError("At least one variable must be set.")
         return "{%s}" % ''.join(args)
     
     _options_ne_dict = _options_non_empty_dict
@@ -492,9 +492,9 @@ class NitrateKerbXmlrpc(NitrateXmlrpc):
         if url.startswith('https://'):
             self._transport = KerbTransport()
         elif url.startswith('http://'):
-            raise "Apache module mod_ssl is required by mod_auth_kerb for encrypt the communication."
+            raise NitrateError("Apache module mod_ssl is required by mod_auth_kerb for encrypt the communication.")
         else:
-            raise "Unrecognized URL scheme"
+            raise NitrateError("Unrecognized URL scheme")
         
         self._transport.cookiejar = CookieJar()
         # print "COOKIES:", self._transport.cookiejar._cookies

@@ -16,10 +16,9 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-from datetime import datetime
 
 from django.core.urlresolvers import reverse
-from django.db import models, connection, transaction
+from django.db import models, connection
 from django.db.models.signals import post_save
 from django.contrib.contenttypes import generic
 
@@ -28,6 +27,7 @@ from tcms.core.models import TCMSActionModel, TimedeltaField
 from tcms.apps.testcases.models import TestCaseBug, TestCaseText, NoneText
 from tcms.apps.testruns import signals as run_watchers
 from tcms.core.contrib.linkreference.models import LinkReference
+import datetime
 
 
 try:
@@ -76,6 +76,7 @@ class TestRun(TCMSActionModel):
         'auth.User',
         through='testruns.TestRunCC',
     )
+    auto_update_run_status = models.BooleanField(default=False)
 
     class Meta:
         db_table = u'test_runs'
@@ -330,10 +331,10 @@ class TestRun(TCMSActionModel):
     def get_percentage(self, count):
         case_run_count = self.total_num_caseruns
         if case_run_count == 0:
-            return None
+            return 0
         percent = float(count)/case_run_count*100
         if not percent:
-            percent = None
+            percent = 0
         else:
             percent = round(percent, 2)
         return percent
@@ -359,6 +360,10 @@ class TestRun(TCMSActionModel):
             for _id in ids
         ))
         percentage =  self.get_percentage(total)
+        if percentage == 100.0:
+            self.stop_date = datetime.datetime.now()
+        else:
+            self.stop_date = None
         return percentage
     completed_case_run_percent = property(_get_completed_case_run_percentage)
 

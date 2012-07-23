@@ -162,15 +162,17 @@ def recent(request, username, template_name='profile/recent.html'):
     tps = tps.extra(select={
         'num_runs': RawSQL.num_runs,
     })
-
+    tps_active = tps.filter(is_active=True)
     trs = TestRun.list(runs_query)
+    test_plans_disable_count = tps.count() - tps_active.count()
 
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'user_profile': up,
         'test_plans_count': tps.count(),
+        'test_plans_disable_count':test_plans_disable_count,
         'test_runs_count': trs.count(),
-        'last_15_test_plans': tps[:15],
+        'last_15_test_plans': tps_active[:15],
         'last_15_test_runs': trs[:15],
     })
 

@@ -1,6 +1,4 @@
-{% load pagination_tags %}
 {% if test_cases %}
-	{% autopaginate test_cases %}
 	<form id="cases_form" action="{% url tcms.apps.testcases.views.clone %}" method="post">
 	<div id="contentTab" class="mixbar">
 		{#}<span class="tit">{{ test_cases.count }} Cases</span>{#}
@@ -10,8 +8,7 @@
 			{% endif %}
 			<input type="button" value="Printable copy" title="Create the printable copy for selected cases." onclick="postToURL('{% url tcms.apps.testcases.views.printable %}', this.form.serialize(true))" />
 			<input type="button" value="Export" title="Export the cases for selected cases." onclick="postToURL('{% url tcms.apps.testcases.views.export %}', this.form.serialize(true))" />
-		</span> 
-		{% paginate %}
+		</span>
 	</div>
 	<table class="list border-bottom" id="testcases_table" cellpadding="0" cellspacing="0" border="0">
 		<thead>
@@ -24,44 +21,20 @@
 				<th width="20" class="nosort">
 					<input type="checkbox" id="id_checkbox_all_case" title="Select all/Select none">
 				</th>
-				<th class="widthID"><a href="{{query_url}}&order_by=case_id">ID</a></th>
-				<th><a href="{{query_url}}&order_by=summary">Summary</a></th>
-				<th width="100"><a href="{{query_url}}&order_by=author__username">Author</a></th>
+				<th class="widthID">ID</th>
+				<th>Summary</th>
+				<th width="100">Author</th>
 				<th width="130">Default Tester</th>
-				<th width="140"><a href="{{query_url}}&order_by=is_automated">Automated</a></th>
-				<th width="90" ><a href="{{query_url}}&order_by=case_status">Status</a></th>
-				<th width="120"><a href="{{query_url}}&order_by=category">Category</a></th>
-				<th width="60"><a href="{{query_url}}&order_by=priority">Priority</th>
-				<th width="140" colspan='2'><a href="{{query_url}}&order_by=create_date">Created</a></th>
+				<th width="160">Automated</th>
+				<th width="90" >Status</th>
+				<th width="120">Category</th>
+				<th width="60">Priority</th>
+				<th width="140">Created</th>
 			</tr>
 		</thead>
 		<tbody>
-			{% for test_case in test_cases %}
-			<tr class="case_title {% cycle 'odd' 'even' %}">
-				<td class="expandable">
-					<img class="expand blind_icon" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
-				</td>
-				<td valign="top"><input type="checkbox" name="case" value="{{ test_case.case_id }}"></td>
-				<td valign="top"><a href="{% url tcms.apps.testcases.views.get test_case.case_id %}">{{ test_case.case_id }}</a></td>
-				<td valign="top" class="expandable"><a id="link_{{ test_case.case_id }}" href="{% url tcms.apps.testcases.views.get test_case.case_id %}">{{ test_case.summary }}</a></td>
-				<td valign="top"><a href="{% url tcms.apps.profiles.views.profile test_case.author.username %}">{{ test_case.author }}</a></td>
-				<td valign="top">{% if test_case.default_tester_id %}<a href="{% url tcms.apps.profiles.views.profile test_case.default_tester.username %}">{{ test_case.default_tester }}</a>{% else %}None{% endif %}</td>
-				<td valign="top">{{ test_case.get_is_automated_status }}</td>
-				<td valign="top">{{ test_case.case_status }}</td>
-				<td valign="top">{{ test_case.category }}</td>
-				<td valign="top" align="center">{{ test_case.priority }}</td>
-				<td valign="top" colspan='2'>{{ test_case.create_date }}</td>
-			</tr>
-		
-			<tr class="case_content hide" style="display: none;">
-				<td colspan="11">
-					<div id="id_loading_{{ test_case.pk }}" class="ajax_loading"></div>
-				</td>
-			</tr>
-			{% endfor %}
 		</tbody>
 	</table>
-{% paginate %}
 </form>
 
 {% else %}

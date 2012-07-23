@@ -38,7 +38,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
 		{% if test_plan %}
-		>>Plan: <a href="{% url tcms.apps.testplans.views.get test_plan.plan_id %}">{{ test_plan.plan_id }}: {{ test_plan.name }}</a>
+		>>Plan: <a href="{{ test_plan.get_absolute_url }}">{{ test_plan.plan_id }}: {{ test_plan.name }}</a>
 		>>Case: <a href="{% url tcms.apps.testcases.views.get test_case.case_id %}?from_plan={{ test_plan.plan_id }}">{{ test_case.case_id }}: {{ test_case }}</a>
 		{% else %}
 		>> Case:<a href="{% url tcms.apps.testcases.views.get test_case.case_id %}?from_plan={{ test_plan.plan_id }}">{{ test_case.case_id }}: {{ test_case }}</a>
@@ -88,6 +88,10 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
 						<label >Arguments</label>
 						<span id="form_arguments" >{{ form.arguments }}</span>
 					</div>
+					<div class="data_row">
+                        <label >Reference Link</label>
+                        <span id="form_extra_link" >{{ form.extra_link }}</span>
+                    </div>
 					<div class="data_row">
 						<label >Notes</label>
 						<span id="form_notes" >{{ form.notes }}</span>
@@ -191,10 +195,11 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
 			</fieldset>
 			<div id="control_box" class="submit-row">
 				<div class="errors">{{ form.errors }}{{ notify_form.errors }}</div>
-				<input type="submit" value="Save" />
+				<input type="submit" value="Save"/>
 				<input type="submit" name="_continue" value="Save and continue editing"/>
 				{% if test_plan %}
-				<input type="submit" name="_continuenext" value="Save and edit next enabled case in plan {{ test_plan.pk }}"/>
+				<input type="submit" name="_returntoplan" value="Save and return to plan" />
+				<input type="submit" name="_continuenext" value="Save and edit next case"/>
 				{% endif %}
 				<input type="reset" value="Reset" />
 				<input type="button" value="Back" onclick="javascript:history.go(-1)" />

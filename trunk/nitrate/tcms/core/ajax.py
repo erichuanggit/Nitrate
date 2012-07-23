@@ -225,32 +225,27 @@ def tag(request, template_name="management/get_tag.html"):
                 except:
                     return "Error when adding %s" % self.tag
 
-            return True
+            return True, self.obj
 
         def remove(self):
-            tp_pks = request.REQUEST.getlist('plan')
-            tc_pks = request.REQUEST.getlist('case')
-            tr_pks = request.REQUEST.getlist('run')
-            if tp_pks:
-                tags_set = TestTag.objects.filter(testplan__pk__in = tp_pks)
-            if tc_pks:
-                tags_set = TestTag.objects.filter(testcase__pk__in = tc_pks)
-            elif tr_pks:
-                tags_set = TestTag.objects.filter(testrun__pk__in = tr_pks)
+            self.obj = self.obj.filter(tag__name__in = self.tag).distinct()
 
-            for tag_str in self.tag:
-                try:
-                    tag = tags_set.filter(name = tag_str)[0]
-                except IndexError:
-                    return "Tag %s does not exist in current plan." % tag_str
+            if not self.obj:
+                return "Tags does not exist in current selected plan."
 
-                for o in self.obj:
+            else:
+                for tag_str in self.tag:
                     try:
-                        o.remove_tag(tag)
-                    except:
-                        return "Remove tag %s error." % tag
-            return True
+                        tag = TestTag.objects.filter(name = tag_str)[0]
+                    except IndexError:
+                        return "Tag %s does not exist in current selected plan."  % tag_str
 
+                    for o in self.obj:
+                        try:
+                            o.remove_tag(tag)
+                        except:
+                            return "Remove tag %s error." % tag
+                return True, self.obj
     objects = Objects(request, template_name)
     template_name, obj = objects.get()
 
@@ -260,7 +255,7 @@ def tag(request, template_name="management/get_tag.html"):
         tag_actions = TagActions(obj = obj, tag = q_tag)
         func = getattr(tag_actions, q_action)
         response = func()
-        if response != True:
+        if response[0] != True:
             return HttpResponse(simplejson.dumps({'response': response, 'rc': 1}))
 
     del q_tag, q_action
@@ -269,7 +264,7 @@ def tag(request, template_name="management/get_tag.html"):
     if request.REQUEST.get('t') == 'json':
         if request.REQUEST.get('f') == 'serialized':
             return HttpResponse(
-                serializers.serialize(request.REQUEST['t'], obj)
+                serializers.serialize(request.REQUEST['t'], response[1])
             )
 
         return HttpResponse(simplejson.dumps({'response': 'ok'}))
@@ -277,7 +272,6 @@ def tag(request, template_name="management/get_tag.html"):
     # Response the single operation
     if len(obj) == 1:
         tags = obj[0].tag.all()
-
         tags = tags.extra(select={
             'num_plans': 'SELECT COUNT(*) FROM test_plan_tags WHERE test_tags.tag_id = test_plan_tags.tag_id',
             'num_cases': 'SELECT COUNT(*) FROM test_case_tags WHERE test_tags.tag_id = test_case_tags.tag_id',
@@ -288,7 +282,6 @@ def tag(request, template_name="management/get_tag.html"):
             'tags': tags,
             'object': obj[0],
         })
-
     return HttpResponse('')
 
 def get_value_by_type(val, v_type):

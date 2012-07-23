@@ -58,10 +58,8 @@ Nitrate.Report.CustomSearch.on_load = function()
     
     $$('.build_link').invoke('observe', 'click', function(e) {
         e.stop();
-        
         var param = $('id_form_search').serialize(true);
-        var index = $$('.build_link').indexOf(this);
-        var build_id = $$('input[name="build_id"][type="hidden"]')[index].value;
+        var build_id = this.siblings()[0].value;
         param.pk__in = build_id;
         
         postToURL(this.href, param, 'get')

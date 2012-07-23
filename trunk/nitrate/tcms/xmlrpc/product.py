@@ -66,7 +66,6 @@ def check_category(request, name, product):
     """
     from tcms.apps.testcases.models import TestCaseCategory
     p = pre_check_product(values = product)
-    query = {'product': p}
     return TestCaseCategory.objects.get(name = name, product = p).serialize()
 
 def check_component(request, name, product):
@@ -88,7 +87,6 @@ def check_component(request, name, product):
     """
     from tcms.apps.management.models import Component
     p = pre_check_product(values = product)
-    query = {'product': p}
     return Component.objects.get(name = name, product = p).serialize()
 
 def check_product(request, name):
@@ -405,7 +403,7 @@ def get_tag(request, id):
     >>> Product.get_tag(10)
     """
     from tcms.apps.management.models import TestTag
-    return Component.objects.get(pk = id).serialize()
+    return TestTag.objects.get(pk=id).serialize()
 
 @log_call
 @user_passes_test(lambda u: u.has_perm('management.add_version'))
@@ -429,7 +427,6 @@ def add_version(request, values):
     >>> Product.add_version({'value': 'devel', 'product': 272})
     [['__all__', 'Version with this Product and Value already exists.']]
     """
-    from tcms.apps.management.models import Version
     from tcms.apps.management.forms import VersionForm
     from tcms.core import forms
 

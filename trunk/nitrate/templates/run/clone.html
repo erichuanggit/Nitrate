@@ -13,6 +13,7 @@
 <script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/tablesort.js"></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testrun_actions.js'></script>
 <script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
+<script type="text/javascript" src="/admin_media/js/admin/RelatedObjectLookups.js"></script>
 <script type="text/javascript">
 Nitrate.Utils.after_page_load(Nitrate.TestRuns.Clone.on_load);
 </script>
@@ -34,7 +35,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Clone.on_load);
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
 		>> <a href="{% url tcms.apps.testplans.views.all %}">...</a>
-		>> <a href="{% url tcms.apps.testplans.views.get test_run.plan_id %}">...</a>
+		>> <a href="{{ test_run.plan.get_absolute_url }}">...</a>
 		>> <a href="{% url tcms.apps.testruns.views.get test_run.run_id %}">{{ test_run.summary }}</a>
 		>> Clone
 	</div>
@@ -64,14 +65,18 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Clone.on_load);
 				</tr>
 				<tr>
 					<td><label>Product Version</label></td>
-					<td>{{ clone_form.product_version }}</td>
+					<td>{{ clone_form.product_version }}<span class="errors">{{ clone_form.product_version.errors }}</span>
+						<a href="{{ ADMIN_PREFIX }}/management/version/add/" class="addlink" onclick="return popupAddAnotherWindow(this, 'product');" id="add_id_product_version">Add Product Version</a>
+					</td>
 				</tr>
 				<tr>
 					<td><label class="strong" for="id_build_id">Build </label></td>
-					<td>{{ clone_form.build }}<div class="errors">{{ clone_form.build.errors }}</div></td>
+					<td>{{ clone_form.build }}<span class="errors">{{ clone_form.build.errors }}</span>
+						<a href="{{ ADMIN_PREFIX }}/management/testbuild/add/" class="addlink" onclick="return popupAddAnotherWindow(this, 'product');" id="add_id_build">Add Build</a>
+					</td>
 				</tr>
 				<tr>
-					<td><label class="strong" for="id_errata_id">Errata</label></td>
+					<td><label for="id_errata_id">Errata</label></td>
 					<td>{{ clone_form.errata_id }}</td>
 				</tr>
 				<tr>
@@ -81,6 +86,10 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Clone.on_load);
 				<tr>
 					<td><label for="id_default_tester">Default Tester</label></td>
 					<td>{{ clone_form.default_tester }} <div class="errors">{{ clone_form.default_tester.errors }}</div></td>
+				</tr>
+				<tr>
+				    <td><label for="id_auto_update_run_status">Set Status Automatically</label></td>
+				    <td>{{ clone_form.auto_update_run_status }} <span class="system_help">{{ clone_form.auto_update_run_status.help_text }}</span>
 				</tr>
 				<tr>
 					<td><label class="strong" for="id_estimated_time">Estimated Time</label></td>

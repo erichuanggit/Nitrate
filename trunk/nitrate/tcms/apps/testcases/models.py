@@ -124,6 +124,12 @@ class TestCase(TCMSActionModel):
     is_automated_proposed = models.BooleanField(default = False)
     script = models.TextField(blank=True)
     arguments = models.TextField(blank=True)
+    extra_link = models.CharField(
+        max_length=1024,
+        default=None,
+        blank=True,
+        null=True
+    )
     summary = models.CharField(max_length=255, blank=True)
     requirement = models.CharField(max_length=255, blank=True)
     alias = models.CharField(max_length=255, blank=True)
@@ -433,7 +439,7 @@ class TestCase(TCMSActionModel):
         return (self.is_automated, )
 
     def get_is_automated_status(self):
-        return self.get_is_automated() + (self.is_automated_proposed and '(Autoproposed)' or '')
+        return self.get_is_automated() + (self.is_automated_proposed and ' (Autoproposed)' or '')
 
     def get_previous_and_next(self, pk_list):
         pk_list = list(pk_list)

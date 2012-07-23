@@ -5,6 +5,7 @@ Nitrate.TestPlans.Details = {};
 Nitrate.TestPlans.Edit = {};
 Nitrate.TestPlans.SearchCase = {};
 Nitrate.TestPlans.Clone = {};
+Nitrate.TestPlans.Attachment = {};
 
 Nitrate.TestPlans.TreeView = {
     pk: new Number(),
@@ -32,7 +33,6 @@ Nitrate.TestPlans.TreeView = {
         var c_plan, p_plan, b_plans, ch_plans, tc_plan;
         
         // Get the current plan
-        /*
         var p1 = { pk: plan_id, t: 'ajax'};
         var c1 = function(t) {
             var returnobj = t.responseText.evalJSON(true);
@@ -44,8 +44,6 @@ Nitrate.TestPlans.TreeView = {
             alert('Plan ' + plan_id + ' can not found in database');
             return false;
         }
-        */
-        c_plan = Nitrate.TestPlans.Instance;
         
         // Get the parent plan
         if(c_plan.fields.parent) {
@@ -97,67 +95,94 @@ Nitrate.TestPlans.TreeView = {
     },
     up: function(e) {
         var tree = Nitrate.TestPlans.TreeView;
-        
-        var p = {
+        var parent_obj, brother_obj; 
+
+        var parent_param = {
             pk: tree.data[0].fields.parent,
             t: 'ajax'
         };
         
-        var c = function(t) {
+        var parent_callback = function(t) {
             var returnobj = t.responseText.evalJSON(true);
-            var parent_obj = {0: returnobj[0], length: 1};
-            parent_obj[0].children = tree.data;
+            parent_obj = {0: returnobj[0], length: 1};
+        }; 
+        tree.filter(parent_param, parent_callback);
+
+        var brother_param = {
+            parent__pk: tree.data[0].fields.parent,
+            t: 'ajax'
+        };
+
+        var brother_callback = function(t){
+            var returnobj = t.responseText.evalJSON(true);
+            brother_obj = returnobj;
+        };
+
+        tree.filter(brother_param, brother_callback);
+
+        if (parent_obj && brother_obj.length) {
+            parent_obj[0].children = brother_obj;
+            var brother_numbers = brother_obj.length;
+            for (i = 0; i < brother_numbers; i++) {
+                if (parent_obj[0].children[i].pk == tree.data[0].pk) {
+                   parent_obj[0].children[i] = tree.data[0];
+                   break;
+                }
+            }
             tree.data = parent_obj;
             tree.render_page();
         }
-        
-        tree.filter(p, c);
     },
     blind: function(e) {
         var tree = Nitrate.TestPlans.TreeView;
-        var e_container = this.up();
-        var e_pk = this.previous();
+        var e_container = this;
+        var li_container = e_container.up(1);
+        var e_pk = e_container.next('a').innerHTML;
         var container_clns = e_container.classNames().toArray();
-        
-        var pk = e_pk.innerHTML;
-        var obj = tree.traverse(tree.data, pk);
+        var expand_icon_url = '/media/images/t2.gif';
+        var collapse_icon_url = '/media/images/t1.gif';
+        var obj = tree.traverse(tree.data, e_pk);
         
         for (i in container_clns) {
             if(typeof(container_clns[i]) != 'string')
                 continue
             
             switch (container_clns[i]) {
-                case 'expand':
-                    this.adjacent('ul')[0].hide();
-                    e_container.removeClassName('expand')
-                    e_container.addClassName('collapse');
+                case 'expand_icon':
+                    li_container.down('ul').hide();
+                    e_container.src = collapse_icon_url;
+                    e_container.removeClassName('expand_icon');
+                    e_container.addClassName('collapse_icon');
                     break;
-                case 'collapse':
+                case 'collapse_icon':
                     if (typeof(obj.children) != 'object' || obj.children == []) {
                         var c = function(t) {
                             var returnobj = t.responseText.evalJSON(true);
                             returnobj = Nitrate.Utils.convert('obj_to_list', returnobj);
                             tree.insert(obj, returnobj);
                             var ul = tree.render(returnobj);
-                            e_container.appendChild(ul);
+                            li_container.appendChild(ul);
                         };
                         
                         var p = {
-                            parent__pk: e_pk.innerHTML,
+                            parent__pk: e_pk,
                             t: 'ajax',
                         };
                         tree.filter(p, c);
                     };
                     
-                    this.adjacent('ul')[0].show();
-                    e_container.removeClassName('collapse');
-                    e_container.addClassName('expand')
+                    li_container.down('ul').show();
+                    e_container.src = expand_icon_url;
+                    e_container.removeClassName('collapse_icon');
+                    e_container.addClassName('expand_icon');
                     break;
             }
         };
     },
     render: function(data) {
         var ul = new Element('ul');
+        var icon_expand = '<img src="/media/images/t2.gif" class="expand_icon">';
+        var icon_collapse = '<img src="/media/images/t1.gif" class="collapse_icon">';
         
         // Add the 'Up' button
         if (!data && this.data) {
@@ -167,6 +192,7 @@ Nitrate.TestPlans.TreeView = {
                 var btn = new Element('input', {'type': 'button', 'value': 'Up'});
                 li.update(btn);
                 btn.observe('click', this.up);
+                li.addClassName('no-list-style');
                 ul.appendChild(li);
             };
         }
@@ -177,17 +203,27 @@ Nitrate.TestPlans.TreeView = {
                 continue;
             
             var li = new Element('li');
-            if (data[i].extras.num_children && data[i].children)
-                li.addClassName('expand');
+            var title = '[<a href="' + data[i].extras.get_url_path + '">' + data[i].pk + '</a>] ';
+
+            if (data[i].extras.num_children && data[i].children){
+                title = icon_expand + title;
+                li.addClassName('no-list-style');
+            }
             
-            if (data[i].extras.num_children && !data[i].children)
-                li.addClassName('collapse');
+            if (data[i].extras.num_children && !data[i].children){
+                title = icon_collapse + title;
+                li.addClassName('no-list-style');
+            }
             
             if (data[i].is_current)
                 li.addClassName('current');
             
+            if (data[i].fields.is_active)
+                title = '<div>' + title;
+            else
+                title = '<div class="line-through">' + title;
+
             // Construct the items
-            var title = '[<a href="' + data[i].extras.get_url_path + '">' + data[i].pk + '</a>] ';
             title += '<a class="plan_name" href="javascript:void(0);">' + data[i].fields.name + '</a>';
             title += ' (';
             if (data[i].extras.num_cases)
@@ -212,14 +248,13 @@ Nitrate.TestPlans.TreeView = {
                     break;
             }
             
-            title += ')';
+            title += ')</div>';
             
             li.update(title);
             ul.appendChild(li);
             
             // Observe the blind link click event
-            li.adjacent('a.plan_name').invoke('observe', 'click', this.blind);
-            
+            li.adjacent('img').invoke('observe', 'click', this.blind);
             if(data[i].children)
                 li.appendChild(this.render(data[i].children));
         };
@@ -292,15 +327,15 @@ Nitrate.TestPlans.List.on_load = function()
             clickedSelectAll(this, $('plans_form'), 'plan');
         });
     };
-    
-    if($('testplans_table')) {
-        TableKit.Sortable.init('testplans_table',
-        {
-            rowEvenClass : 'roweven',
-            rowOddClass : 'rowodd',
-            nosortClass : 'nosort'
-        });
-    };
+//     
+    // if($('testplans_table')) {
+        // TableKit.Sortable.init('testplans_table',
+        // {
+            // rowEvenClass : 'roweven',
+            // rowOddClass : 'rowodd',
+            // nosortClass : 'nosort'
+        // });
+    // };
     
     if($('column_add')) {
         $('column_add').observe('change', function(t) {
@@ -326,6 +361,32 @@ Nitrate.TestPlans.List.on_load = function()
             this.up(1).removeClassName('selection_row');
         };
     });
+
+    var oTable;
+    oTable = jQ('#testplans_table').dataTable({
+        "iDisplayLength": 20,
+        "sPaginationType": "full_numbers",
+        "bFilter": false,
+        // "bLengthChange": false,
+        "aLengthMenu": [[10, 20, 50, -1], [10, 20, 50, "All"]],
+        "aaSorting": [[ 1, "desc" ]],
+        "bProcessing": true,
+        "bServerSide": true,
+        "sAjaxSource": "/plans/ajax/"+this.window.location.search,
+        "aoColumns": [
+          {"bSortable": false },
+          null,
+          {"sType": "html"},
+          {"sType": "html"},
+          {"sType": "html"},
+          null,
+          {"bVisible": false},
+          null,
+          null,
+          null,
+          {"bSortable": false }
+        ]
+        });
 }
 
 Nitrate.TestPlans.Details.on_load = function()
@@ -351,7 +412,6 @@ Nitrate.TestPlans.Details.on_load = function()
             t.removeClassName('tab_focus');
         })
         this.parentNode.addClassName('tab_focus');
-        
         var tab_array = this.href.toArray();
         var tab = '';
         for (var i = tab_array.indexOf('#') + 1; i < tab_array.length; i++)
@@ -425,6 +485,7 @@ Nitrate.TestPlans.Details.on_load = function()
     new Draggable('id_import_case_zone');
 };
 
+
 Nitrate.TestPlans.SearchCase.on_load = function()
 {
     if($('id_product')) {    
@@ -470,6 +531,22 @@ Nitrate.TestPlans.Clone.on_load = function()
     if($('id_product') && !$F('id_default_product_version')){
         fireEvent($('id_product'),'change');
     }
+}
+
+Nitrate.TestPlans.Attachment.on_load = function()
+{
+    jQ(document).ready(function() {
+       jQ("#upload_file").change(function ()
+       {
+         var iSize = jQ("#upload_file")[0].files[0].size;
+         var limit = parseInt(jQ('#upload_file').attr('limit'));
+
+         if (iSize > limit)
+         {
+             alert("Your attachment's size is beyond limit.");
+         }
+      });
+    });
 }
 
 function getTestPlanParam()
@@ -718,7 +795,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 }else{
                     form.tag__name__in.value = this.innerHTML;
                 }*/
-                form.tag__name__in.value = form.tag__name__in.value?(form.tag__name__in.value + ',' + this.innerHTML):this.innerHTML;
+                form.tag__name__in.value = form.tag__name__in.value?(form.tag__name__in.value + ',' + this.textContent):this.textContent;
             })
         }
         
@@ -730,16 +807,10 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 var callback = function(t) {
                     returnobj = t.responseText.evalJSON(true);
                     if(returnobj.rc != 0) {
-                        alert(returnobj.response);
-                        return false;
+                        alert(returnobj.reponse);
                     }
-                    //parameters.a = 'initial';
-                    params.a = 'search';
+                    params.a = 'initial';
                     constructPlanDetailsCasesZone(container, plan_id, params);
-                    //sort cases by sortkey after drag and drop.
-                    $$('a.sort_by_sortkey').each(function(e){
-						fireEvent(e, 'click');
-                    })
                 }
                 resortCasesDragAndDrop(container, this, form, table, params, callback);
             });
@@ -917,7 +988,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                             alert(returnobj.response);
                             return false;
                         }
-                        parameters['case'] = params['case']
+                        parameters['case'] = params['case'];
                         constructPlanDetailsCasesZone(container, plan_id, parameters);
                         clearDialog(c);
                     }
@@ -945,7 +1016,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                         alert(returnobj.response);
                         return false
                     };
-                    
+                    parameters['case'] = case_pks;
                     constructPlanDetailsCasesZone(container, plan_id, parameters);
                 }
                 
@@ -953,7 +1024,27 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 changeCaseMember(table, field, case_pks, callback);
             })
         }
-        
+
+        if(form.adjacent('input.sort_list').length != 0) {
+            var element = form.adjacent('input.sort_list')[0];
+            element.observe('click', function(e) {
+                var case_plan_pks = serializeCasePlanIDFromInputList(table);
+                var case_pks = serializeCaseFromInputList(table);
+                if(case_plan_pks.length == 0) {
+                    alert(default_messages.alert.no_case_selected);
+                    return false;
+                }
+                var params = {
+                    'testcaseplan': case_plan_pks
+                };
+                var callback = function(t) {
+                    parameters['case'] = case_pks;
+                    constructPlanDetailsCasesZone(container, plan_id, parameters);
+                };
+                changeCaseOrder(params, callback);
+            })
+        }
+
         if(form.adjacent('input.btn_reviewer').length > 0) {
             var element = form.adjacent('input.btn_reviewer')[0];
             element.observe('click', function(e) {
@@ -1039,12 +1130,40 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         if(form.adjacent('input.tag_delete').length > 0) {
             var element = form.adjacent('input.tag_delete')[0];
             element.observe('click',function(e) {
+                var c = getDialog();
+                var params = {
+                    'case': serializeCaseFromInputList(table)
+                    };
                 if(serializeCaseFromInputList(table).length == 0){
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                
-                constructBatchTagProcessDialog(plan_id);
+                var form_observe = function(e) {
+                    e.stop();
+
+                    var params = this.serialize(true);
+                    params['case'] = serializeCaseFromInputList(table);
+                    if(params['case'].length == 0){
+                        alert(default_messages.alert.no_case_selected);
+                        return false;
+                    }
+
+                    var url = getURLParam().url_cases_tag;
+                    var callback = function(t) {
+                        returnobj = t.responseText.evalJSON(true);
+
+                        if (returnobj.rc != 0) {
+                            alert(returnobj.response);
+                            return false;
+                        }
+                        parameters['case'] = params['case']
+                        constructPlanDetailsCasesZone(container, plan_id, parameters);
+                        clearDialog(c);
+                    }
+
+                    updateCaseTag(url, params, callback);
+                }
+                renderTagForm(c, params, form_observe);
                 
                 // Observe the batch tag form submit
                 $('id_batch_tag_form').observe('submit',function(e) {
@@ -1059,7 +1178,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     removeBatchTag(params, tag_callback, format)
                  })
             })
-        }
+            }
         
         
         // Observe the change sortkey
@@ -1077,9 +1196,10 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         })
         
         table.adjacent('.change_status_selector').invoke('observe', 'change', function(e) {
-            var title = this.up(1); // Container
-            var case_id = title.getElementsBySelector('input[name="case"]')[0].value;
-            changeTestCaseStatus(this, case_id);
+            var be_confirmed = (this.value == '2');
+            var was_confirmed = (this.up(0).attributes['status'].value == "CONFIRMED");
+            var case_id = this.up(1).id;
+            changeTestCaseStatus(this, case_id, be_confirmed, was_confirmed);
         })
         
         // Display/Hide the case content
@@ -1087,7 +1207,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             var btn = this;
             var title = this.up(); // Container
             var content = this.up().next(); // Content Containers
-            var case_id = title.getElementsBySelector('input[name="case"]')[0].value;
+            var case_id = title.id;
             var template_type = form.adjacent('input[name="template_type"]')[0].value;
             // Review case content call back;
             var review_case_content_callback = function(e) {
@@ -1188,13 +1308,15 @@ function constructPlanComponentsZone(container, parameters, callback)
             var p = $('id_form_plan_components').serialize(true);
             p['component'] = component.value;
             p['a'] = 'remove';
-            
-            constructPlanComponentsZone(container, p, callback)
+            constructPlanComponentsZone(container, p, callback);
         })
         
         $('id_checkbox_all_component').observe('click', function(e) {
             clickedSelectAll(this, this.up(4), 'component');
-        })
+        });
+
+        var c_count = jQ('tbody#component').attr('count');
+        jQ('#component_count').text(c_count);
     }
     
     new Ajax.Updater(container, url, {
@@ -1289,7 +1411,7 @@ function changeCaseMember(container, field, case_ids, callback)
     
     var parameters = {
           'info_type': 'users',
-          'email__startswith': p,
+          'username': p,
     }
     
     getInfoAndUpdateObject(
@@ -1407,13 +1529,26 @@ function removePlanChildren(container, plan_id)
     // container is not in using so far
     
     var tree = Nitrate.TestPlans.TreeView;
+    var plan_obj = tree.traverse(tree.data, plan_id);
+    var children_pks = new Array();
+    for (var i = 0; i < plan_obj.children.length; i++)
+        children_pks.push(plan_obj.children[i].pk);
     var p = prompt('Enter a comma separated list of plan IDs to be removed');
     if(!p)
         return false;
-	if(Number(p)==plan_id){
-        alert('can not remove current plan');
-        return false;
-	}
+    var prompt_pks = p.split(',');
+    for(var j = 0 ; j < prompt_pks.length; j++){
+        if (prompt_pks[j].include(plan_id)){
+            alert('can not remove current plan');
+            return false;
+        }
+        else if (!children_pks.include(prompt_pks[j])){
+            alert('plan ' + prompt_pks[j] + ' is not the child node of current plan');
+            return false;
+        }
+        else
+            continue;
+    }
     var parameters = {
         pk__in: p,
     };
@@ -1475,7 +1610,7 @@ function resortCasesDragAndDrop(container, button, form, table, parameters, call
         });
         
         parameters.a = 'order_cases';
-        
+        parameters.case_sort_by = 'sortkey'; 
         var url = new String('cases/');
         new Ajax.Request(url, {
             method: 'post',

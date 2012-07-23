@@ -25,10 +25,12 @@ from django.core.cache import cache
 from django.utils.safestring import mark_safe, SafeData
 from django.db.models.signals import post_save, post_delete
 from django.conf import settings
+from django.db import models
+from django.template.defaultfilters import slugify
 
 from tcms.core.models import TCMSActionModel
 
-from tcms.apps.management.models import TCMSEnvPlanMap
+from tcms.apps.management.models import TCMSEnvPlanMap, Version
 from tcms.apps.testcases.models import TestCasePlan
 
 # single listen
@@ -56,6 +58,7 @@ class TestPlan(TCMSActionModel):
     """
     plan_id = models.AutoField(max_length=11, primary_key=True)
     default_product_version = models.TextField()
+    product_version = models.ForeignKey(Version, blank=True, null=True)
     name = models.CharField(max_length=255)
     create_date = models.DateTimeField(db_column='creation_date', auto_now_add=True)
     is_active = models.BooleanField(db_column='isactive', default=True)
@@ -103,6 +106,17 @@ class TestPlan(TCMSActionModel):
 
     def __unicode__(self):
         return self.name
+
+    #update version when edit or create
+    def save(self, *args, **kwargs):
+        """Save testplan and relate the default_product_version with Verion object.
+        """
+        new_version, is_created = Version.objects.get_or_create(
+            product = self.product,
+            value = self.default_product_version
+        )
+        self.product_version = new_version
+        super(TestPlan, self).save(*args, **kwargs) # Call the "real" save() method.
 
     @classmethod
     def list(cls, query = None):
@@ -249,31 +263,22 @@ class TestPlan(TCMSActionModel):
             (self.plan_id, case.case_id)
         )
 
-    def get_absolute_url(self, request = None):
-        # Upward compatibility code
-        if request:
-            return request.build_absolute_uri(
-                reverse('tcms.apps.testplans.views.get', args=[self.pk, ])
-            )
-
-        return self.get_url(request)
-
+    @models.permalink
+    def get_absolute_url(self):
+        return ('test_plan_url', (), {
+            'plan_id': self.plan_id,
+            'slug': slugify(self.name),
+        })
+    
     def get_url_path(self, request = None):
-        return reverse('tcms.apps.testplans.views.get', args=[self.pk, ])
+        return self.get_absolute_url()
 
     def get_default_product_version(self):
         """
         Workaround the schema problem with default_product_version
         Get a 'Versions' object based on a string query
         """
-        from tcms.apps.management.models import Version
-        try:
-            return Version.objects.get(
-                product = self.product,
-                value = self.default_product_version
-            )
-        except ObjectDoesNotExist:
-            return None
+        return self.product_version
 
     def get_version_id(self):
         """

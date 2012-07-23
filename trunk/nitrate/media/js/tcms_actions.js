@@ -99,13 +99,14 @@ Event.observe(window, 'load', function(e) {
 var default_messages = {
     'alert': {
         'no_case_selected': 'No cases selected! Please select at least one case.',
-        'ajax_failure': 'Commnucation with server got some unknown errors.',
+        'ajax_failure': 'Communication with server got some unknown errors.',
         'tree_reloaded': 'The tree has been reloaded.',
         'last_case_run': 'It is the last case run',
         'bookmark_added': 'Bookmark added.',
         'no_run_selected': 'No run selected.',
         'invalid_bug_id': 'Please input a valid bug id.',
-        'no_bugs_specified': 'Please specify bug ID'
+        'no_bugs_specified': 'Please specify bug ID',
+        'no_plan_specified': 'Please specify one plan at least.'
     },
     'confirm': {
         'change_case_status': 'Are you sure you want to change the status?',
@@ -163,6 +164,7 @@ function getURLParam()
     param.url_search_case = '/cases/';
     param.url_create_case = '/case/create/';
     param.url_cases_automated = '/cases/automated/';
+    param.url_cases_tag = '/cases/tag/';
     param.url_cases_component = '/cases/component/';
     param.url_cases_category = '/cases/category/';
     param.url_case_details = '/case/' + id + '/';
@@ -827,7 +829,6 @@ function postToURL(path, params, method) {
 function constructTagZone(container, parameters)
 {
     $(container).update('<div class="ajax_loading"></div>');
-    
     var complete = function(t) {
         new Ajax.Autocompleter("id_tags", "id_tags_autocomplete", getURLParam().url_get_product_info, {
             minChars: 2,
@@ -849,6 +850,8 @@ function constructTagZone(container, parameters)
             
             // this.adjacent('input[name="tags"]').invoke('focus');
         })
+        var count = jQ('tbody#tag').attr('count');
+        jQ('#tag_count').text(count);
     }
     
     var url = new String('/management/tags/');
@@ -1341,7 +1344,7 @@ function popupAddAnotherWindow(triggeringLink, parameters)
 {
     var name = triggeringLink.id.replace(/^add_/, '');
     name = id_to_windowname(name);
-    href = triggeringLink.href
+    href = triggeringLink.href;
     if (href.indexOf('?') == -1) {
         href += '?_popup=1';
     } else {
@@ -1365,3 +1368,4 @@ function exportCase(url, case_ids){
     }
     postToURL(url, case_ids);
 }
+

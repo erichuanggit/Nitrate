@@ -19,7 +19,7 @@
 				<th class="table_width_action">Action</th>
 			</tr>
 		</thead>
-		<tbody>
+		<tbody id="component" count='{{ test_plan.component.count }}'>
 			{% for component in test_plan.component.all %}
 			<tr class="{% cycle 'odd' 'even' %}">
 				<td><input type="checkbox" name="component" value="{{ component.pk }}" {% if perms.testplans.change_testplancomponent %}{% else %}disabled{% endif %}/></td>

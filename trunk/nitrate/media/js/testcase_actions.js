@@ -14,14 +14,6 @@ Nitrate.TestCases.List.on_load = function()
             clickedSelectAll(this, this.up(4), 'case')
         });
     };
-    //if($('testcases_table')) {
-        //TableKit.Sortable.init('testcases_table',
-        //{
-            //rowEvenClass : 'roweven',
-            //rowOddClass : 'rowodd',
-            //nosortClass : 'nosort'
-        //});
-    //};
     
     $('id_blind_all_link').observe('click', function(e) {
         //FIXME
@@ -50,20 +42,50 @@ Nitrate.TestCases.List.on_load = function()
             };
         }
     })
-        
-    var toggle_case = function(e) {
-        var c = this.up(); // Container
-        var c_container = c.next(); // Content Containers
-        var case_id = c.getElementsBySelector('input[name="case"]')[0].value;
-        
-        var type = 'case';
-        toggleTestCaseContents(type, c, c_container, case_id);
-    }
     
-    $$('.expandable').invoke('observe', 'click', toggle_case);
     if(window.location.hash == '#expandall'){
         blinddownAllCases();
     }
+
+    var oTable;
+    oTable = jQ('#testcases_table').dataTable({
+        "iDisplayLength": 20,
+        "sPaginationType": "full_numbers",
+        "bFilter": false,
+        "bLengthChange": false,
+        "aaSorting": [[ 2, "desc" ]],
+        "bProcessing": true,
+        "bServerSide": true,
+        "sAjaxSource": "/cases/ajax/"+this.window.location.search,
+        "aoColumns": [
+          {"bSortable": false,"sClass": "expandable" },
+          {"bSortable": false },
+          {"sType": "html","sClass": "expandable"},
+          {"sType": "html","sClass": "expandable"},
+          {"sType": "html","sClass": "expandable"},
+          {"sClass": "expandable"},
+          {"sClass": "expandable"},
+          {"sClass": "expandable"},
+          {"sClass": "expandable"},
+          {"sClass": "expandable"},
+          {"sClass": "expandable"},
+        ]
+    });
+    jQ("#testcases_table tbody tr td.expandable").live("click", function() {
+        var tr = this.up();
+        var case_id = tr.getElementsBySelector('input[name="case"]')[0].value;
+        var detail_td = '<tr class="case_content hide" style="display: none;"><td colspan="11"><div id="id_loading_' + case_id + '" class="ajax_loading"></div></td></tr>'
+        var blind_icon = tr.getElementsBySelector('.blind_icon')[0]
+        if ( oTable.fnIsOpen(tr) ) {
+            $(blind_icon).removeClassName('collapse');
+            $(blind_icon).addClassName('expand');
+            $(blind_icon).src = "/media/images/t1.gif";
+            oTable.fnClose( tr );
+        } else {
+          oTable.fnOpen( tr, detail_td, "info_row" );
+          getTestCaseContents("case", tr, tr.next(), case_id);
+        }
+    });
 }
 
 Nitrate.TestCases.Details.on_load = function()
@@ -71,7 +93,6 @@ Nitrate.TestCases.Details.on_load = function()
     var case_id = Nitrate.TestCases.Instance.pk;
     constructTagZone('tag', { 'case': case_id });
     constructPlanCaseZone($('plan'), case_id);
-    
     $$('li.tab a').invoke('observe', 'click', function(i) {
         $$('div.tab_list').invoke('hide');
         $$('li.tab').invoke('removeClassName', 'tab_focus');
@@ -158,15 +179,6 @@ Nitrate.TestCases.Details.on_load = function()
     
     bindSelectAllCheckbox($('id_checkbox_all_components'), $('id_form_case_component'), 'component');
 
-   // if($('id_table_cases')) {
-     //   TableKit.Sortable.init('id_table_cases',
-       // {
-         //   rowEvenClass : 'roweven',
-           // rowOddClass : 'rowodd',
-            //nosortClass : 'nosort'
-        //});
-    //};
-
     var toggle_case_run = function(e) {
         var c = this.up(); // Container
         var c_container = c.next(); // Content Containers
@@ -177,7 +189,39 @@ Nitrate.TestCases.Details.on_load = function()
         toggleTestCaseContents(type, c, c_container, case_id, case_text_version, case_run_id);
     }
     
-    $$('.expandable').invoke('observe', 'click', toggle_case_run);
+    var toggle_case_runs_by_plan = function(e) {
+        var c = this.up();
+        var case_id = c.getElementsByTagName('input')[0].value;
+        var params = {
+            'type' : 'case_run_list',
+            'container': c,
+            'c_container': c.next(),
+            'case_id': case_id,
+            'case_run_plan_id': c.id
+        }
+        var callback = function(e) {
+            $$('#table_case_runs_by_plan .expandable').invoke('observe', 'click', toggle_case_run);
+        }
+        toggleCaseRunsByPlan(params, callback);
+    }
+    $$('.plan_expandable').invoke('observe', 'click', toggle_case_runs_by_plan);
+    jQ('#testplans_table').dataTable({
+        "bFilter": false,
+        "bLengthChange": false,
+        "bPaginate": false,
+        "bInfo": false,
+        "bAutoWidth": false,
+        "aaSorting": [[ 0, "desc" ]],
+        "aoColumns": [
+          {"sType": "num-html"},
+          null,
+          {"sType": "html"},
+          {"sType": "html"},
+          {"sType": "html"},
+          null,
+          {"bSortable": false},
+        ]
+    });
 }
 
 /*
@@ -199,8 +243,36 @@ Nitrate.TestCases.Create.on_load = function()
     // bind_category_selector_to_product(false, false, $('id_product'), $('id_category'));
     
     SelectFilter.init("id_component", "component", 0, "/admin_media/");
-    bindRefreshComponentCategoryByProduct($('id_refresh_product'));
-
+    //init category and components
+    getCategorisByProductId(false, $('id_product'), $('id_category'));
+    var from = 'id_component_from';
+    var to = 'id_component_to';
+    var from_field = $(from);
+    var to_field = $(to);
+    to_field.update('');
+    getComponentsByProductId(false, $('id_product'), from_field, function() {
+        SelectBox.cache[from] = new Array();
+        SelectBox.cache[to] = new Array();
+        for (var i = 0; (node = from_field.options[i]); i++) {
+            SelectBox.cache[from].push({value: node.value, text: node.text, displayed: 1});
+        }
+    });
+    // bind change on product to update component and category
+    jQ('#id_product').change(function () {
+        var from = 'id_component_from';
+        var to = 'id_component_to';
+        var from_field = $(from);
+        var to_field = $(to);
+        to_field.update('');
+        getComponentsByProductId(false, $('id_product'), from_field, function() {
+            SelectBox.cache[from] = new Array();
+            SelectBox.cache[to] = new Array();
+            for (var i = 0; (node = from_field.options[i]); i++) {
+                SelectBox.cache[from].push({value: node.value, text: node.text, displayed: 1});
+            }
+        });
+        getCategorisByProductId(false, $('id_product'), $('id_category'));
+    });
     resize_tinymce_editors();
 }
 
@@ -209,7 +281,6 @@ Nitrate.TestCases.Edit.on_load = function()
     bind_category_selector_to_product(false, false, $('id_product'), $('id_category'));
     // bind_component_selector_to_product(false, false, $('id_product'), $('id_component'));
     //SelectFilter.init("id_component", "component", 0, "/admin_media/");
-    // bindRefreshComponentCategoryByProduct($('id_refresh_product'));
 
     resize_tinymce_editors();
 }
@@ -249,6 +320,41 @@ Nitrate.TestCases.Clone.on_load = function()
     })
     };
 }
+function getTestCaseContents(template_type, container, content_container, object_pk, case_text_version, case_run_id, callback)
+{
+    if (typeof(container) != 'object')
+    var container = $(container)
+
+    if(typeof(content_container) != 'object')
+    var content_container = $(content_container)
+
+    if ($('id_loading_' + object_pk)) {
+        var url = getURLParam(object_pk).url_case_details;
+        var parameters = {
+            template_type: template_type,
+            case_text_version: case_text_version,
+            case_run_id: case_run_id,
+        };
+
+        new Ajax.Updater(content_container, url, {
+            method: 'get',
+            parameters: parameters,
+            onComplete: callback,
+            onFailure: html_failure
+        });
+    };
+
+    var blind_icon = container.getElementsBySelector('.blind_icon')[0]
+    if (content_container.getStyle('display') == 'none') {
+        $(blind_icon).removeClassName('collapse');
+        $(blind_icon).addClassName('expand');
+        $(blind_icon).src = "/media/images/t1.gif";
+    } else {
+        $(blind_icon).removeClassName('expand');
+        $(blind_icon).addClassName('collapse');
+        $(blind_icon).src = "/media/images/t2.gif";
+    }
+}
 
 function toggleTestCaseContents(template_type, container, content_container, object_pk, case_text_version, case_run_id, callback)
 {
@@ -276,7 +382,7 @@ function toggleTestCaseContents(template_type, container, content_container, obj
         });
     };
     
-    var blind_icon = container.getElementsBySelector('.blind_icon')[0]
+    var blind_icon = container.getElementsByTagName('img')[0];
     if (content_container.getStyle('display') == 'none') {
         $(blind_icon).removeClassName('collapse');
         $(blind_icon).addClassName('expand');
@@ -288,7 +394,7 @@ function toggleTestCaseContents(template_type, container, content_container, obj
     }
 }
 
-function changeTestCaseStatus(selector, case_id)
+function changeTestCaseStatus(selector, case_id, be_confirmed, was_confirmed)
 {
     var value = selector.value;
     var label = selector.previous();
@@ -303,8 +409,19 @@ function changeTestCaseStatus(selector, case_id)
         }
         
         label.innerHTML = case_status;
-        label.show(); 
+        label.show();
         selector.hide();
+
+        if(be_confirmed){
+            jQ('#run_case_count').text(parseInt(jQ('#run_case_count').text())+1);
+            jQ('#review_case_count').text(parseInt(jQ('#review_case_count').text())-1);
+            jQ('#'+case_id).remove();
+        }
+        if(was_confirmed){
+            jQ('#run_case_count').text(parseInt(jQ('#run_case_count').text())-1);
+            jQ('#review_case_count').text(parseInt(jQ('#review_case_count').text())+1);
+            jQ('#'+case_id).remove();
+        }
     }
     
     changeCasesStatus(case_id, value, success);
@@ -374,13 +491,20 @@ function blindupAllCases(element)
         element.src="/media/images/t1.gif";
     }
 }
-
 function changeCaseOrder(parameters, callback)
 {
-    nsk = prompt('Enter your new order number', parameters['sortkey'])   // New sort key
-    
+    if(parameters.hasOwnProperty('sortkey') == true){
+        nsk = prompt('Enter your new order number', parameters['sortkey']);   // New sort key
+        if(nsk == parameters['sortkey']) {
+            alert('Nothing changed');
+            return false;
+        }
+    }
+    else
+        nsk = prompt('Enter your new order number');
+
     if(!nsk)
-    return false
+        return false
     
     if(nsk != parseInt(nsk)) {
         alert('The value must be an integer number and limit between 0 to 32300.');
@@ -391,12 +515,6 @@ function changeCaseOrder(parameters, callback)
         alert('The value must be an integer number and limit between 0 to 32300.');
         return false;
     }
-    
-    if(nsk == parameters['sortkey']) {
-        alert('Nothing changed');
-        return false;
-    }
-    
     var ctype = 'testcases.testcaseplan';
     var object_pk = parameters['testcaseplan'];
     var field = 'sortkey';
@@ -484,11 +602,12 @@ function addCaseBug(form, callback)
             alert($('response').innerHTML);
             return false;
         };
-        
+
         if(callback)
             callback();
+        jQ('#case_bug_count').text(jQ('table#bugs').attr('count'));
     }
-    
+
     new Ajax.Updater('bug', form.action, {
         method: form.method,
         parameters: $(form).serialize(true),
@@ -500,19 +619,20 @@ function removeCaseBug(id, case_id, callback)
 {
     if(!confirm('Are you sure to remove the bug?'))
         return false;
-    
+
     var parameteres = {
         'handle': 'remove',
         id: id,
     }
-    
+
     var complete = function(t) {
         if($('response')) {
             alert($('response').innerHTML);
             return false;
         }
+        jQ('#case_bug_count').text(jQ('table#bugs').attr('count'));
     }
-    
+
     new Ajax.Updater('bug', '/case/' + case_id + '/bug/', {
         method: 'get',
         parameters: parameteres,
@@ -523,36 +643,55 @@ function removeCaseBug(id, case_id, callback)
 function constructPlanCaseZone(container, case_id, parameters)
 {
     // $(container).update('<div class="ajax_loading"></div>');
-    
     var complete = function(t) {
         $('id_plan_form').observe('submit', function(e) {
             e.stop();
-            
+
             var callback = function(e) {
                 e.stop();
                 var plan_ids = this.serialize(true)['plan_id'];
                 if (!plan_ids) {
-                    alert('You must specific one plan at least!');
+                    alert(default_messages.alert.no_plan_specified);
                     return false;
                 }
-                
+
                 var p = {
                     a: 'add',
                     plan_id: plan_ids,
                 };
-                
+
                 constructPlanCaseZone(container, case_id, p);
                 clearDialog();
+                jQ('#plan_count').text(jQ('table#testplans_table').attr('count'));
             }
-            
+
             var p = this.serialize(true)
             if (!p.pk__in) {
-                alert('Plan is required');
+                alert(default_messages.alert.no_plan_specified);
                 return false;
             };
-            
+
             previewPlan(p, getURLParam(case_id).url_case_plan, callback);
         })
+        if(jQ('#testplans_table td a').length > 0){
+            jQ('#testplans_table').dataTable({
+                "bFilter": false,
+                "bLengthChange": false,
+                "bPaginate": false,
+                "bInfo": false,
+                "bAutoWidth": false,
+                "aaSorting": [[ 0, "desc" ]],
+                "aoColumns": [
+                  {"sType": "num-html"},
+                  null,
+                  {"sType": "html"},
+                  {"sType": "html"},
+                  {"sType": "html"},
+                  null,
+                  {"bSortable": false},
+                ]
+            });
+        }
     }
     var url = getURLParam(case_id).url_case_plan;
     new Ajax.Updater(container, url, {
@@ -571,28 +710,8 @@ function removePlanFromCase(container, plan_id, case_id)
         a: 'remove',
         plan_id: plan_id,
     };
-    constructPlanCaseZone(container, case_id, parameters)
-}
-
-function bindRefreshComponentCategoryByProduct(btn_refresh) {
-    btn_refresh.observe('click', function(e) {
-        var from = 'id_component_from';
-        var to = 'id_component_to';
-        var from_field = $(from);
-        var to_field = $(to);
-        
-        to_field.update('');
-        
-        getComponentsByProductId(false, $('id_product'), from_field, function() {
-            SelectBox.cache[from] = new Array();
-            SelectBox.cache[to] = new Array();
-            
-            for (var i = 0; (node = from_field.options[i]); i++) {
-                SelectBox.cache[from].push({value: node.value, text: node.text, displayed: 1});
-            }
-        });
-        getCategorisByProductId(false, $('id_product'), $('id_category'));
-    })
+    constructPlanCaseZone(container, case_id, parameters);
+    jQ('#plan_count').text(jQ('table#testplans_table').attr('count'));
 }
 
 function taggleAllCasesCheckbox(container)
@@ -606,17 +725,48 @@ function taggleAllCasesCheckbox(container)
     }
 }
 
+function renderTagForm(container, parameters, form_observe)
+{
+    var d = new Element('div');
+    if(!container)
+    var container = getDialog();
+    container.show();
+
+    var callback = function(t) {
+        var action = getURLParam().url_cases_tag;
+        var notice = 'Press "Ctrl" to select multiple default component';
+
+        var h = new Element('input', {'type': 'hidden', 'name': 'a', 'value': 'remove'});
+        var a = new Element('input', {'type': 'submit', 'value': 'Remove'});
+        var c = new Element('label');
+        c.appendChild(h);
+        c.appendChild(a);
+        a.observe('click', function(e) { h.value = 'remove'});
+        var f = constructForm(d.innerHTML, action, form_observe, notice, c);
+        container.update(f);
+        bind_component_selector_to_product(false, false, $('id_product'), $('id_o_component'));
+    }
+    var url = getURLParam().url_cases_tag;
+    new Ajax.Updater(d, url, {
+        method: 'post',
+        parameters: parameters,
+        onComplete: callback,
+        onFailure: html_failure,
+    })
+}
+
+
 function renderComponentForm(container, parameters, form_observe)
 {
     var d = new Element('div');
     if(!container)
     var container = getDialog();
     container.show();
-    
+
     var callback = function(t) {
         var action = getURLParam().url_cases_component;
         var notice = 'Press "Ctrl" to select multiple default component';
-        
+
         var h = new Element('input', {'type': 'hidden', 'name': 'a', 'value': 'add'});
         var a = new Element('input', {'type': 'submit', 'value': 'Add'});
         //var r = new Element('input', {'type': 'submit', 'value': 'Remove'});
@@ -624,18 +774,18 @@ function renderComponentForm(container, parameters, form_observe)
         c.appendChild(h);
         c.appendChild(a);
         //c.appendChild(r);
-        
+
         a.observe('click', function(e) { h.value = 'add'});
         //r.observe('click', function(e) {h.value = 'remove'});
-        
+
         var f = constructForm(d.innerHTML, action, form_observe, notice, c);
         container.update(f);
-        
+
         bind_component_selector_to_product(false, false, $('id_product'), $('id_o_component'));
     }
-    
+
     var url = getURLParam().url_cases_component;
-    
+
     new Ajax.Updater(d, url, {
         method: 'post',
         parameters: parameters,
@@ -651,11 +801,11 @@ function renderCategoryForm(container, parameters, form_observe)
     if(!container)
     var container = getDialog();
     container.show();
-    
+
     var callback = function(t) {
         var action = getURLParam().url_cases_category;
         var notice = 'Select Category';
-        
+
         var h = new Element('input', {'type': 'hidden', 'name': 'a', 'value': 'add'});
         var a = new Element('input', {'type': 'submit', 'value': 'Select'});
         //var r = new Element('input', {'type': 'submit', 'value': 'Remove'});
@@ -663,23 +813,33 @@ function renderCategoryForm(container, parameters, form_observe)
         c.appendChild(h);
         c.appendChild(a);
         //c.appendChild(r);
-        
+
         a.observe('click', function(e) { h.value = 'update'});
         //r.observe('click', function(e) {h.value = 'remove'});
-        
+
         var f = constructForm(d.innerHTML, action, form_observe, notice, c);
         container.update(f);
-        
+
         bind_category_selector_to_product(false, false, $('id_product'), $('id_o_category'));
     }
-    
+
     var url = getURLParam().url_cases_category;
-    
+
     new Ajax.Updater(d, url, {
         method: 'post',
         parameters: parameters,
         onComplete: callback,
         onFailure: html_failure,
+    })
+}
+
+function updateCaseTag(url, parameters, callback)
+{
+    new Ajax.Request(url, {
+        method: 'post',
+        parameters: parameters,
+        onSuccess: callback,
+        onFailure: json_failure
     })
 }
 
@@ -721,7 +881,7 @@ function constructCaseAutomatedForm(container, parameters, callback)
                 alert('Nothing selected');
                 return false;
             }
-            
+
             var params = this.serialize(true);
             params['case'] = parameters['case'];
             new Ajax.Request(getURLParam().url_cases_automated, {
@@ -733,7 +893,7 @@ function constructCaseAutomatedForm(container, parameters, callback)
         var f = constructForm(returntext, action, form_observe);
         container.update(f);
     }
-    
+
     getForm(d, 'testcases.CaseAutomatedForm', parameters, c);
 }
 
@@ -746,6 +906,18 @@ function serializeCaseFromInputList(table)
         case_ids.push(elements[i].value);
     };
     return case_ids
+}
+function serializeCasePlanIDFromInputList(table)
+{
+    var elements = $(table).adjacent('input[name="case"]:checked');
+    var case_plan_ids = new Array();
+    for(var i=0; i<elements.length; i++){
+        var tr_element = elements[i].up(1);
+        var case_plan_element = tr_element.getElementsByClassName('col_sortkey_content')[0].getElementsByTagName('span')[0];
+        if (typeof(case_plan_element.innerHTML) == 'string')
+        case_plan_ids.push(case_plan_element.innerHTML);
+    };
+    return case_plan_ids
 }
 
 function serialzeCaseForm(form, table, serialized)
@@ -771,9 +943,48 @@ function toggleDiv(link, divId){
     }
 }
 
-/*
-jQ('a.add_remove').click(function(){
-    var editing = !$(this).hasClass('done');
-    jQ(this).html(editing ? 'Show All' : 'Hide All').toggleClass('done');
+function addCaseBugViaEnterKey(element, e){
+    if (e.keyCode == 13)
+        addCaseBug(element);
 }
-*/
+
+function toggleCaseRunsByPlan(params, callback)
+{
+    var container = params.container;
+    var content_container = params.c_container;
+    var case_run_plan_id = params.case_run_plan_id;
+    var case_id = params.case_id;
+    if (typeof(container) != 'object')
+        container = $(container);
+    
+    if(typeof(content_container) != 'object')
+        content_container = $(content_container);
+    
+    content_container.toggle();
+    
+    if ($('id_loading_' + case_run_plan_id)) {
+        var url = getURLParam(case_id).url_case_details;
+        var parameters = {
+            template_type: params.type,
+            case_run_plan_id: case_run_plan_id,
+        };
+        
+        new Ajax.Updater(content_container, url, {
+            method: 'get',
+            parameters: parameters,
+            onComplete: callback,
+            onFailure: html_failure
+        });
+    };
+    
+    var blind_icon = container.getElementsByTagName('img')[0];
+    if (content_container.getStyle('display') == 'none') {
+        $(blind_icon).removeClassName('collapse');
+        $(blind_icon).addClassName('expand');
+        $(blind_icon).src = "/media/images/t1.gif";
+    } else {
+        $(blind_icon).removeClassName('expand');
+        $(blind_icon).addClassName('collapse');
+        $(blind_icon).src = "/media/images/t2.gif";
+    }
+}

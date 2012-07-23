@@ -30,7 +30,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
 		>> <a href="{% url tcms.apps.testplans.views.all %}">...</a>
-		>> <a href="{% url tcms.apps.testplans.views.get test_plan.plan_id %}">{{ test_plan.plan_id }}: {{ test_plan.name }}</a>
+		>> <a href="{{ test_plan.get_absolute_url }}">{{ test_plan.plan_id }}: {{ test_plan.name }}</a>
 		>> New Test Run
 	</div>
 	<h2>Create New Test Run</h2>
@@ -68,8 +68,8 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 					</td>
 				</tr>
 				<tr>
-					<td valign="top"><label class="strong" for="id_errata_id">Errata</label></td>
-					<td>{{ form.errata_id }}</td>
+					<td valign="top"><label for="id_errata_id">Errata</label></td>
+					<td>{{ form.errata_id }}<div class="errors">{{ form.errata_id.errors }}</div></td>
 				</tr>
 				<tr>
 					<td valign="top" valign="top"><label for="id_manager">Run Manager </label></td>
@@ -78,6 +78,10 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 				<tr>
 					<td valign="top" valign="top"><label for="id_default_tester">Default Tester</label></td>
 					<td>{{ form.default_tester }} <div class="errors">{{ form.default_tester.errors }}</div></td>
+				</tr>
+				<tr>
+					<td valign="top" valign="top"><label for="auto_update_run_status">Set Status Automatically</label></td>
+					<td>{{ form.auto_update_run_status }} <span class="system_help">{{ form.auto_update_run_status.help_text }}</span></td>
 				</tr>
 				<tr>
 					<td valign="top" valign="top"><label class="strong" for="id_estimated_time">Estimated Time</label></td>
@@ -115,7 +119,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 						<div class="system_help">
 							
                             <p>
-                            Environment group must be set for this test plan (<b>{{ test_plan.product.name }}</b>:<b>{{ test_plan.default_product_version }}</b>:<b><a href="{% url tcms.apps.testplans.views.get test_plan.plan_id %}">{{ test_plan }}</a></b>) before you will be able to select environments for this test run.If you do not have permission to edit this plan, please contact the author of this plan, mailto <a href="mailto:{{ test_plan.author.email }}">{{ test_plan.author.email }}</a>
+                            Environment group must be set for this test plan (<b>{{ test_plan.product.name }}</b>:<b>{{ test_plan.default_product_version }}</b>:<b><a href="{{ test_plan.get_absolute_url }}">{{ test_plan }}</a></b>) before you will be able to select environments for this test run.If you do not have permission to edit this plan, please contact the author of this plan, mailto <a href="mailto:{{ test_plan.author.email }}">{{ test_plan.author.email }}</a>
                             
                             </p>
 						</div>
@@ -128,7 +132,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 				<input type="button" name="cancel" value="cancel" onclick="history.go(-1);">
 			</div>
 		</div>
-	</div>
 	{% if test_cases %}
 	<input type="hidden" name="testcases" value="testcases" />
 	<div class="Detailform border-1" id="testcases_selected">
@@ -144,7 +147,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 			<table id="testcases" class="list" cellpadding="0" cellspacing="0" border="0" >
 				<thead>
 					<tr>
-						<th align="left" width="4%"	></th>
 						<th  class="sortcol widthID" align="left" width="4%" >ID</th>
 						<th  class="sortcol" align="left" width="26%" >Test Case Summary</th>
 						<th class="sortcol" align="left" width="20%">Author</th>
@@ -157,11 +159,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 				<tbody>
 					{% for test_case in test_cases %}
 					<tr class="{% cycle 'odd' 'even' %}" id="row_{{ forloop.counter }}" >
-						<td >
-							<a id="blind_link_{{ forloop.counter }}" class="blind_link" href="javascript:toggleTestCaseContents('{{ forloop.counter }}')">
-								<img id="blind_icon_{{ forloop.counter }}" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
-							</a>
-						</td>
 						<td >
 							<a href="/case/{{ test_case.case_id }}/">{{ test_case.case_id }}</a>
 							{% if test_case.case_status.is_confirmed %}
@@ -185,64 +182,6 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 							</a>
 						</td>
 					</tr>
-					<tr id="hidenRow_{{ forloop.counter }}" class="Detailform border-1 hide" style="display: none;">
-						<td colspan="9" valign="top">
-							<table class="case_detail">
-								<tr>
-									<td>
-										<h4>Setup:</h4>
-										<div class="content">{{ test_case.latest_text.setup|safe }}</div>
-									</td>
-									<td class="">
-										<h4>Breakdown:</h4>
-										<div class="content">{{ test_case.latest_text.breakdown|safe }}</div>
-									</td>
-                                    <td rowspan="2" width="200" valign="top">
-								<h4><span class="title strong">Attachment:</span></h4>
-								<ul class="ul-no-format">
-									{% for attachment_file in testcase.attachment.all %}
-									<li>
-										<a href="{% url tcms.core.files.check_file attachment_file.attachment_id %}">
-											{{ attachment_file.file_name }}
-										</a>
-									</li>
-                                    {% empty %}
-									<li class="grey">No attachment found</li>
-									{% endfor %}
-								</ul>
-								<h4 class="title strong">Component:</h4>
-								<ul class="ul-no-format">
-									{% for component in test_case.case.component.all %}
-									<li id="display_component" >{{ component.name }}</li>
-                                    {% empty %}
-									<li class="grey">No component found</li>
-									{% endfor %}
-								</ul>
-								<h4><span class="title strong">Tag:</span></h4>
-								<ul class="ul-no-format">
-								{% for tag in test_case.tag.all %}
-									<li>{{ tag }}</li>
-								{% empty %}
-									<li class="grey">No tag found</li>
-                                 {% endfor %}
-								</ul>
-								
-							</td>
-								</tr>
-								<tr>
-									<td class="">
-										<h4>Actions:</h4>
-										<div class="content">{{ test_case.latest_text.action|safe }}</div>
-									</td>
-									<td class="">
-										<h4>Expected Results:</h4>
-										<div class="content">{{ test_case.latest_text.effect|safe }}</div>
-									</td>
-								</tr>
-							</table>
-							
-						</td>
-					</tr>
 					{% endfor %}
 				</tbody>
 			</table>
@@ -250,7 +189,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 			<span class="prompt-message">
 				<center>
 					No testcase in this testrun , you may 
-					<a href="{% url tcms.apps.testplans.views.get test_plan.plan_id %}">
+					<a href="{{ test_plan.get_absolute_url }}">
 						<strong>Select Cases </strong>
 					</a>
 					from test plan.
@@ -264,4 +203,5 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 			{% endif %}
 		</div>
 	</form>
-	{% endblock %}
+</div>
+{% endblock %}

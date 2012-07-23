@@ -18,6 +18,8 @@
 
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
 from tcms.apps.testplans.models import TestPlan, TestPlanType
+from tcms.apps.management.models import TestTag
+from django.core.exceptions import ObjectDoesNotExist
 from utils import pre_process_ids
 
 __all__ = (
@@ -41,6 +43,7 @@ __all__ = (
     'remove_tag',
     'store_text',
     'update',
+    'import_case_via_XML',
 )
 
 @log_call
@@ -66,7 +69,6 @@ def add_tag(request, plan_ids, tags):
     # Add tag list ['foo', 'bar'] to plan list [12345, 67890] with String
     >>> TestPlan.add_tag('12345, 67890', 'foo, bar')
     """
-    from tcms.apps.management.models import TestTag
     tps = TestPlan.objects.filter(
         plan_id__in = pre_process_ids(value = plan_ids)
     )
@@ -219,8 +221,16 @@ def get(request, plan_id):
         tp = TestPlan.objects.get(plan_id = plan_id)
     except TestPlan.DoesNotExist, error:
         return error
-
-    return tp.serialize()
+    response = tp.serialize()
+    #get the xmlrpc tags
+    tag_ids = tp.tag.values_list('id', flat=True)
+    query = {'id__in': tag_ids}
+    tags = TestTag.to_xmlrpc(query)
+    #cut 'id' attribute off, only leave 'name' here
+    tags_without_id = map(lambda x:x["name"], tags)
+    #replace tag_id list in the serialize return data
+    response["tag"] = tags_without_id
+    return response
 
 def get_change_history(request, plan_id):
     """
@@ -281,7 +291,6 @@ def get_tags(request, plan_id):
     Example:
     >>> TestPlan.get_tags(137)
     """
-    from tcms.apps.management.models import TestTag
     try:
         tp = TestPlan.objects.get(plan_id = plan_id)
     except:
@@ -302,7 +311,6 @@ def get_all_cases_tags(request, plan_id):
     Example:
     >>> TestPlan.get_all_cases_tags(137)
     """
-    from tcms.apps.management.models import TestTag
     try:
         tp = TestPlan.objects.get(plan_id = plan_id)
     except:
@@ -328,8 +336,12 @@ def get_test_cases(request, plan_id):
     >>> TestPlan.get_test_cases(137)
     """
     from tcms.apps.testcases.models import TestCase
-    query = {'plan': plan_id}
-    return TestCase.to_xmlrpc(query)
+    from tcms.apps.testplans.models import TestPlan
+    from tcms.core.utils.xmlrpc import XMLRPCSerializer
+
+    tp = TestPlan.objects.get(pk=plan_id)
+    tcs = TestCase.objects.filter(plan=tp).order_by('testcaseplan__sortkey')
+    return XMLRPCSerializer(tcs).serialize_queryset()
 
 def get_test_runs(request, plan_id):
     """
@@ -457,24 +469,24 @@ def update(request, plan_ids, values):
     Params:      $plan_ids - Integer: A single TestPlan ID.
 
                  $values - Hash of keys matching TestPlan fields and the new values
-                            to set each field to.
-                 +-------------------------+----------------+
-                 | Field                   | Type           |
-                 +-------------------------+----------------+
-                 | name                    | String         |
-                 | type                    | Integer        |
-                 | product                 | Integer        |
-                 | default_product_version | Integer        |
-                 | parent                  | Integer        |
-                 | is_active               | Boolean        |
-                 | env_group               | Integer        |
-                 +-------------------------+----------------+
+                           to set each field to.
+       +------------------------+----------------+------------------------------------+
+      | Field                   | Type           | Description                        |
+      +-------------------------+----------------+------------------------------------+
+      | product                 | Integer        | ID of product                      |
+      | name                    | String         |                                    |
+      | type                    | Integer        | ID of plan type                    |
+      | default_product_version | Integer        |                                    |
+      | parent                  | Integer        | Parent plan ID                     |
+      | is_active               | Boolean        | 0: Archived 1: Active (Default 0)  |
+      | env_group               | Integer        |                                    |
+      +-------------------------+----------------+------------------------------------+
 
     Returns:     Hash: The updated test plan object.
 
     Example:
     # Update product to 61 for plan 207 and 208
-    >>> TestCase.update([207, 208], {'product': 61})
+    >>> TestPlan.update([207, 208], {'product': 61})
     """
     from tcms.core import forms
     from tcms.apps.testplans.forms import XMLRPCEditPlanForm
@@ -516,3 +528,206 @@ def update(request, plan_ids, values):
 
     query = {'pk__in': tps.values_list('pk', flat = True)}
     return TestPlan.to_xmlrpc(query)
+
+def import_case_via_XML(request, plan_id, values):
+    """
+    Description: Add cases to plan via XML file
+
+    Params:      $plan_id - Integer: A single TestPlan ID.
+
+                 $values - String: String which read from XML file object.
+
+    Returns:     String: Success update cases
+
+    Example:
+    # Update product to 61 for plan 207 and 208
+    >>> fb = open('tcms.xml', 'rb')
+    >>> TestPlan.import_case_via_XML(3798, fb.read())
+    """
+    from tcms.apps.testplans.models import TestPlan
+    from tcms.apps.testcases.models import TestCase, TestCasePlan, \
+            TestCaseCategory
+
+    try:
+        tp = TestPlan.objects.get(pk=plan_id)
+    except ObjectDoesNotExist:
+        raise
+
+    try:
+        new_case_from_xml = clean_xml_file(values)
+    except Exception, error:
+        return "Invalid XML File"
+
+    i = 0
+    for case in new_case_from_xml:
+        i += 1
+        # Get the case category from the case and related to the product of the plan
+        try:
+            category = TestCaseCategory.objects.get(
+                product = tp.product, name = case['category_name']
+            )
+        except TestCaseCategory.DoesNotExist:
+            category = TestCaseCategory.objects.create(
+                product = tp.product, name = case['category_name']
+            )
+        # Start to create the objects
+        tc = TestCase.objects.create(
+            is_automated=case['is_automated'],
+            script=None,
+            arguments=None,
+            summary=case['summary'],
+            requirement=None,
+            alias=None,
+            estimated_time='0:0:0',
+            case_status_id=case['case_status_id'],
+            category_id=category.id,
+            priority_id=case['priority_id'],
+            author_id=case['author_id'],
+            default_tester_id=case['default_tester_id'],
+            notes=case['notes'],
+        )
+        TestCasePlan.objects.create(plan=tp, case=tc, sortkey=i*10)
+
+        tc.add_text(case_text_version=1,
+                    author=case['author'],
+                    action=case['action'],
+                    effect=case['effect'],
+                    setup=case['setup'],
+                    breakdown=case['breakdown'],)
+
+        #handle tags
+        if case['tags']:
+            for tag in case['tags']:
+                tc.add_tag(tag=tag)
+
+        tc.add_to_plan(plan=tp)
+    return "Success update %d cases" % (i, )
+
+def clean_xml_file(xml_file):
+    from django.conf import settings
+    from tcms.core.lib.xml2dict.xml2dict import XML2Dict
+
+    xml_file = xml_file.replace('\n', '')
+    xml_file = xml_file.replace('&testopia_', '&')
+
+    try:
+        xml = XML2Dict()
+        xml_data = xml.fromstring(xml_file)
+        if not xml_data['testopia'].get('version') != settings.TESTOPIA_XML_VERSION:
+            raise
+        if xml_data.get('testopia') and xml_data['testopia'].get('testcase'):
+            new_case_from_xml = []
+            if isinstance(xml_data['testopia']['testcase'], list):
+                for case in xml_data['testopia']['testcase']:
+                    new_case_from_xml.append(process_case(case))
+            elif isinstance(xml_data['testopia']['testcase'], dict):
+                new_case_from_xml.append(process_case(xml_data['testopia']['testcase']))
+            else:
+                raise
+        else:
+            raise
+    except Exception, error:
+        raise
+    return new_case_from_xml
+
+def process_case(case):
+    from django.contrib.auth.models import User
+    from tcms.apps.management.models import Priority
+    from tcms.apps.testcases.models import TestCaseStatus
+
+    # Check author
+    element = 'author'
+    if case.get(element, {}).get('value'):
+        try:
+            author = User.objects.get(email = case[element]['value'])
+            author_id = author.id
+        except User.DoesNotExist:
+            raise
+    else:
+        raise
+
+    # Check default tester
+    element = 'defaulttester'
+    if case.get(element, {}).get('value'):
+        try:
+            default_tester = User.objects.get(email=case[element]['value'])
+            default_tester_id = default_tester.id
+        except User.DoesNotExist:
+            raise
+    else:
+        default_tester_id = None
+
+    # Check priority
+    element = 'priority'
+    if case.get(element, {}).get('value'):
+        try:
+            priority = Priority.objects.get(value=case[element]['value'])
+            priority_id = priority.id
+        except Priority.DoesNotExist:
+            raise
+    else:
+        raise
+
+    # Check automated status
+    element = 'automated'
+    if case.get(element, {}).get('value'):
+        is_automated = case[element]['value'] == 'Automatic' and True or False
+    else:
+        is_automated = False
+
+    # Check status
+    element = 'status'
+    if case.get(element, {}).get('value'):
+        try:
+            case_status = TestCaseStatus.objects.get(name = case[element]['value'])
+            case_status_id = case_status.id
+        except TestCaseStatus.DoesNotExist:
+            raise
+    else:
+        raise
+
+    # Check category
+    # *** Ugly code here ***
+    # There is a bug in the XML file, the category is related to product.
+    # But unfortunate it did not defined product in the XML file.
+    # So we have to define the category_name at the moment then get the product from the plan.
+    # If we did not found the category of the product we will create one.
+    element = 'categoryname'
+    if case.get(element, {}).get('value'):
+        category_name = case[element]['value']
+    else:
+        raise
+
+    # Check or create the tag
+    element = 'tag'
+    if case.get(element, {}):
+        tags = []
+        if isinstance(case[element], dict):
+            tag, create = TestTag.objects.get_or_create(name=case[element]['value'])
+            tags.append(tag)
+
+        if isinstance(case[element], list):
+            for tag_name in case[element]:
+                tag, create = TestTag.objects.get_or_create(name=tag_name['value'])
+                tags.append(tag)
+    else:
+        tags = None
+
+    new_case = {
+        'summary': case.get('summary', {}).get('value', ''),
+        'author_id': author_id,
+        'author': author,
+        'default_tester_id': default_tester_id,
+        'priority_id': priority_id,
+        'is_automated': is_automated,
+        'case_status_id': case_status_id,
+        'category_name': category_name,
+        'notes': case.get('notes', {}).get('value', ''),
+        'action': case.get('action', {}).get('value', ''),
+        'effect': case.get('expectedresults', {}).get('value', ''),
+        'setup': case.get('setup', {}).get('value', ''),
+        'breakdown': case.get('breakdown', {}).get('value', ''),
+        'tags': tags,
+    }
+
+    return new_case

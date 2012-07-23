@@ -26,6 +26,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.utils import simplejson
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
+from django.template import RequestContext
 
 from tcms.core import forms
 from tcms.core.views import Prompt
@@ -42,7 +44,8 @@ from tcms.apps.management.models import Priority, TestTag
 
 from tcms.apps.testcases.forms import CaseAutomatedForm, NewCaseForm, \
         SearchCaseForm, CaseFilterForm, EditCaseForm, CaseNotifyForm, \
-        CloneCaseForm, CaseComponentForm, CaseCategoryForm, CaseBugForm
+        CloneCaseForm, CaseComponentForm, CaseCategoryForm, CaseBugForm, \
+        CaseTagForm
 from tcms.apps.testplans.forms import SearchPlanForm
 
 from fields import CC_LIST_DEFAULT_DELIMITER
@@ -65,18 +68,20 @@ def plan_from_request_or_none(request):
 def update_case_email_settings(tc, n_form):
     """Update testcase's email settings."""
 
+    tc.emailing.notify_on_case_update = n_form.cleaned_data[
+        'notify_on_case_update']
+    tc.emailing.notify_on_case_delete = n_form.cleaned_data[
+        'notify_on_case_delete']
+    tc.emailing.auto_to_case_author = n_form.cleaned_data[
+        'author']
+    tc.emailing.auto_to_case_tester = n_form.cleaned_data[
+        'default_tester_of_case']
     tc.emailing.auto_to_run_manager = n_form.cleaned_data[
         'managers_of_runs']
     tc.emailing.auto_to_run_tester = n_form.cleaned_data[
         'default_testers_of_runs']
     tc.emailing.auto_to_case_run_assignee = n_form.cleaned_data[
         'assignees_of_case_runs']
-    tc.emailing.auto_to_case_author = n_form.cleaned_data[
-        'author']
-    tc.emailing.notify_on_case_update = n_form.cleaned_data[
-        'notify_on_case_update']
-    tc.emailing.notify_on_case_delete = n_form.cleaned_data[
-        'notify_on_case_delete']
     tc.emailing.save()
 
     default_tester = n_form.cleaned_data['default_tester_of_case']
@@ -320,12 +325,11 @@ def all(request, template_name="case/all.html"):
                              'case_status',
                              'priority',
                              'category')
-
     tcs = tcs.extra(select={'num_bug': RawSQL.num_case_bugs,})
     tcs = tcs.distinct()
     tcs = order_case_queryset(tcs, order_by, asc)
     # default sorted by sortkey
-    tcs = tcs.order_by('testcaseplan__sortkey')
+    #tcs = tcs.order_by('testcaseplan__sortkey')
     # Resort the order
     # if sorted by 'sortkey'(foreign key field)
     case_sort_by = request.REQUEST.get('case_sort_by')
@@ -344,13 +348,14 @@ def all(request, template_name="case/all.html"):
         selected_case_ids = tcs.values_list('pk', flat=True)
 
     # Get the tags own by the cases
-    ttags = TestTag.objects.filter(testcase__in=tcs).distinct()
+    ttags = TestTag.objects.filter(testcase__in=tcs).order_by('name').distinct()
     # generating a query_url with order options
     query_url = remove_from_request_path(request, 'order_by')
     if asc:
-        query_url = remove_from_request_path(request, 'asc')
+        query_url = remove_from_request_path(query_url, 'asc')
     else:
         query_url = '%s&asc=True' % query_url
+
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'test_cases': tcs,
@@ -362,6 +367,126 @@ def all(request, template_name="case/all.html"):
         'case_own_tags': ttags,
         'query_url': query_url,
     })
+
+def ajax_search(request, template_name='case/common/json_cases.txt'):
+    """Generate the case list in search case and case zone in plan
+    """
+    SearchForm = SearchCaseForm
+
+    tp = plan_from_request_or_none(request)
+    # Initial the form and template
+    if request.REQUEST.get('a') in ('search', 'sort'):
+        search_form = SearchForm(request.REQUEST)
+    else:
+        # Hacking for case plan
+        confirmed_status_name = 'CONFIRMED'
+        # 'c' is meaning component
+        if request.REQUEST.get('template_type') == 'case':
+            d_status = TestCaseStatus.objects.filter(name=confirmed_status_name)
+        elif request.REQUEST.get('template_type') == 'review_case':
+            d_status = TestCaseStatus.objects.exclude(name=confirmed_status_name)
+        else:
+            d_status = TestCaseStatus.objects.all()
+
+        d_status_ids = d_status.values_list('pk', flat=True)
+
+        search_form = SearchForm(initial={'case_status': d_status_ids})
+
+    # Populate the form
+    if request.REQUEST.get('product'):
+        search_form.populate(product_id=request.REQUEST['product'])
+    elif tp and tp.product_id:
+        search_form.populate(product_id=tp.product_id)
+    else:
+        search_form.populate()
+
+    # Query the database when search
+    if request.REQUEST.get('a') in ('search', 'sort') and search_form.is_valid():
+        tcs = TestCase.list(search_form.cleaned_data)
+    elif request.REQUEST.get('a') == 'initial':
+        tcs = TestCase.objects.filter(case_status__in=d_status)
+    else:
+        tcs = TestCase.objects.none()
+
+    # Search the relationship
+    if tp:
+        tcs = tcs.filter(plan=tp)
+
+    tcs = tcs.select_related('author',
+                             'default_tester',
+                             'case_status',
+                             'priority',
+                             'category')
+    tcs = tcs.extra(select={'num_bug': RawSQL.num_case_bugs,})
+
+    #columnIndexNameMap is required for correct sorting behavior, 5 should be product, but we use run.build.product
+    columnIndexNameMap = { 0: '', 1: '', 2: 'case_id', 3: 'summary', 4: 'author__username',
+                          5: 'default_tester__username', 6: 'is_automated', 7: 'case_status__name', 8: 'category__name',
+                          9: 'priority__value', 10: 'create_date'}
+    return ajax_response(request, tcs, tp, columnIndexNameMap, jsonTemplatePath='case/common/json_cases.txt')
+
+def ajax_response(request, querySet, testplan, columnIndexNameMap, jsonTemplatePath='case/common/json_cases.txt', *args):
+    """
+    json template for the ajax request for searching.
+    """
+    cols = int(request.GET.get('iColumns',0)) # Get the number of columns
+    iDisplayLength =  min(int(request.GET.get('iDisplayLength',20)),100)     #Safety measure. If someone messes with iDisplayLength manually, we clip it to the max value of 100.
+    startRecord = int(request.GET.get('iDisplayStart',0)) # Where the data starts from (page)
+    endRecord = startRecord + iDisplayLength  # where the data ends (end of page)
+
+    # Pass sColumns
+    keys = columnIndexNameMap.keys()
+    keys.sort()
+    colitems = [columnIndexNameMap[key] for key in keys]
+    sColumns = ",".join(map(str,colitems))
+
+    # Ordering data
+    iSortingCols =  int(request.GET.get('iSortingCols',0))
+    asortingCols = []
+
+    if iSortingCols:
+        for sortedColIndex in range(0, iSortingCols):
+            sortedColID = int(request.GET.get('iSortCol_'+str(sortedColIndex),0))
+            if request.GET.get('bSortable_%s'%sortedColID, 'false')  == 'true':  # make sure the column is sortable first
+                sortedColName = columnIndexNameMap[sortedColID]
+                sortingDirection = request.GET.get('sSortDir_'+str(sortedColIndex), 'asc')
+                if sortingDirection == 'desc':
+                    sortedColName = '-'+sortedColName
+                asortingCols.append(sortedColName)
+        if len(asortingCols):
+            querySet = querySet.order_by(*asortingCols)
+
+    iTotalRecords = iTotalDisplayRecords = querySet.count() #count how many records match the final criteria
+    #get the slice
+    querySet = querySet[startRecord:endRecord]
+
+    sEcho = int(request.GET.get('sEcho',0)) # required echo response
+
+    if jsonTemplatePath:
+        try:
+            jsonString = render_to_string(jsonTemplatePath, locals(), context_instance=RequestContext(request)) #prepare the JSON with the response, consider using : from django.template.defaultfilters import escapejs
+            response = HttpResponse(jsonString, mimetype="application/javascript")
+        except Exception, e:
+            print e
+    else:
+        aaData = []
+        a = querySet.values()
+        for row in a:
+            rowkeys = row.keys()
+            rowvalues = row.values()
+            rowlist = []
+            for col in range(0,len(colitems)):
+                for idx, val in enumerate(rowkeys):
+                    if val == colitems[col]:
+                        rowlist.append(str(rowvalues[idx]))
+            aaData.append(rowlist)
+            response_dict = {}
+            response_dict.update({'aaData':aaData})
+            response_dict.update({'sEcho': sEcho, 'iTotalRecords': iTotalRecords, 'iTotalDisplayRecords':iTotalDisplayRecords, 'sColumns':sColumns})
+            response =  HttpResponse(simplejson.dumps(response_dict), mimetype='application/javascript')
+#    prevent from caching datatables result
+#    add_never_cache_headers(response)
+    return response
 
 def get(request, case_id, template_name='case/get.html'):
     """Get the case content"""
@@ -405,7 +530,6 @@ def get(request, case_id, template_name='case/get.html'):
             'run__summary', 'tested_by',
             'assignee', 'case__category__name',
             'case__priority__name', 'case_run_status__name').all()
-
     tcrs = tcrs.extra(select={
         'num_bug': RawSQL.num_case_run_bugs,
     }).order_by('run__plan')
@@ -413,22 +537,34 @@ def get(request, case_id, template_name='case/get.html'):
     # FIXME: Just don't know why Django template does not evaluate a generator,
     # and had to evaluate the groupby generator manually like below.
     runs_ordered_by_plan = [(k, list(v)) for k, v in runs_ordered_by_plan]
+    case_run_plans = [k for k, v in runs_ordered_by_plan]
     # Get the specific test case run
     if request.REQUEST.get('case_run_id'):
         tcr = tcrs.get(pk=request.REQUEST['case_run_id'])
     else:
         tcr = None
+    case_run_plan_id = request.REQUEST.get('case_run_plan_id', None)
+    if case_run_plan_id:
+        for item in runs_ordered_by_plan:
+            if item[0].pk == long(case_run_plan_id):
+                case_runs_by_plan = item[1]
+                break
+            else:
+                continue
+    else:
+        case_runs_by_plan = None
 
     # Get the case texts
     tc_text = tc.get_text_with_version(request.REQUEST.get('case_text_version'))
-
     # Switch the templates for different module
     template_types = {
             'case': 'case/get_details.html',
             'review_case': 'case/get_details_review.html',
             'case_run': 'case/get_details_case_run.html',
+            'case_run_list': 'case/get_case_runs_by_plan.html',
             'case_case_run': 'case/get_details_case_case_run.html',
-            'execute_case_run': 'run/execute_case_run.html',}
+            'execute_case_run': 'run/execute_case_run.html',
+            }
 
     if request.REQUEST.get('template_type'):
         template_name = template_types.get(
@@ -442,7 +578,8 @@ def get(request, case_id, template_name='case/get.html'):
         'test_plan': tp,
         'test_plans': tps,
         'test_case_runs': tcrs,
-        'runs_ordered_by_plan': runs_ordered_by_plan,
+        'case_run_plans' : case_run_plans,
+        'test_case_runs_by_plan': case_runs_by_plan,
         'test_case_run': tcr,
         'grouped_case_bugs': grouped_case_bugs,
         'test_case_text': tc_text,
@@ -527,6 +664,7 @@ def update_testcase(request, tc, tc_form):
               'is_automated_proposed',
               'script',
               'arguments',
+              'extra_link',
               'requirement',
               'alias']
 
@@ -614,8 +752,12 @@ def edit(request, case_id, template_name='case/edit.html'):
                 if not tp:
                     raise Http404
 
-                # Exclude the disabled cases
-                pk_list = tp.case.exclude(case_status__name='DISABLED')
+                #find out test case list which belong to the same classification
+                confirm_status_name = 'CONFIRMED'
+                if tc.case_status.name == confirm_status_name:
+                    pk_list = tp.case.filter(case_status__name=confirm_status_name)
+                else:
+                    pk_list = tp.case.exclude(case_status__name=confirm_status_name)
                 pk_list = pk_list.defer('case_id').values_list('pk', flat=True)
 
                 # Get the previous and next case
@@ -624,6 +766,19 @@ def edit(request, case_id, template_name='case/edit.html'):
                     reverse('tcms.apps.testcases.views.edit', args=[n_tc.pk, ]),
                     tp.pk,
                 ))
+
+            if request.REQUEST.get('_returntoplan'):
+                if not tp:
+                    raise Http404
+                confirm_status_name = 'CONFIRMED'
+                if tc.case_status.name == confirm_status_name:
+                    return HttpResponseRedirect('%s#testcases' % (
+                        reverse('tcms.apps.testplans.views.get', args=[tp.pk, ]),
+                    ))
+                else:
+                    return HttpResponseRedirect('%s#reviewcases' % (
+                        reverse('tcms.apps.testplans.views.get', args=[tp.pk, ]),
+                    ))
 
             return HttpResponseRedirect('%s?from_plan=%s' % (
                 reverse('tcms.apps.testcases.views.get', args=[case_id, ]),
@@ -634,8 +789,8 @@ def edit(request, case_id, template_name='case/edit.html'):
         tctxt = tc.latest_text()
         # Notification form initial
         n_form = CaseNotifyForm(initial= {
-            'notify_on_case_delete': tc.emailing.notify_on_case_delete,
             'notify_on_case_update': tc.emailing.notify_on_case_update,
+            'notify_on_case_delete': tc.emailing.notify_on_case_delete,
             'author': tc.emailing.auto_to_case_author,
             'default_tester_of_case': tc.emailing.auto_to_case_tester,
             'managers_of_runs': tc.emailing.auto_to_run_manager,
@@ -651,6 +806,7 @@ def edit(request, case_id, template_name='case/edit.html'):
             'is_automated_proposed': tc.is_automated_proposed,
             'script': tc.script,
             'arguments': tc.arguments,
+            'extra_link': tc.extra_link,
             'alias': tc.alias,
             'case_status': tc.case_status_id,
             'priority': tc.priority_id,
@@ -724,11 +880,12 @@ def clone(request, template_name='case/clone.html'):
                         is_automated_proposed = tc_src.is_automated_proposed,
                         script = tc_src.script,
                         arguments = tc_src.arguments,
+                        extra_link = tc_src.extra_link,
                         summary = tc_src.summary,
                         requirement = tc_src.requirement,
                         alias = tc_src.alias,
                         estimated_time = tc_src.estimated_time,
-                        case_status = tc_src.case_status,
+                        case_status = TestCaseStatus.get_PROPOSED(),
                         category = tc_src.category,
                         priority = tc_src.priority,
                         notes = tc_src.notes,
@@ -869,13 +1026,43 @@ def clone(request, template_name='case/clone.html'):
         search_plan_form = SearchPlanForm(initial={'product': tp.product_id, 'is_active': True})
         search_plan_form.populate(product_id=tp.product_id)
 
+    submit_action = request.REQUEST.get('submit', None)
     return direct_to_template(request, template_name, {
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_plan': tp,
         'search_form': search_plan_form,
         'clone_form': clone_form,
+        'submit_action': submit_action,
     })
+def tag(request):
+    """
+    Management test case tags
+    """
+    ajax_response = {'rc': 0, 'response': 'ok', 'errors_list':[]}
+    tcs = TestCase.objects.filter(pk__in=request.REQUEST.getlist('case'))
+    if not tcs:
+        raise Http404
+
+    if request.REQUEST.get('a'):
+        case_ids = request.POST.getlist('case')
+        tag_ids = request.POST.getlist('o_tag')
+        tcs = TestCase.objects.filter(pk__in=case_ids)
+        tags = TestTag.objects.filter(pk__in=tag_ids)
+        for tc in tcs:
+            for tag in tags:
+                try:
+                    tc.remove_tag(tag=tag)
+                except:
+                    ajax_response = ajax_response['errors_list'].append({
+                            'case': tc.pk,
+                            'component': t.pk
+                    })
+                    return HttpResponse(simplejson.dumps(ajax_response))
+        return HttpResponse(simplejson.dumps(ajax_response))
+    form = CaseTagForm(initial={'tag': request.REQUEST.get('o_tag')})
+    form.populate(case_ids=tcs)
+    return HttpResponse(form.as_p())
 
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasecomponent'))
 def component(request):

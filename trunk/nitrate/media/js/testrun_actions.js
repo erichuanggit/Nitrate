@@ -8,6 +8,7 @@ Nitrate.TestRuns.Clone = {};
 Nitrate.TestRuns.ChooseRuns = {};
 Nitrate.TestRuns.AssignCase = {}
 
+
 Nitrate.TestRuns.List.on_load = function()
 {
     bind_version_selector_to_product(true, $('id_product'));
@@ -55,7 +56,32 @@ Nitrate.TestRuns.List.on_load = function()
             };
         });
     };
-	
+
+    var oTable;
+    oTable = jQ('#testruns_table').dataTable({
+        "iDisplayLength": 20,
+        "sPaginationType": "full_numbers",
+        "bFilter": false,
+        "bLengthChange": false,
+        "aaSorting": [[ 1, "desc" ]],
+        "bProcessing": true,
+        "bServerSide": true,
+        "sAjaxSource": "/runs/ajax/"+this.window.location.search,
+        "aoColumns": [
+          {"bSortable": false },
+          null,
+          {"sType": "html"},
+          {"sType": "html"},
+          {"sType": "html"},
+          {"bVisible": false},
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+        ]
+        });
 }
 
 Nitrate.TestRuns.Details.on_load = function()
@@ -203,6 +229,15 @@ Nitrate.TestRuns.Edit.on_load = function()
 {
     bind_version_selector_to_product(false);
     bind_build_selector_to_product(false);
+    $('id_auto_update_run_status').observe('click', function(){
+        if ($('id_auto_update_run_status').checked == true){
+            $('id_finished').checked = false;
+            $('id_finished').disable();
+        }else{
+            if ($('id_finished').disabled == true)
+                $('id_finished').enable();
+        }
+    })
 }
 
 Nitrate.TestRuns.Execute.on_load = function()
@@ -887,7 +922,7 @@ function changeCaseRunAssignee()
     
     var parameters = {
           'info_type': 'users',
-          'email__startswith': p,
+          'username': p,
     }
     getInfoAndUpdateObject(
         parameters,

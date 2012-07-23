@@ -53,22 +53,15 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomSearch.on_load);
 					<input type="hidden" name="build_id" value="{{ build.pk }}" />
 					{% if build.plans_count %}<a class="build_link"  href="{% url tcms.report.views.custom_details %}" >{% endif %}{{ build }}</a>
 				</td>
-				<td valign="top">
-                {% if build.plans_count %}
-                {{ build.plans_count }}
-                {% else %}
-                0
-                {% endif %}
-                
-                </td>
+				<td valign="top">{{ build.plans_count|default_if_none:0 }}</td>
 				<td valign="top">
                 {% if build.runs_count %}
                 <a href="{% url tcms.apps.testruns.views.all %}?product={{ build.product.pk }}&build={{ build.pk }}&product_version={{ REQUEST_CONTENTS.build_run__product_version }}">{{ build.runs_count }}</a>
                 {% else %}
-                {{ build.runs_count }}
+                {{ build.runs_count|default_if_none:0 }}
                 {% endif %}
                 </td>
-				<td valign="top">{{ build.case_runs_count }}</td>
+				<td valign="top">{{ build.case_runs_count|default_if_none:0 }}</td>
 				<td valign="top">
 				<div class="progress-bar">
 					<div class="progress-inner" style="background-position:0px 0px; width:100%;">

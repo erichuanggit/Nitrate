@@ -88,7 +88,13 @@ Nitrate.TestPlans.Instance = {
 			</div>-->
 			<div class="listinfo">
 				<div class="title grey">Owner&nbsp;:</div>
-				<div id="display_author"  class="name" ><a href="{% url tcms.apps.profiles.views.profile test_plan.owner.username|default:"unknown" %}">{{ test_plan.owner }}</a></div>
+				<div id="display_author"  class="name" >
+				{% if test_plan.owner %}
+				<a href="{% url tcms.apps.profiles.views.profile test_plan.owner.username|default:"unknown" %}">{{ test_plan.owner }}</a>
+				{% else %}
+				{{ test_plan.owner }}
+				{% endif %}
+				</div>
 			</div>
 			<div class="listinfo">
 				<div class="title grey">Product&nbsp;:</div>
@@ -136,7 +142,7 @@ Nitrate.TestPlans.Instance = {
 				<div class="title grey">Parent&nbsp;:</div>
 				<div class="name ">
 				{% if test_plan.parent.pk %}
-					<a href="{% url tcms.apps.testplans.views.get test_plan.parent.pk %}">{{ test_plan.parent.pk }}</a>
+					<a href="{{ test_plan.get_absolute_url }}">{{ test_plan.parent.pk }}</a>
 				{% else %}				
 					None
 				{% endif %}				
@@ -152,24 +158,24 @@ Nitrate.TestPlans.Instance = {
 					<a href="#document" title="document">Document</a>
 				</li>
 				<li id="tab_testcases" class="tab tab_focus">
-					<a href="#testcases" title="testcases">Cases ({{ test_plan.run_case.count }}/{{ test_plan.case.count }})</a>
+					<a href="#testcases" title="testcases">Cases (<span id='run_case_count'>{{ test_plan.run_case.count }}</span>/<span id='case_count'>{{ test_plan.case.count }}</span>)</a>
 				</li>
 				<li id="tab_reviewcases" class="tab">
-					<a href="#reviewcases" title="reviewcases">Reviewing Cases ({{ test_plan.review_case.count }})</a>
+					<a href="#reviewcases" title="reviewcases">Reviewing Cases (<span id='review_case_count'>{{ test_plan.review_case.count }}</span>)</a>
 				</li>
 				<li id="tab_testruns"  class="tab">
-					<a href="#testruns" title="testruns">Runs ({{ test_plan.run.count }})</a>
+					<a href="#testruns" title="testruns">Runs (<span id='run_count'>{{ test_plan.run.count }}</span>)</a>
 				</li>
 				<li id="tab_components"	 class="tab">
-					<a href="#components" title="components">Default Components ({{ test_plan.component.count }})</a>
+					<a href="#components" title="components">Default Components (<span id='component_count'>{{ test_plan.component.count }}</span>)</a>
 				</li>
 				<li id="tab_attachment" class="tab">
-					<a href="#attachment" title="attachment">Attachments ({{ test_plan.attachment.count }})</a>
+					<a href="#attachment" title="attachment">Attachments (<span id='attachment_count'>{{ test_plan.attachment.count }}</span>)</a>
 				</li>
 				<li id="tab_tag" class="tab">
-					<a href="#tag" title="tag">Tags ({{ test_plan.tag.count }})</a>
+					<a href="#tag" title="tag">Tags (<span id='tag_count'>{{ test_plan.tag.count }}</span>)</a>
 				</li>
-				<li id="tab_tag" class="tab">
+				<li id="tab_log" class="tab">
 					<a href="#log" title="log">Log</a>
 				</li>
 				<li id="tab_treeview" class="tab">

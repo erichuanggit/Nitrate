@@ -20,7 +20,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Clone.on_load);
 		<a href="{% url tcms.core.views.index %}">Home</a>
 		>> <a href="{% url tcms.apps.testplans.views.all %}">Planning</a>
 		{% ifequal testplans|length 1 %}
-		>> <a href="{% url tcms.apps.testplans.views.get testplans.0.plan_id %}">{{ testplans.0.plan_id }}: {{ testplans.0.name }}</a> 
+		>> <a href="{{ testplans.0.get_absolute_url }}">{{ testplans.0.plan_id }}: {{ testplans.0.name }}</a> 
 		>> Clone Plan
 		{% else %}
 		>> Clone plans
@@ -52,7 +52,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Clone.on_load);
 								<span class="lab-50">{{ testplan.plan_id }}</span>
 								<span class="lab-100">{{ testplan.type }}</span>
 								<span>
-									<a href="{% url tcms.apps.testplans.views.get testplan.pk %}" title="{{ testplan.name }} ({{ testplan.author.email }})">
+									<a href="{{ test_plan.get_absolute_url }}" title="{{ testplan.name }} ({{ testplan.author.email }})">
 									 {{ testplan.name }}
 									</a>
 								</span>
@@ -77,6 +77,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestPlans.Clone.on_load);
 					<td><label class="strong">Copy Settings</label> </td>
 					<td>
 						<ul class="ul-no-format">
+							<li>{{ clone_form.set_parent }}{{ clone_form.set_parent.label }} ({{ clone_form.set_parent.help_text }})</li>
 							<li>{{ clone_form.keep_orignal_author }}{{ clone_form.keep_orignal_author.label }} ({{ clone_form.keep_orignal_author.help_text }})</li>
 							<li>{{ clone_form.copy_texts }}{{ clone_form.copy_texts.label }} ({{ clone_form.copy_texts.help_text }})</li>
 							<li>{{ clone_form.copy_attachements }}{{ clone_form.copy_attachements.label }} ({{ clone_form.copy_attachements.help_text }})</li>

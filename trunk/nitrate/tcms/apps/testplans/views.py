@@ -19,7 +19,7 @@
 import datetime
 import urllib
 
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponsePermanentRedirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.views.generic.simple import direct_to_template
@@ -28,6 +28,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.simplejson import dumps as json_dumps
 from django.shortcuts import get_object_or_404
 from django.core import serializers
+from django.template.defaultfilters import slugify
+from django.template.loader import render_to_string
+from django.template import RequestContext
+from django.conf import settings
 
 from tcms.core.views import Prompt
 from tcms.core.utils.raw_sql import RawSQL
@@ -253,9 +257,13 @@ def all(request, template_name='plan/all.html'):
 
     query_url = remove_from_request_path(request, 'order_by')
     if asc:
-        query_url = remove_from_request_path(request, 'asc')
+        query_url = remove_from_request_path(query_url, 'asc')
     else:
         query_url = '%s&asc=True' % query_url
+    page_type = request.REQUEST.get('page_type', 'pagination')
+    query_url_page_type = remove_from_request_path(request, 'page_type')
+    if query_url_page_type:
+        query_url_page_type = remove_from_request_path(query_url_page_type, 'page')
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
@@ -263,10 +271,138 @@ def all(request, template_name='plan/all.html'):
         'query_result' : query_result,
         'search_plan_form' : search_form,
         'query_url': query_url,
+        'query_url_page_type': query_url_page_type,
+        'page_type': page_type
     })
 
+def ajax_search(request, template_name='plan/common/json_plans.txt'):
+    """Display all testplans"""
+    # Define the default sub module
+    SUB_MODULE_NAME = 'plans'
 
-def get(request, plan_id, template_name = 'plan/get.html'):
+    # If it's not a search the page will be blank
+    tps = TestPlan.objects.none()
+    query_result = False
+    # if it's a search request the page will be fill
+    if request.REQUEST.items():
+        search_form = SearchPlanForm(request.REQUEST)
+        if request.REQUEST.get('product'):
+            search_form.populate(product_id=request.REQUEST['product'])
+        else:
+            search_form.populate()
+
+        if search_form.is_valid():
+            # Detemine the query is the user's plans and change the sub module value
+            if request.REQUEST.get('author'):
+                if request.user.is_authenticated():
+                    if request.REQUEST['author'] == request.user.username \
+                    or request.REQUEST['author'] == request.user.email:
+                        SUB_MODULE_NAME = "my_plans"
+
+            query_result = True
+            # build a QuerySet:
+            tps = TestPlan.list(search_form.cleaned_data)
+            tps = tps.select_related('author', 'type', 'product')
+
+            # We want to get the number of cases and runs, without doing
+            # lots of per-test queries.
+            #
+            # Ideally we would get the case/run counts using m2m field tricks
+            # in the ORM
+            # Unfortunately, Django's select_related only works on ForeignKey
+            # relationships, not on ManyToManyField attributes
+            # See http://code.djangoproject.com/ticket/6432
+
+            # SQLAlchemy can handle this kind of thing in several ways.
+            # Unfortunately we're using Django
+
+            # The cleanest way I can find to get it into one query is to
+            # use QuerySet.extra()
+            # See http://docs.djangoproject.com/en/dev/ref/models/querysets
+            tps = tps.extra(select={
+                'num_cases': RawSQL.num_cases,
+                'num_runs': RawSQL.num_runs,
+                'num_children': RawSQL.num_plans,
+            })
+    else:
+        # Set search active plans only by default
+        # I wish to use 'default' argument, as the same as in ModelForm
+        # But it does not seem to work
+        search_form = SearchPlanForm(initial={'is_active': True})
+    #columnIndexNameMap is required for correct sorting behavior, 5 should be product, but we use run.build.product
+    columnIndexNameMap = { 0: '', 1: 'plan_id', 2: 'name', 3: 'author__username', 4: 'owner__username',
+                          5: 'product', 6: 'default_product_version', 7: 'type', 8: 'num_cases',
+                          9: 'num_runs', 10: ''}
+    return ajax_response(request, tps, columnIndexNameMap, jsonTemplatePath='plan/common/json_plans.txt')
+
+def ajax_response(request, querySet, columnIndexNameMap, jsonTemplatePath='plan/common/json_plans.txt', *args):
+    """
+    json template for the ajax request for searching.
+    """
+    cols = int(request.GET.get('iColumns',0)) # Get the number of columns
+    iDisplayLength =  min(int(request.GET.get('iDisplayLength',20)),100)     #Safety measure. If someone messes with iDisplayLength manually, we clip it to the max value of 100.
+    if iDisplayLength == -1:
+        startRecord = 0
+        endRecord = querySet.count()
+    else:
+        startRecord = int(request.GET.get('iDisplayStart',0)) # Where the data starts from (page)
+        endRecord = startRecord + iDisplayLength  # where the data ends (end of page)
+
+    # Pass sColumns
+    keys = columnIndexNameMap.keys()
+    keys.sort()
+    colitems = [columnIndexNameMap[key] for key in keys]
+    sColumns = ",".join(map(str,colitems))
+
+    # Ordering data
+    iSortingCols =  int(request.GET.get('iSortingCols',0))
+    asortingCols = []
+
+    if iSortingCols:
+        for sortedColIndex in range(0, iSortingCols):
+            sortedColID = int(request.GET.get('iSortCol_'+str(sortedColIndex),0))
+            if request.GET.get('bSortable_%s'%sortedColID, 'false')  == 'true':  # make sure the column is sortable first
+                sortedColName = columnIndexNameMap[sortedColID]
+                sortingDirection = request.GET.get('sSortDir_'+str(sortedColIndex), 'asc')
+                if sortingDirection == 'desc':
+                    sortedColName = '-'+sortedColName
+                asortingCols.append(sortedColName)
+        if len(asortingCols):
+            querySet = querySet.order_by(*asortingCols)
+
+    iTotalRecords = iTotalDisplayRecords = querySet.count() #count how many records match the final criteria
+    #get the slice
+    querySet = querySet[startRecord:endRecord]
+
+    sEcho = int(request.GET.get('sEcho',0)) # required echo response
+
+    if jsonTemplatePath:
+        try:
+            jsonString = render_to_string(jsonTemplatePath, locals(), context_instance=RequestContext(request)) #prepare the JSON with the response, consider using : from django.template.defaultfilters import escapejs
+            response = HttpResponse(jsonString, mimetype="application/javascript")
+        except Exception, e:
+            print e
+    else:
+        aaData = []
+        a = querySet.values()
+        for row in a:
+            rowkeys = row.keys()
+            rowvalues = row.values()
+            rowlist = []
+            for col in range(0,len(colitems)):
+                for idx, val in enumerate(rowkeys):
+                    if val == colitems[col]:
+                        rowlist.append(str(rowvalues[idx]))
+            aaData.append(rowlist)
+            response_dict = {}
+            response_dict.update({'aaData':aaData})
+            response_dict.update({'sEcho': sEcho, 'iTotalRecords': iTotalRecords, 'iTotalDisplayRecords':iTotalDisplayRecords, 'sColumns':sColumns})
+            response =  HttpResponse(simplejson.dumps(response_dict), mimetype='application/javascript')
+#    prevent from caching datatables result
+#    add_never_cache_headers(response)
+    return response
+
+def get(request, plan_id, slug=None, template_name = 'plan/get.html'):
     """Display the plan details."""
     SUB_MODULE_NAME = 'plans'
 
@@ -275,6 +411,10 @@ def get(request, plan_id, template_name = 'plan/get.html'):
         tp.latest_text = tp.latest_text()
     except ObjectDoesNotExist, error:
         raise Http404
+
+    #redirect if has a cheated slug
+    if slug != slugify(tp.name):
+        return HttpResponsePermanentRedirect(tp.get_absolute_url())
 
     # Generate the run list of plan
     tp_trs = tp.run.select_related('build', 'manager', 'default_tester')
@@ -444,7 +584,7 @@ def edit(request, plan_id, template_name='plan/edit.html'):
             # Update plan email settings
             update_plan_email_settings(tp, form)
             return HttpResponseRedirect(
-                reverse('tcms.apps.testplans.views.get', args=[plan_id, ])
+                reverse('tcms.apps.testplans.views.get', args=[plan_id, slugify(tp.name)])
             )
     else:
         # Generate a blank form
@@ -507,7 +647,6 @@ def clone(request, template_name='plan/clone.html'):
             info='The plan you specific does not exist in database',
             next='javascript:window.history.go(-1)',
         ))
-
     # Clone the plan if the form is submitted
     if request.method == "POST":
         clone_form = ClonePlanForm(request.REQUEST)
@@ -525,7 +664,7 @@ def clone(request, template_name='plan/clone.html'):
                     create_date=tp.create_date,
                     is_active=tp.is_active,
                     extra_link=tp.extra_link,
-                    parent=tp,
+                    parent=clone_form.cleaned_data['set_parent'] and tp or None,
                 )
 
                 # Copy the plan documents
@@ -574,7 +713,10 @@ def clone(request, template_name='plan/clone.html'):
                                     default_tester = None
                             else:
                                 default_tester = request.user
-
+                            tc_category, b_created = TestCaseCategory.objects.get_or_create(
+                                name = tpcase_src.category.name,
+                                product = clone_form.cleaned_data['product']
+                                    )
                             tpcase_dest = TestCase.objects.create(
                                 create_date=tpcase_src.create_date,
                                 is_automated=tpcase_src.is_automated,
@@ -584,8 +726,8 @@ def clone(request, template_name='plan/clone.html'):
                                 requirement=tpcase_src.requirement,
                                 alias=tpcase_src.alias,
                                 estimated_time=tpcase_src.estimated_time,
-                                case_status=tpcase_src.case_status,
-                                category=tpcase_src.category,
+                                case_status=TestCaseStatus.get_PROPOSED(),
+                                category=tc_category,
                                 priority=tpcase_src.priority,
                                 author=author,
                                 default_tester=default_tester,
@@ -652,6 +794,7 @@ def clone(request, template_name='plan/clone.html'):
             clone_form = ClonePlanForm(initial = {
                 'product': tps[0].product.id,
                 'default_product_version': tps[0].get_version_id(),
+                'set_parent': True,
                 'copy_texts': True,
                 'copy_attachements': True,
                 'copy_environment_group': True,
@@ -664,6 +807,7 @@ def clone(request, template_name='plan/clone.html'):
             clone_form.populate(product_id=tps[0].product.id)
         else:
             clone_form = ClonePlanForm(initial = {
+                'set_parent': True,
                 'copy_texts': True,
                 'copy_attachements': True,
                 'link_testcases': True,
@@ -684,11 +828,16 @@ def attachment(request, plan_id, template_name='plan/attachment.html'):
     """Manage attached files"""
     SUB_MODULE_NAME = 'plans'
 
+    file_size_limit = settings.MAX_UPLOAD_SIZE
+    limit_readable = int(file_size_limit)/2**20 #Mb
+
     tp = get_object_or_404(TestPlan, plan_id=plan_id)
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
-        'test_plan': tp ,
+        'test_plan': tp,
+        'limit': file_size_limit,
+        'limit_readable': str(limit_readable) + "Mb",
     })
 
 
@@ -807,7 +956,7 @@ def cases(request, plan_id):
 
             if not request.REQUEST.get('case'):
                 ajax_response['rc'] = 1
-                ajax_response['reponse'] = 'At least one case is required to delete.'
+                ajax_response['reponse'] = 'At least one case is required to re-order.'
                 return HttpResponse(json_dumps(ajax_response))
 
             tc_pks = request.REQUEST.getlist('case')
@@ -1016,7 +1165,6 @@ def component(request, template_name='plan/get_component.html'):
                 return HttpResponse(
                     serializers.serialize(request.REQUEST['type'], obj)
                 )
-
 
             return direct_to_template(request, template_name, {
                 'test_plan': self.tps[0],
