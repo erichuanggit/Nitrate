@@ -141,6 +141,11 @@ jQ(function() {
 					{% include 'run/get_environment.html' %}
 				</div>
 			</div>
+			<div class="listinfo">
+				<div class="title grey">Note&nbsp;:</div>
+				<div class="name" style="max-width:800px;">{{ test_run.notes|urlize|linebreaksbr }}</div>
+				<div class="clear"></div>
+			</div>
 		</div>
 		<div class="rightlistinfo">
 			<div class="listinfo">
@@ -174,12 +179,11 @@ jQ(function() {
 				</div>
 			</div>
 			<div class="listinfo">
-				<div class="title grey">Status&nbsp;:</div>
+			<div class="title grey">Status&nbsp;:</div>
+{% if not test_run.auto_update_run_status %}
 				<div class="name">
 					{% if test_run.stop_date %}
-					<span class="pauselink">
-						Finished
-					</span>
+					<span class="pauselink"> Finished </span>
 					{% if perms.testruns.change_testrun %}
 					<input type="button"  class="spadelink" value="Set to Running" onclick="window.location.href='{% url tcms.apps.testruns.views.change_status test_run.run_id %}?finished=0'">
 					{% endif %}
@@ -190,6 +194,15 @@ jQ(function() {
 					{% endif %}
 					{% endif %}
 				</div>
+{% else %}
+				<div class="name">
+					{% if test_run.completed_case_run_percent == 100.0 %}
+					<span class="pauselink"> Finished </span>
+					{% else %}
+					<span class="runninglink">Running</span>
+					{% endif %}
+				</div>
+{% endif %}
 			</div>
 			<div class="listinfo">
 				<div class="title grey">Finished at&nbsp;:</div>
@@ -203,7 +216,10 @@ jQ(function() {
 					{% include 'run/get_cc.html' %}
 				</div>
 			</div>
-		</div>
+			<div class="listinfo">
+				<div class="title grey">Set Status Automatically&nbsp;:</div>
+				<div class="name"> {{ test_run.auto_update_run_status }} </div>
+			</div>
 		
 		<div class="clear"></div>
 		
@@ -282,11 +298,6 @@ jQ(function() {
 		-->
 	</div>
         <div class="clear"></div>
-	</div>
-	<div class="listinfo">
-		<div class="title grey">Note&nbsp;:</div>
-		<div class="name" style="max-width:800px;">{{ test_run.notes|urlize|linebreaksbr }}</div>
-		<div class="clear"></div>
 	</div>
 	<div class="Detailform border-1">
 		{% include 'run/get_case_runs.html' %}

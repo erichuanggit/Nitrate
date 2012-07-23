@@ -27,6 +27,7 @@ from tcms.core.models import TCMSActionModel, TimedeltaField
 from tcms.apps.testcases.models import TestCaseBug, TestCaseText, NoneText
 from tcms.apps.testruns import signals as run_watchers
 from tcms.core.contrib.linkreference.models import LinkReference
+import datetime
 
 
 try:
@@ -75,6 +76,7 @@ class TestRun(TCMSActionModel):
         'auth.User',
         through='testruns.TestRunCC',
     )
+    auto_update_run_status = models.BooleanField(default=False)
 
     class Meta:
         db_table = u'test_runs'
@@ -358,6 +360,10 @@ class TestRun(TCMSActionModel):
             for _id in ids
         ))
         percentage =  self.get_percentage(total)
+        if percentage == 100.0:
+            self.stop_date = datetime.datetime.now()
+        else:
+            self.stop_date = None
         return percentage
     completed_case_run_percent = property(_get_completed_case_run_percentage)
 

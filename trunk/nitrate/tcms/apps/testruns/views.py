@@ -111,6 +111,7 @@ def new(request, template_name='run/new.html'):
                 default_tester=default_tester,
                 estimated_time=form.cleaned_data['estimated_time'],
                 errata_id=form.cleaned_data['errata_id'],
+                auto_update_run_status = form.cleaned_data['auto_update_run_status']
             )
 
             keep_status = form.cleaned_data['keep_status']
@@ -548,6 +549,7 @@ def edit(request, run_id, template_name='run/edit.html'):
             tr.stop_date = request.REQUEST.get('finished') and datetime.datetime.now() or None
             tr.estimated_time = form.cleaned_data['estimated_time']
             tr.errata_id = form.cleaned_data['errata_id']
+            tr.auto_update_run_status = form.cleaned_data['auto_update_run_status']
             tr.save()
             return HttpResponseRedirect(
                 reverse('tcms.apps.testruns.views.get', args=[run_id, ])
@@ -789,7 +791,9 @@ def clone(request, template_name='run/clone.html'):
                              tr.manager),
                     default_tester=(form.cleaned_data['update_default_tester'] and
                                     form.cleaned_data['default_tester'] or
-                                    tr.default_tester),)
+                                    tr.default_tester),
+                    auto_update_run_status = form.cleaned_data['auto_update_run_status']
+                    )
 
                 for tcr in tr.case_run.all():
                     n_tr.add_case_run(
