@@ -119,7 +119,7 @@
 						<input type="hidden" name="tested_by" value="{{ test_case_run.tested_by.pk }}" />
 						<input type="hidden" name="value" value="" />
 						{% for crs in test_case_run_status %}
-						<input type="submit" class="btn btn_{{ crs.name.lower }}" value="" {% ifequal crs test_case_run.case_run_status %}disabled="True"{% endifequal %} onclick="this.form.value.value={{ crs.pk }}" />
+						<input type="submit" class="btn btn_{{ crs.name.lower }}" value="" crs_id='{{ crs.pk }}' {% ifequal crs test_case_run.case_run_status %}disabled="True"{% endifequal %} onclick="this.form.value.value={{ crs.pk }}" />
 						{% endfor %}
 						<input type="submit" class="submit-post" value="Submit">
 					</td>

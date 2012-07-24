@@ -204,6 +204,20 @@ Nitrate.TestRuns.Details.on_load = function()
                 };
         });
     };
+    //bind click to status btn
+    jQ('.btn_status').live('click', function(){
+        var from = jQ(this).siblings('.btn_status:disabled')[0].title;
+        var to = this.title;
+        if(jQ('span#'+to+' a').text() == '0'){
+            var htmlstr = "[<a href='javascript:void(0)' onclick=\"showCaseRunsWithSelectedStatus($('id_filter'), '"+jQ(this).attr('crs_id')+"')\">0</a>]";
+            jQ('span#'+to).html(htmlstr);
+        }
+        if(jQ('span#'+from+' a').text() == '1'){
+            jQ('span#'+from).html("[<a>1</a>]");
+        }
+        jQ('span#'+to+' a').text(parseInt(jQ('span#'+to+' a').text())+1);
+        jQ('span#'+from+' a').text(parseInt(jQ('span#'+from+' a').text())-1);
+    })
 }
 
 Nitrate.TestRuns.New.on_load = function()
@@ -392,17 +406,7 @@ var updateCaseRunStatus = function(e)
     
     // Update the object when changing the status
     if(parameters['value'] != '') {
-        // updateObject(ctype, object_pk, 'close_date', 'NOW', 'datetime');
         updateObject(ctype, object_pk, field, value, vtype, callback);
-        
-        /*
-        if(parameters['assignee'] != Nitrate.User.pk)
-            updateObject(ctype, object_pk, 'assignee', Nitrate.User.pk);
-        if(parameters['tested_by'] != Nitrate.User.pk)
-            updateObject(ctype, object_pk, 'tested_by', Nitrate.User.pk);
-        */
-        // Set the case run to be current
-        // new Ajax.Request(getURLParam(object_pk).url_case_run_set_current);
     }
 }
 
@@ -1116,8 +1120,6 @@ jQ(document).ready(function(){
             return false;
         updateObject('testruns.testcaserun', object_pks, 'case_run_status', option, 'int', reloadWindow);
     });
-    // URL updating bugs: /caserun/update-bugs-for-many/
-    // URL commenting bugs: /caserun/comment-many/
 });
 
 function get_addlink_dialog()

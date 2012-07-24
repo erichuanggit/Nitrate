@@ -237,9 +237,9 @@ jQ(function() {
 			<li>
 				<label>{{ k }}</label>
 				{% ifnotequal v 0 %}
-				<span>[</span><a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '{{ k.pk }}')">{{ v }}</a><span>]</span>
+                    <span id='{{ k }}'>[<a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '{{ k.pk }}')">{{ v }}</a>]</span>
 				{% else %}
-				<span>[</span>{{ v }}<span>]</span>
+				    <span id='{{ k }}'>[<a>{{ v }}</a>]</span>
 				{% endifnotequal %}
 			</li>
 			{% endfor %}
@@ -260,42 +260,6 @@ jQ(function() {
 				{% endifnotequal %}
 			</li>
 		</ul>
-		<!--
-		<table cellpadding="1" cellspacing="1" border="0" onCreate="var complete_status = new ProgressBar( new ProgressBar( 'complete_status_{{ test_run.run_id }}', {classProgressBar: 'progressBar4', style: ProgressBar.DETERMINATE, selection: {{ test_run.complete_cases|floatformat:0 }}} );">
-			<tr>
-				<td colspan="2" align="center">
-				<div class="progress-bar" style="float:none">
-					<div class="percent">{{ status_counter.complete_percent|floatformat:0 }}.00%</div>
-					<div class="progress-inner" style="width:{{ status_counter.complete_percent|floatformat:"0" }}px;">
-						<div class="progress-failed" style="width:{{ status_counter.failed_percent|floatformat:"0" }}px;">
-					</div>
-				</div>
-				
-				
-				</td>
-			</tr>
-			{% for k, v in status_counter.count_data.items %}
-			<tr>
-				<th width="50%;" style="text-align:right;">{{ k }}</th>
-				<td style="text-align:left;">[<a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '{{ k.pk }}')">{{ v }}</a>]</td>
-			</tr>
-			{% endfor %}
-			<tr>
-				<th style="text-align:right;">Total</th>
-				<td style="text-align:left;"><a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '')">{{ test_case_runs.count }}</a></td>
-			</tr>
-			<tr>
-				<th colspan="2">
-					<a class="strong" href="{% url tcms.apps.testruns.views.report test_run.run_id %}" title="report of test caserun">Report</a>
-				</th>
-			</tr>
-			<tr>
-				<th colspan="2">
-					<a class="strong" href="{% url tcms.apps.testruns.views.report test_run.run_id %}#buglist" title="Show ALl Bugs">Show All Bugs ({{ test_case_run_bugs|length }})</a>
-				</th>
-			</tr>
-		</table>
-		-->
 	</div>
         <div class="clear"></div>
 	</div>
