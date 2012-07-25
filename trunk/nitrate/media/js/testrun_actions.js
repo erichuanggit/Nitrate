@@ -521,7 +521,7 @@ function constructCaseRunZone(container, title_container, case_id)
     }
 }
 
-function addCaseRunBug(title_container, container, case_id, case_run_id, callback)
+function addCaseRunBug(run_id, title_container, container, case_id, case_run_id, callback)
 {
     // FIXME: Popup dialog to select the bug system
     bug_id = prompt('Please input the bug id.');
@@ -561,6 +561,14 @@ function addCaseRunBug(title_container, container, case_id, case_run_id, callbac
                 jQ('span#'+case_run_id+'_case_bug_count').addClass('have_bug');
             }
             jQ('span#'+case_run_id+'_case_bug_count').text(parseInt(jQ('span#'+case_run_id+'_case_bug_count').text())+1);
+            if(jQ('span#total_run_bug_count a').text()=='No Bugs'){
+                jQ('span#total_run_bug_count').html(
+                    "<a title='Show All Bugs' href='/run/"+run_id+"/report/#buglist'>Bugs ["+returnobj.run_bug_count+"]</a>"
+                );
+            }
+            else{
+                jQ('span#total_run_bug_count a').html("Bugs ["+returnobj.run_bug_count+"]");
+            }
             return constructCaseRunZone(container, title_container, case_id);
         } else {
             alert(returnobj.response);
@@ -575,7 +583,7 @@ function addCaseRunBug(title_container, container, case_id, case_run_id, callbac
         onFailure: json_failure,
     })
 }
-function removeCaseRunBug(title_container, container, bug_id, case_id, case_run_id, callback)
+function removeCaseRunBug(run_id, title_container, container, bug_id, case_id, case_run_id, callback)
 {   
     if(!bug_id)
         return false;
@@ -603,6 +611,12 @@ function removeCaseRunBug(title_container, container, bug_id, case_id, case_run_
             jQ('span#'+case_run_id+'_case_bug_count').text(parseInt(jQ('span#'+case_run_id+'_case_bug_count').text())-1);
             if(jQ('span#'+case_run_id+'_case_bug_count').text()=='0'){
                 jQ('span#'+case_run_id+'_case_bug_count').removeClass('have_bug');
+            }
+            if(returnobj.run_bug_count==0){
+                jQ('span#total_run_bug_count').html("<a>No Bugs</a>");
+            }
+            else{
+                jQ('span#total_run_bug_count a').html("Bugs ["+returnobj.run_bug_count+"]");
             }
             return constructCaseRunZone(container, title_container, case_id);
         } else {

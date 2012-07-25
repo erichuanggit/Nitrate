@@ -630,7 +630,7 @@ def bug(request, case_run_id, template_name='run/execute_case_run.html'):
                 description = form.cleaned_data['description'],
             )
             # tcr.set_current()
-
+            self.default_ajax_response['run_bug_count'] = self.get_run_bug_count()
             return self.ajax_response()
 
         def ajax_response(self, response=None):
@@ -659,7 +659,7 @@ def bug(request, case_run_id, template_name='run/execute_case_run.html'):
                 return self.ajax_response(response=response)
 
             # self.case_run.set_current()
-
+            self.default_ajax_response['run_bug_count'] = self.get_run_bug_count()
             return self.ajax_response()
 
         def render_form(self):
@@ -671,6 +671,10 @@ def bug(request, case_run_id, template_name='run/execute_case_run.html'):
                 return HttpResponse(form.as_table())
 
             return HttpResponse(form.as_p())
+
+        def get_run_bug_count(self):
+            run = self.case_run.run
+            return run.get_bug_count()
 
     try:
         tcr = TestCaseRun.objects.get(case_run_id=case_run_id)
