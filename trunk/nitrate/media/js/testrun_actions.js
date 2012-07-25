@@ -556,7 +556,11 @@ function addCaseRunBug(title_container, container, case_id, case_run_id, callbac
         if(returnobj.rc == 0) {
             if (callback)
                 return callback();
-            
+            //update bug count
+            if(jQ('span#'+case_run_id+'_case_bug_count').text()=='0'){
+                jQ('span#'+case_run_id+'_case_bug_count').addClass('have_bug');
+            }
+            jQ('span#'+case_run_id+'_case_bug_count').text(parseInt(jQ('span#'+case_run_id+'_case_bug_count').text())+1);
             return constructCaseRunZone(container, title_container, case_id);
         } else {
             alert(returnobj.response);
@@ -595,7 +599,11 @@ function removeCaseRunBug(title_container, container, bug_id, case_id, case_run_
         if(returnobj.rc == 0) {
             if (callback)
                 return callback();
-
+            //update bug count
+            jQ('span#'+case_run_id+'_case_bug_count').text(parseInt(jQ('span#'+case_run_id+'_case_bug_count').text())-1);
+            if(jQ('span#'+case_run_id+'_case_bug_count').text()=='0'){
+                jQ('span#'+case_run_id+'_case_bug_count').removeClass('have_bug');
+            }
             return constructCaseRunZone(container, title_container, case_id);
         } else {
             alert(returnobj.response);
