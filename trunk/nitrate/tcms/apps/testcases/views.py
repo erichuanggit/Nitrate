@@ -310,7 +310,7 @@ def all(request, template_name="case/all.html"):
 
     # Query the database when search
     if request.REQUEST.get('a') in ('search', 'sort') and search_form.is_valid():
-        tcs = TestCase.list(search_form.cleaned_data)
+        tcs = TestCase.list(search_form.cleaned_data, tp)
     elif request.REQUEST.get('a') == 'initial':
         tcs = TestCase.objects.filter(case_status__in=d_status)
     else:
