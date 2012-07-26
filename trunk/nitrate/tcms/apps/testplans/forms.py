@@ -22,7 +22,7 @@ from django.contrib.auth.models import User
 
 from tcms.core.lib.xml2dict.xml2dict import XML2Dict
 
-from tcms.core.forms.fields import TimedeltaFormField
+from tcms.core.forms.fields import UserField, TimedeltaFormField
 from tcms.core.forms.widgets import TinyMCEWidget
 
 from tcms.apps.management.models import Component, Product, Version, TCMSEnvGroup, Priority, TestTag
@@ -384,6 +384,15 @@ class EditPlanForm(NewPlanForm):
         empty_label = None,
         )
     is_active = forms.BooleanField(label="Active", required=False)
+    owner = UserField(
+        label=' plan\'s owner',
+        required=False
+    )
+    author = UserField(
+        label=' plan\'s author',
+        required=False
+    )
+
 
 # =========== Forms for search/filter ==============
 

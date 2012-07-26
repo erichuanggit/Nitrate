@@ -548,15 +548,7 @@ def edit(request, plan_id, template_name='plan/edit.html'):
                 tp.type = form.cleaned_data['type']
                 tp.is_active = form.cleaned_data['is_active']
                 tp.extra_link = form.cleaned_data['extra_link']
-                owner_name = form.cleaned_data['owner']
-                if owner_name:
-                    try:
-                        owner = User.objects.get(username=owner_name)
-                        tp.owner = owner
-                    except:
-                        pass
-                else:
-                    tp.owner = None
+                tp.owner = form.cleaned_data['owner']
                 # IMPORTANT! tp.current_user is an instance attribute,
                 # added so that in post_save, current logged-in user info
                 # can be accessed.
