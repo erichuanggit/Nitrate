@@ -15,7 +15,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Clone.on_load);
 		{% if test_plan %}
 		>>Plan: <a href="{{ test_plan.get_absolute_url }}">{{ test_plan.plan_id }}: {{ test_plan.name }}</a>
 		{% else %}
-		>> <a href="{% url tcms.apps.testcases.views.all %}">Search Cases</a>
+		>> <a href="{% url tcms.apps.testcases.views.search %}">Search Cases</a>
 		{% endif %}
 		>> Clone case
 	</div>

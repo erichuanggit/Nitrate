@@ -330,7 +330,7 @@ def all(request, template_name="case/all.html"):
     tcs = tcs.distinct()
     tcs = order_case_queryset(tcs, order_by, asc)
     # default sorted by sortkey
-    #tcs = tcs.order_by('testcaseplan__sortkey')
+    tcs = tcs.order_by('testcaseplan__sortkey')
     # Resort the order
     # if sorted by 'sortkey'(foreign key field)
     case_sort_by = request.REQUEST.get('case_sort_by')
@@ -368,6 +368,30 @@ def all(request, template_name="case/all.html"):
         'case_own_tags': ttags,
         'query_url': query_url,
     })
+
+def search(request, template_name='case/all.html'):
+    """
+    generate the function of searching cases with search criteria
+    """
+    search_form = SearchCaseForm(request.REQUEST)
+    search_form.populate()
+    if request.REQUEST.get('a') == 'search' and search_form.is_valid():
+        tcs = TestCase.list(search_form.cleaned_data)
+    else:
+        tcs = TestCase.objects.none()
+    tcs = tcs.select_related('author',
+                        'default_tester',
+                         'case_status',
+                         'priority',
+                         'category')
+    tcs = tcs.distinct()
+    tcs = tcs.order_by('-create_date')
+    return direct_to_template(request, template_name, {
+        'module': MODULE_NAME,
+        'test_cases': tcs,
+        'search_form': search_form,
+    })
+    
 
 def ajax_search(request, template_name='case/common/json_cases.txt'):
     """Generate the case list in search case and case zone in plan
