@@ -478,7 +478,7 @@ def update(request, plan_ids, values):
       | type                    | Integer        | ID of plan type                    |
       | default_product_version | Integer        |                                    |
       | parent                  | Integer        | Parent plan ID                     |
-      | is_active               | Boolean        | 0: Archived 1: Active (Default 0)  |
+      | is_active               | Boolean        | True/False                         |
       | env_group               | Integer        |                                    |
       +-------------------------+----------------+------------------------------------+
 
@@ -490,6 +490,12 @@ def update(request, plan_ids, values):
     """
     from tcms.core import forms
     from tcms.apps.testplans.forms import XMLRPCEditPlanForm
+
+    if values.get('is_active') in (False, True):
+        if values.get('is_active') == False:
+            values['is_active'] = 0
+        else:
+            values['is_active'] = 1
 
     form = XMLRPCEditPlanForm(values)
     if values.get('default_product_version') and not values.get('product'):
