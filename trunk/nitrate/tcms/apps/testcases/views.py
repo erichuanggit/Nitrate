@@ -28,6 +28,7 @@ from django.utils import simplejson
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.template import RequestContext
+from django.conf import settings
 
 from tcms.core import forms
 from tcms.core.views import Prompt
@@ -1246,6 +1247,9 @@ def attachment(request, case_id, template_name='case/attachment.html'):
     """Manage test case attachments"""
     SUB_MODULE_NAME = 'cases'
 
+    file_size_limit = settings.MAX_UPLOAD_SIZE
+    limit_readable = int(file_size_limit)/2**20 #Mb
+
     tc = get_object_or_404(TestCase, case_id=case_id)
     tp = plan_from_request_or_none(request)
 
@@ -1254,6 +1258,8 @@ def attachment(request, case_id, template_name='case/attachment.html'):
         'sub_module': SUB_MODULE_NAME,
         'testplan': tp,
         'testcase': tc,
+        'limit': file_size_limit,
+        'limit_readable': str(limit_readable) + "Mb",
     })
 
 def get_log(request, case_id, template_name="management/get_log.html"):
