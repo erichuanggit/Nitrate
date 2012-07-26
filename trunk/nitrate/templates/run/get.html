@@ -228,7 +228,7 @@ jQ(function() {
 	
 	<div class="statu" style="float:left;" onCreate="var complete_status = new ProgressBar( new ProgressBar( 'complete_status_{{ test_run.run_id }}', {classProgressBar: 'progressBar4', style: ProgressBar.DETERMINATE, selection: {{ test_run.complete_cases|floatformat:0 }}} );">
 		<div class="progress-bar" style="float:none">
-			<div class="percent">{{ status_counter.complete_percent|floatformat:0 }}.00%</div>
+			<div class="percent"><span id='complete_percent'>{{ status_counter.complete_percent|floatformat:0 }}</span>%</div>
 			<div class="progress-inner" style="width:{{ status_counter.complete_percent|floatformat:"0" }}%;">
 				<div class="progress-failed" style="width:{{ status_counter.failed_percent|floatformat:"0" }}%;"></div>
 			</div>

@@ -349,7 +349,8 @@ var updateCaseRunStatus = function(e)
     var vtype = 'int';
     
     // Callback when 
-    var callback = function(t, rtobj) {
+    var callback = function(t) {
+        var returnobj = t.responseText.evalJSON();
         // Reset the content to loading
         var ajax_loading = getAjaxLoading();
         ajax_loading.id = 'id_loading_' + parameters['case_id'];
@@ -393,6 +394,10 @@ var updateCaseRunStatus = function(e)
         } else {
             fireEvent(link, 'click');
         }
+        //update progress bar
+        jQ('span#complete_percent').text(returnobj.c_percent);
+        jQ('div.progress-inner').attr('style','width:'+returnobj.c_percent+'%');
+        jQ('div.progress-failed').attr('style','width:'+returnobj.f_percent+'%');
     }
     
     // Add comment
@@ -406,7 +411,7 @@ var updateCaseRunStatus = function(e)
     
     // Update the object when changing the status
     if(parameters['value'] != '') {
-        updateObject(ctype, object_pk, field, value, vtype, callback);
+        updateRunStatus(ctype, object_pk, field, value, vtype, callback);
     }
 }
 
