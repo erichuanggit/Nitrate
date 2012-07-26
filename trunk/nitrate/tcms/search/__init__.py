@@ -69,7 +69,7 @@ def advance_search(request, tmpl='search/advanced_search.html'):
         return direct_to_template(request, tmpl, locals())
 
     start = time.time()
-    results = retrieve_results(request, plan_form.cleaned_data,
+    results = query(request, plan_form.cleaned_data,
         run_form.cleaned_data, case_form.cleaned_data, target)
     results = order_targets(target, results, data)
     end = time.time()
@@ -78,21 +78,7 @@ def advance_search(request, tmpl='search/advanced_search.html'):
     queries['Target'] = target
     return render_results(request, results, timecost, queries)
 
-def retrieve_results(request, plan_query, run_query, case_query, target):
-    '''
-    Try hitting the cache on first attempt.\n
-    Hits index on empty values.
-    '''
-    from hashlib import md5
-    key     = remove_from_request_path(request, 'page')
-    key     = md5(key).hexdigest()
-    results = cache.get(key)
-    if not results:
-        results = query(plan_query, run_query, case_query, target)
-        cache.set(key, results)
-    return results
-
-def query(plan_query, run_query, case_query, target, using='orm'):
+def query(request, plan_query, run_query, case_query, target, using='orm'):
     USING = {
         'orm': {
             'query': SmartDjangoQuery,
@@ -118,9 +104,9 @@ def sum_orm_queries(plans, cases, runs, target):
         if runs is None:
             runs = TestRun.objects.all()
         if cases:
-            runs = runs.filter(case_run__case__in=cases)
+            runs = runs.filter(case_run__case__in=cases).distinct()
         if plans:
-            runs = runs.filter(plan__in=plans)
+            runs = runs.filter(plan__in=plans).distinct()
         runs = runs.extra(
             select={
                 'env_groups': RawSQL.environment_group_for_run,
@@ -134,9 +120,9 @@ def sum_orm_queries(plans, cases, runs, target):
         if plans is None:
             plans = TestPlan.objects.all()
         if cases:
-            plans = plans.filter(case__in=cases)
+            plans = plans.filter(case__in=cases).distinct()
         if runs:
-            plans = plans.filter(run__in=runs)
+            plans = plans.filter(run__in=runs).distinct()
         plans = plans.extra(select = {
                 'num_cases': RawSQL.num_cases,
                 'num_runs': RawSQL.num_runs,
@@ -150,9 +136,9 @@ def sum_orm_queries(plans, cases, runs, target):
         if cases is None:
             cases = TestCase.objects.all()
         if runs:
-            cases = cases.filter(case_run__run__in=runs)
+            cases = cases.filter(case_run__run__in=runs).distinct()
         if plans:
-            cases = cases.filter(plan__in=plans)
+            cases = cases.filter(plan__in=plans).distinct()
         return cases
 
 def render_results(request, results, time_cost, queries, tmpl='search/results.html'):
