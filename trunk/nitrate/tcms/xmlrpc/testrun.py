@@ -619,8 +619,11 @@ def update(request, run_ids, values):
         if form.cleaned_data['product_version']:
             trs.update(product_version = form.cleaned_data['product_version'])
 
-        if form.cleaned_data['notes']:
-            trs.update(notes = form.cleaned_data['notes'])
+        if values.has_key('notes'):
+            if values.get('notes') and form.cleaned_data['notes']:
+                trs.update(notes = form.cleaned_data['notes'])
+            else:
+                trs.update(notes = None)
 
         if form.cleaned_data['plan_text_version']:
             trs.update(plan_text_version = form.cleaned_data['plan_text_version'])
