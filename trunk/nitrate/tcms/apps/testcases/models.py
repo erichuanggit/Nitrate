@@ -223,10 +223,13 @@ class TestCase(TCMSActionModel):
         return tcs
 
     @classmethod
-    def list(cls, query):
+    def list(cls, query, plan=None):
         """List the cases with request"""
         from django.db.models import Q
-        q = cls.objects
+        if not plan:
+            q = cls.objects
+        else:
+            q = cls.objects.filter(plan=plan)
         if query.get('search'):
             q = q.filter(
                 Q(pk__icontains = query['search'])
@@ -257,7 +260,8 @@ class TestCase(TCMSActionModel):
             q = q.filter(tag__name__in = query['tag__name__in'])
 
         if query.get('category'):
-            q = q.filter(category = query['category'])
+
+            q = q.filter(category__name = query['category'].name)
 
         if query.get('priority'):
             q = q.filter(priority__in = query['priority'])

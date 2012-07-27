@@ -328,6 +328,11 @@ class TestRun(TCMSActionModel):
         to = self.get_notify_addrs()
         mailto(template, subject, to, context, request)
 
+    def get_bug_count(self):
+        tcrs = self.case_run.all()
+        tcr_bugs = TestCaseBug.objects.filter(case_run__case_run_id__in=tcrs.values_list('case_run_id', flat=True)).values('bug_id').distinct()
+        return tcr_bugs.count()
+
     def get_percentage(self, count):
         case_run_count = self.total_num_caseruns
         if case_run_count == 0:
@@ -443,6 +448,20 @@ class TestCaseRunStatus(TCMSActionModel):
         ))
 
         return completed_status.values_list('pk', flat=True)
+
+    @classmethod
+    def _get_failed_status_ids(cls):
+        '''
+        There are some status indicate that
+        the testcaserun is failed.
+        Return IDs of these statuses.
+        '''
+        statuses = cls.objects.all()
+        failed_status = statuses.filter(name__in=(
+            'FAILED', 'ERROR'
+        ))
+
+        return failed_status.values_list('pk', flat=True)
 
 class TestCaseRunManager(models.Manager):
 

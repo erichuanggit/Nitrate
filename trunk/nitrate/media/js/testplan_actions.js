@@ -1,6 +1,7 @@
 Nitrate.TestPlans = {};
 Nitrate.TestPlans.Create = {};
 Nitrate.TestPlans.List = {};
+Nitrate.TestPlans.Advance_Search_List = {};
 Nitrate.TestPlans.Details = {};
 Nitrate.TestPlans.Edit = {};
 Nitrate.TestPlans.SearchCase = {};
@@ -224,14 +225,18 @@ Nitrate.TestPlans.TreeView = {
                 title = '<div class="line-through">' + title;
 
             // Construct the items
-            title += '<a class="plan_name" href="javascript:void(0);">' + data[i].fields.name + '</a>';
+            title += '<a class="plan_name" href="' + data[i].extras.get_url_path + '">' + data[i].fields.name + '</a>';
             title += ' (';
-            if (data[i].extras.num_cases)
+            if (data[i].extras.num_cases && data[i].is_current)
+                title += '<a href="#testcases" onclick="FocusTabOnPlanPage(this)">' + data[i].extras.num_cases + ' cases</a>, ';
+            else if (data[i].extras.num_cases && !(data[i].is_current))
                 title += '<a href="' + data[i].extras.get_url_path + '#testcases">' + data[i].extras.num_cases + ' cases</a>, ';
             else
                 title += '0 case, ';
             
-            if (data[i].extras.num_runs)
+            if (data[i].extras.num_runs && data[i].is_current)
+                title += '<a href="#testruns" onclick="FocusTabOnPlanPage(this)">' + data[i].extras.num_runs + ' runs</a>, ';
+            else if (data[i].extras.num_runs && !data[i].is_current)
                 title += '<a href="' + data[i].extras.get_url_path + '#testruns">' + data[i].extras.num_runs + ' runs</a>, ';
             else
                 title += '0 runs, ';
@@ -314,6 +319,44 @@ Nitrate.TestPlans.Edit.on_load = function()
         $('env_group_help').hide();
     })
     bind_version_selector_to_product(false);
+}
+
+Nitrate.TestPlans.Advance_Search_List.on_load = function()
+{
+    if($('id_product')) {
+        bind_version_selector_to_product(true);
+    };
+    
+    if($('id_check_all_plans')) {
+        $('id_check_all_plans').observe('click', function(e) {
+            clickedSelectAll(this, $('plans_form'), 'plan');
+        });
+    };
+    
+    if($('column_add')) {
+        $('column_add').observe('change', function(t) {
+            switch(this.value) {
+                case 'col_product':
+                    $('col_product_head').show();
+                    $$('.col_product_content').each(function(t){ t.show() });
+                    $('col_product_option').hide();
+                    break;
+                case('col_product_version'):
+                    $('col_product_version_head').show();
+                    $$('.col_product_version_content').each(function(t){ t.show() });
+                    $('col_product_veresion_option').hide();
+                    break;
+            }
+        });
+    };
+    
+    $$('input[name="plan_id"]').invoke('observe', 'click', function(t) {
+        if(this.checked) {
+            this.up(1).addClassName('selection_row');
+        } else {
+            this.up(1).removeClassName('selection_row');
+        };
+    });
 }
 
 Nitrate.TestPlans.List.on_load = function()
@@ -1620,4 +1663,15 @@ function resortCasesDragAndDrop(container, button, form, table, parameters, call
             onFailure: json_failure
         })
     }
+}
+
+function FocusTabOnPlanPage(element){
+    var tab_array = element.href.toArray();
+    var tab_name = '';
+    for (var i = tab_array.indexOf('#') + 1; i < tab_array.length; i++)
+        tab_name += tab_array[i]
+    $('tab_treeview').removeClassName('tab_focus');
+    $('treeview').hide();
+    $('tab_' + tab_name).addClassName('tab_focus');
+    $(tab_name).show();
 }

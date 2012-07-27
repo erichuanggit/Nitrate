@@ -14,7 +14,7 @@
 			<tr class="{% cycle 'even' 'odd'%}">
 				<td><span class="tagvalue">{{ tag }}</span></td>
 				<td><a href="{% url tcms.apps.testplans.views.all %}?action=search&tag__name__in={{ tag }}" title="{{ tag.num_plans }} plans tagged {{ tag }}">{{ tag.num_plans }}</a></td>
-				<td><a href="{% url tcms.apps.testcases.views.all %}?a=search&tag__name__in={{ tag }}"  title="{{ tag.num_cases }} cases tagged {{ tag }}">{{ tag.num_cases }}</a></td>
+				<td><a href="{% url tcms.apps.testcases.views.search %}?a=search&tag__name__in={{ tag }}"  title="{{ tag.num_cases }} cases tagged {{ tag }}">{{ tag.num_cases }}</a></td>
 				<td><a href="{% url tcms.apps.testruns.views.all %}?action=search&tag__name__in={{ tag }}"  title="{{ tag.num_runs }} runs tagged {{ tag }}">{{ tag.num_runs }}</a></td>
 				{% if object.plan_id and perms.testplans.delete_testplantag %}
 				<td><a href="#tag" class="remove" title="remmove tag from this plan" onclick="removeTag(this.up(5), '{{ tag }}')">Remove</a>

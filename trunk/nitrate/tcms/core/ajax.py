@@ -34,7 +34,7 @@ from django.core import serializers
 
 from tcms.apps.testplans.models import TestPlan, TestCasePlan
 from tcms.apps.testcases.models import TestCase, TestCaseTag, TestCaseBugSystem as BugSystem
-from tcms.apps.testruns.models import TestRun, TestCaseRun, TestRunTag
+from tcms.apps.testruns.models import TestRun, TestCaseRun, TestRunTag, TestCaseRunStatus
 from tcms.apps.management.models import TestTag, TestTag
 from tcms.core.utils import get_string_combinations
 from tcms.core.helpers.comments import add_comment
@@ -431,6 +431,132 @@ def update(request):
         targets.update(close_date = now)
         targets.update(tested_by = request.user)
     return say_yes()
+
+def update_case_run_status(request):
+    '''
+    Update Case Run status.
+    '''
+    error = None
+    now = datetime.datetime.now()
+
+    data    = request.REQUEST.copy()
+    ctype   = data.get("content_type")
+    vtype   = data.get('value_type', 'str')
+    object_pk_str = data.get("object_pk")
+    field     = data.get('field')
+    value     = data.get('value')
+
+    object_pk = [int(a) for a in object_pk_str.split(',')]
+
+    if not field or not value or not object_pk or not ctype:
+        return say_no('Following fields are required - content_type, object_pk, field and value.')
+
+    # Convert the value type
+    # FIXME: Django bug here: update() keywords must be strings
+    field = str(field)
+
+    value, error = get_value_by_type(value, vtype)
+    if error: return say_no(error)
+    has_perms = check_permission(request,ctype)
+    if not has_perms: return say_no('Permission Dinied.')
+
+    model = models.get_model(*ctype.split(".", 1))
+    targets = model._default_manager.filter(pk__in=object_pk)
+
+    if not targets: return say_no('No record found')
+    if not hasattr(targets[0], field):
+        return say_no('%s has no field %s' % (ctype, field))
+
+    if hasattr(targets[0], 'log_action'):
+        for t in targets:
+            try:
+                t.log_action(
+                    who = request.user,
+                    action = 'Field %s changed from %s to %s.' % (
+                        field, getattr(t, field), value
+                    )
+                )
+            except (AttributeError, User.DoesNotExist):
+                pass
+    targets.update(**{field: value})
+
+    if hasattr(model, 'mail_scene'):
+        from tcms.core.utils.mailto import mailto
+        mail_context = model.mail_scene(
+            objects = targets, field = field, value = value, ctype = ctype, object_pk = object_pk,
+        )
+        if mail_context:
+            mail_context['request'] = request
+            try:
+                mailto(**mail_context)
+            except:
+                pass
+
+    # Special hacking for updating test case run status
+    # https://bugzilla.redhat.com/show_bug.cgi?id=658160
+    if ctype == 'testruns.testcaserun' and field == 'case_run_status':
+        if len(targets) == 1:
+            targets[0].set_current()
+
+        for t in targets:
+            field = 'close_date'
+            t.log_action(
+                who = request.user,
+                action = 'Field %s changed from %s to %s.' % (
+                    field, getattr(t, field), now
+                )
+            )
+            if t.tested_by != request.user:
+                field = 'tested_by'
+                t.log_action(
+                    who = request.user,
+                    action = 'Field %s changed from %s to %s.' % (
+                        field, getattr(t, field), request.user
+                    )
+                )
+
+            field = 'assignee'
+            try:
+                assignee = t.assginee
+                if assignee != request.user:
+                    t.log_action(
+                        who = request.user,
+                        action = 'Field %s changed from %s to %s.' % (
+                            field, getattr(t, field), request.user
+                        )
+                    )
+                    #t.assignee = request.user
+                t.save()
+            except (AttributeError, User.DoesNotExist):
+                pass
+        targets.update(close_date = now)
+        targets.update(tested_by = request.user)
+
+    run_status_count = targets[0].run.case_run_status.split(',')
+    complete_count = 0
+    failed_count = 0
+    total_count = 0
+    f_ids = TestCaseRunStatus._get_failed_status_ids()
+    c_ids = TestCaseRunStatus._get_completed_status_ids()
+    try:
+        for status_count in run_status_count:
+            s_id, s_count = status_count.split(':')
+            s_id = int(s_id)
+            s_count = int(s_count)
+            if s_id in c_ids:
+                complete_count += s_count
+            if s_id in f_ids:
+                failed_count += s_count
+            total_count += s_count
+    except Exception, e:
+        return say_no(e)
+    complete_percent = complete_count*1.0/total_count*100
+    failed_percent = (complete_count > 0) and failed_count*1.0/complete_count*100 or 0
+    return HttpResponse(simplejson.dumps({
+            'rc': 0, 'response': 'ok',
+            'c_percent': complete_percent,
+            'f_percent': failed_percent
+    }))
 
 def update_case_status(request):
     '''

@@ -486,11 +486,13 @@ def get_test_cases(request, run_id):
         raise
 
     tc_ids = tr.case_run.values_list('case_id', flat=True)
-    tc_tcs = dict(tr.case_run.values_list('case_id', 'case_run_id'))
+    tc_run_id = dict(tr.case_run.values_list('case_id', 'case_run_id'))
+    tc_status = dict(tr.case_run.values_list('case_id', 'case_run_status__name'))
     tcs = TestCase.objects.filter(case_id__in=tc_ids)
     tcs_serializer = XMLRPCSerializer(tcs).serialize_queryset()
     for case in tcs_serializer:
-        case['case_run_id'] = tc_tcs[case['case_id']]
+        case['case_run_id'] = tc_run_id[case['case_id']]
+        case['case_run_status'] = tc_status[case['case_id']]
     return tcs_serializer
 
 def get_test_plan(request, run_id):
@@ -617,8 +619,11 @@ def update(request, run_ids, values):
         if form.cleaned_data['product_version']:
             trs.update(product_version = form.cleaned_data['product_version'])
 
-        if form.cleaned_data['notes']:
-            trs.update(notes = form.cleaned_data['notes'])
+        if values.has_key('notes'):
+            if values.get('notes') and form.cleaned_data['notes']:
+                trs.update(notes = form.cleaned_data['notes'])
+            else:
+                trs.update(notes = None)
 
         if form.cleaned_data['plan_text_version']:
             trs.update(plan_text_version = form.cleaned_data['plan_text_version'])

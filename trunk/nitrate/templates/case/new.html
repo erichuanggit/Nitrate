@@ -27,7 +27,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Create.on_load);
 		>> <a href="{% url tcms.apps.testplans.views.all %}">Planning</a>
 		>> <a href="{{ test_plan.get_absolute_url }}">{{ test_plan.name }}</a>
 		{% else %}
-		>> <a href="{% url tcms.apps.testcases.views.all %}">Testing</a>
+		>> <a href="{% url tcms.apps.testcases.views.search %}">Testing</a>
 		{% endif %}
 		>> Create new case
 	</div>

@@ -48,7 +48,7 @@ Nitrate.TestCases.Instance = {
 	{% else %}
 	<div class="sprites crumble">
 		<a href="{% url tcms.core.views.index %}">Home</a>
-		>><a href="{% url tcms.apps.testcases.views.all %}">Search Case</a>
+		>><a href="{% url tcms.apps.testcases.views.search %}">Search Case</a>
 		>>Case: {{ test_case.case_id }}: {{ test_case.summary }}
 	</div>
 	<div id="tcms_values" class="hidden">
@@ -168,7 +168,7 @@ Nitrate.TestCases.Instance = {
 			<div class="clear"></div>
 			<div class="listinfo">
 				<div class="title grey">Notes&nbsp;:</div>
-				<div class="name" style="max-width:800px;"><span id="display_priority" >{{ test_case.notes|urlize|linebreaksbr }}</span></div>
+				<div class="name" style="max-width:800px;"><span id="display_priority" >{{ test_case.notes|redhat_urlize|linebreaksbr }}</span></div>
 			</div>
 		</fieldset>
 	</div>

@@ -29,8 +29,8 @@
 				<li {% ifequal sub_module 'runs' %} class="subcurrent"{% endifequal %} onclick="window.location='{% url tcms.apps.testruns.views.all %}'">
 					<a href="{% url tcms.apps.testruns.views.all %}">Search Runs</a>
 				</li>
-				<li {% ifequal sub_module 'cases' %} class="subcurrent"{% endifequal %} onclick="window.location='{% url tcms.apps.testcases.views.all %}'">
-					<a href="{% url tcms.apps.testcases.views.all %}">Search Cases</a>
+				<li {% ifequal sub_module 'cases' %} class="subcurrent"{% endifequal %} onclick="window.location='{% url tcms.apps.testcases.views.search %}'">
+					<a href="{% url tcms.apps.testcases.views.search %}">Search Cases</a>
 				</li>
 				{% if user.is_authenticated %}
 				<li {% ifequal sub_module 'my_runs' %} class="subcurrent"{% endifequal %} onclick="window.location='{% url tcms.apps.testruns.views.all %}?people={{ user.email }}'">

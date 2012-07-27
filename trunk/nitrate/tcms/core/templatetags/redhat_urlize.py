@@ -31,6 +31,7 @@ from django.utils.html import escape
 from django.utils.http import urlquote
 
 from django import template
+from urlparse import urlparse
 
 register = template.Library()
 
@@ -47,7 +48,6 @@ def is_redhat_url(middle):
     if not middle:
         return False
 
-    from urlparse import urlparse
     try:
         from urlparse import ParseResult
         py_2_6 = True
@@ -73,6 +73,26 @@ def is_redhat_url(middle):
         return parse_result.netloc.split(':')[0].endswith('redhat.com')
     else:
         return parse_result[1].split(':')[0].endswith('redhat.com')
+
+def custom_is_redhat_url(url):
+    if not url:
+        return False
+    try:
+        from urlparse import ParseResult
+        is_compatible_with_py_2_6 = True
+    except ImportError:
+        is_compatible_with_py_2_6 = False
+
+    parse_result = urlparse(url)
+    if is_compatible_with_py_2_6:
+        netloc = parse_result.netloc
+    else:
+        netloc = parse_result[1]
+
+    if netloc:
+        return netloc.endswith('redhat.com')
+    else:
+        return False
 
 def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
@@ -133,12 +153,40 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     return u''.join(words)
 urlize = allow_lazy(urlize, unicode)
 
+#@stringfilter
+#@register.filter(name='redhat_urlize')
+#def redhat_urlize(value, autoescape=None):
+#    """Converts URLs, which only ends with .redhat.com, in plain text into clickable links."""
+#    # Using my custom urlize above
+#    return mark_safe(urlize(value, nofollow=True, autoescape=autoescape))
+#redhat_urlize.is_safe=True
+#redhat_urlize.needs_autoescape = True
+
 @stringfilter
-@register.filter(name='redhat_urlize')
-def redhat_urlize(value, autoescape=None):
-    """Converts URLs, which only ends with .redhat.com, in plain text into clickable links."""
-    # Using my custom urlize above
-    return mark_safe(urlize(value, nofollow=True, autoescape=autoescape))
-redhat_urlize.is_safe=True
-redhat_urlize.needs_autoescape = True
+@register.filter
+
+#def custom_redhat_urlize(value, autoescape=None):
+#    return mark_safe(bleach.linkify(value, filter_url=custom_is_redhat_url))
+
+def redhat_urlize(value, classname=''):
+
+    url_pattern = re.compile(ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))', re.MULTILINE)
+
+    def _spacify(s, chars=40):
+        if len(s) <= chars:
+            return s
+        for k in range(len(s) / chars):
+            pos = (k + 1) * chars
+            s = s[0:pos] + ' ' + s[pos:]
+        return s
+
+    def _replace(match):
+        cls = classname and (' class="%s"' % classname) or ''
+        href = match.group(0)
+        if custom_is_redhat_url(href):
+            return '<a href="%s"%s target="_blank">%s</a>' % (href, cls, _spacify(href))
+        else:
+            return '<a href="#"%s>%s</a>' %(cls, _spacify(href))
+
+    return mark_safe(url_pattern.sub(_replace, value))
 

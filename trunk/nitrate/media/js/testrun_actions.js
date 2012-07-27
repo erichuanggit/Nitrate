@@ -204,6 +204,20 @@ Nitrate.TestRuns.Details.on_load = function()
                 };
         });
     };
+    //bind click to status btn
+    jQ('.btn_status').live('click', function(){
+        var from = jQ(this).siblings('.btn_status:disabled')[0].title;
+        var to = this.title;
+        if(jQ('span#'+to+' a').text() == '0'){
+            var htmlstr = "[<a href='javascript:void(0)' onclick=\"showCaseRunsWithSelectedStatus($('id_filter'), '"+jQ(this).attr('crs_id')+"')\">0</a>]";
+            jQ('span#'+to).html(htmlstr);
+        }
+        if(jQ('span#'+from+' a').text() == '1'){
+            jQ('span#'+from).html("[<a>1</a>]");
+        }
+        jQ('span#'+to+' a').text(parseInt(jQ('span#'+to+' a').text())+1);
+        jQ('span#'+from+' a').text(parseInt(jQ('span#'+from+' a').text())-1);
+    })
 }
 
 Nitrate.TestRuns.New.on_load = function()
@@ -335,7 +349,8 @@ var updateCaseRunStatus = function(e)
     var vtype = 'int';
     
     // Callback when 
-    var callback = function(t, rtobj) {
+    var callback = function(t) {
+        var returnobj = t.responseText.evalJSON();
         // Reset the content to loading
         var ajax_loading = getAjaxLoading();
         ajax_loading.id = 'id_loading_' + parameters['case_id'];
@@ -379,6 +394,10 @@ var updateCaseRunStatus = function(e)
         } else {
             fireEvent(link, 'click');
         }
+        //update progress bar
+        jQ('span#complete_percent').text(returnobj.c_percent);
+        jQ('div.progress-inner').attr('style','width:'+returnobj.c_percent+'%');
+        jQ('div.progress-failed').attr('style','width:'+returnobj.f_percent+'%');
     }
     
     // Add comment
@@ -392,17 +411,7 @@ var updateCaseRunStatus = function(e)
     
     // Update the object when changing the status
     if(parameters['value'] != '') {
-        // updateObject(ctype, object_pk, 'close_date', 'NOW', 'datetime');
-        updateObject(ctype, object_pk, field, value, vtype, callback);
-        
-        /*
-        if(parameters['assignee'] != Nitrate.User.pk)
-            updateObject(ctype, object_pk, 'assignee', Nitrate.User.pk);
-        if(parameters['tested_by'] != Nitrate.User.pk)
-            updateObject(ctype, object_pk, 'tested_by', Nitrate.User.pk);
-        */
-        // Set the case run to be current
-        // new Ajax.Request(getURLParam(object_pk).url_case_run_set_current);
+        updateRunStatus(ctype, object_pk, field, value, vtype, callback);
     }
 }
 
@@ -517,7 +526,7 @@ function constructCaseRunZone(container, title_container, case_id)
     }
 }
 
-function addCaseRunBug(title_container, container, case_id, case_run_id, callback)
+function addCaseRunBug(run_id, title_container, container, case_id, case_run_id, callback)
 {
     // FIXME: Popup dialog to select the bug system
     bug_id = prompt('Please input the bug id.');
@@ -552,7 +561,19 @@ function addCaseRunBug(title_container, container, case_id, case_run_id, callbac
         if(returnobj.rc == 0) {
             if (callback)
                 return callback();
-            
+            //update bug count
+            if(jQ('span#'+case_run_id+'_case_bug_count').text()=='0'){
+                jQ('span#'+case_run_id+'_case_bug_count').addClass('have_bug');
+            }
+            jQ('span#'+case_run_id+'_case_bug_count').text(parseInt(jQ('span#'+case_run_id+'_case_bug_count').text())+1);
+            if(jQ('span#total_run_bug_count a').text()=='No Bugs'){
+                jQ('span#total_run_bug_count').html(
+                    "<a title='Show All Bugs' href='/run/"+run_id+"/report/#buglist'>Bugs ["+returnobj.run_bug_count+"]</a>"
+                );
+            }
+            else{
+                jQ('span#total_run_bug_count a').html("Bugs ["+returnobj.run_bug_count+"]");
+            }
             return constructCaseRunZone(container, title_container, case_id);
         } else {
             alert(returnobj.response);
@@ -567,7 +588,7 @@ function addCaseRunBug(title_container, container, case_id, case_run_id, callbac
         onFailure: json_failure,
     })
 }
-function removeCaseRunBug(title_container, container, bug_id, case_id, case_run_id, callback)
+function removeCaseRunBug(run_id, title_container, container, bug_id, case_id, case_run_id, callback)
 {   
     if(!bug_id)
         return false;
@@ -591,7 +612,17 @@ function removeCaseRunBug(title_container, container, bug_id, case_id, case_run_
         if(returnobj.rc == 0) {
             if (callback)
                 return callback();
-
+            //update bug count
+            jQ('span#'+case_run_id+'_case_bug_count').text(parseInt(jQ('span#'+case_run_id+'_case_bug_count').text())-1);
+            if(jQ('span#'+case_run_id+'_case_bug_count').text()=='0'){
+                jQ('span#'+case_run_id+'_case_bug_count').removeClass('have_bug');
+            }
+            if(returnobj.run_bug_count==0){
+                jQ('span#total_run_bug_count').html("<a>No Bugs</a>");
+            }
+            else{
+                jQ('span#total_run_bug_count a').html("Bugs ["+returnobj.run_bug_count+"]");
+            }
             return constructCaseRunZone(container, title_container, case_id);
         } else {
             alert(returnobj.response);
@@ -1116,8 +1147,6 @@ jQ(document).ready(function(){
             return false;
         updateObject('testruns.testcaserun', object_pks, 'case_run_status', option, 'int', reloadWindow);
     });
-    // URL updating bugs: /caserun/update-bugs-for-many/
-    // URL commenting bugs: /caserun/comment-many/
 });
 
 function get_addlink_dialog()

@@ -28,6 +28,7 @@ from django.utils import simplejson
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.template import RequestContext
+from django.conf import settings
 
 from tcms.core import forms
 from tcms.core.views import Prompt
@@ -310,7 +311,7 @@ def all(request, template_name="case/all.html"):
 
     # Query the database when search
     if request.REQUEST.get('a') in ('search', 'sort') and search_form.is_valid():
-        tcs = TestCase.list(search_form.cleaned_data)
+        tcs = TestCase.list(search_form.cleaned_data, tp)
     elif request.REQUEST.get('a') == 'initial':
         tcs = TestCase.objects.filter(case_status__in=d_status)
     else:
@@ -329,7 +330,7 @@ def all(request, template_name="case/all.html"):
     tcs = tcs.distinct()
     tcs = order_case_queryset(tcs, order_by, asc)
     # default sorted by sortkey
-    #tcs = tcs.order_by('testcaseplan__sortkey')
+    tcs = tcs.order_by('testcaseplan__sortkey')
     # Resort the order
     # if sorted by 'sortkey'(foreign key field)
     case_sort_by = request.REQUEST.get('case_sort_by')
@@ -367,6 +368,30 @@ def all(request, template_name="case/all.html"):
         'case_own_tags': ttags,
         'query_url': query_url,
     })
+
+def search(request, template_name='case/all.html'):
+    """
+    generate the function of searching cases with search criteria
+    """
+    search_form = SearchCaseForm(request.REQUEST)
+    search_form.populate()
+    if request.REQUEST.get('a') == 'search' and search_form.is_valid():
+        tcs = TestCase.list(search_form.cleaned_data)
+    else:
+        tcs = TestCase.objects.none()
+    tcs = tcs.select_related('author',
+                        'default_tester',
+                         'case_status',
+                         'priority',
+                         'category')
+    tcs = tcs.distinct()
+    tcs = tcs.order_by('-create_date')
+    return direct_to_template(request, template_name, {
+        'module': MODULE_NAME,
+        'test_cases': tcs,
+        'search_form': search_form,
+    })
+    
 
 def ajax_search(request, template_name='case/common/json_cases.txt'):
     """Generate the case list in search case and case zone in plan
@@ -1246,6 +1271,9 @@ def attachment(request, case_id, template_name='case/attachment.html'):
     """Manage test case attachments"""
     SUB_MODULE_NAME = 'cases'
 
+    file_size_limit = settings.MAX_UPLOAD_SIZE
+    limit_readable = int(file_size_limit)/2**20 #Mb
+
     tc = get_object_or_404(TestCase, case_id=case_id)
     tp = plan_from_request_or_none(request)
 
@@ -1254,6 +1282,8 @@ def attachment(request, case_id, template_name='case/attachment.html'):
         'sub_module': SUB_MODULE_NAME,
         'testplan': tp,
         'testcase': tc,
+        'limit': file_size_limit,
+        'limit_readable': str(limit_readable) + "Mb",
     })
 
 def get_log(request, case_id, template_name="management/get_log.html"):
