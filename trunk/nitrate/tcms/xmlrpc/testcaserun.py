@@ -554,8 +554,11 @@ def update(request, case_run_ids, values):
             tcrs.update(tested_by = request.user)
             tcrs.update(close_date = datetime.now())
 
-        if form.cleaned_data['notes']:
-            tcrs.update(notes = form.cleaned_data['notes'])
+        if values.has_key('notes'):
+            if values.get('notes') and form.cleaned_data['notes']:
+                tcrs.update(notes = form.cleaned_data['notes'])
+            else:
+                tcrs.update(notes = None)
 
         if form.cleaned_data['sortkey']:
             tcrs.update(sortkey = form.cleaned_data['sortkey'])
