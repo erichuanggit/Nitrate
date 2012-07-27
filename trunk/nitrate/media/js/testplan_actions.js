@@ -224,14 +224,18 @@ Nitrate.TestPlans.TreeView = {
                 title = '<div class="line-through">' + title;
 
             // Construct the items
-            title += '<a class="plan_name" href="javascript:void(0);">' + data[i].fields.name + '</a>';
+            title += '<a class="plan_name" href="' + data[i].extras.get_url_path + '">' + data[i].fields.name + '</a>';
             title += ' (';
-            if (data[i].extras.num_cases)
+            if (data[i].extras.num_cases && data[i].is_current)
+                title += '<a href="#testcases" onclick="FocusTabOnPlanPage(this)">' + data[i].extras.num_cases + ' cases</a>, ';
+            else if (data[i].extras.num_cases && !(data[i].is_current))
                 title += '<a href="' + data[i].extras.get_url_path + '#testcases">' + data[i].extras.num_cases + ' cases</a>, ';
             else
                 title += '0 case, ';
             
-            if (data[i].extras.num_runs)
+            if (data[i].extras.num_runs && data[i].is_current)
+                title += '<a href="#testruns" onclick="FocusTabOnPlanPage(this)">' + data[i].extras.num_runs + ' runs</a>, ';
+            else if (data[i].extras.num_runs && !data[i].is_current)
                 title += '<a href="' + data[i].extras.get_url_path + '#testruns">' + data[i].extras.num_runs + ' runs</a>, ';
             else
                 title += '0 runs, ';
@@ -1620,4 +1624,15 @@ function resortCasesDragAndDrop(container, button, form, table, parameters, call
             onFailure: json_failure
         })
     }
+}
+
+function FocusTabOnPlanPage(element){
+    var tab_array = element.href.toArray();
+    var tab_name = '';
+    for (var i = tab_array.indexOf('#') + 1; i < tab_array.length; i++)
+        tab_name += tab_array[i]
+    $('tab_treeview').removeClassName('tab_focus');
+    $('treeview').hide();
+    $('tab_' + tab_name).addClassName('tab_focus');
+    $(tab_name).show();
 }
