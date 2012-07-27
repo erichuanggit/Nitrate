@@ -26,6 +26,7 @@ from django.utils import simplejson
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.forms import PasswordChangeForm
+from django.db.models import Q
 
 from tcms.core.utils.raw_sql import RawSQL
 from tcms.apps.testcases.models import TestCase
@@ -146,17 +147,13 @@ def recent(request, username, template_name='profile/recent.html'):
     else:
         up = {'user': request.user}
 
-    plans_query = {
-        'author': request.user,
-    }
-
     runs_query = {
         'people': request.user,
         'is_active': True,
         'status': 'running',
     }
 
-    tps = TestPlan.list(plans_query)
+    tps = TestPlan.objects.filter(Q(author=request.user) | Q(owner=request.user))
     tps = tps.order_by('-plan_id')
     tps = tps.select_related('product', 'type')
     tps = tps.extra(select={
