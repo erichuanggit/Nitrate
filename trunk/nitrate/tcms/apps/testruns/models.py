@@ -449,6 +449,20 @@ class TestCaseRunStatus(TCMSActionModel):
 
         return completed_status.values_list('pk', flat=True)
 
+    @classmethod
+    def _get_failed_status_ids(cls):
+        '''
+        There are some status indicate that
+        the testcaserun is failed.
+        Return IDs of these statuses.
+        '''
+        statuses = cls.objects.all()
+        failed_status = statuses.filter(name__in=(
+            'FAILED', 'ERROR'
+        ))
+
+        return failed_status.values_list('pk', flat=True)
+
 class TestCaseRunManager(models.Manager):
 
     def get_automated_case_count(self):

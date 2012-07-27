@@ -56,6 +56,21 @@ class CaseRunStatusCounter:
                 percent += self.count_data[case_run]
         return percent / self.total * 100
 
+    def failed_percent(self):
+        """
+        Calculate the failed percent
+        """
+        if not self.total:
+            return 0
+        c_percent = 0.0
+        f_percent = 0.0
+        for case_run in self.case_run_status:
+            if case_run.name in ['PASSED', 'ERROR', 'FAILED', 'WAIVED']:
+                c_percent += self.count_data[case_run]
+            if case_run.name in ['ERROR', 'FAILED']:
+                f_percent += self.count_data[case_run]
+        return (c_percent > 0) and f_percent / c_percent * 100 or 0.0
+
 class RunsCounter:
     def __init__(self, running = 0, finished = 0):
         self.running = running
