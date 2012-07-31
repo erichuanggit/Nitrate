@@ -505,13 +505,14 @@ a.section:link,a.section:visited{ color:#fff}
 .refreshlog{ padding-left:10px;}
 .filtercase{ background:url(../images/find.png) no-repeat left top; padding-left:16px;text-decoration:none;cursor:pointer;}
 /*----------Selector Start------------*/
-.selector{ float:left; margin-bottom:10px; }
-.selector-available, .selector-chosen { float:left; margin-bottom:5px; text-align:center; width:230px; border:solid 1px #999;}
-.selector-filter p{ float:left; }
-.selector-filter img{ vertical-align:middle; float:none; }
-.selector-chosen { float:right; }
+.selector{margin-bottom:10px; }
+.selector-available, .selector-chosen { margin-bottom:5px; text-align:center; width:400px; border:solid 1px #999;}
+.selector-filter p{  }
+.selector-filter input[type="text"] { width: 90%; }
+.selector-filter img{ vertical-align:middle;  }
+
 .selector{ float:left; }
-.selector-chooser{ float:left; margin:10px; padding:10px; margin-top:120px; list-style-type:none; }
+.selector-chooser{ margin:10px; padding:10px;list-style-type:none; }
 .selector-chooser li{ text-align:center; width:65px; margin:4px 0px; -moz-border-radius:5px 5px 5px 5px; background:#4E76A8; }
 .selector-chooser li a{ text-decoration:none; color:#fff; font-weight:bold; }
 .selector-filter{ width:100%; float:left; margin:0px; }
