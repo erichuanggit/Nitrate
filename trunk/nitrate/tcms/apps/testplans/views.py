@@ -32,6 +32,7 @@ from django.template.defaultfilters import slugify
 from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.conf import settings
+from django.db.models import Q
 
 from tcms.core.views import Prompt
 from tcms.core.utils.raw_sql import RawSQL
@@ -290,19 +291,20 @@ def ajax_search(request, template_name='plan/common/json_plans.txt'):
             search_form.populate(product_id=request.REQUEST['product'])
         else:
             search_form.populate()
-
         if search_form.is_valid():
             # Detemine the query is the user's plans and change the sub module value
-            if request.REQUEST.get('author'):
+            if request.REQUEST.get('author__email__startswith') and len(search_form.changed_data) == 1:
                 if request.user.is_authenticated():
-                    if request.REQUEST['author'] == request.user.username \
-                    or request.REQUEST['author'] == request.user.email:
-                        SUB_MODULE_NAME = "my_plans"
+                    if request.REQUEST['author__email__startswith'] == request.user.username \
+                    or request.REQUEST['author__email__startswith'] == request.user.email:
+                        user_email = request.REQUEST['author__email__startswith']
+                        tps = TestPlan.objects.filter(Q(author__email__startswith=user_email)
+                                                    | Q(owner__email__startswith=user_email)).distinct()
+            else:
+                tps = TestPlan.list(search_form.cleaned_data)
+                tps = tps.select_related('author', 'type', 'product')
 
             query_result = True
-            # build a QuerySet:
-            tps = TestPlan.list(search_form.cleaned_data)
-            tps = tps.select_related('author', 'type', 'product')
 
             # We want to get the number of cases and runs, without doing
             # lots of per-test queries.
