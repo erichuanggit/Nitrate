@@ -44,37 +44,7 @@ punctuation_re = re.compile('^(?P<lead>(?:%s)*)(?P<middle>.*?)(?P<trail>(?:%s)*)
     ('|'.join([re.escape(x) for x in LEADING_PUNCTUATION]),
     '|'.join([re.escape(x) for x in TRAILING_PUNCTUATION])))
 
-def is_redhat_url(middle):
-    if not middle:
-        return False
-
-    try:
-        from urlparse import ParseResult
-        py_2_6 = True
-    except ImportError:
-        py_2_6 = False
-
-    parse_result = urlparse(middle)
-    if py_2_6:
-        scheme, netloc = parse_result.scheme, parse_result.netloc
-    else:
-        scheme, netloc = parse_result[0], parse_result[1]
-
-    if scheme or netloc:
-        return netloc.split(':')[0].endswith('redhat.com')
-    
-    # According to the RFC 1808, which is also documented
-    #   within the urlparse module seciton of Python documentation, 
-    #   it must add prefix // to the url for reteirving proper netloc    
-    # So, reparse the new URL
-    middle = '//%s' % middle
-    parse_result = urlparse(middle)
-    if py_2_6:
-        return parse_result.netloc.split(':')[0].endswith('redhat.com')
-    else:
-        return parse_result[1].split(':')[0].endswith('redhat.com')
-
-def custom_is_redhat_url(url):
+def is_redhat_url(url):
     if not url:
         return False
     try:
@@ -166,7 +136,7 @@ urlize = allow_lazy(urlize, unicode)
 @register.filter
 
 #def custom_redhat_urlize(value, autoescape=None):
-#    return mark_safe(bleach.linkify(value, filter_url=custom_is_redhat_url))
+#    return mark_safe(bleach.linkify(value, filter_url=is_redhat_url))
 
 def redhat_urlize(value, classname=''):
 
@@ -183,10 +153,12 @@ def redhat_urlize(value, classname=''):
     def _replace(match):
         cls = classname and (' class="%s"' % classname) or ''
         href = match.group(0)
-        if custom_is_redhat_url(href):
+        if is_redhat_url(href):
             return '<a href="%s"%s target="_blank">%s</a>' % (href, cls, _spacify(href))
         else:
             return '<a href="#"%s>%s</a>' %(cls, _spacify(href))
-
-    return mark_safe(url_pattern.sub(_replace, value))
+    if isinstance(value, basestring):
+        return mark_safe(url_pattern.sub(_replace, value))
+    else:
+        return ''
 
