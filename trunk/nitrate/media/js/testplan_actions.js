@@ -240,17 +240,32 @@ Nitrate.TestPlans.TreeView = {
                 title += '<a href="' + data[i].extras.get_url_path + '#testruns">' + data[i].extras.num_runs + ' runs</a>, ';
             else
                 title += '0 runs, ';
-            
-            switch (data[i].extras.num_children) {
-                case 0:
-                    title += '0 child';
-                    break;
-                case 1:
-                    title += '<a href="' + data[i].extras.get_url_path + '#treeview">' + '1 child</a>';
-                    break;
-                default:
-                    title += '<a href="' + data[i].extras.get_url_path + '#treeview">' + data[i].extras.num_children + ' children</a>';
-                    break;
+
+            if (data[i].is_current){
+                switch (data[i].extras.num_children) {
+                    case 0:
+                        title += '0 child';
+                        break;
+                    case 1:
+                        title += '<a href="#treeview" onclick="expandCurrentPlan(this.up(0))">' + '1 child</a>';
+                        break;
+                    default:
+                        title += '<a href="#treeview" onclick="expandCurrentPlan(this.up(0))">' + data[i].extras.num_children + ' children</a>';
+                        break;
+                }
+            }else{
+                switch (data[i].extras.num_children) {
+                    case 0:
+                        title += '0 child';
+                        break;
+                    case 1:
+                        title += '<a href="' + data[i].extras.get_url_path + '#treeview">' + '1 child</a>';
+                        break;
+                    default:
+                        title += '<a href="' + data[i].extras.get_url_path + '#treeview">' + data[i].extras.num_children + ' children</a>';
+                        break;
+                }
+
             }
             
             title += ')</div>';
@@ -1674,4 +1689,34 @@ function FocusTabOnPlanPage(element){
     $('treeview').hide();
     $('tab_' + tab_name).addClassName('tab_focus');
     $(tab_name).show();
+}
+
+function expandCurrentPlan(element){
+    var tree = Nitrate.TestPlans.TreeView;
+    if (element.getElementsByClassName('collapse_icon').length > 0){
+        var e_container = element.getElementsByClassName('collapse_icon')[0];
+        var li_container = e_container.up(1);
+        var e_pk = e_container.next('a').innerHTML;
+        var expand_icon_url = '/media/images/t2.gif';
+        var obj = tree.traverse(tree.data, e_pk);
+        if (typeof(obj.children) != 'object' || obj.children == []) {
+            var c = function(t) {
+                var returnobj = t.responseText.evalJSON(true);
+                returnobj = Nitrate.Utils.convert('obj_to_list', returnobj);
+                tree.insert(obj, returnobj);
+                var ul = tree.render(returnobj);
+                li_container.appendChild(ul);
+            };
+            
+            var p = {
+                parent__pk: e_pk,
+                t: 'ajax',
+            };
+            tree.filter(p, c);
+        }
+        li_container.down('ul').show();
+        e_container.src = expand_icon_url;
+        e_container.removeClassName('collapse_icon');
+        e_container.addClassName('expand_icon');
+    }
 }
