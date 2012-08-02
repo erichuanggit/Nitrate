@@ -28,7 +28,7 @@ def get_tags(request, values):
         +------------------------------------------------------------+
         |                   tag Search Parameters                    |
         +------------------------------------------------------------+
-        |  Key                    | Valid Values                     |
+        | Key                     | Valid Values                     |
         | ids                     | List of Integer                  |
         | names                   | List of String                   |
         +------------------------------------------------------------+
@@ -37,7 +37,7 @@ def get_tags(request, values):
 
     Example:
 
-    >>> values= {'ids': [121, 123, ]}
+    >>> values= {'ids': [121, 123]}
     >>> Tag.get_tags(values)
     """
     if values.get('ids'):

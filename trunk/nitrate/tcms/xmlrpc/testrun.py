@@ -95,8 +95,7 @@ def remove_cases(request, run_ids, case_ids):
     Exception:   When any exception is thrown on the server side, it will be
                  returned as JSON, which contains two items:
 
-                 - status: integer, 0 if all succeed, otherwise an integer that
-                   is greater than 0 will be returned.
+                 - status: 1.
 
                  - message: str, any message specific to the error on the server
 
@@ -244,9 +243,9 @@ def create(request, values):
 @user_passes_test(lambda u: u.has_perm('testruns.change_tcmsenvrunvaluemap'))
 def env_value(request, action, run_ids, env_value_ids):
     """
-    Description: Operate env values to the given runs.
+    Description: add/remove env values to the given runs, function is same as link_env_value/unlink_env_value
 
-    Params:      $action        - String: 'add' or 'remove', It's the same as 'link' and 'unlink'
+    Params:      $action        - String: 'add' or 'remove'.
                  $run_ids       - Integer/Array/String: An integer representing the ID in the database,
                                   an array of run_ids, or a string of comma separated run_ids.
 
@@ -258,7 +257,7 @@ def env_value(request, action, run_ids, env_value_ids):
 
     Example:
     # Add env value 13 to run id 8748
-    >>> TestRun.link_env_value(8748, 13)
+    >>> TestRun.env_value('add', 8748, 13)
     """
     from tcms.apps.management.models import TCMSEnvValue
 
@@ -554,10 +553,11 @@ def update(request, run_ids, values):
     """
     Description: Updates the fields of the selected test run.
 
-    Params:      $ids - Integer: A single TestRun ID.
+    Params:      $run_ids - Integer/Array/String: An integer or alias representing the ID in the database,
+                            an array of run_ids, or a string of comma separated run_ids.
 
                  $values - Hash of keys matching TestRun fields and the new values
-                           to set each field to. See L<create> for description
+                           to set each field to. See params of TestRun.create for description
                  +-------------------+----------------+--------------------------+
                  | Field             | Type           | Description              |
                  +-------------------+----------------+--------------------------+
@@ -620,10 +620,10 @@ def update(request, run_ids, values):
             trs.update(product_version = form.cleaned_data['product_version'])
 
         if values.has_key('notes'):
-            if values.get('notes') and form.cleaned_data['notes']:
+            if values['notes'] in (None, ''):
+                trs.update(notes = values['notes'])
+            if form.cleaned_data['notes']:
                 trs.update(notes = form.cleaned_data['notes'])
-            else:
-                trs.update(notes = None)
 
         if form.cleaned_data['plan_text_version']:
             trs.update(plan_text_version = form.cleaned_data['plan_text_version'])
