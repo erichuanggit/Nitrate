@@ -19,6 +19,7 @@
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import user_passes_test
 from django.core.urlresolvers import reverse
+from django.utils.encoding import smart_str
 
 @user_passes_test(lambda u: u.has_perm('management.add_testattachment'))
 def upload_file(request):
@@ -44,7 +45,7 @@ def upload_file(request):
             stored_file_name = os.path.join(
                 settings.FILE_UPLOAD_DIR, stored_name
             ).replace('\\','/')
-            stored_file_name = stored_file_name.encode('utf-8')
+            stored_file_name = smart_str(stored_file_name)
 
             if upload_file._size > settings.MAX_UPLOAD_SIZE:
                 return HttpResponse(Prompt.render(
@@ -180,7 +181,7 @@ def check_file(request, file_id):
                 raise Http404(error)
 
     response = HttpResponse(contents, mimetype=str(attachment.mime_type))
-    response['Content-Disposition'] = 'attachment; filename=%s' % attachment.file_name.encode('utf-8')
+    response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(attachment.file_name)
     return response
 
 def able_to_delete_attachment(request,file_id):
