@@ -14,7 +14,7 @@ class BZ_Externer_Track_Thread(threading.Thread):
 
     def run(self):
         if self.is_add:
-            proxy = xmlrpclib.ServerProxy(settings.BUGZILLA_URL)
+            proxy = xmlrpclib.ServerProxy(settings.BUGZILLA3_RPC_SERVER)
             proxy.ExternalBugs.add_external_bug({
                 'Bugzilla_login': settings.BUGZILLA_USER,
                 'Bugzilla_password': settings.BUGZILLA_PASSWORD,
