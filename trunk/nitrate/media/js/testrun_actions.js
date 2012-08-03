@@ -350,7 +350,6 @@ var updateCaseRunStatus = function(e)
     
     // Callback when 
     var callback = function(t) {
-        var returnobj = t.responseText.evalJSON();
         // Reset the content to loading
         var ajax_loading = getAjaxLoading();
         ajax_loading.id = 'id_loading_' + parameters['case_id'];
@@ -395,9 +394,11 @@ var updateCaseRunStatus = function(e)
             fireEvent(link, 'click');
         }
         //update progress bar
-        jQ('span#complete_percent').text(returnobj.c_percent);
-        jQ('div.progress-inner').attr('style','width:'+returnobj.c_percent+'%');
-        jQ('div.progress-failed').attr('style','width:'+returnobj.f_percent+'%');
+        if (typeof(t) != 'undefined')
+            var returnobj = t.responseText.evalJSON();
+            jQ('span#complete_percent').text(returnobj.c_percent);
+            jQ('div.progress-inner').attr('style','width:'+returnobj.c_percent+'%');
+            jQ('div.progress-failed').attr('style','width:'+returnobj.f_percent+'%');
     }
     
     // Add comment
