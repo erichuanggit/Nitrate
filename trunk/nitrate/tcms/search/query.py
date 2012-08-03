@@ -69,7 +69,7 @@ class SmartDjangoQuery(object):
             'pl_created_before': 'create_date__lte',
             'pl_product': 'product__id__in',
             'pl_component': 'component__in',
-            'pl_version': 'product__version__in',
+            'pl_version': 'product_version__in',
         },
         TestCase.__name__: {
             'cs_id': 'pk__in',
