@@ -549,7 +549,7 @@ def update_case_run_status(request):
                 failed_count += s_count
             total_count += s_count
     except Exception, e:
-        return say_no(e)
+        return say_no(str(e))
     complete_percent = complete_count*1.0/total_count*100
     failed_percent = (complete_count > 0) and failed_count*1.0/complete_count*100 or 0
     return HttpResponse(simplejson.dumps({
