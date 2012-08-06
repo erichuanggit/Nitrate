@@ -379,7 +379,14 @@ var updateCaseRunStatus = function(e)
         // Mark the case run to mine
         if(!title.hasClassName('mine'))
             title.addClassName('mine');
-        
+
+        //update progress bar
+        if (typeof(t) != 'undefined')
+            var returnobj = t.responseText.evalJSON();
+            jQ('span#complete_percent').text(returnobj.c_percent);
+            jQ('div.progress-inner').attr('style','width:'+returnobj.c_percent+'%');
+            jQ('div.progress-failed').attr('style','width:'+returnobj.f_percent+'%');
+
         // Blind down next case
         fireEvent(link, 'click');
         if ($('id_check_box_auto_blinddown').checked && parameters['value'] != '') {
@@ -393,12 +400,6 @@ var updateCaseRunStatus = function(e)
         } else {
             fireEvent(link, 'click');
         }
-        //update progress bar
-        if (typeof(t) != 'undefined')
-            var returnobj = t.responseText.evalJSON();
-            jQ('span#complete_percent').text(returnobj.c_percent);
-            jQ('div.progress-inner').attr('style','width:'+returnobj.c_percent+'%');
-            jQ('div.progress-failed').attr('style','width:'+returnobj.f_percent+'%');
     }
     
     // Add comment
