@@ -601,7 +601,7 @@ Nitrate.TestPlans.Attachment.on_load = function()
 
          if (iSize > limit)
          {
-             alert("Your attachment's size is beyond limit.");
+             alert("Your attachment's size is beyond limit, please limit your attachments to under 5 megabytes (MB).");
          }
       });
     });
