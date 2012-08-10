@@ -618,7 +618,7 @@ class TestCaseRun(TCMSActionModel):
 
 class TestRunTag(models.Model):
     tag = models.ForeignKey(
-        'management.TestTag', primary_key=True
+        'management.TestTag'
     )
     run = models.ForeignKey(TestRun)
     user = models.IntegerField(db_column='userid', default='0')

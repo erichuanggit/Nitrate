@@ -590,7 +590,7 @@ class TestCaseComponent(models.Model):
 
 class TestCaseTag(models.Model):
     tag = models.ForeignKey(
-        'management.TestTag', primary_key=True
+        'management.TestTag'
     )
     case = models.ForeignKey(TestCase)
     user = models.IntegerField(db_column='userid', default='0')
