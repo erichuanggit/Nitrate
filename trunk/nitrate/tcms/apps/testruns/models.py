@@ -243,6 +243,9 @@ class TestRun(TCMSActionModel):
         return version and version.id or None
 
     def add_case_run(self, case, case_run_status = 1, assignee = None, case_text_version = None, build = None, notes = None, sortkey = 0):
+        self.estimated_time = case.estimated_time + self.estimated_time
+        self.save()
+
         try:
             return self.case_run.create(
                 case = case,
