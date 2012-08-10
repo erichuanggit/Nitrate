@@ -624,7 +624,7 @@ def printable(request, template_name='case/printable.html'):
         return HttpResponse(Prompt.render(
                 request=request,
                 info_type=Prompt.Info,
-                info='At least one plan is required.',))
+                info='At least one case is required.',))
 
     if request.REQUEST.get('plan'):
         tps = TestPlan.objects.filter(pk__in=request.REQUEST.getlist('plan'))
