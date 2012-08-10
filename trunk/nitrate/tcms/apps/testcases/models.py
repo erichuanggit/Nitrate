@@ -192,6 +192,7 @@ class TestCase(TCMSActionModel):
             # sortkey = values['sortkey'],
             script = values['script'],
             arguments = values['arguments'],
+            extra_link = values['extra_link'],
             summary = values['summary'],
             requirement = values['requirement'],
             alias = values['alias'],
