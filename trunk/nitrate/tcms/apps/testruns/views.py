@@ -1223,6 +1223,8 @@ def get_caseruns_of_runs(runs, kwargs=None):
     if priority:
         caseruns = caseruns.filter(case__priority__pk=priority)
     tester = kwargs.get('tester', None)
+    if not tester:
+        caseruns = caseruns.filter(tested_by=None)
     if tester:
         caseruns = caseruns.filter(tested_by__pk=tester)
     status = kwargs.get('status', None)
