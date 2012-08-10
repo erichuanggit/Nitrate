@@ -365,10 +365,13 @@ class TestRun(TCMSActionModel):
             for _id in ids
         ))
         percentage =  self.get_percentage(total)
-        if percentage == 100.0:
-            self.stop_date = datetime.datetime.now()
-        else:
-            self.stop_date = None
+        if self.auto_update_run_status:
+            if percentage == 100.0 and not self.stop_date:
+                self.stop_date = datetime.datetime.now()
+                self.save()
+            elif percentage != 100.0:
+                self.stop_date = None
+                self.save()
         return percentage
     completed_case_run_percent = property(_get_completed_case_run_percentage)
 
