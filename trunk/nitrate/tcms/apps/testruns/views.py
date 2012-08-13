@@ -786,7 +786,7 @@ def clone(request, template_name='run/clone.html'):
         if form.is_valid():
             for tr in trs:
                 n_tr = TestRun.objects.create(
-                    product_version=form.cleaned_data['product_version'],
+                    product_version=form.cleaned_data['product_version'].value,
                     plan_text_version=tr.plan_text_version,
                     summary=tr.summary,
                     notes=tr.notes,
