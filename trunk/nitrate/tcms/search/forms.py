@@ -36,6 +36,7 @@ def partial(func, **kwargs):
 
 # template-functions creating form field with required = False
 LooseCF     = partial(forms.CharField, required=False, max_length=200)
+BugCF     = partial(forms.CharField, required=False, max_length=8)
 LooseIF     = partial(forms.IntegerField, required=False)
 LooseDF     = partial(forms.DateField, required=False)
 LooseBF     = partial(forms.BooleanField, required=False)
@@ -122,7 +123,7 @@ class CaseForm(forms.Form):
     cs_authors  = LooseCF()
     cs_tester   = LooseCF()
     cs_tags     = LooseCF()
-    cs_bugs     = LooseCF()
+    cs_bugs     = BugCF()
     cs_status   = LooseMF(choices=STATUS_CHOICE)
     cs_priority = LooseMF(choices=PRIORITY_CHOICE)
     cs_auto     = LooseCF()
