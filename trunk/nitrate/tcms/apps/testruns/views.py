@@ -527,7 +527,6 @@ def edit(request, run_id, template_name='run/edit.html'):
         tr = TestRun.objects.select_related().get(run_id=run_id)
     except ObjectDoesNotExist, error:
         raise Http404
-
     # If the form is submitted
     if request.method == "POST":
         form = EditRunForm(request.REQUEST)
@@ -546,7 +545,10 @@ def edit(request, run_id, template_name='run/edit.html'):
             tr.build = form.cleaned_data['build']
             tr.product_version = form.cleaned_data['product_version']
             tr.notes = form.cleaned_data['notes']
-            tr.stop_date = request.REQUEST.get('finished') and datetime.datetime.now() or None
+            if tr.stop_date:
+                tr.stop_date = request.REQUEST.get('finished') and tr.stop_date or None
+            else:
+                tr.stop_date = request.REQUEST.get('finished') and datetime.datetime.now() or None
             tr.estimated_time = form.cleaned_data['estimated_time']
             tr.errata_id = form.cleaned_data['errata_id']
             tr.auto_update_run_status = form.cleaned_data['auto_update_run_status']
@@ -568,6 +570,7 @@ def edit(request, run_id, template_name='run/edit.html'):
             'finished': tr.stop_date,
             'estimated_time': tr.estimated_time,
             'errata_id': tr.errata_id,
+            'auto_update_run_status': tr.auto_update_run_status,
         })
         form.populate(product_id=tr.build.product_id)
 
@@ -796,7 +799,6 @@ def clone(request, template_name='run/clone.html'):
                     default_tester=(form.cleaned_data['update_default_tester'] and
                                     form.cleaned_data['default_tester'] or
                                     tr.default_tester),
-                    auto_update_run_status = form.cleaned_data['auto_update_run_status']
                     )
 
                 for tcr in tr.case_run.all():
@@ -1221,6 +1223,8 @@ def get_caseruns_of_runs(runs, kwargs=None):
     if priority:
         caseruns = caseruns.filter(case__priority__pk=priority)
     tester = kwargs.get('tester', None)
+    if not tester:
+        caseruns = caseruns.filter(tested_by=None)
     if tester:
         caseruns = caseruns.filter(tested_by__pk=tester)
     status = kwargs.get('status', None)

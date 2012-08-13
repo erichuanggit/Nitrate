@@ -374,7 +374,10 @@ def search(request, template_name='case/all.html'):
     generate the function of searching cases with search criteria
     """
     search_form = SearchCaseForm(request.REQUEST)
-    search_form.populate()
+    if request.REQUEST.get('product'):
+        search_form.populate(product_id=request.REQUEST['product'])
+    else:
+        search_form.populate()
     if request.REQUEST.get('a') == 'search' and search_form.is_valid():
         tcs = TestCase.list(search_form.cleaned_data)
     else:
@@ -621,7 +624,7 @@ def printable(request, template_name='case/printable.html'):
         return HttpResponse(Prompt.render(
                 request=request,
                 info_type=Prompt.Info,
-                info='At least one plan is required.',))
+                info='At least one case is required.',))
 
     if request.REQUEST.get('plan'):
         tps = TestPlan.objects.filter(pk__in=request.REQUEST.getlist('plan'))

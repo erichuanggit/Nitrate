@@ -192,6 +192,7 @@ class TestCase(TCMSActionModel):
             # sortkey = values['sortkey'],
             script = values['script'],
             arguments = values['arguments'],
+            extra_link = values['extra_link'],
             summary = values['summary'],
             requirement = values['requirement'],
             alias = values['alias'],
@@ -587,7 +588,7 @@ class TestCaseComponent(models.Model):
 
 class TestCaseTag(models.Model):
     tag = models.ForeignKey(
-        'management.TestTag', primary_key=True
+        'management.TestTag'
     )
     case = models.ForeignKey(TestCase)
     user = models.IntegerField(db_column='userid', default='0')
