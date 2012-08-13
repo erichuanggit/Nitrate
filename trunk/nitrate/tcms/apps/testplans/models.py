@@ -269,7 +269,7 @@ class TestPlan(TCMSActionModel):
             'plan_id': self.plan_id,
             'slug': slugify(self.name),
         })
-    
+
     def get_url_path(self, request = None):
         return self.get_absolute_url()
 
@@ -370,7 +370,7 @@ class TestPlanActivity(models.Model):
 
 class TestPlanTag(models.Model):
     tag = models.ForeignKey(
-        'management.TestTag', primary_key=True
+        'management.TestTag'
     )
     plan = models.ForeignKey(TestPlan)
     user = models.IntegerField(default="1", db_column='userid')
