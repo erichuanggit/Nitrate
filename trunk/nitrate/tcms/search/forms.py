@@ -23,6 +23,7 @@ from tcms.apps.management.models import Product, TestBuild, Component, Version
 from tcms.apps.testcases.models import TestCaseCategory
 from tcms.apps.testplans.models import TestPlanType
 from tcms.search.utils import cached_entities
+from tcms.apps.testcases.forms import BugField
 # from stdlib
 #from functools import partial
 
@@ -36,8 +37,8 @@ def partial(func, **kwargs):
 
 # template-functions creating form field with required = False
 LooseCF     = partial(forms.CharField, required=False, max_length=200)
-BugCF     = partial(forms.CharField, required=False, max_length=8)
 LooseIF     = partial(forms.IntegerField, required=False)
+LooseBugF     = partial(BugField, required=False, max_length=20)
 LooseDF     = partial(forms.DateField, required=False)
 LooseBF     = partial(forms.BooleanField, required=False)
 LooseMF     = partial(forms.MultipleChoiceField, required=False, choices=())
@@ -47,7 +48,6 @@ BuildF      = partial(forms.ModelMultipleChoiceField, required=False, queryset=T
 CategoryF   = partial(forms.ModelMultipleChoiceField, required=False, queryset=TestCaseCategory.objects.none())
 ComponentF  = partial(forms.ModelMultipleChoiceField, required=False, queryset=Component.objects.none())
 VersionF    = partial(forms.ModelMultipleChoiceField, required=False, queryset=Version.objects.none())
-
 
 def get_choice(value, _type=str, deli=','):
     '''
@@ -123,7 +123,7 @@ class CaseForm(forms.Form):
     cs_authors  = LooseCF()
     cs_tester   = LooseCF()
     cs_tags     = LooseCF()
-    cs_bugs     = BugCF()
+    cs_bugs     = LooseBugF()
     cs_status   = LooseMF(choices=STATUS_CHOICE)
     cs_priority = LooseMF(choices=PRIORITY_CHOICE)
     cs_auto     = LooseCF()

@@ -44,6 +44,27 @@ AUTOMATED_SERCH_CHOICES = (
     (2, 'Both'),
 )
 
+class BugField(forms.CharField):
+    """
+    Customizing forms CharFiled validation.
+    Bug ID seperated using a delimiter such as comma.
+    """
+    def validate(self, value):
+        from tcms.core.utils import string_to_list
+        super(BugField, self).validate(value)
+        error = 'Enter a valid Bug ID.'
+        bug_ids = string_to_list(value)
+
+        for bug_id in bug_ids:
+            try:
+                bug_id = int(bug_id)
+            except ValueError, error:
+                raise forms.ValidationError(error)
+            if abs(bug_id) > 8388607:
+                raise forms.ValidationError(error)
+
+
+
 # =========== New Case ModelForm ==============
 # The form works fine for web but broken for XML-RPC.
 # So it's not in using yet.
@@ -356,7 +377,7 @@ class BaseCaseSearchForm(forms.Form):
         queryset=Component.objects.none(),
         required=False
     )
-    bug_id = forms.CharField(label="Bug ID", required=False)
+    bug_id = BugField(label="Bug ID", required=False)
     is_automated = forms.ChoiceField(
         choices = AUTOMATED_SERCH_CHOICES,
         required = False,
@@ -545,6 +566,7 @@ class CaseCategoryForm(forms.Form):
         else:
             #self.fields['category'].queryset = TestCaseCategory.objects.all()
             self.fields['o_category'].queryset = TestCaseCategory.objects.all()
+
 class CaseTagForm(forms.Form):
     o_tag = forms.ModelMultipleChoiceField(
         label="Tags",
@@ -556,3 +578,4 @@ class CaseTagForm(forms.Form):
             self.fields['o_tag'].queryset = TestTag.objects.filter(testcase__in=case_ids).order_by('name').distinct()
         else:
             self.fields['o_category'].queryset = TestCaseCategory.objects.all()
+
