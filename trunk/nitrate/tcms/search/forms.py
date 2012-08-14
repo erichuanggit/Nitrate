@@ -38,7 +38,7 @@ def partial(func, **kwargs):
 # template-functions creating form field with required = False
 LooseCF     = partial(forms.CharField, required=False, max_length=200)
 LooseIF     = partial(forms.IntegerField, required=False)
-LooseBugF     = partial(BugField, required=False, max_length=20)
+LooseBugF     = partial(BugField, required=False, max_length=200)
 LooseDF     = partial(forms.DateField, required=False)
 LooseBF     = partial(forms.BooleanField, required=False)
 LooseMF     = partial(forms.MultipleChoiceField, required=False, choices=())
