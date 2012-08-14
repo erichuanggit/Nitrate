@@ -95,7 +95,7 @@ class TCR2File(object):
             sub_elem.set('automated', str(tcr.case.is_automated))
             log_sub_elem = etree.Element('loglinks')
             for link in tcr.links.all():
-                log_sub_elem.set('name', link.name))
+                log_sub_elem.set('name', link.name)
                 log_sub_elem.set('url', link.url)
             sub_elem.append(log_sub_elem)
             bug_sub_elem = etree.Element('bugs')
