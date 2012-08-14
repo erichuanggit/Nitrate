@@ -114,7 +114,7 @@ jQ(function() {
 			<div class="listinfo">
 				<div class="title grey">Started at&nbsp;:</div>
 				<div class="name">
-				{{ test_run.start_date }}
+				{{ test_run.start_date|date:"Y-m-d H:i:s" }}
 				</div>
 			</div>
 			<div class="listinfo" >
@@ -208,7 +208,7 @@ jQ(function() {
 			<div class="listinfo">
 				<div class="title grey">Finished at&nbsp;:</div>
 				<div class="name">
-					{{ test_run.stop_date }}
+				{{ test_run.stop_date|date:"Y-m-d H:i:s" }}
 				</div>
 			</div>
 			<div class="listinfo">

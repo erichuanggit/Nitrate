@@ -545,9 +545,7 @@ def edit(request, run_id, template_name='run/edit.html'):
             tr.build = form.cleaned_data['build']
             tr.product_version = form.cleaned_data['product_version']
             tr.notes = form.cleaned_data['notes']
-            if tr.stop_date:
-                tr.stop_date = request.REQUEST.get('finished') and tr.stop_date or None
-            else:
+            if not form.cleaned_data['auto_update_run_status'] and not tr.stop_date:
                 tr.stop_date = request.REQUEST.get('finished') and datetime.datetime.now() or None
             tr.estimated_time = form.cleaned_data['estimated_time']
             tr.errata_id = form.cleaned_data['errata_id']
