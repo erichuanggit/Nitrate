@@ -40,9 +40,8 @@ class TimedeltaWidget(forms.Widget):
     
     ESTIMATED_DAYS_CHOICE = [(x, x) for x in range(0, 10)]
     ESTIMATED_HOURS_CHOICE = [(x, x) for x in range(0, 24)]
-    ESTIMATED_MINUTES_CHOICE = [(x, x) for x in range(0, 10)]
-    ESTIMATED_MINUTES_CHOICE.extend([(x, x) for x in range(10, 60, 5)])
-    ESTIMATED_SECONDS_CHOICE = [(x, x) for x in range(0, 60, 5)]
+    ESTIMATED_MINUTES_CHOICE = [(x, x) for x in range(0, 60)]
+    ESTIMATED_SECONDS_CHOICE = [(x, x) for x in range(0, 60)]
     
     def __init__(self, attrs=None):
         self.widgets=[]

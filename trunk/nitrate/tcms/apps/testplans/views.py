@@ -500,9 +500,14 @@ def choose_run(request, plan_id, template_name='plan/choose_testrun.html'):
             testrun = get_object_or_404(TestRun, run_id=tr_id)
             cases = TestCaseRun.objects.filter(run=tr_id)
             exist_cases_id = cases.values_list ('case', flat=True)
+
             for testcase in to_be_added_cases:
                 if testcase.case_id not in exist_cases_id:
                     testrun.add_case_run(case=testcase)
+
+            estimated_time = reduce(lambda x, y: x + y, [nc.estimated_time for nc in to_be_added_cases])
+            testrun.estimated_time = testrun.estimated_time + estimated_time
+            testrun.save()
 
         return HttpResponseRedirect (
             reverse ( 'tcms.apps.testplans.views.get', args=[plan_id, ])

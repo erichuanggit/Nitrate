@@ -941,6 +941,13 @@ def assign_case(request, run_id, template_name="run/assign_case.html"):
     if request.method == 'POST':
         # New case ids
         ncs_id = request.REQUEST.getlist('case')
+        if not ncs_id:
+            return HttpResponse(Prompt.render(
+                request=request,
+                info_type=Prompt.Info,
+                info='At least one case is required by a run.',
+                next=reverse('tcms.apps.testruns.views.get', args=[run_id, ]),
+            ))
 
         for nc_id in ncs_id:
             if nc_id in etcrs_id:
@@ -959,6 +966,10 @@ def assign_case(request, run_id, template_name="run/assign_case.html"):
         else:
             for nc in ncs:
                 tr.add_case_run(case=nc,)
+
+        estimated_time = reduce(lambda x, y: x + y, [nc.estimated_time for nc in ncs])
+        tr.estimated_time = tr.estimated_time + estimated_time
+        tr.save()
 
         return HttpResponseRedirect(reverse('tcms.apps.testruns.views.get', args=[tr.run_id, ]))
 
