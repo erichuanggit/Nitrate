@@ -451,30 +451,33 @@ function toggleTestCaseContents(template_type, container, content_container, obj
     }
 }
 
-function changeTestCaseStatus(plan_id, selector, case_id)
+function changeTestCaseStatus(plan_id, selector, case_id, be_confirmed, was_confirmed)
 {
     var value = selector.value;
     var label = selector.previous();
-    
+
     var success = function(t) {
-        var returnobj = t.responseText.evalJSON(true); 
-        var case_status_id = returnobj.case_status_id; 
-        
+        var returnobj = t.responseText.evalJSON(true);
+        var case_status_id = returnobj.case_status_id;
+
         for (var i = 0; (node = selector.options[i]); i++) {
             if(node.selected)
             var case_status = node.innerHTML;
         }
-        
+
         label.innerHTML = case_status;
         label.show();
         selector.hide();
 
-        jQ('#run_case_count').text(returnobj.run_case_count);
-        jQ('#case_count').text(returnobj.case_count);
-        jQ('#review_case_count').text(returnobj.review_case_count);
-        jQ('#'+case_id).remove();
+        if( be_confirmed || was_confirmed){
+            jQ('#run_case_count').text(returnobj.run_case_count);
+            jQ('#case_count').text(returnobj.case_count);
+            jQ('#review_case_count').text(returnobj.review_case_count);
+            jQ('#'+case_id).next().remove();
+            jQ('#'+case_id).remove();
+        }
     }
-    
+
     changeCasesStatus(plan_id, case_id, value, success);
 }
 
