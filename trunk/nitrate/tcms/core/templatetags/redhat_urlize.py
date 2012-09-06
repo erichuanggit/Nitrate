@@ -142,21 +142,13 @@ def redhat_urlize(value, classname=''):
 
     url_pattern = re.compile(ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))', re.MULTILINE)
 
-    def _spacify(s, chars=40):
-        if len(s) <= chars:
-            return s
-        for k in range(len(s) / chars):
-            pos = (k + 1) * chars
-            s = s[0:pos] + ' ' + s[pos:]
-        return s
-
     def _replace(match):
-        cls = classname and (' class="%s"' % classname) or ''
+        cls = classname and ('class="%s"' % classname) or ''
         href = match.group(0)
         if is_redhat_url(href):
-            return '<a href="%s"%s target="_blank">%s</a>' % (href, cls, _spacify(href))
+            return '<a href="%s" %s target="_blank">%s</a>' % (href, cls, href)
         else:
-            return '<a href="#"%s>%s</a>' %(cls, _spacify(href))
+            return '<a href="#" %s>%s</a>' %(cls, href)
     if isinstance(value, basestring):
         return mark_safe(url_pattern.sub(_replace, value))
     else:
