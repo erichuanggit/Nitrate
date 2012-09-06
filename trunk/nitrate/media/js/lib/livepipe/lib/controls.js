@@ -46,9 +46,10 @@ Autocompleter.Base = Class.create({
     this.element     = element;
     this.update      = $(update);
     this.hasFocus    = false;
+    this.update.hasFocus = false;
     this.changed     = false;
     this.active      = false;
-    this.index       = 0;
+    this.index       = -1;
     this.entryCount  = 0;
     this.oldElementValue = this.element.value;
 
@@ -88,6 +89,8 @@ Autocompleter.Base = Class.create({
     Element.hide(this.update);
 
     Event.observe(this.element, 'blur', this.onBlur.bindAsEventListener(this));
+    Event.observe(this.update, 'mouseover', this.onDivFocus.bindAsEventListener(this)); 
+    Event.observe(this.update, 'mouseout', this.onDivBlur.bindAsEventListener(this)); 
     Event.observe(this.element, 'keydown', this.onKeyPress.bindAsEventListener(this));
   },
 
@@ -185,14 +188,25 @@ Autocompleter.Base = Class.create({
     this.index = element.autocompleteIndex;
     this.selectEntry();
     this.hide();
+    Event.stop(event);
   },
 
   onBlur: function(event) {
     // needed to make click events working
-    setTimeout(this.hide.bind(this), 250);
-    this.hasFocus = false;
-    this.active = false;
+    if(this.update.hasFocus == false){
+        setTimeout(this.hide.bind(this), 250);
+        this.hasFocus = false;
+        this.active = false;
+    }
   },
+
+  onDivFocus: function(event) { 
+    this.update.hasFocus = true; 
+  }, 
+
+  onDivBlur: function(event) { 
+    this.update.hasFocus = false; 
+  }, 
 
   render: function() {
     if(this.entryCount > 0) {
@@ -212,14 +226,16 @@ Autocompleter.Base = Class.create({
 
   markPrevious: function() {
     if(this.index > 0) this.index--;
-      else this.index = this.entryCount-1;
+    //else this.index = this.entryCount-1;
     this.getEntry(this.index).scrollIntoView(true);
+    this.showEntry(this.getEntry(this.index).textContent);
   },
 
   markNext: function() {
-    if(this.index < this.entryCount-1) this.index++;
-      else this.index = 0;
-    this.getEntry(this.index).scrollIntoView(false);
+    if(this.index <= this.entryCount-1) this.index++;
+    //else this.index = 0;
+    this.getEntry(this.index).scrollIntoView(true);
+    this.showEntry(this.getEntry(this.index).textContent);
   },
 
   getEntry: function(index) {
@@ -231,8 +247,13 @@ Autocompleter.Base = Class.create({
   },
 
   selectEntry: function() {
+    this.element.value = '';
     this.active = false;
     this.updateElement(this.getCurrentEntry());
+  },
+
+  showEntry: function(selectedElementValue){
+    this.element.value = selectedElementValue;
   },
 
   updateElement: function(selectedElement) {
@@ -283,7 +304,7 @@ Autocompleter.Base = Class.create({
       }
 
       this.stopIndicator();
-      this.index = 0;
+      this.index = -1;
 
       if(this.entryCount==1 && this.options.autoSelect) {
         this.selectEntry();
