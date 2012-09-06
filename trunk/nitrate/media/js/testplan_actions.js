@@ -1257,8 +1257,10 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         })
         
         table.adjacent('.change_status_selector').invoke('observe', 'change', function(e) {
+            var be_confirmed = (this.value == '2');
+            var was_confirmed = (this.up(0).attributes['status'].value == "CONFIRMED");
             var case_id = this.up(1).id;
-            changeTestCaseStatus(plan_id, this, case_id);
+            changeTestCaseStatus(plan_id, this, case_id, be_confirmed, was_confirmed);
         })
         
         // Display/Hide the case content
