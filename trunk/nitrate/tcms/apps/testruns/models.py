@@ -392,12 +392,7 @@ class TestRun(TCMSActionModel):
     passed_case_run_percent = property(_get_passed_case_run_percentage)
 
     def _get_total_case_run_num(self):
-        if hasattr(self, '_serialized_case_run_num'):
-            return self._serialized_case_run_num
-        status = self.get_serialized_case_run_status()
-        case_run_num = sum(status.values())
-        self._serialized_case_run_num = case_run_num
-        return self._serialized_case_run_num
+        return self.case_run.count()
     total_num_caseruns = property(_get_total_case_run_num)
 
 class TestCaseRunStatus(TCMSActionModel):
