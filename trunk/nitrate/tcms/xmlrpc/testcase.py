@@ -510,7 +510,7 @@ def filter(request, query):
         | estimated_time      | Time                                       |
         | plan                | ForeignKey: Test Plan                      |
         | priority            | ForeignKey: Priority                       |
-        | product             | ForeignKey: Product                        |
+        | category__product   | ForeignKey: Product                        |
         | summary             | String                                     |
         | tags                | ForeignKey: Tags                           |
         | create_date         | Datetime                                   |
