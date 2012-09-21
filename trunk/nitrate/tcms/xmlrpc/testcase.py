@@ -462,8 +462,8 @@ def detach_bug(request, case_ids, object_pks):
     Params:      $case_ids - Integer/Array/String: An integer representing the ID in the database,
                              an array of case_ids, or a string of comma separated case_ids
 
-                 $object_pks - Integer/Array/String: An integer representing the ID in the database, it's not real bug id,
-                           an array of primary key of bug, or a string of comma separated primary key of bug.
+                 $bug_ids - Integer/Array/String: An integer representing the ID in the database,
+                           an array of bug_ids, or a string of comma separated primary key of bug_ids.
 
     Returns:     Array: empty on success or an array of hashes with failure
                  codes if a failure occured.
@@ -483,7 +483,7 @@ def detach_bug(request, case_ids, object_pks):
     for tc in tcs:
         for opk in object_pks:
             try:
-                tc.remove_bug(id = opk)
+                tc.remove_bug(bug_id = opk)
             except ObjectDoesNotExist, error:
                 pass
 
