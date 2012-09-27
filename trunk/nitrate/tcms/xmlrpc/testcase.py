@@ -392,6 +392,7 @@ def create(request, values):
       | breakdown                  | String         | Optional  |                             |
       | tag                        | Array/String   | Optional  | String Comma separated      |
       | bug                        | Array/String   | Optional  | String Comma separated      |
+      | extra_link                 | String         | Optional  | reference link              | 
       +----------------------------+----------------+-----------+-----------------------------+
 
     Returns:     Array/Hash: The newly created object hash if a single case was created, or
@@ -1030,6 +1031,7 @@ def update(request, case_ids, values):
         | requirement           | String         | Optional                                |
         | alias                 | String         | Optional                                |
         | notes                 | String         | Optional                                |
+        | extra_link            | String         | Optional(reference link) 
         +-----------------------+----------------+-----------------------------------------+
 
     Example:

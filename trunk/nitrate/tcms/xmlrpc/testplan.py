@@ -18,6 +18,7 @@
 
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
 from tcms.apps.testplans.models import TestPlan, TestPlanType
+from tcms.apps.testcases.models import TestCasePlan
 from tcms.apps.management.models import TestTag
 from django.core.exceptions import ObjectDoesNotExist
 from utils import pre_process_ids
@@ -338,10 +339,19 @@ def get_test_cases(request, plan_id):
     from tcms.apps.testcases.models import TestCase
     from tcms.apps.testplans.models import TestPlan
     from tcms.core.utils.xmlrpc import XMLRPCSerializer
-
-    tp = TestPlan.objects.get(pk=plan_id)
+    try:
+        tp = TestPlan.objects.get(pk=plan_id)
+    except TestPlan.DoesNotExist as e:
+        return e.message
     tcs = TestCase.objects.filter(plan=tp).order_by('testcaseplan__sortkey')
-    return XMLRPCSerializer(tcs).serialize_queryset()
+    serialized_tcs = XMLRPCSerializer(tcs).serialize_queryset()
+    if serialized_tcs:
+        for serialized_tc in serialized_tcs:
+            case_id = serialized_tc.get('case_id', None)
+            tc = tcs.get(pk=case_id)
+            tcp = tc.testcaseplan_set.get(plan=tp)
+            serialized_tc['sortkey'] = tcp.sortkey
+    return serialized_tcs
 
 def get_test_runs(request, plan_id):
     """
