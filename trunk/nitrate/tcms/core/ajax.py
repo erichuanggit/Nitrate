@@ -31,6 +31,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core import serializers
+from django.dispatch import Signal
 
 from tcms.apps.testplans.models import TestPlan, TestCasePlan
 from tcms.apps.testcases.models import TestCase, TestCaseTag, TestCaseBugSystem as BugSystem
@@ -41,7 +42,10 @@ from tcms.core.helpers.comments import add_comment
 
 from tcms.apps.testcases.models import TestCaseCategory
 from tcms.apps.management.models import Component, TestBuild, Version
+from tcms.apps.testruns import signals as run_watchers
 
+post_update = Signal(providing_args=["instances", "kwargs"])
+post_update.connect(run_watchers.post_update_handler)
 
 def check_permission(request, ctype):
     perm = '%s.change_%s' % tuple(ctype.split('.'))
@@ -377,7 +381,7 @@ def update(request):
                 )
             except (AttributeError, User.DoesNotExist):
                 pass
-    targets.update(**{field: value})
+    objects_update(targets, **{field:value})
 
     if hasattr(model, 'mail_scene'):
         from tcms.core.utils.mailto import mailto
@@ -428,8 +432,7 @@ def update(request):
                 t.save()
             except (AttributeError, User.DoesNotExist):
                 pass
-        targets.update(close_date = now)
-        targets.update(tested_by = request.user)
+        targets.update(close_date=now, tested_by=request.user)
     return say_yes()
 
 def update_case_run_status(request):
@@ -478,7 +481,7 @@ def update_case_run_status(request):
                 )
             except (AttributeError, User.DoesNotExist):
                 pass
-    targets.update(**{field: value})
+    objects_update(targets, **{field:value})
 
     if hasattr(model, 'mail_scene'):
         from tcms.core.utils.mailto import mailto
@@ -529,8 +532,7 @@ def update_case_run_status(request):
                 t.save()
             except (AttributeError, User.DoesNotExist):
                 pass
-        targets.update(close_date = now)
-        targets.update(tested_by = request.user)
+        targets.update(close_date=now, tested_by=request.user)
 
     run_status_count = targets[0].run.case_run_status.split(',')
     complete_count = 0
@@ -734,6 +736,12 @@ def get_prod_related_obj_json(request):
     else:
         res = []
     return HttpResponse(simplejson.dumps(res))
+
+def objects_update(objects, **kwargs):
+    objects.update(**kwargs)
+    kwargs['instances'] = objects
+    if isinstance(objects[0], TestCaseRun) and kwargs.get('case_run_status', None):
+        post_update.send(sender=None, **kwargs)
 
 if __name__ == '__main__':
     import doctest

@@ -197,7 +197,7 @@ jQ(function() {
 				</div>
 {% else %}
 				<div class="name">
-					{% if test_run.completed_case_run_percent == 100.0 %}
+					{% if test_run.stop_date %}
 					<span class="pauselink"> Finished </span>
 					{% else %}
 					<span class="runninglink">Running</span>

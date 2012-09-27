@@ -537,6 +537,20 @@ def edit(request, run_id, template_name='run/edit.html'):
 
         #FIXME: Error handler
         if form.is_valid():
+            # detect if auto_update_run_status field is changed by user when edit testrun.
+            auto_update_changed = False
+            if tr.auto_update_run_status != form.cleaned_data['auto_update_run_status']:
+                auto_update_changed = True
+
+            # detect if finished field is changed by user when edit testrun.
+            finish_field_changed = False
+            if tr.stop_date and not form.cleaned_data['finished']:
+                finish_field_changed = True
+                is_finish = False
+            elif not tr.stop_date and form.cleaned_data['finished']:
+                finish_field_changed = True
+                is_finish = True
+
             tr.summary = form.cleaned_data['summary']
             # Permission hack
             if tr.manager == request.user or tr.plan.author == request.user:
@@ -545,12 +559,14 @@ def edit(request, run_id, template_name='run/edit.html'):
             tr.build = form.cleaned_data['build']
             tr.product_version = form.cleaned_data['product_version']
             tr.notes = form.cleaned_data['notes']
-            if not form.cleaned_data['auto_update_run_status'] and not tr.stop_date:
-                tr.stop_date = request.REQUEST.get('finished') and datetime.datetime.now() or None
             tr.estimated_time = form.cleaned_data['estimated_time']
             tr.errata_id = form.cleaned_data['errata_id']
             tr.auto_update_run_status = form.cleaned_data['auto_update_run_status']
             tr.save()
+            if auto_update_changed:
+                tr.update_completion_status(is_auto_updated=True)
+            if finish_field_changed:
+                tr.update_completion_status(is_auto_updated=False, is_finish=is_finish)
             return HttpResponseRedirect(
                 reverse('tcms.apps.testruns.views.get', args=[run_id, ])
             )
@@ -893,11 +909,9 @@ def change_status(request, run_id):
     tr = get_object_or_404(TestRun, run_id=run_id)
 
     if request.GET.get('finished') == '1':
-        tr.stop_date = datetime.datetime.now()
+        tr.update_completion_status(is_auto_updated=False, is_finish=True)
     else:
-        tr.stop_date = None
-
-    tr.save()
+        tr.update_completion_status(is_auto_updated=False, is_finish=False)
 
     return HttpResponseRedirect(
         reverse('tcms.apps.testruns.views.get', args=[run_id, ])

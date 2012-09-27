@@ -19,7 +19,7 @@
 
 from django.core.urlresolvers import reverse
 from django.db import models, connection
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.contrib.contenttypes import generic
 
 from tcms.core.models import TCMSActionModel, TimedeltaField
@@ -365,13 +365,6 @@ class TestRun(TCMSActionModel):
             for _id in ids
         ))
         percentage =  self.get_percentage(total)
-        if self.auto_update_run_status:
-            if percentage == 100.0 and not self.stop_date:
-                self.stop_date = datetime.datetime.now()
-                self.save()
-            elif percentage != 100.0:
-                self.stop_date = None
-                self.save()
         return percentage
     completed_case_run_percent = property(_get_completed_case_run_percentage)
 
@@ -394,6 +387,20 @@ class TestRun(TCMSActionModel):
     def _get_total_case_run_num(self):
         return self.case_run.count()
     total_num_caseruns = property(_get_total_case_run_num)
+
+    def update_completion_status(self, is_auto_updated, is_finish=None):
+        if is_auto_updated and self.auto_update_run_status:
+            if self.completed_case_run_percent == 100.0:
+                self.stop_date = datetime.datetime.now()
+            else:
+                self.stop_date = None
+            self.save()
+        if not is_auto_updated and not self.auto_update_run_status:
+            if is_finish:
+                self.stop_date = datetime.datetime.now()
+            else:
+                self.stop_date = None
+            self.save()
 
 class TestCaseRunStatus(TCMSActionModel):
     id = models.AutoField(db_column='case_run_status_id', primary_key=True)
@@ -637,6 +644,8 @@ class TCMSEnvRunValueMap(models.Model):
 
 # Signals handler
 post_save.connect(run_watchers.post_run_saved, sender=TestRun)
+post_save.connect(run_watchers.post_case_run_saved, sender=TestCaseRun, dispatch_uid='tcms.apps.testruns.models.TestCaseRun')
+post_delete.connect(run_watchers.post_case_run_deleted, sender=TestCaseRun, dispatch_uid='tcms.apps.testruns.models.TestCaseRun')
 
 def make_caserun_status_id_attributes():
     '''

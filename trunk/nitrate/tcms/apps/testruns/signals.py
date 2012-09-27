@@ -64,6 +64,23 @@ def post_run_saved(sender, *args, **kwargs):
         is_created = True
         NewRunEmailThread(instance, is_created).start()
 
+def post_case_run_saved(sender, *args, **kwargs):
+    instance = kwargs['instance']
+    if kwargs.get('created'):
+        tr = instance.run
+        tr.update_completion_status(is_auto_updated=True)
+
+def post_case_run_deleted(sender, **kwargs):
+    instance = kwargs['instance']
+    tr = instance.run
+    tr.update_completion_status(is_auto_updated=True)
+
+def post_update_handler(sender, **kwargs):
+    instances = kwargs['instances']
+    instance = instances[0]
+    tr = instance.run
+    tr.update_completion_status(is_auto_updated=True)
+
 # new testrun created info for qpid
 def qpid_run_created(sender, *args, **kwargs):
     tr = kwargs['instance']
