@@ -277,7 +277,6 @@ def filter(request, values = {}):
         | build               | ForeignKey: Build                        |
         | case                | ForeignKey: Test Case                    |
         | case_run_status     | ForeignKey: Case Run Status              |
-        | category            | ForeignKey: Category                     |
         | is_current          | 1: Only show current 0: show not current |
         | notes               | String                                   |
         | run                 | ForeignKey: Test Run                     |

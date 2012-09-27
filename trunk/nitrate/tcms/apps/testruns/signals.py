@@ -37,7 +37,7 @@ class NewRunEmailThread(threading.Thread):
         if self.is_created:
             self.instance.mail(
                 # new_run.txt can use in testrun update
-                template = 'mail/new_run.txt',
+                template = 'mail/update_run.txt',
                 subject = 'Test Run %s - %s has been updated' % (
                     self.instance.pk, self.instance.summary
                 ),
