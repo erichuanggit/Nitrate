@@ -19,13 +19,19 @@
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
 from tcms.apps.testruns.models import TestCaseRun, TestCaseRunStatus
 from utils import pre_process_ids
+from tcms.core.utils.xmlrpc import XMLRPCSerializer
+from tcms.core.contrib.linkreference.models import create_link, LinkReference
+
+
 
 __all__ = (
     'add_comment',
     'attach_bug',
+    'attach_log',
     'check_case_run_status',
     'create',
     'detach_bug',
+    'detach_log',
     'filter',
     'filter_count',
     'get',
@@ -37,6 +43,7 @@ __all__ = (
     'get_completion_time_s',
     'get_history',
     'get_history_s',
+    'get_logs',
     'lookup_status_name_by_id',
     'lookup_status_id_by_name',
     'update',
@@ -567,3 +574,57 @@ def update(request, case_run_ids, values):
 
     query = {'pk__in': tcrs.values_list('pk', flat = True)}
     return TestCaseRun.to_xmlrpc(query)
+
+
+def attach_log(request, case_run_id, name, url):
+    """
+    Description: Add new log link to TestCaseRun
+
+    Params:     $caserun_id - Integer
+                $name       - String: A short description to this new link, and accept 64 characters at most.
+                $url        - String: The actual URL.
+    """
+    try:
+        test_case_run = TestCaseRun.objects.get(pk=case_run_id)
+    except ObjectDoesNotExist, error:
+        raise
+
+    return create_link(name=name, url=url, link_to=test_case_run)
+
+
+def detach_log(request, case_run_id, link_id):
+    """
+    Description: Remove log link to TestCaseRun
+
+    Params:     $case_run_id - Integer
+                $link_id     - Integer: Id of LinkReference instance
+    """
+    try:
+        test_case_run = TestCaseRun.objects.get(pk=case_run_id)
+    except ObjectDoesNotExist, error:
+        raise
+
+    try:
+        LinkReference.unlink(link_id)
+    except:
+        raise
+
+    return
+
+
+def get_logs(request, case_run_id):
+    """
+    Description:  Get log links to TestCaseRun
+
+    Params:     $case_run_id - Integer:
+    """
+    try:
+        test_case_run = TestCaseRun.objects.get(pk=case_run_id)
+    except ObjectDoesNotExist, error:
+        raise
+
+    links = LinkReference.get_from(test_case_run)
+    s = XMLRPCSerializer(links)
+    return s.serialize_queryset()
+
+
