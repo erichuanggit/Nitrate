@@ -34,6 +34,16 @@ def upload_file(request):
         try:
             upload_file = request.FILES['upload_file']
 
+            try:
+                upload_file.name.decode('utf8')
+            except UnicodeEncodeError:
+                return HttpResponse(Prompt.render(
+                    request = request,
+                    info_type = Prompt.Alert,
+                    info = 'Upload File name is not legal.',
+                    next = 'javascript:window.history.go(-1);',
+                ))
+
             now = datetime.now()
 
             stored_name = '%s-%s-%s' % (
