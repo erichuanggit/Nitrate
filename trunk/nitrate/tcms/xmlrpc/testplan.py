@@ -341,8 +341,8 @@ def get_test_cases(request, plan_id):
     from tcms.core.utils.xmlrpc import XMLRPCSerializer
     try:
         tp = TestPlan.objects.get(pk=plan_id)
-    except TestPlan.DoesNotExist as e:
-        return e.message
+    except TestPlan.DoesNotExist, err:
+        return err.message
     tcs = TestCase.objects.filter(plan=tp).order_by('testcaseplan__sortkey')
     serialized_tcs = XMLRPCSerializer(tcs).serialize_queryset()
     if serialized_tcs:
