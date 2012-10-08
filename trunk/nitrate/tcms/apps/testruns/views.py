@@ -969,6 +969,10 @@ def assign_case(request, run_id, template_name="run/assign_case.html"):
 
         ncs = tcs.filter(case_id__in=ncs_id)
 
+        estimated_time = reduce(lambda x, y: x + y, [nc.estimated_time for nc in ncs])
+        tr.estimated_time = tr.estimated_time + estimated_time
+        tr.save()
+
         if request.REQUEST.get('_use_plan_sortkey'):
             for nc in ncs:
                 try:
@@ -980,10 +984,6 @@ def assign_case(request, run_id, template_name="run/assign_case.html"):
         else:
             for nc in ncs:
                 tr.add_case_run(case=nc,)
-
-        estimated_time = reduce(lambda x, y: x + y, [nc.estimated_time for nc in ncs])
-        tr.estimated_time = tr.estimated_time + estimated_time
-        tr.save()
 
         return HttpResponseRedirect(reverse('tcms.apps.testruns.views.get', args=[tr.run_id, ]))
 
