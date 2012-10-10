@@ -392,7 +392,7 @@ def create(request, values):
       | breakdown                  | String         | Optional  |                             |
       | tag                        | Array/String   | Optional  | String Comma separated      |
       | bug                        | Array/String   | Optional  | String Comma separated      |
-      | extra_link                 | String         | Optional  | reference link              | 
+      | extra_link                 | String         | Optional  | reference link              |
       +----------------------------+----------------+-----------+-----------------------------+
 
     Returns:     Array/Hash: The newly created object hash if a single case was created, or
@@ -456,7 +456,7 @@ def create(request, values):
 
 @log_call
 @user_passes_test(lambda u: u.has_perm('testcases.delete_testcasebug'))
-def detach_bug(request, case_ids, object_pks):
+def detach_bug(request, case_ids, bug_ids):
     """
     Description: Remove one or more bugs to the selected test cases.
 
@@ -478,11 +478,11 @@ def detach_bug(request, case_ids, object_pks):
     >>> TestCase.detach_bug('56789, 12345', '1234, 5678')
     """
     case_ids = pre_process_ids(case_ids)
-    object_pks = pre_process_ids(object_pks)
+    bug_ids = pre_process_ids(bug_ids)
 
     tcs = TestCase.objects.filter(case_id__in = case_ids)
     for tc in tcs:
-        for opk in object_pks:
+        for opk in bug_ids:
             try:
                 tc.remove_bug(bug_id = opk)
             except ObjectDoesNotExist, error:
@@ -1031,7 +1031,7 @@ def update(request, case_ids, values):
         | requirement           | String         | Optional                                |
         | alias                 | String         | Optional                                |
         | notes                 | String         | Optional                                |
-        | extra_link            | String         | Optional(reference link) 
+        | extra_link            | String         | Optional(reference link)
         +-----------------------+----------------+-----------------------------------------+
 
     Example:

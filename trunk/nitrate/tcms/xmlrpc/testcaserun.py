@@ -233,15 +233,15 @@ def create(request, values):
 
 @log_call
 @user_passes_test(lambda u: u.has_perm('testcases.delete_testcasebug'))
-def detach_bug(request, case_run_ids, object_pks):
+def detach_bug(request, case_run_ids, bug_ids):
     """
     Description: Remove one or more bugs to the selected test case-runs.
 
     Params:      $case_run_ids - Integer/Array/String: An integer or alias representing the ID in the database,
                                                        an array of case_run_ids, or a string of comma separated case_run_ids.
 
-                 $object_pks - Integer/Array/String: An integer or alias representing the ID in the database, it's not real bug id,
-                                                  an array of bugs primary key, or a string of comma separated bugs primary key.
+                 $bug_ids - Integer/Array/String: An integer representing the ID in the database,
+                           an array of bug_ids, or a string of comma separated primary key of bug_ids.
 
     Returns:     Array: empty on success or an array of hashes with failure
                         codes if a failure occured.
@@ -257,14 +257,14 @@ def detach_bug(request, case_run_ids, object_pks):
     tcrs = TestCaseRun.objects.filter(
         case_run_id__in = pre_process_ids(case_run_ids)
     )
-
-    object_pks = pre_process_ids(object_pks)
+    bug_ids = pre_process_ids(bug_ids)
 
     for tcr in tcrs:
-        for opk in object_pks:
+        case_run_id = tcr.case_run_id
+        for opk in bug_ids:
             try:
-                tcr.remove_bug(id = opk)
-            except:
+                tcr.remove_bug(bug_id=opk, run_id=case_run_id)
+            except ObjectDoesNotExist, error:
                 pass
 
     return
