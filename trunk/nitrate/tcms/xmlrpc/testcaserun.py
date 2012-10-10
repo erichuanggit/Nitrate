@@ -588,7 +588,8 @@ def attach_log(request, case_run_id, name, url):
     except ObjectDoesNotExist, error:
         raise
 
-    return create_link(name=name, url=url, link_to=test_case_run)
+    create_link(name=name, url=url, link_to=test_case_run)
+    return
 
 
 def detach_log(request, case_run_id, link_id):
