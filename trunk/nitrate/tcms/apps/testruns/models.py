@@ -367,22 +367,35 @@ class TestRun(TCMSActionModel):
         percentage =  self.get_percentage(total)
         return percentage
     completed_case_run_percent = property(_get_completed_case_run_percentage)
-
-    def _get_failed_case_run_percentage(self):
+    
+    def _get_failed_case_run_num(self):
         status = self.get_serialized_case_run_status()
         failed_status_id = TestCaseRunStatus.id_failed
         failed_count = status.get(failed_status_id, 0)
-        percentage = self.get_percentage(failed_count)
+        return failed_count
+    failed_case_run_num = property(_get_failed_case_run_num)
+
+    def _get_failed_case_run_percentage(self):
+        percentage = self.get_percentage(self.failed_case_run_num)
         return percentage
     failed_case_run_percent = property(_get_failed_case_run_percentage)
-
-    def _get_passed_case_run_percentage(self):
+    
+    def _get_passed_case_run_num(self):
         status = self.get_serialized_case_run_status()
         passed_status_id = TestCaseRunStatus.id_passed
         passed_count = status.get(passed_status_id, 0)
-        percentage = self.get_percentage(passed_count)
+        return passed_count
+    passed_case_run_num = property(_get_passed_case_run_num)
+
+    def _get_passed_case_run_percentage(self):
+        percentage = self.get_percentage(self.passed_case_run_num)
         return percentage
     passed_case_run_percent = property(_get_passed_case_run_percentage)
+
+    def get_status_case_run_num(self, status_name):
+        status = self.get_serialized_case_run_status()
+        status_id = TestCaseRunStatus._status_to_id(status_name)
+        return status.get(status_id, 0)
 
     def _get_total_case_run_num(self):
         return self.case_run.count()

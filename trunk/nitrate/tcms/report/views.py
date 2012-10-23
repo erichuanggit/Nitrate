@@ -23,12 +23,15 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 from tcms.apps.testruns.models import TestRun, TestCaseRun
 from tcms.apps.management.models import Classification, Product, Component
-from tcms.core.utils import calc_percent
+from tcms.apps.management.models import TestBuild
+from tcms.apps.testruns.models import TestCaseRunStatus
 from tcms.core.utils.counter import CaseRunStatusCounter, RunsCounter
 from tcms.core.utils.raw_sql import ReportSQL as RawSQL
 from tcms.core.helpers.cache import cached_entities
 from tcms.search.forms import RunForm
-from tcms.report.targets.run import search_runs, test_run_report
+from tcms.report.forms import CustomSearchForm
+from tcms.report.targets.run import search_runs, test_run_report, \
+        set_test_build_attrs, count_items
 from tcms.search import fmt_queries, remove_from_request_path
 
 MODULE_NAME = "report"
@@ -248,16 +251,9 @@ def component(request, product_id, template_name='report/component.html'):
 
 def custom_search(request, template_name='report/custom_search.html'):
     """Custom report with search function"""
-    from tcms.apps.management.models import TestBuild
-    from tcms.apps.testruns.models import TestCaseRunStatus
-    from forms import CustomSearchForm
-
     SUB_MODULE_NAME = 'custom_search'
-    total_plans_count = 0
-    total_runs_count = 0
     auto_count = manual_count = both_count = total_count = 0
-    default_case_run_status = TestCaseRunStatus.objects.filter(name__in = ['passed', 'failed'])
-
+    total_plans_count = total_runs_count = 0
     if request.REQUEST.get('a', '').lower() == 'search':
         form = CustomSearchForm(request.REQUEST)
         form.populate(product_id = request.REQUEST.get('product'))
@@ -265,38 +261,25 @@ def custom_search(request, template_name='report/custom_search.html'):
             tbs = TestBuild.objects
             for k, v in form.fields.items():
                 if form.cleaned_data[k]:
-                    tbs = tbs.filter(**{k: form.cleaned_data[k]})
+                    tbs = tbs.filter(**{k: form.cleaned_data[k]}).distinct()
 
-            extra_query = {
-                'plans_count': RawSQL.custom_search_plans_count,
-                'runs_count': RawSQL.custom_search_runs_count,
-                'case_runs_count': RawSQL.custom_search_case_runs_count_under_run,
-            }
-            for tcrss in default_case_run_status:
-                extra_query['case_runs_' + tcrss.name.lower() + '_count'] = RawSQL.custom_search_case_runs_count_by_status_under_run % tcrss.pk
+            tbs = tbs.extra(select={
+                'runs_count':RawSQL.custom_search_runs_count
+                })
 
-
-            tbs = tbs.distinct()
-            tbs = tbs.extra(select=extra_query)
-
-            total_plans_count = sum(filter(lambda s: s is not None, tbs.values_list('plans_count', flat = True)))
-            total_runs_count = sum(filter(lambda s: s is not None, tbs.values_list('runs_count', flat = True)))
-            trs = TestRun.objects.select_related('build', 'case_run')
-            trs = TestRun.objects.filter(build__in = tbs)
-            for tr in trs:
-                manual_count += tr.case_run.get_manual_case_count()
-                auto_count += tr.case_run.get_automated_case_count()
-                both_count += tr.case_run.get_both()
-
+            total_runs_count = sum(filter(lambda s:s is not None, tbs.values_list('runs_count', flat = True)))
+            for tb in tbs:
+                tb = set_test_build_attrs(tb, show_detail=False)
+            if tbs:
+                total_plans_count = count_items('plans_count', tbs)
+                manual_count = count_items('manual_count', tbs)
+                auto_count = count_items('auto_count', tbs)
+                both_count = count_items('both_count', tbs)
         else:
             tbs = TestBuild.objects.none()
     else:
         form = CustomSearchForm()
         tbs = TestBuild.objects.none()
-
-    for tcrss in default_case_run_status:
-        for tb in tbs:
-            setattr(tb, 'case_runs_%s_percent' % tcrss.name.lower(), calc_percent(getattr(tb, 'case_runs_%s_count' % tcrss.name.lower()), tb.case_runs_count))
 
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
@@ -328,60 +311,38 @@ def custom_details(request, template_name='report/custom_details.html'):
     if form.is_valid():
         tcrses = TestCaseRunStatus.objects.all()
 
-        tbs = TestBuild.objects.filter(pk__in = request.REQUEST.getlist('pk__in'))
-        tps = TestPlan.objects.filter(run__build__in = tbs)
-        trs = TestRun.objects.filter(build__in = tbs)
+        tbs = TestBuild.objects.filter(pk__in = request.REQUEST.getlist('pk__in')).distinct()
+        tps = TestPlan.objects.filter(run__build__in = tbs).distinct()
+        trs = TestRun.objects.filter(build__in = tbs).select_related('build', 'case_run')
         tcrs = TestCaseRun.objects.select_related('case', 'run', 'case_run_status', 'tested_by')
-        tcrs = tcrs.filter(run__build__in = tbs)
+        tcrs = tcrs.filter(run__build__in = tbs).distinct()
 
-#        if form.cleaned_data['product']:
-#            tps = tps.filter(run__build__product = form.cleaned_data['product'])
-#            trs = trs.filter(build__product = form.cleaned_data['product'])
-#            tcrs = tcrs.filter(run__build__product = form.cleaned_data['product'])
-#
-#        if form.cleaned_data['build_run__product_version']:
-#            tps = tps.filter(run__product_version = form.cleaned_data['build_run__product_version'])
-#            trs = trs.filter(product_version = form.cleaned_data['build_run__product_version'])
-#            tcrs = tcrs.filter(run__product_version = form.cleaned_data['build_run__product_version'])
+        tbs = tbs.extra(select={
+                'runs_count': RawSQL.custom_search_runs_count,
+                })
 
-        extra_query = {
-            'plans_count': RawSQL.custom_search_plans_count,
-            'runs_count': RawSQL.custom_search_runs_count,
-            'case_runs_count': RawSQL.custom_search_case_runs_count_under_run,
-        }
-        for tcrss in default_case_run_status:
-            extra_query['case_runs_' + tcrss.name.lower() + '_count'] = RawSQL.custom_search_case_runs_count_by_status_under_run % tcrss.pk
+        for tb in tbs:
+            tb = set_test_build_attrs(tb, show_detail=True)
+        if tbs:
+            total_plans_count = count_items('plans_count', tbs)
+            manual_count = count_items('manual_count', tbs)
+            auto_count = count_items('auto_count', tbs)
+            both_count = count_items('both_count', tbs)
+            total_count = both_count + auto_count + manual_count
+            total_runs_count = sum(filter(lambda s:s is not None, tbs.values_list('runs_count', flat = True)))
 
-        tbs = tbs.distinct()
-        tbs = tbs.extra(select=extra_query)
-        tps = tps.distinct()
         trs = trs.filter(plan__in = tps).distinct()
-
         for tp in tps:
             tp.runs = []
-
             for tr in trs:
                 if tp.plan_id == tr.plan_id:
                     tp.runs.append(tr)
-
-        tcrs = tcrs.distinct()
-        Manual = 0
-        Automated = 1
-        Both = 2
-        both_count = tcrs.filter(case__is_automated = Both).count()
-        auto_count = tcrs.filter(case__is_automated = Automated).count()
-        manual_count = tcrs.filter(case__is_automated = Manual).count()
-        total_count = both_count + auto_count + manual_count
 
         cursor = connection.cursor()
         for tr in trs:
             cursor.execute(RawSQL.custom_details_case_run_count % tr.pk)
             for s, n in cursor.fetchall():
                 setattr(tr, s, n)
-
-        for tcrss in default_case_run_status:
-            for tb in tbs:
-                setattr(tb, 'case_runs_%s_percent' % tcrss.name.lower(), calc_percent(getattr(tb, 'case_runs_%s_count' % tcrss.name.lower()), tb.case_runs_count))
 
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,

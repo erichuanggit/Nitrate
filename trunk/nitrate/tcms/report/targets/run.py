@@ -22,12 +22,13 @@ in here, it is well suggested that you read
 PRD 3.4.1 for a reference.
 '''
 
-
+import operator
 from tcms.search.forms import RunForm
 from tcms.search.query import SmartDjangoQuery
 from tcms.apps.testruns.models import TestRun, TestCaseRun
 from tcms.apps.testruns.models import TestCaseRunStatus
 from tcms.core.utils.raw_sql import ReportSQL
+from tcms.core.utils import calc_percent
 from tcms.apps.testplans.models import TestPlan
 
 from itertools import groupby
@@ -254,6 +255,40 @@ def group_runs_by_plan(runs):
     for run in runs:
         (lambda t: plan_run_map.setdefault(t, []).append(run))(run.plan)
     return plan_run_map
+
+def set_test_build_attrs(tb, show_detail=False):
+    case_runs_count = 0
+    case_runs_passed_count = 0
+    case_runs_failed_count = 0
+    plans_count = 0
+    manual_count = 0
+    auto_count = 0
+    both_count = 0
+    trs = TestRun.objects.filter(build=tb).select_related('case_run', 'plan')
+    if trs:
+        manual_count = reduce(operator.add, [tr.case_run.get_manual_case_count() for tr in trs])
+        auto_count = reduce(operator.add, [tr.case_run.get_automated_case_count() for tr in trs])
+        both_count = reduce(operator.add, [tr.case_run.get_both() for tr in trs])
+        case_runs_count = count_items('total_num_caseruns', trs)
+        plans_count = len(set([tr.plan.pk for tr in trs]))
+        if show_detail:
+            tcr_statuses = TestCaseRunStatus.objects.all()
+        else:
+            tcr_statuses = TestCaseRunStatus.objects.filter(name__in = ['passed', 'failed'])
+        for tcr_status in tcr_statuses:
+            status_name = tcr_status.name.lower()
+            setattr(tb, 'case_runs_%s_count' % status_name, reduce(lambda x, y: x+y, [tr.get_status_case_run_num(status_name)  for tr in trs]))
+        setattr(tb, 'case_runs_passed_percent', calc_percent(tb.case_runs_passed_count, case_runs_count))
+        setattr(tb, 'case_runs_failed_percent', calc_percent(tb.case_runs_failed_count, case_runs_count))
+    setattr(tb, 'manual_count', manual_count)
+    setattr(tb, 'auto_count', auto_count)
+    setattr(tb, 'both_count', both_count)
+    setattr(tb, 'case_runs_count', case_runs_count)
+    setattr(tb, 'plans_count', plans_count)
+    return tb
+
+def count_items(attribute, items):
+    return reduce(operator.add, [getattr(item, attribute) for item in items])
 
 if __name__ == '__main__':
     import doctest
