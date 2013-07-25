@@ -16,7 +16,7 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.exceptions import PermissionDenied
 
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
@@ -28,6 +28,7 @@ __all__ = (
     'get',
     'get_me',
     'update',
+    'join'
 )
 
 def get_user_dict(user):
@@ -89,7 +90,7 @@ def get_me(request):
     """
     return get_user_dict(request.user)
 
-def update(request, values = {}, id = None):
+def update(request, values = None, id = None):
     """
     Description: Updates the fields of the selected user. it also can change the
                  informations of other people if you have permission.
@@ -124,6 +125,9 @@ def update(request, values = {}, id = None):
     else:
         u = request.user
     
+    if values is None:
+        values = {}
+        
     editable_fields = ['first_name', 'last_name', 'email', 'password']
     
     if not request.user.has_perm('auth.change_changeuser') and request.user != u:
@@ -144,3 +148,29 @@ def update(request, values = {}, id = None):
             
     u.save()
     return get_user_dict(u)
+
+@log_call
+@user_passes_test(lambda u: u.has_perm('auth.change_user'))
+def join(request, username, groupname):
+    """
+    Description: Add user to a group specified by name.
+
+    Returns: None
+    
+    Raises: PermissionDenied
+            Object.DoesNotExist
+
+    Example:
+    >>> User.join('username', groupname')
+    """
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist, e:
+        raise User.DoesNotExist('User "%s" does not exist' % username)
+    else:
+        try:
+            group = Group.objects.get(name=groupname)
+        except Group.DoesNotExist, e:
+            raise Group.DoesNotExist('Group "%s" does not exist' % groupname)
+        else:
+            user.groups.add(group)
