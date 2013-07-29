@@ -2,7 +2,7 @@
 %define use_pylint 0
 
 Name:           nitrate
-Version:        3.3.4
+Version:        3.8.2
 Release:        1%{?dist}
 Summary:        Test Case Management System
 
@@ -118,6 +118,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+
+*Fri Jul 25 2013 Chaobin Tang <ctang@redhat.com> - 3.8.2
+- XMLRPC API (Refer to ChangeLog)
 
 *Fri Jul 11 2011 Chaobin Tang <ctang@redhat.com> - 3.5
 - Usability Improvements (Refer to ChangeLog)

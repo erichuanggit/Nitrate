@@ -34,7 +34,7 @@ $(TARBALL): Makefile
 	@rm -f $(TARBALL)
 	@mkdir $(WORK_DIR)
 	@echo "Getting latest codes from git"
-	@cd $(WORK_DIR); git clone git://git.fedorahosted.org/nitrate.git
+	@cd $(WORK_DIR); git clone -b development git://git.fedorahosted.org/nitrate.git
 	# Fixup the version field in the page footer so that it shows the precise
 	# RPM version-release:
 	@cd $(SOURCE_DIR); sed --in-place -r 's|NITRATE_VERSION|$(VERSION)|' $(SOURCE_DIR)/nitrate/templates/tcms_base.html
