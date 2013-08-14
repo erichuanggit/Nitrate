@@ -2,7 +2,7 @@
 %define use_pylint 0
 
 Name:           nitrate
-Version:        3.8.2
+Version:        3.8.3
 Release:        1%{?dist}
 Summary:        Test Case Management System
 

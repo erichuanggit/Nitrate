@@ -16,7 +16,7 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>, Chenxiong Qi <cqi@redhat.com>
 
-VERSION = (3, 8, 2)
+VERSION = (3, 8, 3)
 
 def get_version():
     return VERSION
