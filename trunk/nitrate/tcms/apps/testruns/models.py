@@ -21,6 +21,7 @@ from django.core.urlresolvers import reverse
 from django.db import models, connection
 from django.db.models.signals import post_save, post_delete
 from django.contrib.contenttypes import generic
+from django.conf import settings
 
 from tcms.core.models import TCMSActionModel, TimedeltaField
 
@@ -367,7 +368,7 @@ class TestRun(TCMSActionModel):
         percentage =  self.get_percentage(total)
         return percentage
     completed_case_run_percent = property(_get_completed_case_run_percentage)
-    
+
     def _get_failed_case_run_num(self):
         status = self.get_serialized_case_run_status()
         failed_status_id = TestCaseRunStatus.id_failed
@@ -379,7 +380,7 @@ class TestRun(TCMSActionModel):
         percentage = self.get_percentage(self.failed_case_run_num)
         return percentage
     failed_case_run_percent = property(_get_failed_case_run_percentage)
-    
+
     def _get_passed_case_run_num(self):
         status = self.get_serialized_case_run_status()
         passed_status_id = TestCaseRunStatus.id_passed
@@ -656,9 +657,13 @@ class TCMSEnvRunValueMap(models.Model):
         db_table = u'tcms_env_run_value_map'
 
 # Signals handler
-post_save.connect(run_watchers.post_run_saved, sender=TestRun)
-post_save.connect(run_watchers.post_case_run_saved, sender=TestCaseRun, dispatch_uid='tcms.apps.testruns.models.TestCaseRun')
-post_delete.connect(run_watchers.post_case_run_deleted, sender=TestCaseRun, dispatch_uid='tcms.apps.testruns.models.TestCaseRun')
+def _run_listen():
+    post_save.connect(run_watchers.post_run_saved, sender=TestRun)
+    post_save.connect(run_watchers.post_case_run_saved, sender=TestCaseRun, dispatch_uid='tcms.apps.testruns.models.TestCaseRun')
+    post_delete.connect(run_watchers.post_case_run_deleted, sender=TestCaseRun, dispatch_uid='tcms.apps.testruns.models.TestCaseRun')
+
+if settings.LISTENING_MODEL_SIGNAL:
+    _run_listen()
 
 def make_caserun_status_id_attributes():
     '''
