@@ -1,3 +1,6 @@
+*Tue Sep 17 2013 Jian Chen <jianchen@redhat.com> - 3.8.4
+- Fixed bug # 1005797 - [RFE] Add a column with number of comments into Case Runs table
+- Fixed bug # 921930 - Date format of attached log links is incorrect
 *T Jul 25 2013 Chaobin Tang <ctang@redhat.com> - 3.8.2
 - Fixed bug # 988332 - Added one permission protected XMLRPC API to add group for a user.
 *Fri Jul 11 2011 Chaobin Tang <ctang@redhat.com> - 3.5
