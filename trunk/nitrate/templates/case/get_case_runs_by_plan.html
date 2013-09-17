@@ -1,3 +1,4 @@
+{% load comments %}
 <td id="id_case_run_{{ forloop.counter }}" colspan="12">
 <table class="list" id="table_case_runs_by_plan" cellspacing="0" cellspan="0">
 <tbody>
@@ -13,6 +14,7 @@
 		<th width="80">Priority</th>
 		<th width="120">Text Version</th>
 		<th width="100">Status</th>
+        <th width="100">Comments</th>
 		<th width="40">Sort</th>
 	</tr>
 {% for test_case_run in test_case_runs_by_plan %}
@@ -55,6 +57,12 @@
 				<img sborder="0" alt="" class="icon_status left_float btn_{{ test_case_run.case_run_status.name|lower }}" />
 				<label class="left_float">{{ test_case_run.case_run_status.name|upper }}</label>
 			</td>
+            {% get_comment_count for test_case_run as comment_count %}
+            {% if comment_count > 0 %}
+            <td class="expandable"><img src="{{ MEDIA_URL }}/images/comment.png" style="vertical-align: middle;">{{ comment_count }}</td>
+            {% else %}
+            <td class="expandable">{{ comment_count }}</td>
+            {% endif %}
 			<td>
 				<span class="mark">
 					<a href="#" onclick="changeCaseRunOrder('{{ test_case_run.run_id }}', '{{ test_case_run.case_run_id }}', '{{ test_case_run.sortkey }}')">{{ test_case_run.sortkey }}</a>
