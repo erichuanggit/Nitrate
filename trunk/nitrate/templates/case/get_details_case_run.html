@@ -215,7 +215,7 @@
                             <div class="content">
                                 <ul class="ul-format">
                                     {% for link in test_case_run.links.all %}
-                                      <li><a href="{{ link.url }}" target="_blank" title="{{ link.url }}">{{ link.name|escape }}</a>&nbsp;<span class="grey">{{ link.created_on|date:"N m, Y" }}</span>&nbsp;<a href="javascript:void(0);" onclick="removeLink(this, {{ link.pk }});"><img title="Remove this log" src="/media/images/remove_small.png"></a></li>
+                                      <li><a href="{{ link.url }}" target="_blank" title="{{ link.url }}">{{ link.name|escape }}</a>&nbsp;<span class="grey">{{ link.created_on|date:"N d, Y" }}</span>&nbsp;<a href="javascript:void(0);" onclick="removeLink(this, {{ link.pk }});"><img title="Remove this log" src="/media/images/remove_small.png"></a></li>
                                     {% endfor %}
                                 </ul>
                              </div>
