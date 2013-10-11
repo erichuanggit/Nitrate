@@ -175,15 +175,12 @@ class TestPlan(TCMSActionModel):
             else:
                 plan_text_version = 1
 
-        try:
-            return self.text.create(
-                plan_text_version = plan_text_version,
-                author = author,
-                create_date = create_date,
-                plan_text = plan_text
-            )
-        except:
-            raise
+        return self.text.create(
+            plan_text_version = plan_text_version,
+            author = author,
+            create_date = create_date,
+            plan_text = plan_text
+        )
 
     def add_case(self, case, sortkey=0):
 
@@ -206,31 +203,22 @@ class TestPlan(TCMSActionModel):
 
     def add_env_group(self, env_group):
         # Create the env plan map
-        try:
-            return TCMSEnvPlanMap.objects.create(
-                plan = self,
-                group = env_group,
-            )
-        except:
-            raise
+        return TCMSEnvPlanMap.objects.create(
+            plan = self,
+            group = env_group,
+        )
 
     def add_attachment(self, attachment):
-        try:
-            return TestPlanAttachment.objects.create(
-                plan = self,
-                attachment = attachment,
-            )
-        except:
-            raise
+        return TestPlanAttachment.objects.create(
+            plan = self,
+            attachment = attachment,
+        )
 
     def add_tag(self, tag):
-        try:
-            return TestPlanTag.objects.get_or_create(
-                plan = self,
-                tag = tag
-            )
-        except:
-            raise
+        return TestPlanTag.objects.get_or_create(
+            plan = self,
+            tag = tag
+        )
 
     def remove_tag(self, tag):
         cursor = connection.cursor()
@@ -250,10 +238,7 @@ class TestPlan(TCMSActionModel):
 
     def clear_env_groups(self):
         # Remove old env groups because we only maintanence on group per plan.
-        try:
-            return TCMSEnvPlanMap.objects.filter(plan = self).delete()
-        except:
-            raise
+        return TCMSEnvPlanMap.objects.filter(plan = self).delete()
 
     def delete_case(self, case):
         cursor = connection.cursor()

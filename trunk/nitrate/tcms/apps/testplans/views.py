@@ -1100,10 +1100,7 @@ def component(request, template_name='plan/get_component.html'):
 
             for tp in self.tps:
                 for c in cs:
-                    try:
-                        tp.add_component(c)
-                    except:
-                        raise
+                    tp.add_component(c)
             return self.render()
 
         def clear(self):
@@ -1138,10 +1135,7 @@ def component(request, template_name='plan/get_component.html'):
 
             for tp in self.tps:
                 for c in cs:
-                    try:
-                        tp.remove_component(c)
-                    except:
-                        raise
+                    tp.remove_component(c)
 
             return self.render()
 
