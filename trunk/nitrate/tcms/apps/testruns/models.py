@@ -378,7 +378,7 @@ class TestRun(TCMSActionModel):
         return status.get(status_id, 0)
 
     def _get_total_case_run_num(self):
-        return 10  # self.case_run.count()
+        return self.case_run.count()
     total_num_caseruns = property(_get_total_case_run_num)
 
     def update_completion_status(self, is_auto_updated, is_finish=None):
