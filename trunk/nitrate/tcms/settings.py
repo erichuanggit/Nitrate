@@ -260,6 +260,9 @@ CASE_DELETE_EMAIL_TEMPLATE = 'mail/delete_case.txt'
 # 500MB - 429916160
 MAX_UPLOAD_SIZE = 5242880
 
+# Pagination
+PLAN_RUNS_PAGE_SIZE = 20
+
 # Site-specific messages
 
 # The site can supply optional "message of the day" style

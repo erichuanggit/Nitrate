@@ -541,6 +541,10 @@ Nitrate.TestPlans.Details.on_load = function()
     
     // Make the import case dialog draggable.
     new Draggable('id_import_case_zone');
+
+    jQ('#show_more_runs').live('click', Nitrate.TestPlans.Runs.showMore);
+    jQ('#reload_runs').live('click', Nitrate.TestPlans.Runs.reload);
+    jQ('#tab_testruns').live('click', Nitrate.TestPlans.Runs.initializaRunTab);
 };
 
 
@@ -1720,5 +1724,78 @@ function expandCurrentPlan(element){
         e_container.src = expand_icon_url;
         e_container.removeClassName('collapse_icon');
         e_container.addClassName('expand_icon');
+    }
+}
+
+Nitrate.TestPlans.Runs = {
+
+    makeUrlFromPlanId: function (planId) {
+        return '/plan/' + planId + '/runs/';
+    }
+
+    , render: function (data, textStatus, jqXHR) {
+        var tbody = jQ('#testruns_body');
+        tbody.append(data.html);
+    }
+
+    , initializaRunTab: function () {
+        var that = Nitrate.TestPlans.Runs;
+        // When the testruns tab first clicked.
+        var tbody = jQ('#testruns_body');
+        if (tbody.children().length === 0) {
+            that.reload();
+        }
+    }
+
+    , nextPage: function (planId) {
+        var that = this;
+        var url = that.makeUrlFromPlanId(planId);
+        var request = jQ.ajax({
+            dataType: 'json',
+            url: url,
+            data: that.filter()
+        }).done(that.render);
+        return request;
+    }
+
+    , filter: function (data) {
+        var queryString = jQ("#run_filter").serialize();
+        return queryString;
+    }
+
+    , showMore: function () {
+        var that = Nitrate.TestPlans.Runs;
+        var showMoreLink = jQ('#show_more_runs');
+        if (showMoreLink.attr('ended') === 'yes') {
+            return false;
+        }
+        var planId = showMoreLink.attr('plan');
+        var localPageNum = parseInt(jQ('[name=page_num]').val());
+        var request = that.nextPage(planId);
+        request.done(function(data, textStatus, jqXHR) {
+            // Update the local page number
+            if (localPageNum < data.numPages) {
+                var remaining = (data.numPages - localPageNum);
+                localPageNum++;
+                jQ('[name=page_num]').val(localPageNum);
+                showMoreLink.html("Show More (" + remaining + " pages left)");
+            } else {
+                showMoreLink.html("End");
+                showMoreLink.attr('ended', 'yes');
+            }
+        });
+    }
+
+    , reload: function () {
+        var that = Nitrate.TestPlans.Runs;
+        // clean the table
+        var tbody = jQ('#testruns_body');
+        tbody.empty();
+        var page = jQ('[name=page_num');
+        page.val('1');
+        var showMoreLink = jQ('#show_more_runs');
+        showMoreLink.html('Show More');
+        showMoreLink.attr('ended', 'no');
+        that.showMore();
     }
 }

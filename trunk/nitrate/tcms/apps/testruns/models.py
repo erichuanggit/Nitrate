@@ -329,6 +329,8 @@ class TestRun(TCMSActionModel):
         to = self.get_notify_addrs()
         mailto(template, subject, to, context, request)
 
+# START  deprecating
+
     def get_bug_count(self):
         tcrs = self.case_run.all()
         tcr_bugs = TestCaseBug.objects.filter(case_run__case_run_id__in=tcrs.values_list('case_run_id', flat=True)).values('bug_id').distinct()
@@ -415,6 +417,8 @@ class TestRun(TCMSActionModel):
             else:
                 self.stop_date = None
             self.save()
+
+# END deprecating
 
 class TestCaseRunStatus(TCMSActionModel):
     id = models.AutoField(db_column='case_run_status_id', primary_key=True)

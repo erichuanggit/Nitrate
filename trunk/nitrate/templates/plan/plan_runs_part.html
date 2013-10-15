@@ -1,0 +1,42 @@
+{% for test_run in test_runs %}
+<tr class="{% cycle 'odd' 'even' %}">
+	<td><input type="checkbox" class="shiftselect" name="run" value="{{ test_run.pk }}" /></td>
+	<td	 valign="top">
+		<a href="{% url tcms.apps.testruns.views.get test_run.run_id %}?from_plan={{ test_plan.plan_id }}">{{ test_run.run_id }}</a>
+	</td>
+	<td valign="top" class="subject">
+		<a href="{% url tcms.apps.testruns.views.get test_run.run_id %}?from_plan={{ test_plan.plan_id }}">{{ test_run.summary }}</a>
+	</td>
+	<td valign="top"><a href="{% url tcms.apps.profiles.views.profile test_run.manager.username %}">{{ test_run.manager }}</a></td>
+	<td valign="top">{% if test_run.default_tester_id %}<a href="{% url tcms.apps.profiles.views.profile test_run.default_tester.username %}">{{ test_run.default_tester }}</a>{% else%} None{% endif %}</td>
+	<td valign="top">{{ test_run.start_date }}</td>
+	<td valign="top">{{ test_run.build }}</td>
+	<td valign="top">{% if test_run.stop_date %}Finished{% else %}Running{% endif %}</td>
+	<td valign="top" align='center'>{{ test_run.total_num_caseruns|default:"0" }}</td>
+	<td valign="top">
+		<div class="progress-bar" style="width:100px;">
+			<div class="percent">{{ test_run.failed_case_run_percent|default:"0" }}%</div>
+			<div class="progress-failed" style="width:{{ test_run.failed_case_run_percent|default:"0" }}px;">
+			</div>
+		</div>
+	</td>
+	<td valign="top">
+
+		<div class="progress-bar" style="width:100px;">
+			<div class="percent">{{ test_run.passed_case_run_percent|default:"0" }}%</div>
+			<div class="progress-inner" style="width:{{ test_run.passed_case_run_percent|default:"0" }}px;">
+			</div>
+		</div>
+	</td>
+</tr>
+{% empty %}
+<tr>
+	<td colspan="9">
+		{% if perms.testruns.add_testrun %}
+		<span class="prompt-message"><center >No Test Run was found in this plan, if you  want to create one ,go to <a href="{% url tcms.apps.testruns.views.new %}?from_plan={{ test_plan.plan_id }}">Create Test Run</a>.</center></span>
+		{% else %}
+		<span class="prompt-message"><center >No Test Run was found in this plan.</center></span>
+		{% endif %}
+	</td>
+</tr>
+{% endfor %}

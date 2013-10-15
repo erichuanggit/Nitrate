@@ -1,3 +1,25 @@
+<div>
+	<form id="run_filter">
+	<ul>
+		<li>ID: <input type="text" name="run_id"></li>
+		<li>Summary: <input type="text" name="summary__icontains"/></li>
+		<li>Build:
+			<select name="build">
+				<option value="">--</option>
+				{% for build in test_plan.product.build.all %}
+				<option value="{{build.build_id}}">{{build.name}}</option>
+				{% endfor %}
+			</select>
+		</li>
+		<li>Manager: <input type="text" name="manager__username__iexact"/></li>
+		<li>Default Tester: <input type="text" name="default_tester__username__iexact"/> </li>
+		<li>Start Date: <input type="text" name="start_date" class="vDateField"/> </li>
+		<li><a href="#reload" id="reload_runs">Reload</a></li>
+		<input type="hidden" name="page_num" value="1"/>
+	</ul>
+	</form>
+</div>
+
 <form id='id_form_run' action="{% url tcms.apps.testruns.views.clone %}" method="get">
 	<input type="hidden" name="from_plan" value="{{ test_plan.pk }}" />
 	<input type="hidden" name="product" value="{{ test_plan.product.pk }}" />
@@ -25,49 +47,16 @@
 				<th align="left" width="110" class="number" >Success</th>
 			</tr>
 		</thead>
-		<tbody>
-			{% for test_run in test_runs %}
-			<tr class="{% cycle 'odd' 'even' %}">
-				<td><input type="checkbox" class="shiftselect" name="run" value="{{ test_run.pk }}" /></td>
-				<td	 valign="top">
-					<a href="{% url tcms.apps.testruns.views.get test_run.run_id %}?from_plan={{ test_plan.plan_id }}">{{ test_run.run_id }}</a>
-				</td>
-				<td valign="top" class="subject">
-					<a href="{% url tcms.apps.testruns.views.get test_run.run_id %}?from_plan={{ test_plan.plan_id }}">{{ test_run.summary }}</a>
-				</td>
-				<td valign="top"><a href="{% url tcms.apps.profiles.views.profile test_run.manager.username %}">{{ test_run.manager }}</a></td>
-				<td valign="top">{% if test_run.default_tester_id %}<a href="{% url tcms.apps.profiles.views.profile test_run.default_tester.username %}">{{ test_run.default_tester }}</a>{% else%} None{% endif %}</td>
-				<td valign="top">{{ test_run.start_date }}</td>
-				<td valign="top">{{ test_run.build }}</td>
-				<td valign="top">{% if test_run.stop_date %}Finished{% else %}Running{% endif %}</td>
-				<td valign="top" align='center'>{{ test_run.total_num_caseruns|default:"0" }}</td>
-				<td valign="top">
-					<div class="progress-bar" style="width:100px;">
-						<div class="percent">{{ test_run.failed_case_run_percent|default:"0" }}%</div>
-						<div class="progress-failed" style="width:{{ test_run.failed_case_run_percent|default:"0" }}px;">
-						</div>
-					</div>
-				</td>
-				<td valign="top">
-
-					<div class="progress-bar" style="width:100px;">
-						<div class="percent">{{ test_run.passed_case_run_percent|default:"0" }}%</div>
-						<div class="progress-inner" style="width:{{ test_run.passed_case_run_percent|default:"0" }}px;">
-						</div>
-					</div>
-				</td>
-			</tr>
-			{% empty %}
+		<tbody id="testruns_body"></tbody>
+		<tfoot>
 			<tr>
-				<td colspan="9">
-					{% if perms.testruns.add_testrun %}
-					<span class="prompt-message"><center >No Test Run was found in this plan, if you  want to create one ,go to <a href="{% url tcms.apps.testruns.views.new %}?from_plan={{ test_plan.plan_id }}">Create Test Run</a>.</center></span>
-					{% else %}
-					<span class="prompt-message"><center >No Test Run was found in this plan.</center></span>
-					{% endif %}
+				<td colspan="11">
+					<a href="#show_more_runs" id="show_more_runs" 
+						plan="{{test_plan.pk}}"
+						page="1"
+						ended="no">Show More</a>
 				</td>
 			</tr>
-			{% endfor %}
-		</tbody>
+		</tfoot>
 	</table>
 </form>

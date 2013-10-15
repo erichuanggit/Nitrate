@@ -27,6 +27,7 @@ from django.views.generic.simple import direct_to_template
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import simplejson
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -323,6 +324,48 @@ def all(request, template_name = 'run/all.html'):
         'search_form': search_form,
         'query_url': query_url,
     })
+
+def load_runs_of_one_plan(request, plan_id, template_name='plan/plan_runs_part.html'):
+    """A dedicated view to return a set of runs of a plan.
+
+    This view is used in a plan detail page, for the contained
+    testrun tab. It replaces the original solution, with a paginated
+    resultset in return, serves as a performance healing.
+    Also, in order for user to locate the data, it accepts
+    field lookup parameters collected from the filter panel
+    in the UI.
+    """
+    tp = TestPlan.objects.get(plan_id=plan_id)
+    data = dict(request.REQUEST)
+
+    # pagination
+    page_num = data.pop('page_num', 1)
+
+    # clean the query parameters
+    data = dict([(k, v) for k, v in data.iteritems() if v.strip()])
+
+    queryset = tp.run.filter(**data).select_related('build',
+                'manager', 'default_tester')
+
+    # pagination using Django's paginator API
+    paginator = Paginator(queryset, settings.PLAN_RUNS_PAGE_SIZE)
+    try:
+        runs = paginator.page(page_num).object_list
+    except PageNotAnInteger:
+        runs = queryset.none()
+    except EmptyPage:
+        runs = queryset.none()
+
+    response = direct_to_template(request, template_name, {
+            'test_runs': runs,
+            'test_plan': tp
+        })
+    return HttpResponse(simplejson.dumps({
+            'html': response.content,
+            'numPages': paginator.num_pages,
+            'pageNum': page_num
+        }))
+    
 
 def ajax_search(request, template_name ='run/common/json_runs.txt'):
     """Read the test runs from database and display them."""

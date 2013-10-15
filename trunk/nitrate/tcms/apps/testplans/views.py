@@ -419,7 +419,7 @@ def get(request, plan_id, slug=None, template_name = 'plan/get.html'):
         return HttpResponsePermanentRedirect(tp.get_absolute_url())
 
     # Generate the run list of plan
-    tp_trs = tp.run.select_related('build', 'manager', 'default_tester')
+    #TODO tp_trs = tp.run.select_related('build', 'manager', 'default_tester')
     tp_rvs = tp.review.select_related('author', 'default_reviewer')
     tp_rvs = tp_rvs.extra(
         select={'total_num_review_cases': RawSQL.total_num_review_cases,}
@@ -434,7 +434,7 @@ def get(request, plan_id, slug=None, template_name = 'plan/get.html'):
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_plan': tp,
-        'test_runs': tp_trs,
+        # TODO'test_runs': tp_trs,
         'test_reviews': tp_rvs,
         'xml_form': ImportCasesViaXMLForm(initial = {'a': 'import_cases'}),
     })
