@@ -1747,13 +1747,24 @@ Nitrate.TestPlans.Runs = {
         }
     }
 
+    , showLoading: function () {
+        var loader = jQ('#img_loading_runs');
+        loader.show();
+    }
+
+    , hideLoading: function () {
+        var loader = jQ('#img_loading_runs');
+        loader.hide();
+    }
+
     , nextPage: function (planId) {
         var that = this;
         var url = that.makeUrlFromPlanId(planId);
         var request = jQ.ajax({
             dataType: 'json',
             url: url,
-            data: that.filter()
+            data: that.filter(),
+            beforeSend: that.showLoading
         }).done(that.render);
         return request;
     }
@@ -1784,6 +1795,8 @@ Nitrate.TestPlans.Runs = {
                 showMoreLink.attr('ended', 'yes');
             }
         });
+        request.done(that.hideLoading);
+        return false;
     }
 
     , reload: function () {
@@ -1797,5 +1810,6 @@ Nitrate.TestPlans.Runs = {
         showMoreLink.html('Show More');
         showMoreLink.attr('ended', 'no');
         that.showMore();
+        return false;
     }
 }

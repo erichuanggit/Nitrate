@@ -340,6 +340,7 @@ def load_runs_of_one_plan(request, plan_id, template_name='plan/plan_runs_part.h
 
     # pagination
     page_num = data.pop('page_num', 1)
+    page_size = int(data.pop('page_size', settings.PLAN_RUNS_PAGE_SIZE))
 
     # clean the query parameters
     data = dict([(k, v) for k, v in data.iteritems() if v.strip()])
@@ -348,7 +349,7 @@ def load_runs_of_one_plan(request, plan_id, template_name='plan/plan_runs_part.h
                 'manager', 'default_tester')
 
     # pagination using Django's paginator API
-    paginator = Paginator(queryset, settings.PLAN_RUNS_PAGE_SIZE)
+    paginator = Paginator(queryset, page_size)
     try:
         runs = paginator.page(page_num).object_list
     except PageNotAnInteger:
