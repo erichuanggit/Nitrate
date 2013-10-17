@@ -17,7 +17,7 @@
 	</thead>
 	<tbody>
 		{% for test_run in test_runs %}
-		<tr class="{% cycle 'rowodd' 'roweven' %}">
+		<tr class="{% cycle 'rowodd' 'roweven' %}" id="run_{{test_run.run_id}}">
 			<td><input type='checkbox' name="run" value="{{ test_run.pk }}" /></td>
 			<td><a href="{% url tcms.apps.testruns.views.get test_run.run_id %}" >{{ test_run.run_id }}</a></td>
 			<td><a href="{% url tcms.apps.testruns.views.get test_run.run_id %}" >{{ test_run.summary|striptags }}</a></td>
@@ -35,6 +35,7 @@
 				<span class="runninglink">Running</span>
 				{% endif %}
 			</td>
+			<!--
 			<td>
 				<div class="progress-bar" title="failed:{{ test_run.failed_case_run_percent|default:"0" }}%">
 					<div class="progress-inner" style="width:{{ test_run.completed_case_run_percent|default:"0" }}%;">
@@ -43,6 +44,15 @@
 							</div>
 					</div>
 					<div class="percent">{{ test_run.completed_case_run_percent|default:"0" }}%</div>
+				</div>
+			</td> -->
+			<td>
+				<a href="#statistics" class="btn-statistics" run="{{test_run.run_id}}">calculate</a>
+				<div class="progress-bar" style="display: none;">
+					<div class="progress-inner" status="completed_case_run_percent">
+						<div class="progress-failed" status="failed_case_run_percent"></div>
+					</div>
+					<div class="percent">{#{{ test_run.completed_case_run_percent|default:"0" }}%#}</div>
 				</div>
 			</td>
 		</tr>

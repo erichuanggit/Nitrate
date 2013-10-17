@@ -24,7 +24,7 @@
         {% else %}
             "<span class='runninglink'>Running</span>"
         {% endif %},
-        "<div class='progress-bar' title='failed:{{ test_run.failed_case_run_percent|default:'0' }}%'><div class='progress-inner' style='width:{{ test_run.completed_case_run_percent|default:'0' }}%;'><div class='progress-failed' style='width:{{ test_run.failed_case_run_percent|default:'0' }}%;'></div></div><div class='percent'>{{ test_run.completed_case_run_percent|default:'0' }}%</div></div>"
+        "<a href='#statistics' class='btn-statistics' run='{{test_run.run_id}}'>calculate</a><div class='progress-bar' style='display: none;'><div class='progress-inner'><div class='progress-failed'></div></div><div class='percent'></div></div>"
         ]
     {% if not forloop.last %}
     ,

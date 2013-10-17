@@ -136,6 +136,7 @@ urlpatterns = patterns('',
     (r'^run/(?P<run_id>\d+)/cc/$', 'tcms.apps.testruns.views.cc'),
     (r'^run/(?P<run_id>\d+)/update/$', 'tcms.apps.testruns.views.update_case_run_text'),
     (r'^run/(?P<run_id>\d+)/export/$', 'tcms.apps.testruns.views.export'),
+    (r'^run/(?P<run_id>\d+)/percent/$', 'tcms.apps.testruns.views.caserun_of_the_status_in_percentage'),
 
     (r'^caseruns/$', 'tcms.apps.testruns.views.caseruns'),
     (r'^caserun/(?P<case_run_id>\d+)/current/$', 'tcms.apps.testruns.views.set_current'),

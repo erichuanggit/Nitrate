@@ -1298,3 +1298,27 @@ def get_caseruns_of_runs(runs, kwargs=None):
     if status:
         caseruns = caseruns.filter(case_run_status__name__iexact=status)
     return caseruns
+
+def caserun_of_the_status_in_percentage(request, run_id):
+    """View calculates the statistics of one run.
+
+    Part of the lazy-loading optimization.
+
+    For one TestRun, aggregating its TestCaseRuns
+    in a given status or multiple statuses is useful
+    for users to gain statistical knowledge of the
+    testing progress.
+
+    This view is called by AJAX requests.
+    """
+    data = request.REQUEST
+
+    try:
+        status = data.get('status')
+        assert (status in TestRun.PERCENTAGES)
+    except AssertionError:
+        raise Http404
+    else:
+        run = get_object_or_404(TestRun, pk=run_id)
+        percent = getattr(run, status)
+        return HttpResponse(simplejson.dumps({'percent': percent}))

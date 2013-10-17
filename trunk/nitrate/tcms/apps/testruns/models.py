@@ -40,6 +40,12 @@ except ImportError:
 
 class TestRun(TCMSActionModel):
 
+    # Attribute names to get testrun statistics
+    PERCENTAGES = (
+        'failed_case_run_percent',
+        'passed_case_run_percent', 
+        'completed_case_run_percent')
+
     run_id = models.AutoField(primary_key=True)
     errata_id = models.IntegerField(max_length=11, null=True, blank=True)
 
@@ -51,7 +57,6 @@ class TestRun(TCMSActionModel):
     summary = models.TextField()
     notes = models.TextField(blank=True)
     estimated_time = TimedeltaField()
-    case_run_status = models.CharField(max_length=100, default='')
 
     plan = models.ForeignKey('testplans.TestPlan', related_name='run')
     environment_id = models.IntegerField(default=0)
@@ -329,8 +334,6 @@ class TestRun(TCMSActionModel):
         to = self.get_notify_addrs()
         mailto(template, subject, to, context, request)
 
-# START  deprecating
-
     def get_bug_count(self):
         tcrs = self.case_run.all()
         tcr_bugs = TestCaseBug.objects.filter(case_run__case_run_id__in=tcrs.values_list('case_run_id', flat=True)).values('bug_id').distinct()
@@ -341,41 +344,24 @@ class TestRun(TCMSActionModel):
         if case_run_count == 0:
             return 0
         percent = float(count)/case_run_count*100
-        if not percent:
-            percent = 0
-        else:
-            percent = round(percent, 2)
+        percent = round(percent, 2)
         return percent
 
-    def get_serialized_case_run_status(self):
-        if hasattr(self, 'serialized_case_run_status'):
-            return self.serialized_case_run_status
-        if self.case_run_status:
-            status = dict([
-                map(int, _s.split(':'))
-                for _s in self.case_run_status.split(',')
-            ])
-        else:
-            status = {}
-        self.serialized_case_run_status = status
-        return self.serialized_case_run_status
-
     def _get_completed_case_run_percentage(self):
-        status = self.get_serialized_case_run_status()
-        ids = TestCaseRunStatus.completed_status_ids
-        total = sum((
-            status.get(_id, 0)
-            for _id in ids
-        ))
-        percentage =  self.get_percentage(total)
+        ids = TestCaseRunStatus._get_completed_status_ids()
+        completed_caserun = self.case_run.filter(
+            case_run_status__in=ids)
+        
+        percentage =  self.get_percentage(completed_caserun.count())
         return percentage
     completed_case_run_percent = property(_get_completed_case_run_percentage)
 
     def _get_failed_case_run_num(self):
-        status = self.get_serialized_case_run_status()
-        failed_status_id = TestCaseRunStatus.id_failed
-        failed_count = status.get(failed_status_id, 0)
-        return failed_count
+        failed_status_id = TestCaseRunStatus.id_failed()
+        failed_caserun = self.case_run.filter(
+            case_run_status=failed_status_id
+        )
+        return failed_caserun.count()
     failed_case_run_num = property(_get_failed_case_run_num)
 
     def _get_failed_case_run_percentage(self):
@@ -384,10 +370,11 @@ class TestRun(TCMSActionModel):
     failed_case_run_percent = property(_get_failed_case_run_percentage)
 
     def _get_passed_case_run_num(self):
-        status = self.get_serialized_case_run_status()
-        passed_status_id = TestCaseRunStatus.id_passed
-        passed_count = status.get(passed_status_id, 0)
-        return passed_count
+        passed_status_id = TestCaseRunStatus.id_passed()
+        passed_caserun = self.case_run.filter(
+            case_run_status=passed_status_id
+        )
+        return passed_caserun.count()
     passed_case_run_num = property(_get_passed_case_run_num)
 
     def _get_passed_case_run_percentage(self):
@@ -396,9 +383,11 @@ class TestRun(TCMSActionModel):
     passed_case_run_percent = property(_get_passed_case_run_percentage)
 
     def get_status_case_run_num(self, status_name):
-        status = self.get_serialized_case_run_status()
         status_id = TestCaseRunStatus._status_to_id(status_name)
-        return status.get(status_id, 0)
+        caserun = self.case_run.filter(
+            case_run_status=status_id
+        )
+        return caserun.count()
 
     def _get_total_case_run_num(self):
         return self.case_run.count()
@@ -418,9 +407,8 @@ class TestRun(TCMSActionModel):
                 self.stop_date = None
             self.save()
 
-# END deprecating
-
 class TestCaseRunStatus(TCMSActionModel):
+
     id = models.AutoField(db_column='case_run_status_id', primary_key=True)
     name = models.CharField(max_length=60, blank=True)
     sortkey = models.IntegerField(null=True, blank=True, default=0)
@@ -441,22 +429,36 @@ class TestCaseRunStatus(TCMSActionModel):
 
     @classmethod
     def get_IDLE(cls):
-        return cls.objects.get(name = 'IDLE')
+        key = 'IDLE'
+        result = cls.cache_get(key)
+        if result is None:
+            result = cls.cache_set(key, cls.objects.get(name = 'IDLE'))
+        return result
 
     @classmethod
-    def id_to_string(cls, id):
-        try:
-            return cls.objects.get(id = id).name
-        except cls.DoesNotExist:
-            return None
+    def id_to_string(cls, _id):
+        key = 'id_to_string_' + str(_id)
+        result = cls.cache_get(key)
+        if result is None:
+            try:
+                result = cls.objects.get(id=_id).name
+            except cls.DoesNotExist:
+                result = None
+            cls.cache_set(key, result)
+        return result
 
     @classmethod
     def _status_to_id(cls, status):
         status = status.upper()
-        try:
-            return cls.objects.get(name=status).pk
-        except cls.DoesNotExist:
-            return None
+        key = 'status_to_id_' + status
+        result = cls.cache_get(key)
+        if result is None:
+            try:
+                result = cls.objects.get(name=status).pk
+            except cls.DoesNotExist:
+                result = None
+            cls.cache_set(key, result)
+        return result
 
     @classmethod
     def _get_completed_status_ids(cls):
@@ -465,12 +467,16 @@ class TestCaseRunStatus(TCMSActionModel):
         the testcaserun is completed.
         Return IDs of these statuses.
         '''
-        statuses = cls.objects.all()
-        completed_status = statuses.filter(name__in=(
-            'FAILED', 'PASSED', 'ERROR', 'WAIVED'
-        ))
+        key = 'completed_status_ids'
+        result = cls.cache_get(key)
+        if result is None:
+            completed_status = cls.objects.filter(name__in=(
+                'FAILED', 'PASSED', 'ERROR', 'WAIVED'
+            ))
 
-        return completed_status.values_list('pk', flat=True)
+            result = completed_status.values_list('pk', flat=True)
+            result = cls.cache_set(key, list(result))
+        return result
 
     @classmethod
     def _get_failed_status_ids(cls):
@@ -479,12 +485,69 @@ class TestCaseRunStatus(TCMSActionModel):
         the testcaserun is failed.
         Return IDs of these statuses.
         '''
-        statuses = cls.objects.all()
-        failed_status = statuses.filter(name__in=(
-            'FAILED', 'ERROR'
-        ))
+        key = 'failed_status_ids'
+        result = cls.cache_get(key)
+        if result is None:
+            statuses = cls.objects.all()
+            failed_status = statuses.filter(name__in=(
+                'FAILED', 'ERROR'
+            ))
 
-        return failed_status.values_list('pk', flat=True)
+            result = failed_status.values_list('pk', flat=True)
+            result = cls.cache_set(key, list(result))
+        return result
+
+    @classmethod
+    def id_passed(cls):
+        key = 'id_passed'
+        result = cls.cache_get(key)
+        if result is None:
+            return cls.cache_set(key, cls._status_to_id('passed'))
+        return result
+
+    @classmethod
+    def id_failed(cls):
+        key = 'id_failed'
+        result = cls.cache_get(key)
+        if result is None:
+            return cls.cache_set(key, cls._status_to_id('failed'))
+        return result
+
+    @classmethod
+    def _get_cache(cls):
+        """A dictionary used to cache statuses.
+
+        The caching implementation in here is a
+        dedicated cache for this class. There are
+        limited few number of statuses, and they
+        are needed frequently enough to be cached.
+        """
+        key_cache = '_cache'
+        cache = getattr(cls, key_cache, {})
+        if not hasattr(cls, key_cache):
+            setattr(cls, key_cache, cache)
+
+        return cache
+
+    @classmethod
+    def cache_get(cls, key):
+        cache = cls._get_cache()
+        return cache.get(key, None)
+
+    @classmethod
+    def cache_set(cls, key, value):
+        cache = cls._get_cache()
+        if len(cache) > 1000: # Prevent overflow
+            cache.clear()
+        cache[key] = value
+        return value
+
+    def save(self, *args, **kwargs):
+        """Overrides save() only to outdate the cached statuses."""
+        cache = getattr(self.__class__, '_cache', {})
+        cache.clear()
+
+        super(self.__class__, self).save(*args, **kwargs)
 
 class TestCaseRunManager(models.Manager):
 
@@ -668,27 +731,6 @@ def _run_listen():
 
 if settings.LISTENING_MODEL_SIGNAL:
     _run_listen()
-
-def make_caserun_status_id_attributes():
-    '''
-    Considering the changing of TestCaseRunStatus names
-    will rarely happen,
-    make accessing of caserunstatus IDs as attributes
-    so that using status names are not violating DRY principle.
-    '''
-    kls = TestCaseRunStatus
-    kls.id_passed = kls._status_to_id('passed')
-    kls.id_failed = kls._status_to_id('failed')
-    kls.completed_status_ids = kls._get_completed_status_ids()
-
-def contributing_to_class():
-    '''
-    After the evaluation of django model classes,
-    extra attributed could be added in here to change
-    the behaviour of the original classes.
-    '''
-    make_caserun_status_id_attributes()
-contributing_to_class()
 
 if register_model:
     register_model(TestRun)

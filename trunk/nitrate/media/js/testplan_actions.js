@@ -545,6 +545,7 @@ Nitrate.TestPlans.Details.on_load = function()
     jQ('#show_more_runs').live('click', Nitrate.TestPlans.Runs.showMore);
     jQ('#reload_runs').live('click', Nitrate.TestPlans.Runs.reload);
     jQ('#tab_testruns').live('click', Nitrate.TestPlans.Runs.initializaRunTab);
+    jQ('.btn-statistics').live('click', Nitrate.TestPlans.Runs.percent);
 };
 
 
@@ -1733,6 +1734,10 @@ Nitrate.TestPlans.Runs = {
         return '/plan/' + planId + '/runs/';
     }
 
+    , makePercentUrlFromRunId: function (runId) {
+        return '/run/' + runId + '/percent/';
+    }
+
     , render: function (data, textStatus, jqXHR) {
         var tbody = jQ('#testruns_body');
         tbody.append(data.html);
@@ -1810,6 +1815,35 @@ Nitrate.TestPlans.Runs = {
         showMoreLink.html('Show More');
         showMoreLink.attr('ended', 'no');
         that.showMore();
+        return false;
+    }
+
+    , percent: function (clicked) {
+        var that = Nitrate.TestPlans.Runs;
+        var target = jQ(clicked.target);
+        var runId = target.attr('run');
+        var url = that.makePercentUrlFromRunId(runId)
+        var status = target.attr('status');
+        var request = jQ.ajax(url, {
+            dataType: 'json',
+            data: {'status': status},
+            beforeSend: function () {
+                target.text('calculating ...');
+            }
+        });
+        request.done(function (data, textStatus, jqXHR) {
+           // display the result
+           var percentage = data['percent'];
+           // locate the <tr> with runID
+           var tr = jQ('#run_' + runId);
+           // update the percentage with status name
+           var bar = tr.find('.'+status).find('.progress-bar');
+           var slots = bar.children();
+           jQ(slots[0]).text(percentage + '%');
+           jQ(slots[1]).css({'width': percentage+'px'});
+           target.hide(); // hide the button link
+           bar.show(); // show the progress bar
+        });
         return false;
     }
 }

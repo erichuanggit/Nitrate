@@ -534,30 +534,11 @@ def update_case_run_status(request):
                 pass
         targets.update(close_date=now, tested_by=request.user)
 
-    run_status_count = targets[0].run.case_run_status.split(',')
-    complete_count = 0
-    failed_count = 0
-    total_count = 0
-    f_ids = TestCaseRunStatus._get_failed_status_ids()
-    c_ids = TestCaseRunStatus._get_completed_status_ids()
-    try:
-        for status_count in run_status_count:
-            s_id, s_count = status_count.split(':')
-            s_id = int(s_id)
-            s_count = int(s_count)
-            if s_id in c_ids:
-                complete_count += s_count
-            if s_id in f_ids:
-                failed_count += s_count
-            total_count += s_count
-    except Exception, e:
-        return say_no(str(e))
-    complete_percent = (total_count > 0) and '%.2f'%(complete_count*1.0/total_count*100) or 0
-    failed_percent = (complete_count > 0) and '%.2f'%(failed_count*1.0/complete_count*100) or 0
+    test_run = targets[0].run
     return HttpResponse(simplejson.dumps({
             'rc': 0, 'response': 'ok',
-            'c_percent': complete_percent,
-            'f_percent': failed_percent
+            'c_percent': test_run.completed_case_run_percent,
+            'f_percent': test_run.failed_case_run_percent
     }))
 
 def update_case_status(request):

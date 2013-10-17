@@ -13,6 +13,8 @@ Nitrate.TestRuns.List.on_load = function()
 {
     bind_version_selector_to_product(true, $('id_product'));
     bind_build_selector_to_product(true, $('id_product'));
+
+    jQ('.btn-statistics').live('click', Nitrate.TestRuns.Progress.percent);
     
     if($('relativeSearchOption_case')) {
         $('relativeSearchOption_case').observe('click', function(e) {
@@ -79,7 +81,7 @@ Nitrate.TestRuns.List.on_load = function()
           null,
           null,
           null,
-          null,
+          {"bSortable": false }
         ]
         });
 }
@@ -217,7 +219,7 @@ Nitrate.TestRuns.Details.on_load = function()
         }
         jQ('span#'+to+' a').text(parseInt(jQ('span#'+to+' a').text())+1);
         jQ('span#'+from+' a').text(parseInt(jQ('span#'+from+' a').text())-1);
-    })
+    });
 }
 
 Nitrate.TestRuns.New.on_load = function()
@@ -336,6 +338,43 @@ Nitrate.TestRuns.AssignCase.on_load= function()
             this.up().next(7).update('');
         }
     })
+}
+
+Nitrate.TestRuns.Progress = {
+
+    percent: function (e) {
+        /**
+         * This is a run-search page specific 
+         * js callback to lazy-load the testrun progress.
+         *
+        */
+        var target = jQ(e.target);
+        var tr = target.parent().parent();
+        var url = '/run/' + target.attr('run') + '/percent/';
+        jQ.ajax(url, {
+            dataType: 'json',
+            data: {'status': 'completed_case_run_percent'},
+            beforeSend: function () {
+                target.text('calculating ...');
+            },
+            success: function (data) {
+                var percent = data.percent;
+                tr.find('.percent').html(percent + '%');
+                tr.find('.progress-inner').css({'width': percent});
+            }
+        });
+        jQ.ajax(url, {
+            dataType: 'json',
+            data: {'status': 'failed_case_run_percent'},
+            success: function (data) {
+                var percent = data.percent;
+                tr.find('.progress-failed').css({'width': percent});
+                target.hide();
+                tr.find('.progress-bar').show();
+            }
+        });
+        return false;
+    }
 }
 
 var updateCaseRunStatus = function(e)

@@ -1,23 +1,49 @@
 <div>
 	<form id="run_filter">
-	<ul>
-		<li>ID: <input type="text" name="run_id"></li>
-		<li>Summary: <input type="text" name="summary__icontains"/></li>
-		<li>Build:
-			<select name="build">
-				<option value="">--</option>
-				{% for build in test_plan.product.build.all %}
-				<option value="{{build.build_id}}">{{build.name}}</option>
-				{% endfor %}
-			</select>
-		</li>
-		<li>Manager: <input type="text" name="manager__username__iexact"/></li>
-		<li>Default Tester: <input type="text" name="default_tester__username__iexact"/> </li>
-		<li>Started Since: <input type="text" name="start_date__gt" class="vDateField"/> </li>
-		<li>Items Per Page: <input type="text" name="page_size" value="20"/></li>
-		<li><a href="#reload" id="reload_runs">Reload</a></li>
-		<input type="hidden" name="page_num" value="1"/>
-	</ul>
+	<div class="leftlistinfo">
+		<div class="listinfo">
+			<div class="title">ID&nbsp;:</div>
+		 	<div class="listinfo_input"><input type="text" name="run_id"></div>
+			<div class="listinfo">
+				<div class="title">Summary&nbsp;:</div>
+			 	<div class="listinfo_input"><input type="text" name="summary__icontains"/></div>
+			</div>
+			<div class="listinfo">
+				<div class="title">Build&nbsp;:</div>
+			 	<div class="listinfo_input">
+					<select name="build">
+						<option value="">--</option>
+						{% for build in test_plan.product.build.all %}
+						<option value="{{build.build_id}}">{{build.name}}</option>
+						{% endfor %}
+					</select>
+			 	</div>
+			</div>
+			<div class="listinfo">
+				<div class="title">Manager&nbsp;:</div>
+				<div class="listinfo_input"><input type="text" name="manager__username__iexact"/></div>
+			</div>
+			<div class="listinfo">
+				<div class="title"></div>
+				<div class="listinfo_input"><button id="reload_runs">Reload</button></div>
+				<input type="hidden" name="page_num" value="1"/>
+			</div>
+		</div>
+	</div>
+	<div class="rightlistinfo">
+		<div class="listinfo">
+			<div class="title">Default Tester&nbsp;:</div>
+		 	<div class="listinfo_input"><input type="text" name="default_tester__username__iexact"/></div>
+			<div class="listinfo">
+				<div class="title">Started Since&nbsp;:</div>
+			 	<div class="listinfo_input"> <input type="text" name="start_date__gt" class="vDateField"/> </div>
+			</div>
+			<div class="listinfo">
+				<div class="title">Items Per Page&nbsp;:</div>
+			 	<div class="listinfo_input"><input type="text" name="page_size" value="20"/></div>
+			</div>
+		</div>
+	</div>
 	</form>
 </div>
 
