@@ -447,105 +447,141 @@ Nitrate.TestPlans.List.on_load = function()
         });
 }
 
-Nitrate.TestPlans.Details.on_load = function()
-{
-    var plan_id = Nitrate.TestPlans.Instance.pk;
-    // regUrl('display_summary');
-    
-    // Initial the contents
-    constructTagZone('tag', { plan: plan_id });
-    constructPlanComponentsZone('components');
-    // TableKit.Sortable.init('testreview_table');
-    // Initial the tree view
-    Nitrate.TestPlans.TreeView.init(plan_id);
-    Nitrate.TestPlans.TreeView.render_page();
+Nitrate.TestPlans.Details = {
 
-    // Initial the tabs.
-    $$('li.tab a').invoke('observe', 'click', function(i) {
-        $$('div.tab_list').each(function(t) {
-            t.hide();
-        })
-        
-        $$('li.tab').each(function(t) {
-            t.removeClassName('tab_focus');
-        })
-        this.parentNode.addClassName('tab_focus');
-        var tab_array = this.href.toArray();
-        var tab = '';
-        for (var i = tab_array.indexOf('#') + 1; i < tab_array.length; i++)
-            tab += tab_array[i]
-        $(tab).show();
-    })
-    
-    // Display the current tab.
-    if(window.location.hash) {
-        fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
-    }
-    
-    // Initial the case plan
-    var run_case_params = {
-        'a': 'initial',
-        'template_type': 'case',
-        'from_plan': plan_id
-    }
-    
-    constructPlanDetailsCasesZone('testcases', plan_id, run_case_params);
-    
-    $('tab_testcases').observe('mousedown', function(e) {
-        if (this.classNames().toArray().indexOf('tab_focus') == -1) {
-            constructPlanDetailsCasesZone('testcases', plan_id, run_case_params);
-        }
-    })
-    
-    // Initial the review case
-    var review_case_params = {
-        'a': 'initial',
-        'template_type': 'review_case',
-        'from_plan': plan_id
-    }
-    constructPlanDetailsCasesZone('reviewcases', plan_id, review_case_params);
-    
-    $('tab_reviewcases').observe('mousedown', function(e) {
-        if (this.classNames().toArray().indexOf('tab_focus') == -1) {
-            constructPlanDetailsCasesZone('reviewcases', plan_id, review_case_params);
-        }
-    })
-    
+    /*
+     * Lazy-loading TestPlans TreeView
+     */
+    loadPlansTreeView: function(plan_id) {
+        // TableKit.Sortable.init('testreview_table');
+        // Initial the tree view
+        Nitrate.TestPlans.TreeView.init(plan_id);
+        Nitrate.TestPlans.TreeView.render_page();
+    },
 
-    // Initial the enable/disble btns
-    if($('btn_disable')) {
-        $('btn_disable').observe('click', function(e){
-            updateObject('testplans.testplan', plan_id, 'is_active', 'False', 'bool', reloadWindow);
-        })
-    }
-    
-    if($('btn_enable')) {
-        $('btn_enable').observe('click', function(e) {
-            updateObject('testplans.testplan', plan_id, 'is_active', 'True', 'bool', reloadWindow);
-        })
-    }
-    
-    // Bind for run form
-    $('id_form_run').observe('submit', function(e) {
-        if(!this.serialize(true)['run']) {
-            e.stop();
-            alert(default_messages.alert.no_run_selected);
-        }
-    })
-    
-    $('id_check_all_runs').observe('click', function(e) {
-        clickedSelectAll(this, 'testruns_table', 'run')
-    })
-    
-    TableKit.Sortable.init('testruns_table');
-    
-    // Make the import case dialog draggable.
-    new Draggable('id_import_case_zone');
+    initTabs: function() {
+        $$('li.tab a').invoke('observe', 'click', function(i) {
+            $$('div.tab_list').each(function(t) {
+                t.hide();
+            });
 
-    jQ('#show_more_runs').live('click', Nitrate.TestPlans.Runs.showMore);
-    jQ('#reload_runs').live('click', Nitrate.TestPlans.Runs.reload);
-    jQ('#tab_testruns').live('click', Nitrate.TestPlans.Runs.initializaRunTab);
-    jQ('.btn-statistics').live('click', Nitrate.TestPlans.Runs.percent);
+            $$('li.tab').each(function(t) {
+                t.removeClassName('tab_focus');
+            });
+            this.parentNode.addClassName('tab_focus');
+            var tab_array = this.href.toArray();
+            var tab = '';
+            for (var i = tab_array.indexOf('#') + 1; i < tab_array.length; i++)
+                tab += tab_array[i]
+            $(tab).show();
+        });
+
+        // Display the tab indicated by hash along with URL.
+        if(window.location.hash) {
+            fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
+        }
+    },
+
+    /*
+     * Load cases table.
+     *
+     * Proxy of global function with same name.
+     */
+    loadCases: function(container, plan_id, parameters) {
+        constructPlanDetailsCasesZone(container, plan_id, parameters);
+    },
+
+    /*
+     * Loading newly created cases with proposal status to show table of these
+     * kind of cases.
+     */
+    loadNormalCases: function(plan_id) {
+        var params = {
+            'a': 'initial',
+            'template_type': 'case',
+            'from_plan': plan_id
+        };
+        var container = 'testcases';
+        Nitrate.TestPlans.Details.loadCases(container, plan_id, params);
+    },
+
+    /*
+     * Loading reviewing cases to show table of these kind of cases.
+     */
+    loadReviewingCases: function(plan_id) {
+        var params = {
+            'a': 'initial',
+            'template_type': 'review_case',
+            'from_plan': plan_id
+        };
+        var container = 'reviewcases';
+        Nitrate.TestPlans.Details.loadCases(container, plan_id, params);
+    },
+
+    observeEvents: function(plan_id) {
+        $('tab_testcases').observe('mousedown', function(e) {
+            if (this.classNames().toArray().indexOf('tab_focus') == -1) {
+                Nitrate.TestPlans.Details.loadNormalCases(plan_id);
+            }
+        });
+
+        $('tab_reviewcases').observe('mousedown', function(e) {
+            if (this.classNames().toArray().indexOf('tab_focus') == -1) {
+                Nitrate.TestPlans.Details.loadReviewingCases(plan_id);
+            }
+        });
+
+        // Initial the enable/disble btns
+        if($('btn_disable')) {
+            $('btn_disable').observe('click', function(e){
+                updateObject('testplans.testplan', plan_id, 'is_active', 'False', 'bool', reloadWindow);
+            });
+        }
+
+        if($('btn_enable')) {
+            $('btn_enable').observe('click', function(e) {
+                updateObject('testplans.testplan', plan_id, 'is_active', 'True', 'bool', reloadWindow);
+            });
+        }
+    },
+
+    on_load: function() {
+        var plan_id = Nitrate.TestPlans.Instance.pk;
+        // regUrl('display_summary');
+        //
+
+        // Initial the contents
+        constructTagZone('tag', { plan: plan_id });
+        constructPlanComponentsZone('components');
+
+        Nitrate.TestPlans.Details.loadPlansTreeView(plan_id);
+        Nitrate.TestPlans.Details.initTabs();
+        Nitrate.TestPlans.Details.loadNormalCases(plan_id);
+        Nitrate.TestPlans.Details.loadReviewingCases(plan_id);
+        Nitrate.TestPlans.Details.observeEvents(plan_id);
+
+        TableKit.Sortable.init('testruns_table');
+
+        // Make the import case dialog draggable.
+        new Draggable('id_import_case_zone');
+
+        // Bind for run form
+        $('id_form_run').observe('submit', function(e) {
+            if(!this.serialize(true)['run']) {
+                e.stop();
+                alert(default_messages.alert.no_run_selected);
+            }
+        });
+
+        $('id_check_all_runs').observe('click', function(e) {
+            clickedSelectAll(this, 'testruns_table', 'run');
+        });
+
+        jQ('#show_more_runs').live('click', Nitrate.TestPlans.Runs.showMore);
+        jQ('#reload_runs').live('click', Nitrate.TestPlans.Runs.reload);
+        jQ('#tab_testruns').live('click', Nitrate.TestPlans.Runs.initializaRunTab);
+        jQ('.btn-statistics').live('click', Nitrate.TestPlans.Runs.percent);
+    }
 };
 
 

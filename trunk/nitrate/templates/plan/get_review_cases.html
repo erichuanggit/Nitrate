@@ -217,8 +217,8 @@
 			<td class="col_priority_content expandable" align="center">{{ test_case.priority }}</td>
 			<td valign="top" width="8%" class="col_category_content expandable" style="display:none">{{ test_case.category }}</td>
 			<td class="col_sortkey_content" align="center">
-				<a href="javascript:void(0);" class="mark case_sortkey">{{ test_case|sortkey:test_plan }}</a>
-				<span style="display:none">{{test_case|testcaseplan:test_plan}}</span>
+				<a href="javascript:void(0);" class="mark case_sortkey">{{ test_case.cal_sortkey }}</a>
+				<span style="display:none">{{ test_case.cal_testcaseplan_pk }}</span>
 			</td>
 			<td align="center" >
 				{% if perms.testcases.change_testcase %}

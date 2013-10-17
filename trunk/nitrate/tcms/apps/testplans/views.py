@@ -15,24 +15,26 @@
 #
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
+#   Chenxiong Qi <cqi@redhat.com>
 
 import datetime
 import urllib
 
-from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponsePermanentRedirect
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import user_passes_test, login_required
-from django.views.generic.simple import direct_to_template
-from django.core.urlresolvers import reverse
-from django.core.exceptions import ObjectDoesNotExist
-from django.utils.simplejson import dumps as json_dumps
-from django.shortcuts import get_object_or_404
-from django.core import serializers
-from django.template.defaultfilters import slugify
-from django.template.loader import render_to_string
-from django.template import RequestContext
 from django.conf import settings
+from django.contrib.auth.decorators import user_passes_test, login_required
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from django.core import serializers
+from django.core.urlresolvers import reverse
+from django.db.models import Count
 from django.db.models import Q
+from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponsePermanentRedirect
+from django.shortcuts import get_object_or_404
+from django.template.defaultfilters import slugify
+from django.template import RequestContext
+from django.template.loader import render_to_string
+from django.utils.simplejson import dumps as json_dumps
+from django.views.generic.simple import direct_to_template
 
 from tcms.core.views import Prompt
 from tcms.core.utils.raw_sql import RawSQL
@@ -276,6 +278,74 @@ def all(request, template_name='plan/all.html'):
         'page_type': page_type
     })
 
+def get_number_of_plans_cases(plan_ids):
+    '''Get the number of cases related to each plan
+
+    Arguments:
+    - plan_ids: a tuple or list of TestPlans' id
+
+    Return value:
+    Return value is an dict object, where key is plan_id and the value is the
+    total count.
+    '''
+    qs = TestCasePlan.objects.filter(plan__in=plan_ids)
+    qs = qs.values('plan').annotate(
+        total_count=Count('pk')).order_by('-plan')
+    return dict([(item['plan'], item['total_count']) for item in qs])
+
+def get_number_of_plans_runs(plan_ids):
+    '''Get the number of runs related to each plan
+
+    Arguments:
+    - plan_ids: a tuple or list of TestPlans' id
+
+    Return value:
+    Return value is an dict object, where key is plan_id and the value is the
+    total count.
+    '''
+    qs = TestRun.objects.filter(plan__in=plan_ids)
+    qs = qs.values('plan').annotate(
+        total_count=Count('pk')).order_by('-plan')
+    return dict([(item['plan'], item['total_count']) for item in qs])
+
+def get_number_of_children_plans(plan_ids):
+    '''Get the number of children plans related to each plan
+
+    Arguments:
+    - plan_ids: a tuple or list of TestPlans' id
+
+    Return value:
+    Return value is an dict object, where key is plan_id and the value is the
+    total count.
+    '''
+    qs = TestPlan.objects.filter(parent__in=plan_ids)
+    qs = qs.values('parent').annotate(
+        total_count=Count('parent')).order_by('-parent')
+    return dict([(item['parent'], item['total_count']) for item in qs])
+
+def calculate_stats_for_testplans(plans):
+    '''Attach the number of cases and runs for each TestPlan
+
+    Arguments:
+    - plans: the queryset of TestPlans
+
+    Return value:
+    A list of TestPlans, each of which is attached the statistics which is
+    with prefix cal meaning calculation result.
+    '''
+    plan_ids = [plan.pk for plan in plans]
+    cases_counts = get_number_of_plans_cases(plan_ids)
+    runs_counts = get_number_of_plans_runs(plan_ids)
+    children_counts = get_number_of_children_plans(plan_ids)
+
+    # Attach calculated statistics to each object of TestPlan
+    for plan in plans:
+        setattr(plan, 'cal_cases_count', cases_counts.get(plan.pk, 0))
+        setattr(plan, 'cal_runs_count', runs_counts.get(plan.pk, 0))
+        setattr(plan, 'cal_children_count', children_counts.get(plan.pk, 0))
+
+    return plans
+
 def ajax_search(request, template_name='plan/common/json_plans.txt'):
     """Display all testplans"""
     # Define the default sub module
@@ -302,30 +372,9 @@ def ajax_search(request, template_name='plan/common/json_plans.txt'):
                                                     | Q(owner__email__startswith=user_email)).distinct()
             else:
                 tps = TestPlan.list(search_form.cleaned_data)
-                tps = tps.select_related('author', 'type', 'product')
+                tps = tps.select_related('author', 'owner', 'type', 'product')
 
             query_result = True
-
-            # We want to get the number of cases and runs, without doing
-            # lots of per-test queries.
-            #
-            # Ideally we would get the case/run counts using m2m field tricks
-            # in the ORM
-            # Unfortunately, Django's select_related only works on ForeignKey
-            # relationships, not on ManyToManyField attributes
-            # See http://code.djangoproject.com/ticket/6432
-
-            # SQLAlchemy can handle this kind of thing in several ways.
-            # Unfortunately we're using Django
-
-            # The cleanest way I can find to get it into one query is to
-            # use QuerySet.extra()
-            # See http://docs.djangoproject.com/en/dev/ref/models/querysets
-            tps = tps.extra(select={
-                'num_cases': RawSQL.num_cases,
-                'num_runs': RawSQL.num_runs,
-                'num_children': RawSQL.num_plans,
-            })
     else:
         # Set search active plans only by default
         # I wish to use 'default' argument, as the same as in ModelForm
@@ -337,6 +386,9 @@ def ajax_search(request, template_name='plan/common/json_plans.txt'):
                           9: 'num_runs', 10: ''}
     return ajax_response(request, tps, columnIndexNameMap, jsonTemplatePath='plan/common/json_plans.txt')
 
+# TODO: refactor this method by moving sorting, pagination and data calculation
+# to the outside. Response just does what the response is resposible for to the
+# HTTP.
 def ajax_response(request, querySet, columnIndexNameMap, jsonTemplatePath='plan/common/json_plans.txt', *args):
     """
     json template for the ajax request for searching.
@@ -376,6 +428,10 @@ def ajax_response(request, querySet, columnIndexNameMap, jsonTemplatePath='plan/
     #get the slice
     querySet = querySet[startRecord:endRecord]
 
+    # We need to display the number of cases and runs that are related to each
+    # TestPlan.
+    querySet = calculate_stats_for_testplans(querySet)
+
     sEcho = int(request.GET.get('sEcho',0)) # required echo response
 
     if jsonTemplatePath:
@@ -402,6 +458,7 @@ def ajax_response(request, querySet, columnIndexNameMap, jsonTemplatePath='plan/
             response =  HttpResponse(simplejson.dumps(response_dict), mimetype='application/javascript')
 #    prevent from caching datatables result
 #    add_never_cache_headers(response)
+
     return response
 
 def get(request, plan_id, slug=None, template_name = 'plan/get.html'):
@@ -1100,10 +1157,7 @@ def component(request, template_name='plan/get_component.html'):
 
             for tp in self.tps:
                 for c in cs:
-                    try:
-                        tp.add_component(c)
-                    except:
-                        raise
+                    tp.add_component(c)
             return self.render()
 
         def clear(self):
@@ -1138,10 +1192,7 @@ def component(request, template_name='plan/get_component.html'):
 
             for tp in self.tps:
                 for c in cs:
-                    try:
-                        tp.remove_component(c)
-                    except:
-                        raise
+                    tp.remove_component(c)
 
             return self.render()
 

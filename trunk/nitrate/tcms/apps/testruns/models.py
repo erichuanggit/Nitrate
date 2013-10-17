@@ -188,12 +188,9 @@ class TestRun(TCMSActionModel):
                     tcr.save()
 
                 if tcr.case_run_id == case_run_id:
-                    try:
-                        prev_tcr, next_tcr = tcr.get_previous_or_next()
-                        next_tcr.is_current = True
-                        next_tcr.save()
-                    except:
-                        raise
+                    prev_tcr, next_tcr = tcr.get_previous_or_next()
+                    next_tcr.is_current = True
+                    next_tcr.save()
 
         for tcr in tcrs:
             if not tcr.is_finished():
@@ -249,56 +246,44 @@ class TestRun(TCMSActionModel):
         return version and version.id or None
 
     def add_case_run(self, case, case_run_status = 1, assignee = None, case_text_version = None, build = None, notes = None, sortkey = 0):
-        try:
-            return self.case_run.create(
-                case = case,
-                assignee = assignee or (
-                    case.default_tester_id and case.default_tester
-                ) or (
-                    self.default_tester_id and self.default_tester
-                ),
-                tested_by = None,
-                case_run_status = isinstance(case_run_status, int) \
-                    and TestCaseRunStatus.objects.get(id = case_run_status) \
-                    or case_run_status,
-                case_text_version = case_text_version or case.latest_text().case_text_version,
-                build = build or self.build,
-                notes = notes,
-                sortkey = sortkey,
-                environment_id = self.environment_id,
-                running_date = None,
-                close_date = None,
-                is_current = False,
-            )
-        except:
-            raise
+        return self.case_run.create(
+            case = case,
+            assignee = assignee or (
+                case.default_tester_id and case.default_tester
+            ) or (
+                self.default_tester_id and self.default_tester
+            ),
+            tested_by = None,
+            case_run_status = isinstance(case_run_status, int) \
+                and TestCaseRunStatus.objects.get(id = case_run_status) \
+                or case_run_status,
+            case_text_version = case_text_version or case.latest_text().case_text_version,
+            build = build or self.build,
+            notes = notes,
+            sortkey = sortkey,
+            environment_id = self.environment_id,
+            running_date = None,
+            close_date = None,
+            is_current = False,
+        )
 
     def add_tag(self, tag):
-        try:
-            return TestRunTag.objects.get_or_create(
-                run = self,
-                tag = tag
-            )
-        except:
-            raise
+        return TestRunTag.objects.get_or_create(
+            run = self,
+            tag = tag
+        )
 
     def add_cc(self, user):
-        try:
-            return TestRunCC.objects.get_or_create(
-                run = self,
-                user = user,
-            )
-        except:
-            raise
+        return TestRunCC.objects.get_or_create(
+            run = self,
+            user = user,
+        )
 
     def add_env_value(self, env_value):
-        try:
-            return TCMSEnvRunValueMap.objects.get_or_create(
-                run = self,
-                value = env_value,
-            )
-        except:
-            raise
+        return TCMSEnvRunValueMap.objects.get_or_create(
+            run = self,
+            value = env_value,
+        )
 
     def remove_tag(self, tag):
         cursor = connection.cursor()
@@ -309,25 +294,19 @@ class TestRun(TCMSActionModel):
         )
 
     def remove_cc(self, user):
-        try:
-            cursor = connection.cursor()
-            cursor.execute("DELETE from test_run_cc \
-                WHERE run_id = %s \
-                AND who = %s",
-                (self.run_id, user.id)
-            )
-        except:
-            raise
+        cursor = connection.cursor()
+        cursor.execute("DELETE from test_run_cc \
+            WHERE run_id = %s \
+            AND who = %s",
+            (self.run_id, user.id)
+        )
 
     def remove_env_value(self, env_value):
-        try:
-            run_env_value = TCMSEnvRunValueMap.objects.get(
-                run = self,
-                value = env_value,
-            )
-            run_env_value.delete()
-        except:
-            raise
+        run_env_value = TCMSEnvRunValueMap.objects.get(
+            run = self,
+            value = env_value,
+        )
+        run_env_value.delete()
 
     def mail(self, template, subject, context, to = [], request = None):
         from tcms.core.utils.mailto import mailto
@@ -626,22 +605,16 @@ class TestCaseRun(TCMSActionModel):
         return scence_templates.get(field)
 
     def add_bug(self, bug_id, bug_system, summary = None, description = None):
-        try:
-            return self.case.add_bug(
-                bug_id = bug_id,
-                bug_system = bug_system,
-                summary = summary,
-                description = description,
-                case_run = self,
-            )
-        except:
-            raise
+        return self.case.add_bug(
+            bug_id = bug_id,
+            bug_system = bug_system,
+            summary = summary,
+            description = description,
+            case_run = self,
+        )
 
     def remove_bug(self, bug_id, run_id=None):
-        try:
-            self.case.remove_bug(bug_id = bug_id, run_id=run_id)
-        except:
-            raise
+        self.case.remove_bug(bug_id = bug_id, run_id=run_id)
 
     def is_finished(self):
         return self.case_run_status.is_finished()

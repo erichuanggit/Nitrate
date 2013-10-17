@@ -19,8 +19,8 @@
         "5":"{{ test_plan.product }}",
         "6":"{{ test_plan.default_product_version }}",
         "7":"{{ test_plan.type }}",
-        "8":"<a href='{{ test_plan.get_absolute_url }}' title='{{ test_plan.num_cases }} test cases'>{{ test_plan.num_cases }}</a>",
-        "9":"<a href='{{ test_plan.get_absolute_url }}#testruns' title='{{ test_plan.num_runs }} test runs'>{{ test_plan.num_runs }}</a>",
+        "8":"<a href='{{ test_plan.get_absolute_url }}' title='{{ test_plan.cal_cases_count }} test cases'>{{ test_plan.cal_cases_count }}</a>",
+        "9":"<a href='{{ test_plan.get_absolute_url }}#testruns' title='{{ test_plan.cal_runs_count }} test runs'>{{ test_plan.cal_runs_count }}</a>",
         {% if perms.testplans.change_testplan %}
             "10":"<a class='editlink' href='{% url tcms.apps.testplans.views.edit test_plan.plan_id %}'>Edit</a>"
         {% else %}

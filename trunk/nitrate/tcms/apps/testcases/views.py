@@ -29,6 +29,7 @@ from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.conf import settings
+from django.db.models import Count
 
 from tcms.core import forms
 from tcms.core.views import Prompt
@@ -39,6 +40,7 @@ from tcms.search import remove_from_request_path
 
 from tcms.apps.testcases.models import TestCase, TestCaseStatus, \
         TestCaseAttachment, TestCasePlan, TestCaseCategory
+from tcms.apps.testcases.models import TestCaseBug
 from tcms.apps.testplans.models import TestPlan
 from tcms.apps.testruns.models import TestCaseRunStatus
 from tcms.apps.management.models import Priority, TestTag
@@ -256,6 +258,54 @@ def new(request, template_name='case/new.html'):
         'form': form
     })
 
+
+def get_testcaseplan_sortkey_pk_for_testcases(plan_id, tc_ids):
+    '''Get each TestCase' sortkey and related TestCasePlan's pk'''
+    qs = TestCasePlan.objects.filter(
+        plan__pk=plan_id, case__in=tc_ids).values('pk', 'sortkey', 'case')
+    return dict([(
+        item['case'], {
+            'testcaseplan_pk': item['pk'],
+            'sortkey': item['sortkey']
+        }) for item in qs])
+
+
+def calculate_number_of_bugs_for_testcases(tc_ids):
+    '''Calculate the number of bugs for each TestCase
+
+    Arguments:
+    - tc_ids: a list of tuple of TestCases' IDs
+    '''
+    qs = TestCaseBug.objects.filter(case__in=tc_ids)
+    qs = qs.values('case').annotate(total_count=Count('pk'))
+    return dict([(item['case'], item['total_count']) for item in qs])
+
+
+def calculate_for_testcases(plan_id, testcases):
+    '''Calculate extra data for TestCases
+
+    Attach TestCasePlan.sortkey, TestCasePlan.pk, and the number of bugs of
+    each TestCase.
+
+    Arguments:
+    - plan_id: the ID of a TestPlan, whose testcase is querying.
+    - testcases: a queryset of TestCases.
+    '''
+    tc_ids = [tc.pk for tc in testcases]
+    sortkey_tcpkan_pks = get_testcaseplan_sortkey_pk_for_testcases(
+        plan_id, tc_ids)
+    num_bugs = calculate_number_of_bugs_for_testcases(tc_ids)
+
+    for tc in testcases:
+        data = sortkey_tcpkan_pks.get(tc.pk, None)
+        setattr(tc, 'cal_sortkey', data['sortkey'] if data else None)
+        setattr(tc, 'cal_testcaseplan_pk',
+                data['testcaseplan_pk'] if data else None)
+        setattr(tc, 'cal_num_bugs', num_bugs.get(tc.pk, None))
+
+    return testcases
+
+
 def all(request, template_name="case/all.html"):
     """Generate the case list in search case and case zone in plan
 
@@ -326,7 +376,6 @@ def all(request, template_name="case/all.html"):
                              'case_status',
                              'priority',
                              'category')
-    tcs = tcs.extra(select={'num_bug': RawSQL.num_case_bugs,})
     tcs = tcs.distinct()
     tcs = order_case_queryset(tcs, order_by, asc)
     # default sorted by sortkey
@@ -357,6 +406,12 @@ def all(request, template_name="case/all.html"):
     else:
         query_url = '%s&asc=True' % query_url
 
+    # There are several extra information related to each TestCase to be shown
+    # also. This step must be the very final one, because the calculation of
+    # related data requires related TestCases' IDs, that is the queryset of
+    # TestCases should be evaluated in advance.
+    tcs = calculate_for_testcases(tp.pk, tcs)
+
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'test_cases': tcs,
@@ -368,6 +423,7 @@ def all(request, template_name="case/all.html"):
         'case_own_tags': ttags,
         'query_url': query_url,
     })
+
 
 def search(request, template_name='case/all.html'):
     """
