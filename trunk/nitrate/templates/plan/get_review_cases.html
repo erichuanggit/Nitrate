@@ -181,6 +181,8 @@
 		</tr>
 	</thead>
 	<tbody>
+		{% include 'plan/cases_rows.html' with test_cases=test_cases %}
+		{% comment %}
 		{% for test_case in test_cases %}
 		<tr class="case_title {% cycle 'odd' 'even' %}" id='{{ test_case.pk }}' >
 			<td class="expandable">
@@ -240,5 +242,6 @@
 			</td>
 		</tr>
 		{% endfor %}
+		{% endcomment %}
 	</tbody>
 </table>
