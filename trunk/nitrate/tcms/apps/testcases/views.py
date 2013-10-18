@@ -306,70 +306,60 @@ def calculate_for_testcases(plan_id, testcases):
     return testcases
 
 
-def all(request, template_name="case/all.html"):
-    """Generate the case list in search case and case zone in plan
+def get_case_status(template_type):
+    '''Get part or all TestCaseStatus according to template type'''
+    confirmed_status_name = 'CONFIRMED'
+    if template_type == 'case':
+        d_status = TestCaseStatus.objects.filter(name=confirmed_status_name)
+    elif template_type == 'review_case':
+        d_status = TestCaseStatus.objects.exclude(name=confirmed_status_name)
+    else:
+        d_status = TestCaseStatus.objects.all()
+    return d_status
 
-    Parameters:
-    a: Action
-       -- search: Search form submitted.
-       -- initial: Initial the case filter
-    from_plan: Plan ID
-       -- [number]: When the plan ID defined, it will build the case
-    page in plan.
 
-    """
+def build_cases_search_form(request, populate=None, plan=None):
+    '''Build search form preparing for quering TestCases'''
     # Intial the plan in plan details page
     if request.REQUEST.get('from_plan'):
         SearchForm = CaseFilterForm
-        # Hacking for case plan
-        if request.REQUEST.get('template_type') == 'case':
-            template_name = 'plan/get_cases.html'
-        elif request.REQUEST.get('template_type') == 'review_case':
-            template_name = 'plan/get_review_cases.html'
     else:
         SearchForm = SearchCaseForm
 
-    tp = plan_from_request_or_none(request)
-    # sorting
-    order_by = request.REQUEST.get('order_by', 'create_date')
-    asc = bool(request.REQUEST.get('asc', None))
     # Initial the form and template
     if request.REQUEST.get('a') in ('search', 'sort'):
         search_form = SearchForm(request.REQUEST)
     else:
-        # Hacking for case plan
-        confirmed_status_name = 'CONFIRMED'
-        # 'c' is meaning component
-        if request.REQUEST.get('template_type') == 'case':
-            d_status = TestCaseStatus.objects.filter(name=confirmed_status_name)
-        elif request.REQUEST.get('template_type') == 'review_case':
-            d_status = TestCaseStatus.objects.exclude(name=confirmed_status_name)
-        else:
-            d_status = TestCaseStatus.objects.all()
-
+        d_status = get_case_status(request.REQUEST.get('template_type'))
         d_status_ids = d_status.values_list('pk', flat=True)
-
         search_form = SearchForm(initial={'case_status': d_status_ids})
 
-    # Populate the form
-    if request.REQUEST.get('product'):
-        search_form.populate(product_id=request.REQUEST['product'])
-    elif tp and tp.product_id:
-        search_form.populate(product_id=tp.product_id)
-    else:
-        search_form.populate()
+    if populate:
+        if plan is None:
+            raise ValueError('A TestPlan should be passed when populate form.')
+        if request.REQUEST.get('product'):
+            search_form.populate(product_id=request.REQUEST['product'])
+        elif plan and plan.product_id:
+            search_form.populate(product_id=plan.product_id)
+        else:
+            search_form.populate()
 
-    # Query the database when search
+    return search_form
+
+
+def query_testcases(request, plan):
+    '''Query TestCases according to the criterias along with REQUEST'''
     if request.REQUEST.get('a') in ('search', 'sort') and search_form.is_valid():
-        tcs = TestCase.list(search_form.cleaned_data, tp)
+        tcs = TestCase.list(search_form.cleaned_data, plan)
     elif request.REQUEST.get('a') == 'initial':
+        d_status = get_case_status(request.REQUEST.get('template_type'))
         tcs = TestCase.objects.filter(case_status__in=d_status)
     else:
         tcs = TestCase.objects.none()
 
     # Search the relationship
-    if tp:
-        tcs = tcs.filter(plan=tp)
+    if plan:
+        tcs = tcs.filter(plan=plan)
 
     tcs = tcs.select_related('author',
                              'default_tester',
@@ -377,6 +367,9 @@ def all(request, template_name="case/all.html"):
                              'priority',
                              'category')
     tcs = tcs.distinct()
+    # sorting
+    order_by = request.REQUEST.get('order_by', 'create_date')
+    asc = bool(request.REQUEST.get('asc', None))
     tcs = order_case_queryset(tcs, order_by, asc)
     # default sorted by sortkey
     tcs = tcs.order_by('testcaseplan__sortkey')
@@ -391,26 +384,63 @@ def all(request, template_name="case/all.html"):
         else:
             tcs = tcs.order_by('-testcaseplan__sortkey')
 
+    # There are several extra information related to each TestCase to be shown
+    # also. This step must be the very final one, because the calculation of
+    # related data requires related TestCases' IDs, that is the queryset of
+    # TestCases should be evaluated in advance.
+    tcs = calculate_for_testcases(plan.pk, tcs)
+
+    return tcs
+
+
+def all(request, template_name="case/all.html"):
+    """Generate the case list in search case and case zone in plan
+
+    Parameters:
+    a: Action
+       -- search: Search form submitted.
+       -- initial: Initial the case filter
+    from_plan: Plan ID
+       -- [number]: When the plan ID defined, it will build the case
+    page in plan.
+
+    """
+    # Intial the plan in plan details page
+    tp = plan_from_request_or_none(request)
+    search_form = build_cases_search_form(request, populate=True, plan=tp)
+    tcs = query_testcases(request, tp)
+    tc_ids = [tc.pk for tc in tcs]
+
     # Initial the case ids
     if request.REQUEST.get('case'):
-        selected_case_ids = map(lambda f: int(f), request.REQUEST.getlist('case'))
+        selected_case_ids = map(lambda f: int(f),
+                                request.REQUEST.getlist('case'))
     else:
-        selected_case_ids = tcs.values_list('pk', flat=True)
+        #selected_case_ids = tcs.values_list('pk', flat=True)
+        selected_case_ids = tc_ids
 
     # Get the tags own by the cases
-    ttags = TestTag.objects.filter(testcase__in=tcs).order_by('name').distinct()
+    ttags = TestTag.objects.filter(testcase__in=tc_ids).order_by('name').distinct()
+
     # generating a query_url with order options
+    #
+    # FIXME: query_url is always equivlant to None&asc=True whatever what
+    # criterias specified in filter form, or just with default filter
+    # conditions during loading TestPlan page.
     query_url = remove_from_request_path(request, 'order_by')
+    asc = bool(request.REQUEST.get('asc', None))
     if asc:
         query_url = remove_from_request_path(query_url, 'asc')
     else:
         query_url = '%s&asc=True' % query_url
 
-    # There are several extra information related to each TestCase to be shown
-    # also. This step must be the very final one, because the calculation of
-    # related data requires related TestCases' IDs, that is the queryset of
-    # TestCases should be evaluated in advance.
-    tcs = calculate_for_testcases(tp.pk, tcs)
+    # Due to this method serves several sort of search requests, so before
+    # rendering the search result, template should be adjusted to a proper one.
+    if request.REQUEST.get('from_plan'):
+        if request.REQUEST.get('template_type') == 'case':
+            template_name = 'plan/get_cases.html'
+        elif request.REQUEST.get('template_type') == 'review_case':
+            template_name = 'plan/get_review_cases.html'
 
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
