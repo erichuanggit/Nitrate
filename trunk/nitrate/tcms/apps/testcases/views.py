@@ -347,7 +347,7 @@ def build_cases_search_form(request, populate=None, plan=None):
     return search_form
 
 
-def query_testcases(request, plan):
+def query_testcases(request, plan, search_form):
     '''Query TestCases according to the criterias along with REQUEST'''
     if request.REQUEST.get('a') in ('search', 'sort') and search_form.is_valid():
         tcs = TestCase.list(search_form.cleaned_data, plan)
@@ -408,7 +408,7 @@ def all(request, template_name="case/all.html"):
     # Intial the plan in plan details page
     tp = plan_from_request_or_none(request)
     search_form = build_cases_search_form(request, populate=True, plan=tp)
-    tcs = query_testcases(request, tp)
+    tcs = query_testcases(request, tp, search_form)
     tc_ids = [tc.pk for tc in tcs]
 
     # Initial the case ids
