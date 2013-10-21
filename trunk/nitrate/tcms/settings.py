@@ -324,3 +324,7 @@ KRB5_REALM = ''
 ERRATA_URL_PREFIX = 'https://errata.devel.redhat.com/errata/stateview'
 # user guide url:
 USER_GUIDE_URL = 'https://riddler.bne.redhat.com/TCMS-User_Guide/index.html'
+
+# Default page size for showing each possible query result. This provides a
+# consistent user experiece to users.
+DEFAULT_PAGE_SIZE = 20

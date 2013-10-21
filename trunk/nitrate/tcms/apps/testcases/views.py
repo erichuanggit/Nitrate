@@ -347,8 +347,28 @@ def build_cases_search_form(request, populate=None, plan=None):
     return search_form
 
 
+def paginate_testcases(request, testcases):
+    '''Paginate queried TestCases
+
+    Arguments:
+    - request: django's HttpRequest from which to get pagination data
+    - testcases: an object queryset representing already queried TestCases
+
+    Return value: return the queryset for chain call
+    '''
+    DEFAULT_PAGE_INDEX = 1
+    DEFAULT_PAGE_SIZE = settings.DEFAULT_PAGE_SIZE
+
+    POST = request.POST
+    page_index = int(POST.get('page_index', DEFAULT_PAGE_INDEX))
+    page_size = int(POST.get('page_size', DEFAULT_PAGE_SIZE))
+    offset = (page_index - 1) * page_size
+    return testcases[offset:offset + page_size]
+
+
 def query_testcases(request, plan, search_form):
     '''Query TestCases according to the criterias along with REQUEST'''
+    # FIXME: search_form is not defined before being used.
     if request.REQUEST.get('a') in ('search', 'sort') and search_form.is_valid():
         tcs = TestCase.list(search_form.cleaned_data, plan)
     elif request.REQUEST.get('a') == 'initial':
@@ -384,13 +404,36 @@ def query_testcases(request, plan, search_form):
         else:
             tcs = tcs.order_by('-testcaseplan__sortkey')
 
-    # There are several extra information related to each TestCase to be shown
-    # also. This step must be the very final one, because the calculation of
-    # related data requires related TestCases' IDs, that is the queryset of
-    # TestCases should be evaluated in advance.
-    tcs = calculate_for_testcases(plan.pk, tcs)
-
     return tcs
+
+
+def load_more_cases(request, template_name='plan/cases_rows.html'):
+    '''Loading more TestCases'''
+    plan = plan_from_request_or_none(request)
+    cases = []
+    selected_case_ids = []
+    if plan is not None:
+        search_form = build_cases_search_form(request)
+        cases = query_testcases(request, plan, search_form)
+        cases = paginate_testcases(request, cases)
+        cases = calculate_for_testcases(plan.pk, cases)
+        selected_case_ids = [tc.pk for tc in cases]
+    return direct_to_template(request, template_name, {
+        'test_plan': plan,
+        'test_cases': cases,
+        'selected_case_ids': selected_case_ids,
+        'case_status': TestCaseStatus.objects.all(),
+    })
+
+
+def get_selected_cases_ids(request, default_cases_ids):
+    '''Get selected cases' IDs used to determine whether to check a case'''
+    REQUEST = request.REQUEST
+    if REQUEST.get('case'):
+        # FIXME: why do use list comprehension.
+        return map(lambda f: int(f), REQUEST.getlist('case'))
+    else:
+        return default_cases_ids
 
 
 def all(request, template_name="case/all.html"):
@@ -412,15 +455,18 @@ def all(request, template_name="case/all.html"):
     tc_ids = [tc.pk for tc in tcs]
 
     # Initial the case ids
-    if request.REQUEST.get('case'):
-        selected_case_ids = map(lambda f: int(f),
-                                request.REQUEST.getlist('case'))
-    else:
-        #selected_case_ids = tcs.values_list('pk', flat=True)
-        selected_case_ids = tc_ids
+    selected_case_ids = get_selected_cases_ids(request, tc_ids)
 
     # Get the tags own by the cases
     ttags = TestTag.objects.filter(testcase__in=tc_ids).order_by('name').distinct()
+
+    tcs = paginate_testcases(request, tcs)
+
+    # There are several extra information related to each TestCase to be shown
+    # also. This step must be the very final one, because the calculation of
+    # related data requires related TestCases' IDs, that is the queryset of
+    # TestCases should be evaluated in advance.
+    tcs = calculate_for_testcases(tp.pk, tcs)
 
     # generating a query_url with order options
     #
@@ -452,6 +498,10 @@ def all(request, template_name="case/all.html"):
         'priorities': Priority.objects.all(),
         'case_own_tags': ttags,
         'query_url': query_url,
+
+        # Load more is a POST request, so POST parameters are required only.
+        # Remember this for loading more cases with the same as criterias.
+        'search_criterias': request.raw_post_data,
     })
 
 

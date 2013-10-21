@@ -518,6 +518,42 @@ Nitrate.TestPlans.Details = {
         Nitrate.TestPlans.Details.loadCases(container, plan_id, params);
     },
 
+    /*
+     * Load more cases with previous criterias.
+     */
+    onLoadMoreCasesClick: function(e) {
+        var post_data = jQ('#load-more-cases').attr('data-criterias');
+        var page_index = jQ('#load-more-cases').attr('data-page-index');
+        var page_index_re = /page_index=\d+/;
+        if (post_data.match(page_index_re))
+          post_data = post_data.replace(page_index_re, 'page_index=' + page_index);
+        else
+          post_data = post_data + '&page_index=' + page_index;
+
+        jQ.post('/cases/load-more/',
+            post_data,
+            function(data) {
+                var has_more = jQ(data)[0].hasAttribute('id');
+                if (has_more) {
+                    jQ('#testcases table tbody').append(data);
+
+                    // Increase page index for next batch cases to load
+                    var page_index = jQ('#load-more-cases').attr('data-page-index');
+                    jQ('#load-more-cases')
+                        .attr('data-page-index', parseInt(page_index) + 1);
+                } else {
+                    jQ('#load-more-cases').unbind('click').remove();
+                }
+            });
+    },
+
+    /*
+     * Load more reviewing cases with previous criterias.
+     */
+    onLoadMoreReviewcasesClick: function(e) {
+        console.log('loading more reviewing cases ...');
+    },
+
     observeEvents: function(plan_id) {
         $('tab_testcases').observe('mousedown', function(e) {
             if (this.classNames().toArray().indexOf('tab_focus') == -1) {
@@ -543,6 +579,11 @@ Nitrate.TestPlans.Details = {
                 updateObject('testplans.testplan', plan_id, 'is_active', 'True', 'bool', reloadWindow);
             });
         }
+
+        jQ('#load-more-cases').live('click',
+            Nitrate.TestPlans.Details.onLoadMoreCasesClick);
+        jQ('#load-more-reviewcases').live('click',
+            Nitrate.TestPlans.Details.onLoadMoreReviewcasesClick);
     },
 
     on_load: function() {

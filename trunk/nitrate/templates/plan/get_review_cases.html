@@ -245,3 +245,10 @@
 		{% endcomment %}
 	</tbody>
 </table>
+<div class="cases-pagination">
+	<!-- There is a fixed size of page, 20 cases per page by default. After cases
+			 is loaded for the first time, Load More will load cases from the second
+			 page, and then the page index will be change to next page. -->
+	<a id="load-more-reviewcases" href="javascript:void(0)" class="load-more"
+	 data-page-size="30" data-criterias={{ search_criterias }}>Load more</a>
+</div>
