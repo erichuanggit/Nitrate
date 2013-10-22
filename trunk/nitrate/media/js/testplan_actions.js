@@ -579,7 +579,8 @@ Nitrate.TestPlans.Details = {
      * Load more reviewing cases with previous criterias.
      */
     onLoadMoreReviewcasesClick: function(e) {
-        console.log('loading more reviewing cases ...');
+        var container = Nitrate.TestPlans.CasesContainer.ReviewingCases;
+        Nitrate.TestPlans.Details.loadMoreCasesClicHandler(e, container);
     },
 
     observeEvents: function(plan_id) {
