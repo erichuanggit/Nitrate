@@ -564,12 +564,6 @@ Nitrate.TestPlans.Details = {
     },
 
     observeEvents: function(plan_id) {
-        $('tab_testcases').observe('mousedown', function(e) {
-            if (this.classNames().toArray().indexOf('tab_focus') == -1) {
-                Nitrate.TestPlans.Details.loadNormalCases(plan_id);
-            }
-        });
-
         $('tab_reviewcases').observe('mousedown', function(e) {
             if (this.classNames().toArray().indexOf('tab_focus') == -1) {
                 Nitrate.TestPlans.Details.loadReviewingCases(plan_id);
