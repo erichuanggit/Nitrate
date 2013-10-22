@@ -566,7 +566,11 @@ Nitrate.TestPlans.Details = {
     observeEvents: function(plan_id) {
         $('tab_reviewcases').observe('mousedown', function(e) {
             if (this.classNames().toArray().indexOf('tab_focus') == -1) {
-                Nitrate.TestPlans.Details.loadReviewingCases(plan_id);
+                var opened  = Nitrate.TestPlans.Details.reviewingCasesTabOpened;
+                if (!opened) {
+                    Nitrate.TestPlans.Details.loadReviewingCases(plan_id);
+                    Nitrate.TestPlans.Details.reviewingCasesTabOpened = true;
+                }
             }
         });
 
@@ -601,7 +605,6 @@ Nitrate.TestPlans.Details = {
         Nitrate.TestPlans.Details.loadPlansTreeView(plan_id);
         Nitrate.TestPlans.Details.initTabs();
         Nitrate.TestPlans.Details.loadNormalCases(plan_id);
-        Nitrate.TestPlans.Details.loadReviewingCases(plan_id);
         Nitrate.TestPlans.Details.observeEvents(plan_id);
 
         TableKit.Sortable.init('testruns_table');
