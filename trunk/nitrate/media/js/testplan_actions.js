@@ -971,7 +971,7 @@ function bindEventsOnLoadedCases(container, form) {
      */
     var elems = container.adjacent('.expandable.js-just-loaded');
     elems.each(function(elem) {
-        elem.removeClassName('just-loaded');
+        elem.removeClassName('js-just-loaded');
     });
 }
 
