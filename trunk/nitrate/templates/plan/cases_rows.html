@@ -11,7 +11,7 @@ test_cases should be a queryset of a list of TestCases.
 {% endcomment %}
 {% for test_case in test_cases %}
 <tr class="case_title {% cycle 'odd' 'even' %}" id='{{ test_case.pk }}' >
-	<td class="expandable">
+	<td class="expandable js-just-loaded">
 		<img class="expand blind_icon" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
 	</td>
 	<td>

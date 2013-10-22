@@ -518,6 +518,13 @@ Nitrate.TestPlans.Details = {
         Nitrate.TestPlans.Details.loadCases(container, plan_id, params);
     },
 
+    bindEventsOnLoadedCases: function() {
+        var container = $('testcases');
+        var form = container.childElements()[0];
+        var table = container.childElements()[1];
+        bindEventsOnLoadedCases(table, form);
+    },
+
     /*
      * Load more cases with previous criterias.
      */
@@ -541,6 +548,8 @@ Nitrate.TestPlans.Details = {
                     var page_index = jQ('#load-more-cases').attr('data-page-index');
                     jQ('#load-more-cases')
                         .attr('data-page-index', parseInt(page_index) + 1);
+
+                    Nitrate.TestPlans.Details.bindEventsOnLoadedCases();
                 } else {
                     jQ('#load-more-cases').unbind('click').remove();
                 }
@@ -863,6 +872,88 @@ function unlinkCasePlan(container, parameters)
         onSuccess: success,
         onFailure: json_failure
     })
+}
+
+/*
+ * Bind events on loaded cases.
+ *
+ * Arguments:
+ * - container: the HTML element containing all loaded cases. Currently, the
+ *   container is a TABLE.
+ */
+function bindEventsOnLoadedCases(container, form) {
+    // Display/Hide the case content
+    container.adjacent('.expandable.js-just-loaded').invoke('observe', 'click', function(e) {
+        var btn = this;
+        var title = this.up(); // Container
+        var content = this.up().next(); // Content Containers
+        var case_id = title.id;
+        var template_type = form.adjacent('input[name="template_type"]')[0].value;
+        // Review case content call back;
+        var review_case_content_callback = function(e) {
+            var comment_container_t = new Element('div');
+            // Change status/comment callback
+            var cc_callback = function(e) {
+                e.stop();
+                var params = this.serialize(true);
+                var refresh_case = function(t) {
+                    var td = new Element('td', {colspan: 12});
+                    var id = 'id_loading_' + params['object_pk'];
+                    td.appendChild(getAjaxLoading(id));
+                    content.update(td);
+                    fireEvent(btn, 'click');
+                    fireEvent(btn, 'click');
+                }
+                submitComment(comment_container_t, params, refresh_case);
+            };
+            content.adjacent('.update_form').invoke('stopObserving', 'submit');
+            content.adjacent('.update_form').invoke('observe', 'submit', cc_callback);
+
+            // Observe the delete comment form
+            var rc_callback = function(e) {
+                e.stop();
+                if(!confirm(default_messages.confirm.remove_comment))
+                    return false;
+                var params = this.serialize(true);
+                var refresh_case = function(t) {
+                    var returnobj = t.responseText.evalJSON();
+                    if (returnobj.rc != 0) {
+                        alert(returnobj.response);
+                        return false;
+                    }
+
+                    var td = new Element('td', {colspan: 12});
+                    var id = 'id_loading_' + params['object_pk'];
+                    td.appendChild(getAjaxLoading(id));
+                    content.update(td);
+                    fireEvent(btn, 'click');
+                    fireEvent(btn, 'click');
+                }
+                removeComment(this, refresh_case)
+            };
+            content.adjacent('.form_comment').invoke('stopObserving', 'submit');
+            content.adjacent('.form_comment').invoke('observe', 'submit', rc_callback);
+        };
+
+        switch(template_type) {
+        case 'review_case':
+            var case_content_callback = review_case_content_callback;
+            break;
+        default:
+            var case_content_callback = function(e) {};
+        }
+
+        toggleTestCaseContents(template_type, title, content, case_id, nil, nil, case_content_callback);
+    });
+
+    /*
+     * Using class just-loaded to identify thoes cases that are just loaded to
+     * avoid register event handler repeatedly.
+     */
+    var elems = container.adjacent('.expandable.js-just-loaded');
+    elems.each(function(elem) {
+        elem.removeClassName('just-loaded');
+    });
 }
 
 function constructPlanDetailsCasesZone(container, plan_id, parameters)
@@ -1336,79 +1427,16 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             };
             
             changeCaseOrder(params, callback)
-        })
+        });
         
         table.adjacent('.change_status_selector').invoke('observe', 'change', function(e) {
             var be_confirmed = (this.value == '2');
             var was_confirmed = (this.up(0).attributes['status'].value == "CONFIRMED");
             var case_id = this.up(1).id;
             changeTestCaseStatus(plan_id, this, case_id, be_confirmed, was_confirmed);
-        })
-        
-        // Display/Hide the case content
-        table.adjacent('.expandable').invoke('observe', 'click', function(e) {
-            var btn = this;
-            var title = this.up(); // Container
-            var content = this.up().next(); // Content Containers
-            var case_id = title.id;
-            var template_type = form.adjacent('input[name="template_type"]')[0].value;
-            // Review case content call back;
-            var review_case_content_callback = function(e) {
-                var comment_container_t = new Element('div');
-                // Change status/comment callback
-                
-                var cc_callback = function(e) {
-                    e.stop();
-                    var params = this.serialize(true);
-                    var refresh_case = function(t) {
-                        var td = new Element('td', {colspan: 12});
-                        var id = 'id_loading_' + params['object_pk'];
-                        td.appendChild(getAjaxLoading(id));
-                        content.update(td);
-                        fireEvent(btn, 'click');
-                        fireEvent(btn, 'click');
-                    }
-                    submitComment(comment_container_t, params, refresh_case);
-                };
-                content.adjacent('.update_form').invoke('stopObserving', 'submit');
-                content.adjacent('.update_form').invoke('observe', 'submit', cc_callback);
-                
-                // Observe the delete comment form
-                var rc_callback = function(e) {
-                    e.stop();
-                    if(!confirm(default_messages.confirm.remove_comment))
-                        return false;
-                    var params = this.serialize(true);
-                    var refresh_case = function(t) {
-                        var returnobj = t.responseText.evalJSON();
-                        if (returnobj.rc != 0) {
-                            alert(returnobj.response);
-                            return false;
-                        }
-                    
-                        var td = new Element('td', {colspan: 12});
-                        var id = 'id_loading_' + params['object_pk'];
-                        td.appendChild(getAjaxLoading(id));
-                        content.update(td);
-                        fireEvent(btn, 'click');
-                        fireEvent(btn, 'click');
-                    }
-                    removeComment(this, refresh_case)
-                };
-                content.adjacent('.form_comment').invoke('stopObserving', 'submit');
-                content.adjacent('.form_comment').invoke('observe', 'submit', rc_callback);
-            };
-            
-            switch(template_type) {
-                case 'review_case':
-                    var case_content_callback = review_case_content_callback;
-                    break;
-                default:
-                    var case_content_callback = function(e) {};
-            }
-            
-            toggleTestCaseContents(template_type, title, content, case_id, nil, nil, case_content_callback);
         });
+
+        bindEventsOnLoadedCases(table, form);
     };
     
     var url = getURLParam().url_search_case;
