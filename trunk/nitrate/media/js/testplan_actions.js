@@ -542,7 +542,7 @@ Nitrate.TestPlans.Details = {
             function(data) {
                 var has_more = jQ(data)[0].hasAttribute('id');
                 if (has_more) {
-                    jQ('#testcases table tbody').append(data);
+                    jQ('#cases-list').find('tbody:first').append(data);
 
                     // Increase page index for next batch cases to load
                     var page_index = jQ('#load-more-cases').attr('data-page-index');
