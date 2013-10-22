@@ -1,4 +1,3 @@
-{% load ifin %}
 {% load comments %}
 {% load testcase_tags %}
 <form action="{% url tcms.apps.testcases.views.all %}" method="get">
@@ -182,67 +181,6 @@
 	</thead>
 	<tbody>
 		{% include 'plan/cases_rows.html' with test_cases=test_cases %}
-		{% comment %}
-		{% for test_case in test_cases %}
-		<tr class="case_title {% cycle 'odd' 'even' %}" id='{{ test_case.pk }}' >
-			<td class="expandable">
-				<img class="expand blind_icon" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
-			</td>
-			<td>
-				<input type="checkbox" name="case" value="{{ test_case.pk }}" class="checkbox shiftselect" {% ifin test_case.pk selected_case_ids %}checked{% endifin %} />
-			</td>
-			<td>
-				<a href="{% url tcms.apps.testcases.views.get test_case.case_id %}?from_plan={{ test_plan.plan_id }}">{{ test_case.pk }}</a>
-			</td>
-			<td class="subject expandable">
-				<a class="blind_down_link">{{ test_case.summary }}</a>
-			</td>
-			<td class="col_author_content"><a href="{% url tcms.apps.profiles.views.profile test_case.author.username %}">{{ test_case.author }}</a></td>
-			<td class="col_author_content">{% if test_case.reviewer_id %}<a href="{% url tcms.apps.profiles.views.profile test_case.reviewer.username %}">{{ test_case.reviewer }}</a>{% else%} None {% endif %}</td>
-			<td class="col_tester_content expandable">{{ test_case.get_is_automated_status }}</td>
-			<!-- <td >{{ testcase.create_date }}</td>-->
-			<td status='{{ test_case.case_status }}'>
-				{% if perms.testcases.change_testcase %}
-				<a class="show_change_status_link" href="javascript:void(0);" onclick="this.hide(); this.next().show()" style="display: none;">
-					{{ test_case.case_status }}
-				</a>
-				<select class="change_status_selector" >
-					{% for case_stat in case_status %}
-					<option {% ifequal case_stat.pk test_case.case_status_id %} selected="1" {% endifequal %} value="{{ case_stat.id }}">{{ case_stat.name }}</option>
-					{% endfor %}
-				</select>
-				{% else %}
-				{{ test_case.case_status }}
-				{% endif %}
-			</td>
-			<td class="col_priority_category expandable">{{ test_case.category }}</td>
-			<td class="col_priority_content expandable" align="center">{{ test_case.priority }}</td>
-			<td valign="top" width="8%" class="col_category_content expandable" style="display:none">{{ test_case.category }}</td>
-			<td class="col_sortkey_content" align="center">
-				<a href="javascript:void(0);" class="mark case_sortkey">{{ test_case.cal_sortkey }}</a>
-				<span style="display:none">{{ test_case.cal_testcaseplan_pk }}</span>
-			</td>
-			<td align="center" >
-				{% if perms.testcases.change_testcase %}
-				<a class="editlink" href="{% url tcms.apps.testcases.views.edit test_case.case_id %}?from_plan={{ test_plan.plan_id }}">Edit</a>
-				{% else %}
-				<span class="editlink grey">Edit</span>
-				{% endif %}
-			</td>
-		</tr>
-		<tr class="case_content hide" style="display: none;">
-			<td colspan="12">
-				<div id="id_loading_{{ test_case.pk }}" class="ajax_loading review_cases"></div>
-			</td>
-		</tr>
-		{% empty %}
-		<tr>
-			<td colspan="12">
-				<center class="prompt-message prompt">No test case was found in this plan.</center></span>
-			</td>
-		</tr>
-		{% endfor %}
-		{% endcomment %}
 	</tbody>
 </table>
 <div class="cases-pagination">
@@ -250,5 +188,5 @@
 			 is loaded for the first time, Load More will load cases from the second
 			 page, and then the page index will be change to next page. -->
 	<a id="load-more-reviewcases" href="javascript:void(0)" class="load-more"
-	 data-page-size="30" data-criterias={{ search_criterias }}>Load more</a>
+	 data-page-index="2" data-criterias={{ search_criterias }}>Load more</a>
 </div>

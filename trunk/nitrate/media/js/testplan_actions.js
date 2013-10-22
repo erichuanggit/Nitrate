@@ -8,6 +8,16 @@ Nitrate.TestPlans.SearchCase = {};
 Nitrate.TestPlans.Clone = {};
 Nitrate.TestPlans.Attachment = {};
 
+/*
+ * Hold container IDs
+ */
+Nitrate.TestPlans.CasesContainer = {
+    // containing cases with confirmed status
+    ConfirmedCases: 'testcases',
+    // containing cases with non-confirmed status
+    ReviewingCases: 'reviewcases'
+};
+
 Nitrate.TestPlans.TreeView = {
     pk: new Number(),
     data: new Object(),
@@ -495,13 +505,13 @@ Nitrate.TestPlans.Details = {
      * Loading newly created cases with proposal status to show table of these
      * kind of cases.
      */
-    loadNormalCases: function(plan_id) {
+    loadConfirmedCases: function(plan_id) {
         var params = {
             'a': 'initial',
             'template_type': 'case',
             'from_plan': plan_id
         };
-        var container = 'testcases';
+        var container = Nitrate.TestPlans.CasesContainer.ConfirmedCases;
         Nitrate.TestPlans.Details.loadCases(container, plan_id, params);
     },
 
@@ -514,23 +524,25 @@ Nitrate.TestPlans.Details = {
             'template_type': 'review_case',
             'from_plan': plan_id
         };
-        var container = 'reviewcases';
+        var container = Nitrate.TestPlans.CasesContainer.ReviewingCases;
         Nitrate.TestPlans.Details.loadCases(container, plan_id, params);
     },
 
-    bindEventsOnLoadedCases: function() {
-        var container = $('testcases');
-        var form = container.childElements()[0];
-        var table = container.childElements()[1];
+    bindEventsOnLoadedCases: function(container) {
+        var elem = $(container);
+        var form = elem.childElements()[0];
+        var table = elem.childElements()[1];
         bindEventsOnLoadedCases(table, form);
     },
 
+
     /*
-     * Load more cases with previous criterias.
+     * The real function to load more cases and show them in specific container.
      */
-    onLoadMoreCasesClick: function(e) {
-        var post_data = jQ('#load-more-cases').attr('data-criterias');
-        var page_index = jQ('#load-more-cases').attr('data-page-index');
+    loadMoreCasesClicHandler: function(e, container) {
+        var elemLoadMore = jQ('#' + container).find('.js-load-more');
+        var post_data = elemLoadMore.attr('data-criterias');
+        var page_index = elemLoadMore.attr('data-page-index');
         var page_index_re = /page_index=\d+/;
         if (post_data.match(page_index_re))
           post_data = post_data.replace(page_index_re, 'page_index=' + page_index);
@@ -542,18 +554,25 @@ Nitrate.TestPlans.Details = {
             function(data) {
                 var has_more = jQ(data)[0].hasAttribute('id');
                 if (has_more) {
-                    jQ('#cases-list').find('tbody:first').append(data);
+                    jQ('#' + container).find('.js-cases-list').find('tbody:first').append(data);
 
                     // Increase page index for next batch cases to load
-                    var page_index = jQ('#load-more-cases').attr('data-page-index');
-                    jQ('#load-more-cases')
-                        .attr('data-page-index', parseInt(page_index) + 1);
+                    var page_index = elemLoadMore.attr('data-page-index');
+                    elemLoadMore.attr('data-page-index', parseInt(page_index) + 1);
 
-                    Nitrate.TestPlans.Details.bindEventsOnLoadedCases();
+                    Nitrate.TestPlans.Details.bindEventsOnLoadedCases(container);
                 } else {
-                    jQ('#load-more-cases').unbind('click').remove();
+                    elemLoadMore.unbind('click').remove();
                 }
             });
+    },
+
+    /*
+     * Load more cases with previous criterias.
+     */
+    onLoadMoreCasesClick: function(e) {
+        var container = Nitrate.TestPlans.CasesContainer.ConfirmedCases;
+        Nitrate.TestPlans.Details.loadMoreCasesClicHandler(e, container);
     },
 
     /*
@@ -587,9 +606,11 @@ Nitrate.TestPlans.Details = {
             });
         }
 
-        jQ('#load-more-cases').live('click',
+        var container = Nitrate.TestPlans.CasesContainer.ConfirmedCases;
+        jQ('#' + container).find('.js-load-more').live('click',
             Nitrate.TestPlans.Details.onLoadMoreCasesClick);
-        jQ('#load-more-reviewcases').live('click',
+        container = Nitrate.TestPlans.CasesContainer.ReviewingCases;
+        jQ('#' + container).find('.js-load-more').live('click',
             Nitrate.TestPlans.Details.onLoadMoreReviewcasesClick);
     },
 
@@ -604,7 +625,7 @@ Nitrate.TestPlans.Details = {
 
         Nitrate.TestPlans.Details.loadPlansTreeView(plan_id);
         Nitrate.TestPlans.Details.initTabs();
-        Nitrate.TestPlans.Details.loadNormalCases(plan_id);
+        Nitrate.TestPlans.Details.loadConfirmedCases(plan_id);
         Nitrate.TestPlans.Details.observeEvents(plan_id);
 
         TableKit.Sortable.init('testruns_table');

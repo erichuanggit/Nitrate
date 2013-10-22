@@ -133,7 +133,7 @@
 		</div>
 	</div>
 </form>
-<table id="cases-list" class="list" cellpadding="1" cellspacing="0" border="0">
+<table class="list js-cases-list" cellpadding="1" cellspacing="0" border="0">
 	<thead>
 		<tr>
 			<th class="nosort" align="left" width="18px">
@@ -205,6 +205,6 @@
 
 	data-page-index records the next page index to load.
 	{% endcomment %}
-	<a id="load-more-cases" href="javascript:void(0)" class="load-more" data-page-index="2"
+	<a href="javascript:void(0)" class="load-more js-load-more" data-page-index="2"
 	 data-criterias="{{ search_criterias }}">Show more</a>
 </div>
