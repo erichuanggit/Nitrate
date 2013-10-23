@@ -603,6 +603,15 @@ Nitrate.TestPlans.Details = {
     },
 
     observeEvents: function(plan_id) {
+        var NTPD = Nitrate.TestPlans.Details;
+
+        $('tab_treeview').observe('click', function(e) {
+            if (!NTPD.plansTreeViewOpened) {
+                NTPD.loadPlansTreeView(plan_id);
+                NTPD.plansTreeViewOpened = true;
+            }
+        });
+
         $('tab_reviewcases').observe('mousedown', function(e) {
             if (this.classNames().toArray().indexOf('tab_focus') == -1) {
                 var opened  = Nitrate.TestPlans.Details.reviewingCasesTabOpened;
@@ -643,7 +652,6 @@ Nitrate.TestPlans.Details = {
         constructTagZone('tag', { plan: plan_id });
         constructPlanComponentsZone('components');
 
-        Nitrate.TestPlans.Details.loadPlansTreeView(plan_id);
         Nitrate.TestPlans.Details.initTabs();
         Nitrate.TestPlans.Details.loadConfirmedCases(plan_id);
         Nitrate.TestPlans.Details.observeEvents(plan_id);
