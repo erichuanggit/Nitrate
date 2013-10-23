@@ -6,8 +6,8 @@ tag.
 Arguments:
 - test_cases: an iterable object containing all TestCases. Particularly,
 test_cases should be a queryset of a list of TestCases.
-- selected_case_ids:
-- test_plan:
+- selected_case_ids: used to select loaded cases.
+- test_plan: its pk is used here.
 {% endcomment %}
 {% for test_case in test_cases %}
 <tr class="case_title {% cycle 'odd' 'even' %}" id='{{ test_case.pk }}' >
