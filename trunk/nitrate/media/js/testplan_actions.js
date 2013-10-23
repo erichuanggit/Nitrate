@@ -499,6 +499,14 @@ Nitrate.TestPlans.Details = {
      */
     loadCases: function(container, plan_id, parameters) {
         constructPlanDetailsCasesZone(container, plan_id, parameters);
+
+        if (Nitrate.TestPlans.Details._bindEventsOnLoadedCases === undefined) {
+            Nitrate.TestPlans.Details._bindEventsOnLoadedCases = bindEventsOnLoadedCases({
+                cases_container: container,
+                plan_id: plan_id,
+                parameters: parameters
+            });
+        }
     },
 
     /*
@@ -532,9 +540,8 @@ Nitrate.TestPlans.Details = {
         var elem = $(container);
         var form = elem.childElements()[0];
         var table = elem.childElements()[1];
-        bindEventsOnLoadedCases(table, form);
+        Nitrate.TestPlans.Details._bindEventsOnLoadedCases(table, form);
     },
-
 
     /*
      * The real function to load more cases and show them in specific container.
@@ -896,83 +903,112 @@ function unlinkCasePlan(container, parameters)
 /*
  * Bind events on loaded cases.
  *
+ * This is a closure. The real function needs cases container, plan's ID, and
+ * initial parameters as the initializatio parameters.
+ *
  * Arguments:
  * - container: the HTML element containing all loaded cases. Currently, the
  *   container is a TABLE.
  */
-function bindEventsOnLoadedCases(container, form) {
-    // Display/Hide the case content
-    container.adjacent('.expandable.js-just-loaded').invoke('observe', 'click', function(e) {
-        var btn = this;
-        var title = this.up(); // Container
-        var content = this.up().next(); // Content Containers
-        var case_id = title.id;
-        var template_type = form.adjacent('input[name="template_type"]')[0].value;
-        // Review case content call back;
-        var review_case_content_callback = function(e) {
-            var comment_container_t = new Element('div');
-            // Change status/comment callback
-            var cc_callback = function(e) {
-                e.stop();
-                var params = this.serialize(true);
-                var refresh_case = function(t) {
-                    var td = new Element('td', {colspan: 12});
-                    var id = 'id_loading_' + params['object_pk'];
-                    td.appendChild(getAjaxLoading(id));
-                    content.update(td);
-                    fireEvent(btn, 'click');
-                    fireEvent(btn, 'click');
-                }
-                submitComment(comment_container_t, params, refresh_case);
-            };
-            content.adjacent('.update_form').invoke('stopObserving', 'submit');
-            content.adjacent('.update_form').invoke('observe', 'submit', cc_callback);
+function bindEventsOnLoadedCases(options) {
+    var parameters = options.parameters;
+    var plan_id = options.plan_id;
+    var cases_container = options.cases_container;
 
-            // Observe the delete comment form
-            var rc_callback = function(e) {
-                e.stop();
-                if(!confirm(default_messages.confirm.remove_comment))
-                    return false;
-                var params = this.serialize(true);
-                var refresh_case = function(t) {
-                    var returnobj = t.responseText.evalJSON();
-                    if (returnobj.rc != 0) {
-                        alert(returnobj.response);
-                        return false;
+    return function(container, form) {
+        // Observe the change sortkey
+        container.adjacent('.case_sortkey.js-just-loaded').invoke('observe', 'click', function(e) {
+            var c = this.next(); // Container
+            var params = {
+                'testcaseplan': c.innerHTML,
+                'sortkey': this.innerHTML,
+            };
+            var callback = function(t) {
+                constructPlanDetailsCasesZone(cases_container, plan_id, parameters);
+            };
+            changeCaseOrder(params, callback)
+        });
+
+        container.adjacent('.change_status_selector.js-just-loaded').invoke('observe', 'change', function(e) {
+            var be_confirmed = (this.value == '2');
+            var was_confirmed = (this.up(0).attributes['status'].value == "CONFIRMED");
+            var case_id = this.up(1).id;
+            changeTestCaseStatus(plan_id, this, case_id, be_confirmed, was_confirmed);
+        });
+
+        // Display/Hide the case content
+        container.adjacent('.expandable.js-just-loaded').invoke('observe', 'click', function(e) {
+            var btn = this;
+            var title = this.up(); // Container
+            var content = this.up().next(); // Content Containers
+            var case_id = title.id;
+            var template_type = form.adjacent('input[name="template_type"]')[0].value;
+            // Review case content call back;
+            var review_case_content_callback = function(e) {
+                var comment_container_t = new Element('div');
+                // Change status/comment callback
+                var cc_callback = function(e) {
+                    e.stop();
+                    var params = this.serialize(true);
+                    var refresh_case = function(t) {
+                        var td = new Element('td', {colspan: 12});
+                        var id = 'id_loading_' + params['object_pk'];
+                        td.appendChild(getAjaxLoading(id));
+                        content.update(td);
+                        fireEvent(btn, 'click');
+                        fireEvent(btn, 'click');
                     }
+                    submitComment(comment_container_t, params, refresh_case);
+                };
+                content.adjacent('.update_form').invoke('stopObserving', 'submit');
+                content.adjacent('.update_form').invoke('observe', 'submit', cc_callback);
 
-                    var td = new Element('td', {colspan: 12});
-                    var id = 'id_loading_' + params['object_pk'];
-                    td.appendChild(getAjaxLoading(id));
-                    content.update(td);
-                    fireEvent(btn, 'click');
-                    fireEvent(btn, 'click');
-                }
-                removeComment(this, refresh_case)
+                // Observe the delete comment form
+                var rc_callback = function(e) {
+                    e.stop();
+                    if(!confirm(default_messages.confirm.remove_comment))
+                        return false;
+                    var params = this.serialize(true);
+                    var refresh_case = function(t) {
+                        var returnobj = t.responseText.evalJSON();
+                        if (returnobj.rc != 0) {
+                            alert(returnobj.response);
+                            return false;
+                        }
+
+                        var td = new Element('td', {colspan: 12});
+                        var id = 'id_loading_' + params['object_pk'];
+                        td.appendChild(getAjaxLoading(id));
+                        content.update(td);
+                        fireEvent(btn, 'click');
+                        fireEvent(btn, 'click');
+                    }
+                    removeComment(this, refresh_case)
+                };
+                content.adjacent('.form_comment').invoke('stopObserving', 'submit');
+                content.adjacent('.form_comment').invoke('observe', 'submit', rc_callback);
             };
-            content.adjacent('.form_comment').invoke('stopObserving', 'submit');
-            content.adjacent('.form_comment').invoke('observe', 'submit', rc_callback);
-        };
 
-        switch(template_type) {
-        case 'review_case':
-            var case_content_callback = review_case_content_callback;
-            break;
-        default:
-            var case_content_callback = function(e) {};
-        }
+            switch(template_type) {
+            case 'review_case':
+                var case_content_callback = review_case_content_callback;
+                break;
+            default:
+                var case_content_callback = function(e) {};
+            }
 
-        toggleTestCaseContents(template_type, title, content, case_id, nil, nil, case_content_callback);
-    });
+            toggleTestCaseContents(template_type, title, content, case_id, nil, nil, case_content_callback);
+        });
 
-    /*
-     * Using class just-loaded to identify thoes cases that are just loaded to
-     * avoid register event handler repeatedly.
-     */
-    var elems = container.adjacent('.expandable.js-just-loaded');
-    elems.each(function(elem) {
-        elem.removeClassName('js-just-loaded');
-    });
+        /*
+         * Using class just-loaded to identify thoes cases that are just loaded to
+         * avoid register event handler repeatedly.
+         */
+        var elems = container.adjacent('.js-just-loaded');
+        elems.each(function(elem) {
+            elem.removeClassName('js-just-loaded');
+        });
+    }
 }
 
 function constructPlanDetailsCasesZone(container, plan_id, parameters)
@@ -984,6 +1020,12 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
     
     if(!parameters)
         var parameters = {'a': 'initial', 'from_plan': plan_id}
+
+    var _bindEventsOnLoadedCases = bindEventsOnLoadedCases({
+        cases_container: container,
+        plan_id: plan_id,
+        parameters: parameters
+    });
     
     complete = function(t) {
         var form = container.childElements()[0];
@@ -1432,32 +1474,10 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                  })
             })
             }
-        
-        
-        // Observe the change sortkey
-        table.adjacent('.case_sortkey').invoke('observe', 'click', function(e) {
-            var c = this.next(); // Container
-            var params = {
-                'testcaseplan': c.innerHTML,
-                'sortkey': this.innerHTML,
-            };
-            var callback = function(t) {
-                constructPlanDetailsCasesZone(container, plan_id, parameters);
-            };
-            
-            changeCaseOrder(params, callback)
-        });
-        
-        table.adjacent('.change_status_selector').invoke('observe', 'change', function(e) {
-            var be_confirmed = (this.value == '2');
-            var was_confirmed = (this.up(0).attributes['status'].value == "CONFIRMED");
-            var case_id = this.up(1).id;
-            changeTestCaseStatus(plan_id, this, case_id, be_confirmed, was_confirmed);
-        });
 
-        bindEventsOnLoadedCases(table, form);
+        _bindEventsOnLoadedCases(table, form);
     };
-    
+
     var url = getURLParam().url_search_case;
     new Ajax.Updater(container, url, {
         method: 'post',
