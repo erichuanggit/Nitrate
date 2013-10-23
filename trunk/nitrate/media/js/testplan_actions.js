@@ -543,6 +543,14 @@ Nitrate.TestPlans.Details = {
         Nitrate.TestPlans.Details._bindEventsOnLoadedCases(table, form);
     },
 
+    showRemainingCasesCount: function(container) {
+        var casesListContainer = jQ('#' + container).find('.js-cases-list');
+        var total_count = jQ('.content_tab').find('.js-' + container + '-count').text();
+        var loaded_count = casesListContainer.find('tr[id]').length;
+        jQ('span.js-remaining-number-of-' + container).text(
+            parseInt(total_count) - parseInt(loaded_count));
+    },
+
     /*
      * The real function to load more cases and show them in specific container.
      */
@@ -561,13 +569,17 @@ Nitrate.TestPlans.Details = {
             function(data) {
                 var has_more = jQ(data)[0].hasAttribute('id');
                 if (has_more) {
-                    jQ('#' + container).find('.js-cases-list').find('tbody:first').append(data);
+                    var casesListContainer = jQ('#' + container).find('.js-cases-list');
+                    casesListContainer.find('tbody:first').append(data);
 
                     // Increase page index for next batch cases to load
                     var page_index = elemLoadMore.attr('data-page-index');
                     elemLoadMore.attr('data-page-index', parseInt(page_index) + 1);
 
                     Nitrate.TestPlans.Details.bindEventsOnLoadedCases(container);
+
+                    // Calculate the remaining number of cases
+                    Nitrate.TestPlans.Details.showRemainingCasesCount(container);
                 } else {
                     elemLoadMore.unbind('click').remove();
                 }
@@ -1476,6 +1488,8 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             }
 
         _bindEventsOnLoadedCases(table, form);
+
+        Nitrate.TestPlans.Details.showRemainingCasesCount(container.id);
     };
 
     var url = getURLParam().url_search_case;

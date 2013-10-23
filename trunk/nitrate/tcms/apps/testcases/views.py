@@ -488,7 +488,7 @@ def all(request, template_name="case/all.html"):
         elif request.REQUEST.get('template_type') == 'review_case':
             template_name = 'plan/get_review_cases.html'
 
-    return direct_to_template(request, template_name, {
+    result = direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'test_cases': tcs,
         'test_plan': tp,
@@ -503,6 +503,12 @@ def all(request, template_name="case/all.html"):
         # Remember this for loading more cases with the same as criterias.
         'search_criterias': request.raw_post_data,
     })
+
+    from django.db import connection
+    from pprint import pprint
+    pprint(connection.queries)
+
+    return result
 
 
 def search(request, template_name='case/all.html'):
