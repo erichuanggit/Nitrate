@@ -450,8 +450,8 @@ Nitrate.TestPlans.List.on_load = function()
           null,
           {"bVisible": false},
           null,
-          null,
-          null,
+          {"bSortable": false },
+          {"bSortable": false },
           {"bSortable": false }
         ]
         });
