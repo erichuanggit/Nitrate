@@ -547,8 +547,11 @@ Nitrate.TestPlans.Details = {
         var casesListContainer = jQ('#' + container).find('.js-cases-list');
         var total_count = jQ('.content_tab').find('.js-' + container + '-count').text();
         var loaded_count = casesListContainer.find('tr[id]').length;
-        jQ('span.js-remaining-number-of-' + container).text(
-            parseInt(total_count) - parseInt(loaded_count));
+		var remaining_count = parseInt(total_count) - parseInt(loaded_count);
+		if (remaining_count === 0) {
+			jQ('#' + container).find('.js-load-more').text('No more').die();
+		}
+		jQ('span.js-remaining-number-of-' + container).text(remaining_count);
     },
 
     /*
