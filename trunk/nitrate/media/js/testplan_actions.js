@@ -567,11 +567,15 @@ Nitrate.TestPlans.Details = {
         else
           post_data = post_data + '&page_index=' + page_index;
 
+        jQ('#' + container).find('.ajax_loading').show();
+
         jQ.post('/cases/load-more/',
             post_data,
             function(data) {
                 var has_more = jQ(data)[0].hasAttribute('id');
                 if (has_more) {
+                    jQ('#' + container).find('.ajax_loading').hide();
+
                     var casesListContainer = jQ('#' + container).find('.js-cases-list');
                     casesListContainer.find('tbody:first').append(data);
 
@@ -586,6 +590,9 @@ Nitrate.TestPlans.Details = {
                 } else {
                     elemLoadMore.unbind('click').remove();
                 }
+            }).fail(function() {
+                jQ('#' + container).find('.ajax_loading').hide();
+                alert('Cannot load subsequent cases.');
             });
     },
 
