@@ -1092,3 +1092,17 @@ ul.data_content_title li{ display:inline-block; margin-left:3px;}
 
 .linotype{float:left; padding-bottom:12px;}
 .linotype li{list-style:none;}
+
+.show-more-cases {
+    font-size: 15px;
+    padding: 12px;
+}
+
+.show-more-cases a {
+    margin-right: 12px;
+    text-decoration: underline;
+}
+
+.hide {
+    display: none;
+}
