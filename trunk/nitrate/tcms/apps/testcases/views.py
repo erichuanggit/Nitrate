@@ -296,11 +296,17 @@ def calculate_for_testcases(plan_id, testcases):
         plan_id, tc_ids)
     num_bugs = calculate_number_of_bugs_for_testcases(tc_ids)
 
+    # FIXME: strongly recommended to upgrade to Python +2.6
     for tc in testcases:
         data = sortkey_tcpkan_pks.get(tc.pk, None)
-        setattr(tc, 'cal_sortkey', data['sortkey'] if data else None)
-        setattr(tc, 'cal_testcaseplan_pk',
-                data['testcaseplan_pk'] if data else None)
+        if data:
+            setattr(tc, 'cal_sortkey', data['sortkey'])
+        else:
+            setattr(tc, 'cal_sortkey', None)
+        if data:
+            setattr(tc, 'cal_testcaseplan_pk', data['testcaseplan_pk'])
+        else:
+            setattr(tc, 'cal_testcaseplan_pk', None)
         setattr(tc, 'cal_num_bugs', num_bugs.get(tc.pk, None))
 
     return testcases
