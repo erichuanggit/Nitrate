@@ -543,15 +543,28 @@ Nitrate.TestPlans.Details = {
         Nitrate.TestPlans.Details._bindEventsOnLoadedCases(table, form);
     },
 
+    /*
+     * Show the remaining number of TestCases to be loaded.
+     *
+     * A side-effect is that when there is no more TestCases to be loaded,
+     * disable Show More hyperlink and display descriptive text to tell user
+     * what is happening.
+     */
     showRemainingCasesCount: function(container) {
-        var casesListContainer = jQ('#' + container).find('.js-cases-list');
-        var total_count = jQ('.content_tab').find('.js-' + container + '-count').text();
-        var loaded_count = casesListContainer.find('tr[id]').length;
-        var remaining_count = parseInt(total_count) - parseInt(loaded_count);
-        if (remaining_count === 0) {
-            jQ('#' + container).find('.js-load-more').text('No more').die();
+        var contentContainer = jQ('#' + container);
+        var casesListContainer = contentContainer.find('.js-cases-list');
+        var totalCasesCount = contentContainer.find('.js-total-cases-count').text();
+        var loadedCasesCount = casesListContainer.find('tr[id]').length;
+        var remainingCount = parseInt(totalCasesCount) - parseInt(loadedCasesCount);
+        if (remainingCount === 0) {
+            contentContainer.find('a.js-load-more').die('click').toggle();
+            contentContainer.find('span.js-loading-progress').toggle();
+            contentContainer.find('span.js-nomore-msg').toggle();
+            setTimeout(function() {
+                contentContainer.find('span.js-nomore-msg').toggle('slow');
+            }, 2000)
         }
-        jQ('span.js-remaining-number-of-' + container).text(remaining_count);
+        contentContainer.find('.js-remaining-cases-count').text(remainingCount);
     },
 
     /*
@@ -644,13 +657,6 @@ Nitrate.TestPlans.Details = {
                 updateObject('testplans.testplan', plan_id, 'is_active', 'True', 'bool', reloadWindow);
             });
         }
-
-        var container = Nitrate.TestPlans.CasesContainer.ConfirmedCases;
-        jQ('#' + container).find('.js-load-more').live('click',
-            Nitrate.TestPlans.Details.onLoadMoreCasesClick);
-        container = Nitrate.TestPlans.CasesContainer.ReviewingCases;
-        jQ('#' + container).find('.js-load-more').live('click',
-            Nitrate.TestPlans.Details.onLoadMoreReviewcasesClick);
     },
 
     on_load: function() {
@@ -1066,15 +1072,16 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             alert('form element of container is not a form');
             return false;
         };
-        
+
         var filter = form.adjacent('.list_filter')[0];
-        
+
+        // Filter cases
         form.observe('submit', function(e) {
             e.stop();
             var params = serialzeCaseForm(form, table);
             constructPlanDetailsCasesZone(container, plan_id, params);
-        })
-        
+        });
+
         // Change the case backgroud after selected
         form.adjacent('input[name="case"]').invoke('observe', 'click', function(e) {
             if(this.checked) {
@@ -1082,17 +1089,17 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             } else {
                 this.up(1).removeClassName('selection_row');
             }
-        })
-        
+        });
+
         // Observe the check all selectbox
         if(form.adjacent('input[value="all"]').length > 0) {
             var element = form.adjacent('input[value="all"]')[0];
-            
+
             element.observe('click', function(e) {
                 clickedSelectAll(this, this.up(4), 'case');
-            })
+            });
         }
-        
+
         if(form.adjacent('.btn_filter').length > 0) {
             var element = form.adjacent('.btn_filter')[0];
             element.observe('click', function(t) {
@@ -1103,9 +1110,9 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     filter.hide();
                     this.update(default_messages.link.show_filter);
                 }
-            })
+            });
         }
-        
+
         // Bind click the tags in tags list to tags field in filter
         if(form.adjacent('.taglist a[href="#testcases"]').length > 0) {
             var elements = form.adjacent('.taglist a');
@@ -1118,9 +1125,9 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     form.tag__name__in.value = this.innerHTML;
                 }*/
                 form.tag__name__in.value = form.tag__name__in.value?(form.tag__name__in.value + ',' + this.textContent):this.textContent;
-            })
+            });
         }
-        
+
         // Bind the sort link
         if(form.adjacent('.btn_sort').length > 0) {
             var element = form.adjacent('.btn_sort')[0];
@@ -1137,7 +1144,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 resortCasesDragAndDrop(container, this, form, table, params, callback);
             });
         }
-        
+
         // Bind batch change case status selector
         if(form.adjacent('input[name="new_case_status_id"]').length > 0) {
             var element = form.adjacent('input[name="new_case_status_id"]')[0];
@@ -1172,9 +1179,9 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 }
                 
                 changeCasesStatus(plan_id, params['case'], this.value, callback);
-            })
+            });
         }
-        
+
         if(form.adjacent('input[name="new_priority_id"]').length > 0) {
             var element = form.adjacent('input[name="new_priority_id"]')[0];
             
@@ -1506,6 +1513,11 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             }
 
         _bindEventsOnLoadedCases(table, form);
+
+        // Register event handler for loading more cases.
+        jQ('#' + container.id).find('.js-load-more')
+            .die('click')
+            .live('click', Nitrate.TestPlans.Details.onLoadMoreCasesClick);
 
         Nitrate.TestPlans.Details.showRemainingCasesCount(container.id);
     };

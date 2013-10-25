@@ -458,7 +458,9 @@ def all(request, template_name="case/all.html"):
     tp = plan_from_request_or_none(request)
     search_form = build_cases_search_form(request, populate=True, plan=tp)
     tcs = query_testcases(request, tp, search_form)
+    # FIXME: do not iterate each TestCase to generate this list
     tc_ids = [tc.pk for tc in tcs]
+    total_cases_count = len(tcs)
 
     # Initial the case ids
     selected_case_ids = get_selected_cases_ids(request, tc_ids)
@@ -508,6 +510,7 @@ def all(request, template_name="case/all.html"):
         # Load more is a POST request, so POST parameters are required only.
         # Remember this for loading more cases with the same as criterias.
         'search_criterias': request.raw_post_data,
+        'total_cases_count': total_cases_count,
     })
 
 

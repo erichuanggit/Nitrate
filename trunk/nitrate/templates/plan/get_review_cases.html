@@ -188,8 +188,9 @@
 	<!-- There is a fixed size of page, 20 cases per page by default. After cases
 			 is loaded for the first time, Load More will load cases from the second
 			 page, and then the page index will be change to next page. -->
-	<a href="javascript:void(0)" class="load-more js-load-more"
-	 data-page-index="2" data-criterias={{ search_criterias }}>Load more</a>
-        <span class="hide">No more</span>
-	(Remaining <span class="js-remaining-number-of-reviewcases">0</span>)
+	<a href="javascript:void(0)" class="load-more js-load-more" data-page-index="2" data-criterias="{{ search_criterias }}">Show more</a>
+	<span class="js-loading-progress">
+		(<span class="js-remaining-cases-count">0</span>/<span class="js-total-cases-count">{{ total_cases_count|default:"0" }}</span>)
+	</span>
+	<span class="js-nomore-msg" style="display:none">All cases have been loaded.</span>
 </div>
