@@ -2,7 +2,7 @@
 %define use_pylint 0
 
 Name:           nitrate
-Version:        3.8.4
+Version:        3.8.5
 Release:        1%{?dist}
 Summary:        Test Case Management System
 
@@ -118,6 +118,14 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+
+*Fri Oct 25 2013 Chenxiong Qi <cqi@redhat.com> - 3.8.5-1
+- Bug 1017112 - [Performance] Loading TestRuns in pagination way in the TestPlan page
+- Bug 1018021 - [Performance] Search TestPlan without any criteria causes MySQL occurpies nearly 100% CPU time
+- Bug 1019641 - Lazy-loading TreeView tab in a TestPlan page
+- Bug 1017110 - [Performace] Loading Reviewing TestCases in pagination way in the TestPlan page
+- Bug 1017102 - [Performace] Loading TestCases in pagination way in the TestPlan page
+- Bug 1017255 - [Performance] Rewrite implementation of TestCase' progressbar 
 
 *Tue Sep 17 2013 Jian Chen <jianchen@redhat.com> - 3.8.4
 - Add a column with number of comments into Case Runs table
