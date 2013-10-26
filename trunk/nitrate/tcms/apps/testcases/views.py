@@ -432,14 +432,25 @@ def load_more_cases(request, template_name='plan/cases_rows.html'):
     })
 
 
-def get_selected_cases_ids(request, default_cases_ids):
-    '''Get selected cases' IDs used to determine whether to check a case'''
+def get_selected_cases_ids(request):
+    '''Get cases' IDs to restore the checked status after current operation
+
+    The cases whose ID appears in REQUEST is handled, and they should be
+    checked when user sees the page returned after current operation.
+
+    If there is no case argument in REQUEST, check all. This is also the
+    default behavior.
+
+    Return values:
+    - a list of IDs, which should be checked.
+    - empty list, representing select all.
+    '''
     REQUEST = request.REQUEST
     if REQUEST.get('case'):
-        # FIXME: why do use list comprehension.
+        # FIXME: why do not use list comprehension.
         return map(lambda f: int(f), REQUEST.getlist('case'))
     else:
-        return default_cases_ids
+        return []
 
 
 def all(request, template_name="case/all.html"):
@@ -458,15 +469,13 @@ def all(request, template_name="case/all.html"):
     tp = plan_from_request_or_none(request)
     search_form = build_cases_search_form(request, populate=True, plan=tp)
     tcs = query_testcases(request, tp, search_form)
-    # FIXME: do not iterate each TestCase to generate this list
-    tc_ids = [tc.pk for tc in tcs]
-    total_cases_count = len(tcs)
+    total_cases_count = tcs.count()
 
     # Initial the case ids
-    selected_case_ids = get_selected_cases_ids(request, tc_ids)
+    selected_case_ids = get_selected_cases_ids(request)
 
     # Get the tags own by the cases
-    ttags = TestTag.objects.filter(testcase__in=tc_ids).order_by('name').distinct()
+    ttags = TestTag.objects.filter(testcase__in=tcs).order_by('name').distinct()
 
     tcs = paginate_testcases(request, tcs)
 
@@ -512,7 +521,6 @@ def all(request, template_name="case/all.html"):
         'search_criterias': request.raw_post_data,
         'total_cases_count': total_cases_count,
     })
-
 
 def search(request, template_name='case/all.html'):
     """
