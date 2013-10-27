@@ -487,9 +487,20 @@ Nitrate.TestPlans.Details = {
         });
 
         // Display the tab indicated by hash along with URL.
-        if(window.location.hash) {
-            fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
+        var defaultSwitchTo = '#testcases';
+        var switchTo = window.location.hash;
+        var exist = jQ('#contentTab')
+            .find('a')
+            .map(function(index, element) {
+                return element.getAttribute('href');
+            })
+            .filter(function(index, element) {
+                return element === switchTo;
+            }).length > 0;
+        if (!exist) {
+            switchTo = defaultSwitchTo;
         }
+        fireEvent($$('a[href=\"' + switchTo + '\"]')[0], 'click');
     },
 
     /*
@@ -628,6 +639,13 @@ Nitrate.TestPlans.Details = {
     observeEvents: function(plan_id) {
         var NTPD = Nitrate.TestPlans.Details;
 
+        $('tab_testcases').observe('click', function(e) {
+            if (!NTPD.testcasesTabOpened) {
+                NTPD.loadConfirmedCases(plan_id);
+                NTPD.testcasesTabOpened = true;
+            };
+        });
+
         $('tab_treeview').observe('click', function(e) {
             if (!NTPD.plansTreeViewOpened) {
                 NTPD.loadPlansTreeView(plan_id);
@@ -635,13 +653,11 @@ Nitrate.TestPlans.Details = {
             }
         });
 
-        $('tab_reviewcases').observe('mousedown', function(e) {
-            if (this.classNames().toArray().indexOf('tab_focus') == -1) {
-                var opened  = Nitrate.TestPlans.Details.reviewingCasesTabOpened;
-                if (!opened) {
-                    Nitrate.TestPlans.Details.loadReviewingCases(plan_id);
-                    Nitrate.TestPlans.Details.reviewingCasesTabOpened = true;
-                }
+        $('tab_reviewcases').observe('click', function(e) {
+            var opened  = Nitrate.TestPlans.Details.reviewingCasesTabOpened;
+            if (!opened) {
+                Nitrate.TestPlans.Details.loadReviewingCases(plan_id);
+                Nitrate.TestPlans.Details.reviewingCasesTabOpened = true;
             }
         });
 
@@ -668,9 +684,9 @@ Nitrate.TestPlans.Details = {
         constructTagZone('tag', { plan: plan_id });
         constructPlanComponentsZone('components');
 
-        Nitrate.TestPlans.Details.initTabs();
-        Nitrate.TestPlans.Details.loadConfirmedCases(plan_id);
+//        Nitrate.TestPlans.Details.loadConfirmedCases(plan_id);
         Nitrate.TestPlans.Details.observeEvents(plan_id);
+        Nitrate.TestPlans.Details.initTabs();
 
         TableKit.Sortable.init('testruns_table');
 
