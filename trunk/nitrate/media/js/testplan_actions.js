@@ -636,6 +636,20 @@ Nitrate.TestPlans.Details = {
         Nitrate.TestPlans.Details.loadMoreCasesClicHandler(e, container);
     },
 
+    observeLoadMore: function(container) {
+        var NTC = Nitrate.TestPlans.CasesContainer;
+        var NTD = Nitrate.TestPlans.Details;
+        var loadMoreEventHandlers = {};
+        loadMoreEventHandlers[NTC.ConfirmedCases] = NTD.onLoadMoreCasesClick;
+        loadMoreEventHandlers[NTC.ReviewingCases] = NTD.onLoadMoreReviewcasesClick;
+        var eventHandler = loadMoreEventHandlers[container];
+        if (eventHandler) {
+            jQ('#' + container).find('.js-load-more')
+                .die('click')
+                .live('click', eventHandler);
+        }
+    },
+
     observeEvents: function(plan_id) {
         var NTPD = Nitrate.TestPlans.Details;
 
@@ -684,7 +698,6 @@ Nitrate.TestPlans.Details = {
         constructTagZone('tag', { plan: plan_id });
         constructPlanComponentsZone('components');
 
-//        Nitrate.TestPlans.Details.loadConfirmedCases(plan_id);
         Nitrate.TestPlans.Details.observeEvents(plan_id);
         Nitrate.TestPlans.Details.initTabs();
 
@@ -1531,10 +1544,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         _bindEventsOnLoadedCases(table, form);
 
         // Register event handler for loading more cases.
-        jQ('#' + container.id).find('.js-load-more')
-            .die('click')
-            .live('click', Nitrate.TestPlans.Details.onLoadMoreCasesClick);
-
+        Nitrate.TestPlans.Details.observeLoadMore(container.id);
         Nitrate.TestPlans.Details.showRemainingCasesCount(container.id);
     };
 
