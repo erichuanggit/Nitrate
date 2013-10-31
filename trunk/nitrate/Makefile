@@ -15,6 +15,13 @@ RPMBUILD_OPTIONS=--nodeps --define "_sourcedir $(PWD)" --define "_srcrpmdir $(PW
 WORK_DIR=/tmp/nitrate-$(VERSION)
 SOURCE_DIR = $(WORK_DIR)/nitrate/trunk/
 
+# By default, development is the default branch for making tarball. Meanwhile,
+# developer has the oppotunity to force make to make tarball from other branch
+# by specifying a branch name via TCMS_BRANCH explicitly.
+ifeq ($(strip $(TCMS_BRANCH)),)
+	TCMS_BRANCH=development
+endif
+
 # Target: build a local RPM
 local-rpm: $(SRPM)
 	echo "$(SRPM)"
@@ -34,7 +41,7 @@ $(TARBALL): Makefile
 	@rm -f $(TARBALL)
 	@mkdir $(WORK_DIR)
 	@echo "Getting latest codes from git"
-	@cd $(WORK_DIR); git clone -b development git://git.fedorahosted.org/nitrate.git
+	@cd $(WORK_DIR); git clone -b $(TCMS_BRANCH) git://git.fedorahosted.org/nitrate.git
 	# Fixup the version field in the page footer so that it shows the precise
 	# RPM version-release:
 	@cd $(SOURCE_DIR); sed --in-place -r 's|NITRATE_VERSION|$(VERSION)|' $(SOURCE_DIR)/nitrate/templates/tcms_base.html
