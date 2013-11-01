@@ -567,15 +567,17 @@ Nitrate.TestPlans.Details = {
         var totalCasesCount = contentContainer.find('.js-total-cases-count').text();
         var loadedCasesCount = casesListContainer.find('tr[id]').length;
         var remainingCount = parseInt(totalCasesCount) - parseInt(loadedCasesCount);
+        contentContainer.find('.js-number-of-loaded-cases').text(loadedCasesCount);
         if (remainingCount === 0) {
             contentContainer.find('a.js-load-more').die('click').toggle();
             contentContainer.find('span.js-loading-progress').toggle();
             contentContainer.find('span.js-nomore-msg').toggle();
             setTimeout(function() {
                 contentContainer.find('span.js-nomore-msg').toggle('slow');
-            }, 2000)
+            }, 2000);
+        } else {
+            contentContainer.find('.js-remaining-cases-count').text(remainingCount);
         }
-        contentContainer.find('.js-remaining-cases-count').text(remainingCount);
     },
 
     /*
