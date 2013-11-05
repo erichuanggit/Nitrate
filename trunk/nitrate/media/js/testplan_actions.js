@@ -564,7 +564,8 @@ Nitrate.TestPlans.Details = {
     showRemainingCasesCount: function(container) {
         var contentContainer = jQ('#' + container);
         var casesListContainer = contentContainer.find('.js-cases-list');
-        var totalCasesCount = contentContainer.find('.js-total-cases-count').text();
+        var totalCasesCount = contentContainer
+			.find('.js-remaining-cases-count').attr('data-cases-count');
         var loadedCasesCount = casesListContainer.find('tr[id]').length;
         var remainingCount = parseInt(totalCasesCount) - parseInt(loadedCasesCount);
         contentContainer.find('.js-number-of-loaded-cases').text(loadedCasesCount);

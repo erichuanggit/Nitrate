@@ -612,6 +612,8 @@ def update_case_status(request):
     plan.review_case = plan.case.exclude(case_status__name=confirm_status_name)
     run_case_count = plan.run_case.count()
     case_count = plan.case.count()
+    # FIXME: why not calculate review_case_count or run_case_count by using
+    # substraction, which saves one SQL query.
     review_case_count = plan.review_case.count()
     return HttpResponse(
         simplejson.dumps({

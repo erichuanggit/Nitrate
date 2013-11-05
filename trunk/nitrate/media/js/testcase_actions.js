@@ -465,6 +465,19 @@ function changeTestCaseStatus(plan_id, selector, case_id, be_confirmed, was_conf
             var case_status = node.innerHTML;
         }
 
+        // We have to reload the other side of cases to reflect the status
+        // change. This MUST be done before selector is hided.
+        var switchMap = {
+            testcases: function() {
+                Nitrate.TestPlans.Details.reviewingCasesTabOpened = false;
+            },
+            reviewcases: function() {
+                Nitrate.TestPlans.Details.testcasesTabOpened = false;
+            }
+        };
+        var container_id = jQ(selector).parents('.tab_list').attr('id');
+        switchMap[container_id]();
+
         label.innerHTML = case_status;
         label.show();
         selector.hide();
