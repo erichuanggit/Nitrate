@@ -147,9 +147,12 @@ ALTER TABLE test_plans ADD column product_version_id mediumint(9) DEFAULT null ;
 ALTER TABLE test_cases ADD column extra_link varchar(1024) DEFAULT null ;
 ALTER TABLE test_runs ADD column auto_update_run_status boolean DEFAULT false;       
 
--- TCMS 3.8.3, Remove the whole trigger thing created in 3.6.3
+-- TCMS 3.8.5, Remove the whole trigger thing created in 3.6.3
 ALTER TABLE test_runs DROP COLUMN case_run_status;
 
 DROP TRIGGER case_run_status_trigger_update;
 DROP TRIGGER case_run_status_trigger_insert;
 DROP TRIGGER case_run_status_trigger_delete;
+
+ALTER TABLE auth_user MODIFY first_name VARCHAR(30) CHARACTER SET utf8;
+ALTER TABLE auth_user MODIFY last_name VARCHAR(30) CHARACTER SET utf8;
