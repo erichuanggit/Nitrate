@@ -720,6 +720,7 @@ Nitrate.TestPlans.Details = {
             clickedSelectAll(this, 'testruns_table', 'run');
         });
 
+        Nitrate.TestPlans.Runs.initializaRunTab();
         jQ('#show_more_runs').live('click', Nitrate.TestPlans.Runs.showMore);
         jQ('#reload_runs').live('click', Nitrate.TestPlans.Runs.reload);
         jQ('#tab_testruns').live('click', Nitrate.TestPlans.Runs.initializaRunTab);
@@ -1960,11 +1961,19 @@ Nitrate.TestPlans.Runs = {
     }
 
     , initializaRunTab: function () {
+        /**
+         * Load the first page of the runs when:
+         * 1. Current active tab is #testrun;
+         * AND
+         * 2. No testruns are ever loaded.
+         *
+        */
         var that = Nitrate.TestPlans.Runs;
-        // When the testruns tab first clicked.
-        var tbody = jQ('#testruns_body');
-        if (tbody.children().length === 0) {
-            that.reload();
+        if (jQ('#tab_testruns').hasClass('tab_focus')) {
+            var tbody = jQ('#testruns_body');
+            if (tbody.children().length === 0) {
+                that.reload();
+            }
         }
     }
 
