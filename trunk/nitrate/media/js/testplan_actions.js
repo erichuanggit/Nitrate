@@ -568,7 +568,6 @@ Nitrate.TestPlans.Details = {
 			.find('.js-remaining-cases-count').attr('data-cases-count');
         var loadedCasesCount = casesListContainer.find('tr[id]').length;
         var remainingCount = parseInt(totalCasesCount) - parseInt(loadedCasesCount);
-        contentContainer.find('.js-number-of-loaded-cases').text(loadedCasesCount);
         if (remainingCount === 0) {
             contentContainer.find('a.js-load-more').die('click').toggle();
             contentContainer.find('span.js-loading-progress').toggle();

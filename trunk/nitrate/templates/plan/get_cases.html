@@ -128,7 +128,7 @@
 	<div class="list_filter" {% ifnotequal REQUEST_CONTENTS.a 'search' %} style="display:none;" {% endifnotequal %}>
 		{% include 'case/form/filter.html' %}
 		<div class="submit-row bottom">
-			<span class="tit"><span class="js-number-of-loaded-cases">{{ test_cases|length }}</span> Cases</span>
+			<span class="tit"><span class="js-number-of-loaded-cases">{{ total_cases_count }}</span> Cases</span>
 			<input type="submit" value="Filter cases" />
 		</div>
 	</div>
