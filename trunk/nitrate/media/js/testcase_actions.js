@@ -999,14 +999,14 @@ function serializeCasePlanIDFromInputList(table)
  * - exclude_cases: whether to exclude all cases while serializing. For
  *   instance, when filter cases, it's unnecessary to collect all selected
  *   cases' IDs, due to all filtered cases in the response should be selected
- *   by default.
+ *   by default. Default to true if not passed.
  */
 function serialzeCaseForm(form, table, serialized, exclude_cases)
 {
     if(typeof(serialized) != 'boolean')
     var serialized = true;
     if (exclude_cases === undefined) {
-        exclude_cases = true;
+        exclude_cases = false;
     }
     var data = form.serialize(serialized);
     if (!exclude_cases) {
