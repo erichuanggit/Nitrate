@@ -1003,7 +1003,6 @@ function serializeCasePlanIDFromInputList(table)
  */
 function serialzeCaseForm(form, table, serialized, exclude_cases)
 {
-    console.log(form, table, serialized, exclude_cases);
     if(typeof(serialized) != 'boolean')
     var serialized = true;
     if (exclude_cases === undefined) {
