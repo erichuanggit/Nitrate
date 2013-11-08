@@ -1111,7 +1111,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         // Filter cases
         form.observe('submit', function(e) {
             e.stop();
-            var params = serialzeCaseForm(form, table);
+            var params = serialzeCaseForm(form, table, true, true);
             constructPlanDetailsCasesZone(container, plan_id, params);
         });
 

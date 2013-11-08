@@ -988,12 +988,31 @@ function serializeCasePlanIDFromInputList(table)
     return case_plan_ids
 }
 
-function serialzeCaseForm(form, table, serialized)
+/*
+ * Serialize criterias for searching cases.
+ *
+ * Arguments:
+ * - form: the form from which criterias are searched
+ * - table: the table containing all loaded cases
+ * - serialized: whether to serialize the form data. true is default, if not
+ *   passed.
+ * - exclude_cases: whether to exclude all cases while serializing. For
+ *   instance, when filter cases, it's unnecessary to collect all selected
+ *   cases' IDs, due to all filtered cases in the response should be selected
+ *   by default.
+ */
+function serialzeCaseForm(form, table, serialized, exclude_cases)
 {
+    console.log(form, table, serialized, exclude_cases);
     if(typeof(serialized) != 'boolean')
     var serialized = true;
+    if (exclude_cases === undefined) {
+        exclude_cases = true;
+    }
     var data = form.serialize(serialized);
-    data['case'] = serializeCaseFromInputList(table);
+    if (!exclude_cases) {
+        data['case'] = serializeCaseFromInputList(table);
+    }
     return data
 }
 
