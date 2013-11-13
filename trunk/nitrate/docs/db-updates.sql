@@ -1,3 +1,5 @@
+-- For Version 3.8.5, Wed Nov 13 2013
+
 USE testopia;
 
 -- Performance improvement by removing triggers added previously
