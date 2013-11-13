@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.1.35, for redhat-linux-gnu (i386)
+-- MySQL dump 10.14  Distrib 5.5.33a-MariaDB, for Linux (x86_64)
 --
 -- Host: localhost    Database: testopia
 -- ------------------------------------------------------
--- Server version	5.1.35
+-- Server version	5.5.33a-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -30,15 +30,6 @@ CREATE TABLE `attach_data` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `attach_data`
---
-
-LOCK TABLES `attach_data` WRITE;
-/*!40000 ALTER TABLE `attach_data` DISABLE KEYS */;
-/*!40000 ALTER TABLE `attach_data` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `attachments`
 --
 
@@ -46,7 +37,7 @@ DROP TABLE IF EXISTS `attachments`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `attachments` (
-  `attach_id` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `attach_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `bug_id` mediumint(9) NOT NULL,
   `creation_ts` datetime NOT NULL,
   `description` mediumtext NOT NULL,
@@ -65,13 +56,128 @@ CREATE TABLE `attachments` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `attachments`
+-- Table structure for table `auth_group`
 --
 
-LOCK TABLES `attachments` WRITE;
-/*!40000 ALTER TABLE `attachments` DISABLE KEYS */;
-/*!40000 ALTER TABLE `attachments` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `auth_group`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `auth_group` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(80) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `auth_group_permissions`
+--
+
+DROP TABLE IF EXISTS `auth_group_permissions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `auth_group_permissions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `group_id` int(11) NOT NULL,
+  `permission_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `group_id` (`group_id`,`permission_id`),
+  KEY `permission_id_refs_id_a7792de1` (`permission_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=5072 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `auth_message`
+--
+
+DROP TABLE IF EXISTS `auth_message`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `auth_message` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `message` longtext NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `auth_message_user_id` (`user_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4898 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `auth_permission`
+--
+
+DROP TABLE IF EXISTS `auth_permission`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `auth_permission` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `content_type_id` int(11) NOT NULL,
+  `codename` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `content_type_id` (`content_type_id`,`codename`),
+  KEY `auth_permission_content_type_id` (`content_type_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=227 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `auth_user`
+--
+
+DROP TABLE IF EXISTS `auth_user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `auth_user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(30) CHARACTER SET utf8 DEFAULT NULL,
+  `first_name` varchar(30) CHARACTER SET utf8 DEFAULT NULL,
+  `last_name` varchar(30) CHARACTER SET utf8 DEFAULT NULL,
+  `email` varchar(30) CHARACTER SET utf8 DEFAULT NULL,
+  `password` varchar(30) CHARACTER SET utf8 DEFAULT NULL,
+  `is_staff` tinyint(1) NOT NULL,
+  `is_active` tinyint(1) NOT NULL,
+  `is_superuser` tinyint(1) NOT NULL,
+  `last_login` datetime NOT NULL,
+  `date_joined` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=MyISAM AUTO_INCREMENT=4435 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `auth_user_groups`
+--
+
+DROP TABLE IF EXISTS `auth_user_groups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `auth_user_groups` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `group_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`,`group_id`),
+  KEY `group_id_refs_id_f0ee9890` (`group_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=6145 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `auth_user_user_permissions`
+--
+
+DROP TABLE IF EXISTS `auth_user_user_permissions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `auth_user_user_permissions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `permission_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`,`permission_id`),
+  KEY `permission_id_refs_id_67e79cb` (`permission_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=17496 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `bug_group_map`
@@ -89,15 +195,6 @@ CREATE TABLE `bug_group_map` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `bug_group_map`
---
-
-LOCK TABLES `bug_group_map` WRITE;
-/*!40000 ALTER TABLE `bug_group_map` DISABLE KEYS */;
-/*!40000 ALTER TABLE `bug_group_map` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `bug_severity`
 --
 
@@ -105,7 +202,7 @@ DROP TABLE IF EXISTS `bug_severity`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `bug_severity` (
-  `id` smallint(6) NOT NULL AUTO_INCREMENT,
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `value` varchar(64) NOT NULL,
   `sortkey` smallint(6) NOT NULL DEFAULT '0',
   `isactive` tinyint(4) NOT NULL DEFAULT '1',
@@ -116,16 +213,6 @@ CREATE TABLE `bug_severity` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `bug_severity`
---
-
-LOCK TABLES `bug_severity` WRITE;
-/*!40000 ALTER TABLE `bug_severity` DISABLE KEYS */;
-INSERT INTO `bug_severity` VALUES (1,'blocker',100,1),(2,'critical',200,1),(3,'major',300,1),(4,'normal',400,1),(5,'minor',500,1),(6,'trivial',600,1),(7,'enhancement',700,1);
-/*!40000 ALTER TABLE `bug_severity` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `bug_status`
 --
 
@@ -133,7 +220,7 @@ DROP TABLE IF EXISTS `bug_status`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `bug_status` (
-  `id` smallint(6) NOT NULL AUTO_INCREMENT,
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `value` varchar(64) NOT NULL,
   `sortkey` smallint(6) NOT NULL DEFAULT '0',
   `isactive` tinyint(4) NOT NULL DEFAULT '1',
@@ -144,16 +231,6 @@ CREATE TABLE `bug_status` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `bug_status`
---
-
-LOCK TABLES `bug_status` WRITE;
-/*!40000 ALTER TABLE `bug_status` DISABLE KEYS */;
-INSERT INTO `bug_status` VALUES (1,'UNCONFIRMED',100,1),(2,'NEW',200,1),(3,'ASSIGNED',300,1),(4,'REOPENED',400,1),(5,'RESOLVED',500,1),(6,'VERIFIED',600,1),(7,'CLOSED',700,1);
-/*!40000 ALTER TABLE `bug_status` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `bugs`
 --
 
@@ -161,7 +238,7 @@ DROP TABLE IF EXISTS `bugs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `bugs` (
-  `bug_id` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `bug_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `assigned_to` mediumint(9) NOT NULL,
   `bug_file_loc` text,
   `bug_severity` varchar(64) NOT NULL,
@@ -207,17 +284,8 @@ CREATE TABLE `bugs` (
   KEY `bugs_target_milestone_idx` (`target_milestone`),
   KEY `bugs_qa_contact_idx` (`qa_contact`),
   KEY `bugs_votes_idx` (`votes`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `bugs`
---
-
-LOCK TABLES `bugs` WRITE;
-/*!40000 ALTER TABLE `bugs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `bugs` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `bugs_activity`
@@ -242,15 +310,6 @@ CREATE TABLE `bugs_activity` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `bugs_activity`
---
-
-LOCK TABLES `bugs_activity` WRITE;
-/*!40000 ALTER TABLE `bugs_activity` DISABLE KEYS */;
-/*!40000 ALTER TABLE `bugs_activity` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `bz_schema`
 --
 
@@ -262,16 +321,6 @@ CREATE TABLE `bz_schema` (
   `version` decimal(3,2) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `bz_schema`
---
-
-LOCK TABLES `bz_schema` WRITE;
-/*!40000 ALTER TABLE `bz_schema` DISABLE KEYS */;
-INSERT INTO `bz_schema` VALUES ('$VAR1 = {\n          \'attach_data\' => {\n                             \'FIELDS\' => [\n                                           \'id\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'PRIMARYKEY\' => 1,\n                                             \'TYPE\' => \'INT3\'\n                                           },\n                                           \'thedata\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'LONGBLOB\'\n                                           }\n                                         ]\n                           },\n          \'attachments\' => {\n                             \'FIELDS\' => [\n                                           \'attach_id\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'PRIMARYKEY\' => 1,\n                                             \'TYPE\' => \'MEDIUMSERIAL\'\n                                           },\n                                           \'bug_id\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'INT3\'\n                                           },\n                                           \'creation_ts\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'DATETIME\'\n                                           },\n                                           \'description\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'MEDIUMTEXT\'\n                                           },\n                                           \'mimetype\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'MEDIUMTEXT\'\n                                           },\n                                           \'ispatch\',\n                                           {\n                                             \'TYPE\' => \'BOOLEAN\'\n                                           },\n                                           \'filename\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'varchar(100)\'\n                                           },\n                                           \'submitter_id\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'INT3\'\n                                           },\n                                           \'isobsolete\',\n                                           {\n                                             \'DEFAULT\' => \'FALSE\',\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'BOOLEAN\'\n                                           },\n                                           \'isprivate\',\n                                           {\n                                             \'DEFAULT\' => \'FALSE\',\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'BOOLEAN\'\n                                           },\n                                           \'isurl\',\n                                           {\n                                             \'DEFAULT\' => \'FALSE\',\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'BOOLEAN\'\n                                           }\n                                         ],\n                             \'INDEXES\' => [\n                                            \'attachments_bug_id_idx\',\n                                            [\n                                              \'bug_id\'\n                                            ],\n                                            \'attachments_creation_ts_idx\',\n                                            [\n                                              \'creation_ts\'\n                                            ],\n                                            \'attachments_submitter_id_idx\',\n                                            [\n                                              \'submitter_id\',\n                                              \'bug_id\'\n                                            ]\n                                          ]\n                           },\n          \'bug_group_map\' => {\n                               \'FIELDS\' => [\n                                             \'bug_id\',\n                                             {\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'INT3\'\n                                             },\n                                             \'group_id\',\n                                             {\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'INT3\'\n                                             }\n                                           ],\n                               \'INDEXES\' => [\n                                              \'bug_group_map_bug_id_idx\',\n                                              {\n                                                \'FIELDS\' => [\n                                                              \'bug_id\',\n                                                              \'group_id\'\n                                                            ],\n                                                \'TYPE\' => \'UNIQUE\'\n                                              },\n                                              \'bug_group_map_group_id_idx\',\n                                              [\n                                                \'group_id\'\n                                              ]\n                                            ]\n                             },\n          \'bug_severity\' => {\n                              \'FIELDS\' => [\n                                            \'id\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'PRIMARYKEY\' => 1,\n                                              \'TYPE\' => \'SMALLSERIAL\'\n                                            },\n                                            \'value\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'varchar(64)\'\n                                            },\n                                            \'sortkey\',\n                                            {\n                                              \'DEFAULT\' => 0,\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'INT2\'\n                                            },\n                                            \'isactive\',\n                                            {\n                                              \'DEFAULT\' => \'TRUE\',\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'BOOLEAN\'\n                                            }\n                                          ],\n                              \'INDEXES\' => [\n                                             \'bug_severity_value_idx\',\n                                             {\n                                               \'FIELDS\' => [\n                                                             \'value\'\n                                                           ],\n                                               \'TYPE\' => \'UNIQUE\'\n                                             },\n                                             \'bug_severity_sortkey_idx\',\n                                             [\n                                               \'sortkey\',\n                                               \'value\'\n                                             ]\n                                           ]\n                            },\n          \'bug_status\' => {\n                            \'FIELDS\' => [\n                                          \'id\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'PRIMARYKEY\' => 1,\n                                            \'TYPE\' => \'SMALLSERIAL\'\n                                          },\n                                          \'value\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'varchar(64)\'\n                                          },\n                                          \'sortkey\',\n                                          {\n                                            \'DEFAULT\' => 0,\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'INT2\'\n                                          },\n                                          \'isactive\',\n                                          {\n                                            \'DEFAULT\' => \'TRUE\',\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'BOOLEAN\'\n                                          }\n                                        ],\n                            \'INDEXES\' => [\n                                           \'bug_status_value_idx\',\n                                           {\n                                             \'FIELDS\' => [\n                                                           \'value\'\n                                                         ],\n                                             \'TYPE\' => \'UNIQUE\'\n                                           },\n                                           \'bug_status_sortkey_idx\',\n                                           [\n                                             \'sortkey\',\n                                             \'value\'\n                                           ]\n                                         ]\n                          },\n          \'bugs\' => {\n                      \'FIELDS\' => [\n                                    \'bug_id\',\n                                    {\n                                      \'NOTNULL\' => 1,\n                                      \'PRIMARYKEY\' => 1,\n                                      \'TYPE\' => \'MEDIUMSERIAL\'\n                                    },\n                                    \'assigned_to\',\n                                    {\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'INT3\'\n                                    },\n                                    \'bug_file_loc\',\n                                    {\n                                      \'TYPE\' => \'TEXT\'\n                                    },\n                                    \'bug_severity\',\n                                    {\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'varchar(64)\'\n                                    },\n                                    \'bug_status\',\n                                    {\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'varchar(64)\'\n                                    },\n                                    \'creation_ts\',\n                                    {\n                                      \'TYPE\' => \'DATETIME\'\n                                    },\n                                    \'delta_ts\',\n                                    {\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'DATETIME\'\n                                    },\n                                    \'short_desc\',\n                                    {\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'varchar(255)\'\n                                    },\n                                    \'op_sys\',\n                                    {\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'varchar(64)\'\n                                    },\n                                    \'priority\',\n                                    {\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'varchar(64)\'\n                                    },\n                                    \'product_id\',\n                                    {\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'INT2\'\n                                    },\n                                    \'rep_platform\',\n                                    {\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'varchar(64)\'\n                                    },\n                                    \'reporter\',\n                                    {\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'INT3\'\n                                    },\n                                    \'version\',\n                                    {\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'varchar(64)\'\n                                    },\n                                    \'component_id\',\n                                    {\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'INT2\'\n                                    },\n                                    \'resolution\',\n                                    {\n                                      \'DEFAULT\' => \'\\\'\\\'\',\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'varchar(64)\'\n                                    },\n                                    \'target_milestone\',\n                                    {\n                                      \'DEFAULT\' => \'\\\'---\\\'\',\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'varchar(20)\'\n                                    },\n                                    \'qa_contact\',\n                                    {\n                                      \'TYPE\' => \'INT3\'\n                                    },\n                                    \'status_whiteboard\',\n                                    {\n                                      \'DEFAULT\' => \'\\\'\\\'\',\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'MEDIUMTEXT\'\n                                    },\n                                    \'votes\',\n                                    {\n                                      \'DEFAULT\' => \'0\',\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'INT3\'\n                                    },\n                                    \'keywords\',\n                                    {\n                                      \'DEFAULT\' => \'\\\'\\\'\',\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'MEDIUMTEXT\'\n                                    },\n                                    \'lastdiffed\',\n                                    {\n                                      \'TYPE\' => \'DATETIME\'\n                                    },\n                                    \'everconfirmed\',\n                                    {\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'BOOLEAN\'\n                                    },\n                                    \'reporter_accessible\',\n                                    {\n                                      \'DEFAULT\' => \'TRUE\',\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'BOOLEAN\'\n                                    },\n                                    \'cclist_accessible\',\n                                    {\n                                      \'DEFAULT\' => \'TRUE\',\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'BOOLEAN\'\n                                    },\n                                    \'estimated_time\',\n                                    {\n                                      \'DEFAULT\' => \'0\',\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'decimal(5,2)\'\n                                    },\n                                    \'remaining_time\',\n                                    {\n                                      \'DEFAULT\' => \'0\',\n                                      \'NOTNULL\' => 1,\n                                      \'TYPE\' => \'decimal(5,2)\'\n                                    },\n                                    \'deadline\',\n                                    {\n                                      \'TYPE\' => \'DATETIME\'\n                                    },\n                                    \'alias\',\n                                    {\n                                      \'TYPE\' => \'varchar(20)\'\n                                    }\n                                  ],\n                      \'INDEXES\' => [\n                                     \'bugs_alias_idx\',\n                                     {\n                                       \'FIELDS\' => [\n                                                     \'alias\'\n                                                   ],\n                                       \'TYPE\' => \'UNIQUE\'\n                                     },\n                                     \'bugs_assigned_to_idx\',\n                                     [\n                                       \'assigned_to\'\n                                     ],\n                                     \'bugs_creation_ts_idx\',\n                                     [\n                                       \'creation_ts\'\n                                     ],\n                                     \'bugs_delta_ts_idx\',\n                                     [\n                                       \'delta_ts\'\n                                     ],\n                                     \'bugs_bug_severity_idx\',\n                                     [\n                                       \'bug_severity\'\n                                     ],\n                                     \'bugs_bug_status_idx\',\n                                     [\n                                       \'bug_status\'\n                                     ],\n                                     \'bugs_op_sys_idx\',\n                                     [\n                                       \'op_sys\'\n                                     ],\n                                     \'bugs_priority_idx\',\n                                     [\n                                       \'priority\'\n                                     ],\n                                     \'bugs_product_id_idx\',\n                                     [\n                                       \'product_id\'\n                                     ],\n                                     \'bugs_reporter_idx\',\n                                     [\n                                       \'reporter\'\n                                     ],\n                                     \'bugs_version_idx\',\n                                     [\n                                       \'version\'\n                                     ],\n                                     \'bugs_component_id_idx\',\n                                     [\n                                       \'component_id\'\n                                     ],\n                                     \'bugs_resolution_idx\',\n                                     [\n                                       \'resolution\'\n                                     ],\n                                     \'bugs_target_milestone_idx\',\n                                     [\n                                       \'target_milestone\'\n                                     ],\n                                     \'bugs_qa_contact_idx\',\n                                     [\n                                       \'qa_contact\'\n                                     ],\n                                     \'bugs_votes_idx\',\n                                     [\n                                       \'votes\'\n                                     ]\n                                   ]\n                    },\n          \'bugs_activity\' => {\n                               \'FIELDS\' => [\n                                             \'bug_id\',\n                                             {\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'INT3\'\n                                             },\n                                             \'attach_id\',\n                                             {\n                                               \'TYPE\' => \'INT3\'\n                                             },\n                                             \'who\',\n                                             {\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'INT3\'\n                                             },\n                                             \'bug_when\',\n                                             {\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'DATETIME\'\n                                             },\n                                             \'fieldid\',\n                                             {\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'INT3\'\n                                             },\n                                             \'added\',\n                                             {\n                                               \'TYPE\' => \'TINYTEXT\'\n                                             },\n                                             \'removed\',\n                                             {\n                                               \'TYPE\' => \'TINYTEXT\'\n                                             }\n                                           ],\n                               \'INDEXES\' => [\n                                              \'bugs_activity_bug_id_idx\',\n                                              [\n                                                \'bug_id\'\n                                              ],\n                                              \'bugs_activity_who_idx\',\n                                              [\n                                                \'who\'\n                                              ],\n                                              \'bugs_activity_bug_when_idx\',\n                                              [\n                                                \'bug_when\'\n                                              ],\n                                              \'bugs_activity_fieldid_idx\',\n                                              [\n                                                \'fieldid\'\n                                              ]\n                                            ]\n                             },\n          \'bz_schema\' => {\n                           \'FIELDS\' => [\n                                         \'schema_data\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'LONGBLOB\'\n                                         },\n                                         \'version\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'decimal(3,2)\'\n                                         }\n                                       ]\n                         },\n          \'category_group_map\' => {\n                                    \'FIELDS\' => [\n                                                  \'category_id\',\n                                                  {\n                                                    \'NOTNULL\' => 1,\n                                                    \'TYPE\' => \'INT2\'\n                                                  },\n                                                  \'group_id\',\n                                                  {\n                                                    \'NOTNULL\' => 1,\n                                                    \'TYPE\' => \'INT3\'\n                                                  }\n                                                ],\n                                    \'INDEXES\' => [\n                                                   \'category_group_map_category_id_idx\',\n                                                   {\n                                                     \'FIELDS\' => [\n                                                                   \'category_id\',\n                                                                   \'group_id\'\n                                                                 ],\n                                                     \'TYPE\' => \'UNIQUE\'\n                                                   }\n                                                 ]\n                                  },\n          \'cc\' => {\n                    \'FIELDS\' => [\n                                  \'bug_id\',\n                                  {\n                                    \'NOTNULL\' => 1,\n                                    \'TYPE\' => \'INT3\'\n                                  },\n                                  \'who\',\n                                  {\n                                    \'NOTNULL\' => 1,\n                                    \'TYPE\' => \'INT3\'\n                                  }\n                                ],\n                    \'INDEXES\' => [\n                                   \'cc_bug_id_idx\',\n                                   {\n                                     \'FIELDS\' => [\n                                                   \'bug_id\',\n                                                   \'who\'\n                                                 ],\n                                     \'TYPE\' => \'UNIQUE\'\n                                   },\n                                   \'cc_who_idx\',\n                                   [\n                                     \'who\'\n                                   ]\n                                 ]\n                  },\n          \'classifications\' => {\n                                 \'FIELDS\' => [\n                                               \'id\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'PRIMARYKEY\' => 1,\n                                                 \'TYPE\' => \'SMALLSERIAL\'\n                                               },\n                                               \'name\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'varchar(64)\'\n                                               },\n                                               \'description\',\n                                               {\n                                                 \'TYPE\' => \'MEDIUMTEXT\'\n                                               },\n                                               \'sortkey\',\n                                               {\n                                                 \'DEFAULT\' => \'0\',\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'INT2\'\n                                               }\n                                             ],\n                                 \'INDEXES\' => [\n                                                \'classifications_name_idx\',\n                                                {\n                                                  \'FIELDS\' => [\n                                                                \'name\'\n                                                              ],\n                                                  \'TYPE\' => \'UNIQUE\'\n                                                }\n                                              ]\n                               },\n          \'component_cc\' => {\n                              \'FIELDS\' => [\n                                            \'user_id\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'INT3\'\n                                            },\n                                            \'component_id\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'INT2\'\n                                            }\n                                          ],\n                              \'INDEXES\' => [\n                                             \'component_cc_user_id_idx\',\n                                             {\n                                               \'FIELDS\' => [\n                                                             \'component_id\',\n                                                             \'user_id\'\n                                                           ],\n                                               \'TYPE\' => \'UNIQUE\'\n                                             }\n                                           ]\n                            },\n          \'components\' => {\n                            \'FIELDS\' => [\n                                          \'id\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'PRIMARYKEY\' => 1,\n                                            \'TYPE\' => \'SMALLSERIAL\'\n                                          },\n                                          \'name\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'varchar(64)\'\n                                          },\n                                          \'product_id\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'INT2\'\n                                          },\n                                          \'initialowner\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'INT3\'\n                                          },\n                                          \'initialqacontact\',\n                                          {\n                                            \'TYPE\' => \'INT3\'\n                                          },\n                                          \'description\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'MEDIUMTEXT\'\n                                          }\n                                        ],\n                            \'INDEXES\' => [\n                                           \'components_product_id_idx\',\n                                           {\n                                             \'FIELDS\' => [\n                                                           \'product_id\',\n                                                           \'name\'\n                                                         ],\n                                             \'TYPE\' => \'UNIQUE\'\n                                           },\n                                           \'components_name_idx\',\n                                           [\n                                             \'name\'\n                                           ]\n                                         ]\n                          },\n          \'dependencies\' => {\n                              \'FIELDS\' => [\n                                            \'blocked\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'INT3\'\n                                            },\n                                            \'dependson\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'INT3\'\n                                            }\n                                          ],\n                              \'INDEXES\' => [\n                                             \'dependencies_blocked_idx\',\n                                             [\n                                               \'blocked\'\n                                             ],\n                                             \'dependencies_dependson_idx\',\n                                             [\n                                               \'dependson\'\n                                             ]\n                                           ]\n                            },\n          \'duplicates\' => {\n                            \'FIELDS\' => [\n                                          \'dupe_of\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'INT3\'\n                                          },\n                                          \'dupe\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'PRIMARYKEY\' => 1,\n                                            \'TYPE\' => \'INT3\'\n                                          }\n                                        ]\n                          },\n          \'email_setting\' => {\n                               \'FIELDS\' => [\n                                             \'user_id\',\n                                             {\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'INT3\'\n                                             },\n                                             \'relationship\',\n                                             {\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'INT1\'\n                                             },\n                                             \'event\',\n                                             {\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'INT1\'\n                                             }\n                                           ],\n                               \'INDEXES\' => [\n                                              \'email_setting_user_id_idx\',\n                                              {\n                                                \'FIELDS\' => [\n                                                              \'user_id\',\n                                                              \'relationship\',\n                                                              \'event\'\n                                                            ],\n                                                \'TYPE\' => \'UNIQUE\'\n                                              }\n                                            ]\n                             },\n          \'fielddefs\' => {\n                           \'FIELDS\' => [\n                                         \'id\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'PRIMARYKEY\' => 1,\n                                           \'TYPE\' => \'MEDIUMSERIAL\'\n                                         },\n                                         \'name\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'varchar(64)\'\n                                         },\n                                         \'type\',\n                                         {\n                                           \'DEFAULT\' => 0,\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'INT2\'\n                                         },\n                                         \'custom\',\n                                         {\n                                           \'DEFAULT\' => \'FALSE\',\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'BOOLEAN\'\n                                         },\n                                         \'description\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'MEDIUMTEXT\'\n                                         },\n                                         \'mailhead\',\n                                         {\n                                           \'DEFAULT\' => \'FALSE\',\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'BOOLEAN\'\n                                         },\n                                         \'sortkey\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'INT2\'\n                                         },\n                                         \'obsolete\',\n                                         {\n                                           \'DEFAULT\' => \'FALSE\',\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'BOOLEAN\'\n                                         },\n                                         \'enter_bug\',\n                                         {\n                                           \'DEFAULT\' => \'FALSE\',\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'BOOLEAN\'\n                                         }\n                                       ],\n                           \'INDEXES\' => [\n                                          \'fielddefs_name_idx\',\n                                          {\n                                            \'FIELDS\' => [\n                                                          \'name\'\n                                                        ],\n                                            \'TYPE\' => \'UNIQUE\'\n                                          },\n                                          \'fielddefs_sortkey_idx\',\n                                          [\n                                            \'sortkey\'\n                                          ]\n                                        ]\n                         },\n          \'flagexclusions\' => {\n                                \'FIELDS\' => [\n                                              \'type_id\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT2\'\n                                              },\n                                              \'product_id\',\n                                              {\n                                                \'TYPE\' => \'INT2\'\n                                              },\n                                              \'component_id\',\n                                              {\n                                                \'TYPE\' => \'INT2\'\n                                              }\n                                            ],\n                                \'INDEXES\' => [\n                                               \'flagexclusions_type_id_idx\',\n                                               [\n                                                 \'type_id\',\n                                                 \'product_id\',\n                                                 \'component_id\'\n                                               ]\n                                             ]\n                              },\n          \'flaginclusions\' => {\n                                \'FIELDS\' => [\n                                              \'type_id\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT2\'\n                                              },\n                                              \'product_id\',\n                                              {\n                                                \'TYPE\' => \'INT2\'\n                                              },\n                                              \'component_id\',\n                                              {\n                                                \'TYPE\' => \'INT2\'\n                                              }\n                                            ],\n                                \'INDEXES\' => [\n                                               \'flaginclusions_type_id_idx\',\n                                               [\n                                                 \'type_id\',\n                                                 \'product_id\',\n                                                 \'component_id\'\n                                               ]\n                                             ]\n                              },\n          \'flags\' => {\n                       \'FIELDS\' => [\n                                     \'id\',\n                                     {\n                                       \'NOTNULL\' => 1,\n                                       \'PRIMARYKEY\' => 1,\n                                       \'TYPE\' => \'MEDIUMSERIAL\'\n                                     },\n                                     \'type_id\',\n                                     {\n                                       \'NOTNULL\' => 1,\n                                       \'TYPE\' => \'INT2\'\n                                     },\n                                     \'status\',\n                                     {\n                                       \'NOTNULL\' => 1,\n                                       \'TYPE\' => \'char(1)\'\n                                     },\n                                     \'bug_id\',\n                                     {\n                                       \'NOTNULL\' => 1,\n                                       \'TYPE\' => \'INT3\'\n                                     },\n                                     \'attach_id\',\n                                     {\n                                       \'TYPE\' => \'INT3\'\n                                     },\n                                     \'creation_date\',\n                                     {\n                                       \'NOTNULL\' => 1,\n                                       \'TYPE\' => \'DATETIME\'\n                                     },\n                                     \'modification_date\',\n                                     {\n                                       \'TYPE\' => \'DATETIME\'\n                                     },\n                                     \'setter_id\',\n                                     {\n                                       \'TYPE\' => \'INT3\'\n                                     },\n                                     \'requestee_id\',\n                                     {\n                                       \'TYPE\' => \'INT3\'\n                                     }\n                                   ],\n                       \'INDEXES\' => [\n                                      \'flags_bug_id_idx\',\n                                      [\n                                        \'bug_id\',\n                                        \'attach_id\'\n                                      ],\n                                      \'flags_setter_id_idx\',\n                                      [\n                                        \'setter_id\'\n                                      ],\n                                      \'flags_requestee_id_idx\',\n                                      [\n                                        \'requestee_id\'\n                                      ],\n                                      \'flags_type_id_idx\',\n                                      [\n                                        \'type_id\'\n                                      ]\n                                    ]\n                     },\n          \'flagtypes\' => {\n                           \'FIELDS\' => [\n                                         \'id\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'PRIMARYKEY\' => 1,\n                                           \'TYPE\' => \'SMALLSERIAL\'\n                                         },\n                                         \'name\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'varchar(50)\'\n                                         },\n                                         \'description\',\n                                         {\n                                           \'TYPE\' => \'TEXT\'\n                                         },\n                                         \'cc_list\',\n                                         {\n                                           \'TYPE\' => \'varchar(200)\'\n                                         },\n                                         \'target_type\',\n                                         {\n                                           \'DEFAULT\' => \'\\\'b\\\'\',\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'char(1)\'\n                                         },\n                                         \'is_active\',\n                                         {\n                                           \'DEFAULT\' => \'TRUE\',\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'BOOLEAN\'\n                                         },\n                                         \'is_requestable\',\n                                         {\n                                           \'DEFAULT\' => \'FALSE\',\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'BOOLEAN\'\n                                         },\n                                         \'is_requesteeble\',\n                                         {\n                                           \'DEFAULT\' => \'FALSE\',\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'BOOLEAN\'\n                                         },\n                                         \'is_multiplicable\',\n                                         {\n                                           \'DEFAULT\' => \'FALSE\',\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'BOOLEAN\'\n                                         },\n                                         \'sortkey\',\n                                         {\n                                           \'DEFAULT\' => \'0\',\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'INT2\'\n                                         },\n                                         \'grant_group_id\',\n                                         {\n                                           \'TYPE\' => \'INT3\'\n                                         },\n                                         \'request_group_id\',\n                                         {\n                                           \'TYPE\' => \'INT3\'\n                                         }\n                                       ]\n                         },\n          \'group_control_map\' => {\n                                   \'FIELDS\' => [\n                                                 \'group_id\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'INT3\'\n                                                 },\n                                                 \'product_id\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'INT3\'\n                                                 },\n                                                 \'entry\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'BOOLEAN\'\n                                                 },\n                                                 \'membercontrol\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'BOOLEAN\'\n                                                 },\n                                                 \'othercontrol\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'BOOLEAN\'\n                                                 },\n                                                 \'canedit\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'BOOLEAN\'\n                                                 },\n                                                 \'editcomponents\',\n                                                 {\n                                                   \'DEFAULT\' => \'FALSE\',\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'BOOLEAN\'\n                                                 },\n                                                 \'editbugs\',\n                                                 {\n                                                   \'DEFAULT\' => \'FALSE\',\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'BOOLEAN\'\n                                                 },\n                                                 \'canconfirm\',\n                                                 {\n                                                   \'DEFAULT\' => \'FALSE\',\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'BOOLEAN\'\n                                                 }\n                                               ],\n                                   \'INDEXES\' => [\n                                                  \'group_control_map_product_id_idx\',\n                                                  {\n                                                    \'FIELDS\' => [\n                                                                  \'product_id\',\n                                                                  \'group_id\'\n                                                                ],\n                                                    \'TYPE\' => \'UNIQUE\'\n                                                  },\n                                                  \'group_control_map_group_id_idx\',\n                                                  [\n                                                    \'group_id\'\n                                                  ]\n                                                ]\n                                 },\n          \'group_group_map\' => {\n                                 \'FIELDS\' => [\n                                               \'member_id\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'INT3\'\n                                               },\n                                               \'grantor_id\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'INT3\'\n                                               },\n                                               \'grant_type\',\n                                               {\n                                                 \'DEFAULT\' => \'0\',\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'INT1\'\n                                               }\n                                             ],\n                                 \'INDEXES\' => [\n                                                \'group_group_map_member_id_idx\',\n                                                {\n                                                  \'FIELDS\' => [\n                                                                \'member_id\',\n                                                                \'grantor_id\',\n                                                                \'grant_type\'\n                                                              ],\n                                                  \'TYPE\' => \'UNIQUE\'\n                                                }\n                                              ]\n                               },\n          \'groups\' => {\n                        \'FIELDS\' => [\n                                      \'id\',\n                                      {\n                                        \'NOTNULL\' => 1,\n                                        \'PRIMARYKEY\' => 1,\n                                        \'TYPE\' => \'MEDIUMSERIAL\'\n                                      },\n                                      \'name\',\n                                      {\n                                        \'NOTNULL\' => 1,\n                                        \'TYPE\' => \'varchar(255)\'\n                                      },\n                                      \'description\',\n                                      {\n                                        \'NOTNULL\' => 1,\n                                        \'TYPE\' => \'TEXT\'\n                                      },\n                                      \'isbuggroup\',\n                                      {\n                                        \'NOTNULL\' => 1,\n                                        \'TYPE\' => \'BOOLEAN\'\n                                      },\n                                      \'userregexp\',\n                                      {\n                                        \'DEFAULT\' => \'\\\'\\\'\',\n                                        \'NOTNULL\' => 1,\n                                        \'TYPE\' => \'TINYTEXT\'\n                                      },\n                                      \'isactive\',\n                                      {\n                                        \'DEFAULT\' => \'TRUE\',\n                                        \'NOTNULL\' => 1,\n                                        \'TYPE\' => \'BOOLEAN\'\n                                      }\n                                    ],\n                        \'INDEXES\' => [\n                                       \'groups_name_idx\',\n                                       {\n                                         \'FIELDS\' => [\n                                                       \'name\'\n                                                     ],\n                                         \'TYPE\' => \'UNIQUE\'\n                                       }\n                                     ]\n                      },\n          \'keyworddefs\' => {\n                             \'FIELDS\' => [\n                                           \'id\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'PRIMARYKEY\' => 1,\n                                             \'TYPE\' => \'SMALLSERIAL\'\n                                           },\n                                           \'name\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'varchar(64)\'\n                                           },\n                                           \'description\',\n                                           {\n                                             \'TYPE\' => \'MEDIUMTEXT\'\n                                           }\n                                         ],\n                             \'INDEXES\' => [\n                                            \'keyworddefs_name_idx\',\n                                            {\n                                              \'FIELDS\' => [\n                                                            \'name\'\n                                                          ],\n                                              \'TYPE\' => \'UNIQUE\'\n                                            }\n                                          ]\n                           },\n          \'keywords\' => {\n                          \'FIELDS\' => [\n                                        \'bug_id\',\n                                        {\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'INT3\'\n                                        },\n                                        \'keywordid\',\n                                        {\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'INT2\'\n                                        }\n                                      ],\n                          \'INDEXES\' => [\n                                         \'keywords_bug_id_idx\',\n                                         {\n                                           \'FIELDS\' => [\n                                                         \'bug_id\',\n                                                         \'keywordid\'\n                                                       ],\n                                           \'TYPE\' => \'UNIQUE\'\n                                         },\n                                         \'keywords_keywordid_idx\',\n                                         [\n                                           \'keywordid\'\n                                         ]\n                                       ]\n                        },\n          \'logincookies\' => {\n                              \'FIELDS\' => [\n                                            \'cookie\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'PRIMARYKEY\' => 1,\n                                              \'TYPE\' => \'varchar(16)\'\n                                            },\n                                            \'userid\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'INT3\'\n                                            },\n                                            \'ipaddr\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'varchar(40)\'\n                                            },\n                                            \'lastused\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'DATETIME\'\n                                            }\n                                          ],\n                              \'INDEXES\' => [\n                                             \'logincookies_lastused_idx\',\n                                             [\n                                               \'lastused\'\n                                             ]\n                                           ]\n                            },\n          \'longdescs\' => {\n                           \'FIELDS\' => [\n                                         \'comment_id\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'PRIMARYKEY\' => 1,\n                                           \'TYPE\' => \'MEDIUMSERIAL\'\n                                         },\n                                         \'bug_id\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'INT3\'\n                                         },\n                                         \'who\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'INT3\'\n                                         },\n                                         \'bug_when\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'DATETIME\'\n                                         },\n                                         \'work_time\',\n                                         {\n                                           \'DEFAULT\' => \'0\',\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'decimal(5,2)\'\n                                         },\n                                         \'thetext\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'MEDIUMTEXT\'\n                                         },\n                                         \'isprivate\',\n                                         {\n                                           \'DEFAULT\' => \'FALSE\',\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'BOOLEAN\'\n                                         },\n                                         \'already_wrapped\',\n                                         {\n                                           \'DEFAULT\' => \'FALSE\',\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'BOOLEAN\'\n                                         },\n                                         \'type\',\n                                         {\n                                           \'DEFAULT\' => \'0\',\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'INT2\'\n                                         },\n                                         \'extra_data\',\n                                         {\n                                           \'TYPE\' => \'varchar(255)\'\n                                         }\n                                       ],\n                           \'INDEXES\' => [\n                                          \'longdescs_bug_id_idx\',\n                                          [\n                                            \'bug_id\'\n                                          ],\n                                          \'longdescs_who_idx\',\n                                          [\n                                            \'who\',\n                                            \'bug_id\'\n                                          ],\n                                          \'longdescs_bug_when_idx\',\n                                          [\n                                            \'bug_when\'\n                                          ],\n                                          \'longdescs_thetext_idx\',\n                                          {\n                                            \'FIELDS\' => [\n                                                          \'thetext\'\n                                                        ],\n                                            \'TYPE\' => \'FULLTEXT\'\n                                          }\n                                        ]\n                         },\n          \'milestones\' => {\n                            \'FIELDS\' => [\n                                          \'id\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'PRIMARYKEY\' => 1,\n                                            \'TYPE\' => \'MEDIUMSERIAL\'\n                                          },\n                                          \'product_id\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'INT2\'\n                                          },\n                                          \'value\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'varchar(20)\'\n                                          },\n                                          \'sortkey\',\n                                          {\n                                            \'DEFAULT\' => 0,\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'INT2\'\n                                          }\n                                        ],\n                            \'INDEXES\' => [\n                                           \'milestones_product_id_idx\',\n                                           {\n                                             \'FIELDS\' => [\n                                                           \'product_id\',\n                                                           \'value\'\n                                                         ],\n                                             \'TYPE\' => \'UNIQUE\'\n                                           }\n                                         ]\n                          },\n          \'namedqueries\' => {\n                              \'FIELDS\' => [\n                                            \'id\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'PRIMARYKEY\' => 1,\n                                              \'TYPE\' => \'MEDIUMSERIAL\'\n                                            },\n                                            \'userid\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'INT3\'\n                                            },\n                                            \'name\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'varchar(64)\'\n                                            },\n                                            \'query\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'MEDIUMTEXT\'\n                                            },\n                                            \'query_type\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'BOOLEAN\'\n                                            }\n                                          ],\n                              \'INDEXES\' => [\n                                             \'namedqueries_userid_idx\',\n                                             {\n                                               \'FIELDS\' => [\n                                                             \'userid\',\n                                                             \'name\'\n                                                           ],\n                                               \'TYPE\' => \'UNIQUE\'\n                                             }\n                                           ]\n                            },\n          \'namedqueries_link_in_footer\' => {\n                                             \'FIELDS\' => [\n                                                           \'namedquery_id\',\n                                                           {\n                                                             \'NOTNULL\' => 1,\n                                                             \'TYPE\' => \'INT3\'\n                                                           },\n                                                           \'user_id\',\n                                                           {\n                                                             \'NOTNULL\' => 1,\n                                                             \'TYPE\' => \'INT3\'\n                                                           }\n                                                         ],\n                                             \'INDEXES\' => [\n                                                            \'namedqueries_link_in_footer_id_idx\',\n                                                            {\n                                                              \'FIELDS\' => [\n                                                                            \'namedquery_id\',\n                                                                            \'user_id\'\n                                                                          ],\n                                                              \'TYPE\' => \'UNIQUE\'\n                                                            },\n                                                            \'namedqueries_link_in_footer_userid_idx\',\n                                                            [\n                                                              \'user_id\'\n                                                            ]\n                                                          ]\n                                           },\n          \'namedquery_group_map\' => {\n                                      \'FIELDS\' => [\n                                                    \'namedquery_id\',\n                                                    {\n                                                      \'NOTNULL\' => 1,\n                                                      \'TYPE\' => \'INT3\'\n                                                    },\n                                                    \'group_id\',\n                                                    {\n                                                      \'NOTNULL\' => 1,\n                                                      \'TYPE\' => \'INT3\'\n                                                    }\n                                                  ],\n                                      \'INDEXES\' => [\n                                                     \'namedquery_group_map_namedquery_id_idx\',\n                                                     {\n                                                       \'FIELDS\' => [\n                                                                     \'namedquery_id\'\n                                                                   ],\n                                                       \'TYPE\' => \'UNIQUE\'\n                                                     },\n                                                     \'namedquery_group_map_group_id_idx\',\n                                                     [\n                                                       \'group_id\'\n                                                     ]\n                                                   ]\n                                    },\n          \'op_sys\' => {\n                        \'FIELDS\' => [\n                                      \'id\',\n                                      {\n                                        \'NOTNULL\' => 1,\n                                        \'PRIMARYKEY\' => 1,\n                                        \'TYPE\' => \'SMALLSERIAL\'\n                                      },\n                                      \'value\',\n                                      {\n                                        \'NOTNULL\' => 1,\n                                        \'TYPE\' => \'varchar(64)\'\n                                      },\n                                      \'sortkey\',\n                                      {\n                                        \'DEFAULT\' => 0,\n                                        \'NOTNULL\' => 1,\n                                        \'TYPE\' => \'INT2\'\n                                      },\n                                      \'isactive\',\n                                      {\n                                        \'DEFAULT\' => \'TRUE\',\n                                        \'NOTNULL\' => 1,\n                                        \'TYPE\' => \'BOOLEAN\'\n                                      }\n                                    ],\n                        \'INDEXES\' => [\n                                       \'op_sys_value_idx\',\n                                       {\n                                         \'FIELDS\' => [\n                                                       \'value\'\n                                                     ],\n                                         \'TYPE\' => \'UNIQUE\'\n                                       },\n                                       \'op_sys_sortkey_idx\',\n                                       [\n                                         \'sortkey\',\n                                         \'value\'\n                                       ]\n                                     ]\n                      },\n          \'priority\' => {\n                          \'FIELDS\' => [\n                                        \'id\',\n                                        {\n                                          \'NOTNULL\' => 1,\n                                          \'PRIMARYKEY\' => 1,\n                                          \'TYPE\' => \'SMALLSERIAL\'\n                                        },\n                                        \'value\',\n                                        {\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'varchar(64)\'\n                                        },\n                                        \'sortkey\',\n                                        {\n                                          \'DEFAULT\' => 0,\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'INT2\'\n                                        },\n                                        \'isactive\',\n                                        {\n                                          \'DEFAULT\' => \'TRUE\',\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'BOOLEAN\'\n                                        }\n                                      ],\n                          \'INDEXES\' => [\n                                         \'priority_value_idx\',\n                                         {\n                                           \'FIELDS\' => [\n                                                         \'value\'\n                                                       ],\n                                           \'TYPE\' => \'UNIQUE\'\n                                         },\n                                         \'priority_sortkey_idx\',\n                                         [\n                                           \'sortkey\',\n                                           \'value\'\n                                         ]\n                                       ]\n                        },\n          \'products\' => {\n                          \'FIELDS\' => [\n                                        \'id\',\n                                        {\n                                          \'NOTNULL\' => 1,\n                                          \'PRIMARYKEY\' => 1,\n                                          \'TYPE\' => \'SMALLSERIAL\'\n                                        },\n                                        \'name\',\n                                        {\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'varchar(64)\'\n                                        },\n                                        \'classification_id\',\n                                        {\n                                          \'DEFAULT\' => \'1\',\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'INT2\'\n                                        },\n                                        \'description\',\n                                        {\n                                          \'TYPE\' => \'MEDIUMTEXT\'\n                                        },\n                                        \'milestoneurl\',\n                                        {\n                                          \'DEFAULT\' => \'\\\'\\\'\',\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'TINYTEXT\'\n                                        },\n                                        \'disallownew\',\n                                        {\n                                          \'DEFAULT\' => 0,\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'BOOLEAN\'\n                                        },\n                                        \'votesperuser\',\n                                        {\n                                          \'DEFAULT\' => 0,\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'INT2\'\n                                        },\n                                        \'maxvotesperbug\',\n                                        {\n                                          \'DEFAULT\' => \'10000\',\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'INT2\'\n                                        },\n                                        \'votestoconfirm\',\n                                        {\n                                          \'DEFAULT\' => 0,\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'INT2\'\n                                        },\n                                        \'defaultmilestone\',\n                                        {\n                                          \'DEFAULT\' => \'\\\'---\\\'\',\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'varchar(20)\'\n                                        }\n                                      ],\n                          \'INDEXES\' => [\n                                         \'products_name_idx\',\n                                         {\n                                           \'FIELDS\' => [\n                                                         \'name\'\n                                                       ],\n                                           \'TYPE\' => \'UNIQUE\'\n                                         }\n                                       ]\n                        },\n          \'profile_setting\' => {\n                                 \'FIELDS\' => [\n                                               \'user_id\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'INT3\'\n                                               },\n                                               \'setting_name\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'varchar(32)\'\n                                               },\n                                               \'setting_value\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'varchar(32)\'\n                                               }\n                                             ],\n                                 \'INDEXES\' => [\n                                                \'profile_setting_value_unique_idx\',\n                                                {\n                                                  \'FIELDS\' => [\n                                                                \'user_id\',\n                                                                \'setting_name\'\n                                                              ],\n                                                  \'TYPE\' => \'UNIQUE\'\n                                                }\n                                              ]\n                               },\n          \'profiles\' => {\n                          \'FIELDS\' => [\n                                        \'userid\',\n                                        {\n                                          \'NOTNULL\' => 1,\n                                          \'PRIMARYKEY\' => 1,\n                                          \'TYPE\' => \'MEDIUMSERIAL\'\n                                        },\n                                        \'login_name\',\n                                        {\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'varchar(255)\'\n                                        },\n                                        \'cryptpassword\',\n                                        {\n                                          \'TYPE\' => \'varchar(128)\'\n                                        },\n                                        \'realname\',\n                                        {\n                                          \'DEFAULT\' => \'\\\'\\\'\',\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'varchar(255)\'\n                                        },\n                                        \'disabledtext\',\n                                        {\n                                          \'DEFAULT\' => \'\\\'\\\'\',\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'MEDIUMTEXT\'\n                                        },\n                                        \'disable_mail\',\n                                        {\n                                          \'DEFAULT\' => \'FALSE\',\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'BOOLEAN\'\n                                        },\n                                        \'mybugslink\',\n                                        {\n                                          \'DEFAULT\' => \'TRUE\',\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'BOOLEAN\'\n                                        },\n                                        \'extern_id\',\n                                        {\n                                          \'TYPE\' => \'varchar(64)\'\n                                        }\n                                      ],\n                          \'INDEXES\' => [\n                                         \'profiles_login_name_idx\',\n                                         {\n                                           \'FIELDS\' => [\n                                                         \'login_name\'\n                                                       ],\n                                           \'TYPE\' => \'UNIQUE\'\n                                         }\n                                       ]\n                        },\n          \'profiles_activity\' => {\n                                   \'FIELDS\' => [\n                                                 \'userid\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'INT3\'\n                                                 },\n                                                 \'who\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'INT3\'\n                                                 },\n                                                 \'profiles_when\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'DATETIME\'\n                                                 },\n                                                 \'fieldid\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'INT3\'\n                                                 },\n                                                 \'oldvalue\',\n                                                 {\n                                                   \'TYPE\' => \'TINYTEXT\'\n                                                 },\n                                                 \'newvalue\',\n                                                 {\n                                                   \'TYPE\' => \'TINYTEXT\'\n                                                 }\n                                               ],\n                                   \'INDEXES\' => [\n                                                  \'profiles_activity_userid_idx\',\n                                                  [\n                                                    \'userid\'\n                                                  ],\n                                                  \'profiles_activity_profiles_when_idx\',\n                                                  [\n                                                    \'profiles_when\'\n                                                  ],\n                                                  \'profiles_activity_fieldid_idx\',\n                                                  [\n                                                    \'fieldid\'\n                                                  ]\n                                                ]\n                                 },\n          \'quips\' => {\n                       \'FIELDS\' => [\n                                     \'quipid\',\n                                     {\n                                       \'NOTNULL\' => 1,\n                                       \'PRIMARYKEY\' => 1,\n                                       \'TYPE\' => \'MEDIUMSERIAL\'\n                                     },\n                                     \'userid\',\n                                     {\n                                       \'TYPE\' => \'INT3\'\n                                     },\n                                     \'quip\',\n                                     {\n                                       \'NOTNULL\' => 1,\n                                       \'TYPE\' => \'TEXT\'\n                                     },\n                                     \'approved\',\n                                     {\n                                       \'DEFAULT\' => \'TRUE\',\n                                       \'NOTNULL\' => 1,\n                                       \'TYPE\' => \'BOOLEAN\'\n                                     }\n                                   ]\n                     },\n          \'rep_platform\' => {\n                              \'FIELDS\' => [\n                                            \'id\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'PRIMARYKEY\' => 1,\n                                              \'TYPE\' => \'SMALLSERIAL\'\n                                            },\n                                            \'value\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'varchar(64)\'\n                                            },\n                                            \'sortkey\',\n                                            {\n                                              \'DEFAULT\' => 0,\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'INT2\'\n                                            },\n                                            \'isactive\',\n                                            {\n                                              \'DEFAULT\' => \'TRUE\',\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'BOOLEAN\'\n                                            }\n                                          ],\n                              \'INDEXES\' => [\n                                             \'rep_platform_value_idx\',\n                                             {\n                                               \'FIELDS\' => [\n                                                             \'value\'\n                                                           ],\n                                               \'TYPE\' => \'UNIQUE\'\n                                             },\n                                             \'rep_platform_sortkey_idx\',\n                                             [\n                                               \'sortkey\',\n                                               \'value\'\n                                             ]\n                                           ]\n                            },\n          \'resolution\' => {\n                            \'FIELDS\' => [\n                                          \'id\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'PRIMARYKEY\' => 1,\n                                            \'TYPE\' => \'SMALLSERIAL\'\n                                          },\n                                          \'value\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'varchar(64)\'\n                                          },\n                                          \'sortkey\',\n                                          {\n                                            \'DEFAULT\' => 0,\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'INT2\'\n                                          },\n                                          \'isactive\',\n                                          {\n                                            \'DEFAULT\' => \'TRUE\',\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'BOOLEAN\'\n                                          }\n                                        ],\n                            \'INDEXES\' => [\n                                           \'resolution_value_idx\',\n                                           {\n                                             \'FIELDS\' => [\n                                                           \'value\'\n                                                         ],\n                                             \'TYPE\' => \'UNIQUE\'\n                                           },\n                                           \'resolution_sortkey_idx\',\n                                           [\n                                             \'sortkey\',\n                                             \'value\'\n                                           ]\n                                         ]\n                          },\n          \'series\' => {\n                        \'FIELDS\' => [\n                                      \'series_id\',\n                                      {\n                                        \'NOTNULL\' => 1,\n                                        \'PRIMARYKEY\' => 1,\n                                        \'TYPE\' => \'MEDIUMSERIAL\'\n                                      },\n                                      \'creator\',\n                                      {\n                                        \'TYPE\' => \'INT3\'\n                                      },\n                                      \'category\',\n                                      {\n                                        \'NOTNULL\' => 1,\n                                        \'TYPE\' => \'INT2\'\n                                      },\n                                      \'subcategory\',\n                                      {\n                                        \'NOTNULL\' => 1,\n                                        \'TYPE\' => \'INT2\'\n                                      },\n                                      \'name\',\n                                      {\n                                        \'NOTNULL\' => 1,\n                                        \'TYPE\' => \'varchar(64)\'\n                                      },\n                                      \'frequency\',\n                                      {\n                                        \'NOTNULL\' => 1,\n                                        \'TYPE\' => \'INT2\'\n                                      },\n                                      \'last_viewed\',\n                                      {\n                                        \'TYPE\' => \'DATETIME\'\n                                      },\n                                      \'query\',\n                                      {\n                                        \'NOTNULL\' => 1,\n                                        \'TYPE\' => \'MEDIUMTEXT\'\n                                      },\n                                      \'is_public\',\n                                      {\n                                        \'DEFAULT\' => \'FALSE\',\n                                        \'NOTNULL\' => 1,\n                                        \'TYPE\' => \'BOOLEAN\'\n                                      }\n                                    ],\n                        \'INDEXES\' => [\n                                       \'series_creator_idx\',\n                                       {\n                                         \'FIELDS\' => [\n                                                       \'creator\',\n                                                       \'category\',\n                                                       \'subcategory\',\n                                                       \'name\'\n                                                     ],\n                                         \'TYPE\' => \'UNIQUE\'\n                                       }\n                                     ]\n                      },\n          \'series_categories\' => {\n                                   \'FIELDS\' => [\n                                                 \'id\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'PRIMARYKEY\' => 1,\n                                                   \'TYPE\' => \'SMALLSERIAL\'\n                                                 },\n                                                 \'name\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'varchar(64)\'\n                                                 }\n                                               ],\n                                   \'INDEXES\' => [\n                                                  \'series_categories_name_idx\',\n                                                  {\n                                                    \'FIELDS\' => [\n                                                                  \'name\'\n                                                                ],\n                                                    \'TYPE\' => \'UNIQUE\'\n                                                  }\n                                                ]\n                                 },\n          \'series_data\' => {\n                             \'FIELDS\' => [\n                                           \'series_id\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'INT3\'\n                                           },\n                                           \'series_date\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'DATETIME\'\n                                           },\n                                           \'series_value\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'INT3\'\n                                           }\n                                         ],\n                             \'INDEXES\' => [\n                                            \'series_data_series_id_idx\',\n                                            {\n                                              \'FIELDS\' => [\n                                                            \'series_id\',\n                                                            \'series_date\'\n                                                          ],\n                                              \'TYPE\' => \'UNIQUE\'\n                                            }\n                                          ]\n                           },\n          \'setting\' => {\n                         \'FIELDS\' => [\n                                       \'name\',\n                                       {\n                                         \'NOTNULL\' => 1,\n                                         \'PRIMARYKEY\' => 1,\n                                         \'TYPE\' => \'varchar(32)\'\n                                       },\n                                       \'default_value\',\n                                       {\n                                         \'NOTNULL\' => 1,\n                                         \'TYPE\' => \'varchar(32)\'\n                                       },\n                                       \'is_enabled\',\n                                       {\n                                         \'DEFAULT\' => \'TRUE\',\n                                         \'NOTNULL\' => 1,\n                                         \'TYPE\' => \'BOOLEAN\'\n                                       },\n                                       \'subclass\',\n                                       {\n                                         \'TYPE\' => \'varchar(32)\'\n                                       }\n                                     ]\n                       },\n          \'setting_value\' => {\n                               \'FIELDS\' => [\n                                             \'name\',\n                                             {\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'varchar(32)\'\n                                             },\n                                             \'value\',\n                                             {\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'varchar(32)\'\n                                             },\n                                             \'sortindex\',\n                                             {\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'INT2\'\n                                             }\n                                           ],\n                               \'INDEXES\' => [\n                                              \'setting_value_nv_unique_idx\',\n                                              {\n                                                \'FIELDS\' => [\n                                                              \'name\',\n                                                              \'value\'\n                                                            ],\n                                                \'TYPE\' => \'UNIQUE\'\n                                              },\n                                              \'setting_value_ns_unique_idx\',\n                                              {\n                                                \'FIELDS\' => [\n                                                              \'name\',\n                                                              \'sortindex\'\n                                                            ],\n                                                \'TYPE\' => \'UNIQUE\'\n                                              }\n                                            ]\n                             },\n          \'test_attachment_data\' => {\n                                      \'FIELDS\' => [\n                                                    \'attachment_id\',\n                                                    {\n                                                      \'NOTNULL\' => 1,\n                                                      \'TYPE\' => \'INT4\',\n                                                      \'UNSIGNED\' => 1\n                                                    },\n                                                    \'contents\',\n                                                    {\n                                                      \'TYPE\' => \'LONGBLOB\'\n                                                    }\n                                                  ],\n                                      \'INDEXES\' => [\n                                                     \'test_attachment_data_primary_idx\',\n                                                     [\n                                                       \'attachment_id\'\n                                                     ]\n                                                   ]\n                                    },\n          \'test_attachments\' => {\n                                  \'FIELDS\' => [\n                                                \'attachment_id\',\n                                                {\n                                                  \'NOTNULL\' => 1,\n                                                  \'PRIMARYKEY\' => 1,\n                                                  \'TYPE\' => \'INTSERIAL\'\n                                                },\n                                                \'submitter_id\',\n                                                {\n                                                  \'NOTNULL\' => 1,\n                                                  \'TYPE\' => \'INT3\'\n                                                },\n                                                \'description\',\n                                                {\n                                                  \'TYPE\' => \'MEDIUMTEXT\'\n                                                },\n                                                \'filename\',\n                                                {\n                                                  \'TYPE\' => \'MEDIUMTEXT\'\n                                                },\n                                                \'creation_ts\',\n                                                {\n                                                  \'NOTNULL\' => 1,\n                                                  \'TYPE\' => \'DATETIME\'\n                                                },\n                                                \'mime_type\',\n                                                {\n                                                  \'NOTNULL\' => 1,\n                                                  \'TYPE\' => \'varchar(100)\'\n                                                }\n                                              ],\n                                  \'INDEXES\' => [\n                                                 \'test_attachments_submitter_idx\',\n                                                 [\n                                                   \'submitter_id\'\n                                                 ]\n                                               ]\n                                },\n          \'test_builds\' => {\n                             \'FIELDS\' => [\n                                           \'build_id\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'PRIMARYKEY\' => 1,\n                                             \'TYPE\' => \'INTSERIAL\'\n                                           },\n                                           \'product_id\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'INT2\'\n                                           },\n                                           \'milestone\',\n                                           {\n                                             \'TYPE\' => \'varchar(20)\'\n                                           },\n                                           \'name\',\n                                           {\n                                             \'TYPE\' => \'varchar(255)\'\n                                           },\n                                           \'description\',\n                                           {\n                                             \'TYPE\' => \'TEXT\'\n                                           },\n                                           \'isactive\',\n                                           {\n                                             \'DEFAULT\' => \'1\',\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'BOOLEAN\'\n                                           }\n                                         ],\n                             \'INDEXES\' => [\n                                            \'build_name_idx\',\n                                            [\n                                              \'name\'\n                                            ],\n                                            \'build_milestone_idx\',\n                                            [\n                                              \'milestone\'\n                                            ],\n                                            \'build_product_id_name_idx\',\n                                            {\n                                              \'FIELDS\' => [\n                                                            \'product_id\',\n                                                            \'name\'\n                                                          ],\n                                              \'TYPE\' => \'UNIQUE\'\n                                            },\n                                            \'build_prod_idx\',\n                                            {\n                                              \'FIELDS\' => [\n                                                            \'build_id\',\n                                                            \'product_id\'\n                                                          ],\n                                              \'TYPE\' => \'UNIQUE\'\n                                            }\n                                          ]\n                           },\n          \'test_case_activity\' => {\n                                    \'FIELDS\' => [\n                                                  \'case_id\',\n                                                  {\n                                                    \'NOTNULL\' => 1,\n                                                    \'TYPE\' => \'INT4\',\n                                                    \'UNSIGNED\' => 1\n                                                  },\n                                                  \'fieldid\',\n                                                  {\n                                                    \'NOTNULL\' => 1,\n                                                    \'TYPE\' => \'INT2\',\n                                                    \'UNSIGNED\' => 1\n                                                  },\n                                                  \'who\',\n                                                  {\n                                                    \'NOTNULL\' => 1,\n                                                    \'TYPE\' => \'INT3\'\n                                                  },\n                                                  \'changed\',\n                                                  {\n                                                    \'NOTNULL\' => 1,\n                                                    \'TYPE\' => \'DATETIME\'\n                                                  },\n                                                  \'oldvalue\',\n                                                  {\n                                                    \'TYPE\' => \'MEDIUMTEXT\'\n                                                  },\n                                                  \'newvalue\',\n                                                  {\n                                                    \'TYPE\' => \'MEDIUMTEXT\'\n                                                  }\n                                                ],\n                                    \'INDEXES\' => [\n                                                   \'case_activity_case_id_idx\',\n                                                   [\n                                                     \'case_id\'\n                                                   ],\n                                                   \'case_activity_who_idx\',\n                                                   [\n                                                     \'who\'\n                                                   ],\n                                                   \'case_activity_when_idx\',\n                                                   [\n                                                     \'changed\'\n                                                   ],\n                                                   \'case_activity_field_idx\',\n                                                   [\n                                                     \'fieldid\'\n                                                   ]\n                                                 ]\n                                  },\n          \'test_case_attachments\' => {\n                                       \'FIELDS\' => [\n                                                     \'attachment_id\',\n                                                     {\n                                                       \'NOTNULL\' => 1,\n                                                       \'TYPE\' => \'INT4\'\n                                                     },\n                                                     \'case_id\',\n                                                     {\n                                                       \'NOTNULL\' => 1,\n                                                       \'TYPE\' => \'INT4\',\n                                                       \'UNSIGNED\' => 1\n                                                     },\n                                                     \'case_run_id\',\n                                                     {\n                                                       \'TYPE\' => \'INT4\',\n                                                       \'UNSIGNED\' => 1\n                                                     }\n                                                   ],\n                                       \'INDEXES\' => [\n                                                      \'test_case_attachments_primary_idx\',\n                                                      [\n                                                        \'attachment_id\'\n                                                      ],\n                                                      \'attachment_case_id_idx\',\n                                                      [\n                                                        \'case_id\'\n                                                      ],\n                                                      \'attachment_caserun_id_idx\',\n                                                      [\n                                                        \'case_run_id\'\n                                                      ]\n                                                    ]\n                                     },\n          \'test_case_bugs\' => {\n                                \'FIELDS\' => [\n                                              \'bug_id\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT3\'\n                                              },\n                                              \'case_run_id\',\n                                              {\n                                                \'TYPE\' => \'INT4\',\n                                                \'UNSIGNED\' => 1\n                                              },\n                                              \'case_id\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT4\',\n                                                \'UNSIGNED\' => 1\n                                              }\n                                            ],\n                                \'INDEXES\' => [\n                                               \'case_bugs_bug_id_idx\',\n                                               [\n                                                 \'bug_id\'\n                                               ],\n                                               \'case_bugs_case_id_idx\',\n                                               [\n                                                 \'case_id\'\n                                               ],\n                                               \'case_bugs_case_run_id_idx\',\n                                               [\n                                                 \'case_run_id\'\n                                               ]\n                                             ]\n                              },\n          \'test_case_categories\' => {\n                                      \'FIELDS\' => [\n                                                    \'category_id\',\n                                                    {\n                                                      \'NOTNULL\' => 1,\n                                                      \'PRIMARYKEY\' => 1,\n                                                      \'TYPE\' => \'SMALLSERIAL\'\n                                                    },\n                                                    \'product_id\',\n                                                    {\n                                                      \'NOTNULL\' => 1,\n                                                      \'TYPE\' => \'INT2\'\n                                                    },\n                                                    \'name\',\n                                                    {\n                                                      \'NOTNULL\' => 1,\n                                                      \'TYPE\' => \'varchar(240)\'\n                                                    },\n                                                    \'description\',\n                                                    {\n                                                      \'TYPE\' => \'MEDIUMTEXT\'\n                                                    }\n                                                  ],\n                                      \'INDEXES\' => [\n                                                     \'category_product_id_name_idx\',\n                                                     {\n                                                       \'FIELDS\' => [\n                                                                     \'product_id\',\n                                                                     \'name\'\n                                                                   ],\n                                                       \'TYPE\' => \'UNIQUE\'\n                                                     },\n                                                     \'category_product_idx\',\n                                                     {\n                                                       \'FIELDS\' => [\n                                                                     \'category_id\',\n                                                                     \'product_id\'\n                                                                   ],\n                                                       \'TYPE\' => \'UNIQUE\'\n                                                     },\n                                                     \'category_name_idx_v2\',\n                                                     [\n                                                       \'name\'\n                                                     ]\n                                                   ]\n                                    },\n          \'test_case_components\' => {\n                                      \'FIELDS\' => [\n                                                    \'case_id\',\n                                                    {\n                                                      \'NOTNULL\' => 1,\n                                                      \'TYPE\' => \'INT4\',\n                                                      \'UNSIGNED\' => 1\n                                                    },\n                                                    \'component_id\',\n                                                    {\n                                                      \'NOTNULL\' => 1,\n                                                      \'TYPE\' => \'INT2\'\n                                                    }\n                                                  ],\n                                      \'INDEXES\' => [\n                                                     \'components_case_id_idx\',\n                                                     {\n                                                       \'FIELDS\' => [\n                                                                     \'case_id\',\n                                                                     \'component_id\'\n                                                                   ],\n                                                       \'TYPE\' => \'UNIQUE\'\n                                                     },\n                                                     \'components_component_id_idx\',\n                                                     [\n                                                       \'component_id\'\n                                                     ]\n                                                   ]\n                                    },\n          \'test_case_dependencies\' => {\n                                        \'FIELDS\' => [\n                                                      \'dependson\',\n                                                      {\n                                                        \'NOTNULL\' => 1,\n                                                        \'TYPE\' => \'INT4\',\n                                                        \'UNSIGNED\' => 1\n                                                      },\n                                                      \'blocked\',\n                                                      {\n                                                        \'NOTNULL\' => 1,\n                                                        \'TYPE\' => \'INT4\',\n                                                        \'UNSIGNED\' => 1\n                                                      }\n                                                    ],\n                                        \'INDEXES\' => [\n                                                       \'case_dependencies_primary_idx\',\n                                                       {\n                                                         \'FIELDS\' => [\n                                                                       \'dependson\',\n                                                                       \'blocked\'\n                                                                     ],\n                                                         \'TYPE\' => \'UNIQUE\'\n                                                       },\n                                                       \'case_dependencies_blocked_idx\',\n                                                       [\n                                                         \'blocked\'\n                                                       ]\n                                                     ]\n                                      },\n          \'test_case_plans\' => {\n                                 \'FIELDS\' => [\n                                               \'plan_id\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'INT4\',\n                                                 \'UNSIGNED\' => 1\n                                               },\n                                               \'case_id\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'INT4\',\n                                                 \'UNSIGNED\' => 1\n                                               }\n                                             ],\n                                 \'INDEXES\' => [\n                                                \'test_case_plans_primary_idx\',\n                                                {\n                                                  \'FIELDS\' => [\n                                                                \'plan_id\',\n                                                                \'case_id\'\n                                                              ],\n                                                  \'TYPE\' => \'UNIQUE\'\n                                                },\n                                                \'test_case_plans_case_idx\',\n                                                [\n                                                  \'case_id\'\n                                                ]\n                                              ]\n                               },\n          \'test_case_run_status\' => {\n                                      \'FIELDS\' => [\n                                                    \'case_run_status_id\',\n                                                    {\n                                                      \'NOTNULL\' => 1,\n                                                      \'PRIMARYKEY\' => 1,\n                                                      \'TYPE\' => \'SMALLSERIAL\'\n                                                    },\n                                                    \'name\',\n                                                    {\n                                                      \'TYPE\' => \'varchar(20)\'\n                                                    },\n                                                    \'sortkey\',\n                                                    {\n                                                      \'TYPE\' => \'INT4\'\n                                                    },\n                                                    \'description\',\n                                                    {\n                                                      \'TYPE\' => \'TEXT\'\n                                                    }\n                                                  ]\n                                    },\n          \'test_case_runs\' => {\n                                \'FIELDS\' => [\n                                              \'case_run_id\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'PRIMARYKEY\' => 1,\n                                                \'TYPE\' => \'INTSERIAL\'\n                                              },\n                                              \'run_id\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT4\',\n                                                \'UNSIGNED\' => 1\n                                              },\n                                              \'case_id\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT4\',\n                                                \'UNSIGNED\' => 1\n                                              },\n                                              \'assignee\',\n                                              {\n                                                \'TYPE\' => \'INT3\'\n                                              },\n                                              \'testedby\',\n                                              {\n                                                \'TYPE\' => \'INT3\'\n                                              },\n                                              \'case_run_status_id\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT1\',\n                                                \'UNSIGNED\' => 1\n                                              },\n                                              \'case_text_version\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT3\'\n                                              },\n                                              \'build_id\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT4\',\n                                                \'UNSIGNED\' => 1\n                                              },\n                                              \'running_date\',\n                                              {\n                                                \'TYPE\' => \'DATETIME\'\n                                              },\n                                              \'close_date\',\n                                              {\n                                                \'TYPE\' => \'DATETIME\'\n                                              },\n                                              \'notes\',\n                                              {\n                                                \'TYPE\' => \'TEXT\'\n                                              },\n                                              \'iscurrent\',\n                                              {\n                                                \'DEFAULT\' => \'0\',\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'BOOLEAN\'\n                                              },\n                                              \'sortkey\',\n                                              {\n                                                \'TYPE\' => \'INT4\'\n                                              },\n                                              \'environment_id\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT4\',\n                                                \'UNSIGNED\' => 1\n                                              }\n                                            ],\n                                \'INDEXES\' => [\n                                               \'case_run_case_id_idx\',\n                                               [\n                                                 \'case_id\'\n                                               ],\n                                               \'case_run_assignee_idx\',\n                                               [\n                                                 \'assignee\'\n                                               ],\n                                               \'case_run_testedby_idx\',\n                                               [\n                                                 \'testedby\'\n                                               ],\n                                               \'case_run_close_date_idx\',\n                                               [\n                                                 \'close_date\'\n                                               ],\n                                               \'case_run_build_env_idx\',\n                                               {\n                                                 \'FIELDS\' => [\n                                                               \'run_id\',\n                                                               \'case_id\',\n                                                               \'build_id\',\n                                                               \'environment_id\'\n                                                             ],\n                                                 \'TYPE\' => \'UNIQUE\'\n                                               },\n                                               \'case_run_status_idx\',\n                                               [\n                                                 \'case_run_status_id\'\n                                               ],\n                                               \'case_run_text_ver_idx\',\n                                               [\n                                                 \'case_text_version\'\n                                               ],\n                                               \'case_run_build_idx_v2\',\n                                               [\n                                                 \'build_id\'\n                                               ],\n                                               \'case_run_env_idx_v2\',\n                                               [\n                                                 \'environment_id\'\n                                               ]\n                                             ]\n                              },\n          \'test_case_status\' => {\n                                  \'FIELDS\' => [\n                                                \'case_status_id\',\n                                                {\n                                                  \'NOTNULL\' => 1,\n                                                  \'PRIMARYKEY\' => 1,\n                                                  \'TYPE\' => \'SMALLSERIAL\'\n                                                },\n                                                \'name\',\n                                                {\n                                                  \'NOTNULL\' => 1,\n                                                  \'TYPE\' => \'varchar(255)\'\n                                                },\n                                                \'description\',\n                                                {\n                                                  \'TYPE\' => \'TEXT\'\n                                                }\n                                              ]\n                                },\n          \'test_case_tags\' => {\n                                \'FIELDS\' => [\n                                              \'tag_id\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT4\',\n                                                \'UNSIGNED\' => 1\n                                              },\n                                              \'case_id\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT4\',\n                                                \'UNSIGNED\' => 1\n                                              },\n                                              \'userid\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT3\'\n                                              }\n                                            ],\n                                \'INDEXES\' => [\n                                               \'case_tags_primary_idx\',\n                                               {\n                                                 \'FIELDS\' => [\n                                                               \'tag_id\',\n                                                               \'case_id\',\n                                                               \'userid\'\n                                                             ],\n                                                 \'TYPE\' => \'UNIQUE\'\n                                               },\n                                               \'case_tags_secondary_idx\',\n                                               {\n                                                 \'FIELDS\' => [\n                                                               \'tag_id\',\n                                                               \'case_id\'\n                                                             ],\n                                                 \'TYPE\' => \'UNIQUE\'\n                                               },\n                                               \'case_tags_case_id_idx_v3\',\n                                               [\n                                                 \'case_id\'\n                                               ],\n                                               \'case_tags_userid_idx\',\n                                               [\n                                                 \'userid\'\n                                               ]\n                                             ]\n                              },\n          \'test_case_texts\' => {\n                                 \'FIELDS\' => [\n                                               \'case_id\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'INT4\',\n                                                 \'UNSIGNED\' => 1\n                                               },\n                                               \'case_text_version\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'INT3\'\n                                               },\n                                               \'who\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'INT3\'\n                                               },\n                                               \'creation_ts\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'DATETIME\'\n                                               },\n                                               \'action\',\n                                               {\n                                                 \'TYPE\' => \'MEDIUMTEXT\'\n                                               },\n                                               \'effect\',\n                                               {\n                                                 \'TYPE\' => \'MEDIUMTEXT\'\n                                               },\n                                               \'setup\',\n                                               {\n                                                 \'TYPE\' => \'MEDIUMTEXT\'\n                                               },\n                                               \'breakdown\',\n                                               {\n                                                 \'TYPE\' => \'MEDIUMTEXT\'\n                                               }\n                                             ],\n                                 \'INDEXES\' => [\n                                                \'case_versions_idx\',\n                                                {\n                                                  \'FIELDS\' => [\n                                                                \'case_id\',\n                                                                \'case_text_version\'\n                                                              ],\n                                                  \'TYPE\' => \'UNIQUE\'\n                                                },\n                                                \'case_versions_who_idx\',\n                                                [\n                                                  \'who\'\n                                                ],\n                                                \'case_versions_creation_ts_idx\',\n                                                [\n                                                  \'creation_ts\'\n                                                ]\n                                              ]\n                               },\n          \'test_cases\' => {\n                            \'FIELDS\' => [\n                                          \'case_id\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'PRIMARYKEY\' => 1,\n                                            \'TYPE\' => \'INTSERIAL\'\n                                          },\n                                          \'case_status_id\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'INT1\'\n                                          },\n                                          \'category_id\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'INT2\',\n                                            \'UNSIGNED\' => 1\n                                          },\n                                          \'priority_id\',\n                                          {\n                                            \'TYPE\' => \'INT2\'\n                                          },\n                                          \'author_id\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'INT3\'\n                                          },\n                                          \'default_tester_id\',\n                                          {\n                                            \'TYPE\' => \'INT3\'\n                                          },\n                                          \'creation_date\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'DATETIME\'\n                                          },\n                                          \'estimated_time\',\n                                          {\n                                            \'TYPE\' => \'TIME\'\n                                          },\n                                          \'isautomated\',\n                                          {\n                                            \'DEFAULT\' => \'0\',\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'BOOLEAN\'\n                                          },\n                                          \'sortkey\',\n                                          {\n                                            \'TYPE\' => \'INT4\'\n                                          },\n                                          \'script\',\n                                          {\n                                            \'TYPE\' => \'MEDIUMTEXT\'\n                                          },\n                                          \'arguments\',\n                                          {\n                                            \'TYPE\' => \'MEDIUMTEXT\'\n                                          },\n                                          \'summary\',\n                                          {\n                                            \'TYPE\' => \'varchar(255)\'\n                                          },\n                                          \'requirement\',\n                                          {\n                                            \'TYPE\' => \'varchar(255)\'\n                                          },\n                                          \'alias\',\n                                          {\n                                            \'TYPE\' => \'varchar(255)\'\n                                          }\n                                        ],\n                            \'INDEXES\' => [\n                                           \'test_case_category_idx\',\n                                           [\n                                             \'category_id\'\n                                           ],\n                                           \'test_case_author_idx\',\n                                           [\n                                             \'author_id\'\n                                           ],\n                                           \'test_case_creation_date_idx\',\n                                           [\n                                             \'creation_date\'\n                                           ],\n                                           \'test_case_sortkey_idx\',\n                                           [\n                                             \'sortkey\'\n                                           ],\n                                           \'test_case_shortname_idx\',\n                                           [\n                                             \'alias\'\n                                           ],\n                                           \'test_case_requirement_idx\',\n                                           [\n                                             \'requirement\'\n                                           ],\n                                           \'test_case_status_idx\',\n                                           [\n                                             \'case_status_id\'\n                                           ],\n                                           \'test_case_tester_idx\',\n                                           [\n                                             \'default_tester_id\'\n                                           ]\n                                         ]\n                          },\n          \'test_email_settings\' => {\n                                     \'FIELDS\' => [\n                                                   \'userid\',\n                                                   {\n                                                     \'NOTNULL\' => 1,\n                                                     \'TYPE\' => \'INT3\'\n                                                   },\n                                                   \'eventid\',\n                                                   {\n                                                     \'NOTNULL\' => 1,\n                                                     \'TYPE\' => \'INT1\',\n                                                     \'UNSIGNED\' => 1\n                                                   },\n                                                   \'relationship_id\',\n                                                   {\n                                                     \'NOTNULL\' => 1,\n                                                     \'TYPE\' => \'INT1\',\n                                                     \'UNSIGNED\' => 1\n                                                   }\n                                                 ],\n                                     \'INDEXES\' => [\n                                                    \'test_email_setting_user_id_idx\',\n                                                    {\n                                                      \'FIELDS\' => [\n                                                                    \'userid\',\n                                                                    \'relationship_id\',\n                                                                    \'eventid\'\n                                                                  ],\n                                                      \'TYPE\' => \'UNIQUE\'\n                                                    }\n                                                  ]\n                                   },\n          \'test_environment_category\' => {\n                                           \'FIELDS\' => [\n                                                         \'env_category_id\',\n                                                         {\n                                                           \'NOTNULL\' => 1,\n                                                           \'PRIMARYKEY\' => 1,\n                                                           \'TYPE\' => \'INTSERIAL\'\n                                                         },\n                                                         \'product_id\',\n                                                         {\n                                                           \'NOTNULL\' => 1,\n                                                           \'TYPE\' => \'INT2\'\n                                                         },\n                                                         \'name\',\n                                                         {\n                                                           \'TYPE\' => \'varchar(255)\'\n                                                         }\n                                                       ],\n                                           \'INDEXES\' => [\n                                                          \'test_environment_category_key1\',\n                                                          {\n                                                            \'FIELDS\' => [\n                                                                          \'env_category_id\',\n                                                                          \'product_id\'\n                                                                        ],\n                                                            \'TYPE\' => \'UNIQUE\'\n                                                          },\n                                                          \'test_environment_category_key2\',\n                                                          {\n                                                            \'FIELDS\' => [\n                                                                          \'product_id\',\n                                                                          \'name\'\n                                                                        ],\n                                                            \'TYPE\' => \'UNIQUE\'\n                                                          }\n                                                        ]\n                                         },\n          \'test_environment_element\' => {\n                                          \'FIELDS\' => [\n                                                        \'element_id\',\n                                                        {\n                                                          \'NOTNULL\' => 1,\n                                                          \'PRIMARYKEY\' => 1,\n                                                          \'TYPE\' => \'INTSERIAL\'\n                                                        },\n                                                        \'env_category_id\',\n                                                        {\n                                                          \'NOTNULL\' => 1,\n                                                          \'TYPE\' => \'INT4\',\n                                                          \'UNSIGNED\' => 1\n                                                        },\n                                                        \'name\',\n                                                        {\n                                                          \'TYPE\' => \'varchar(255)\'\n                                                        },\n                                                        \'parent_id\',\n                                                        {\n                                                          \'TYPE\' => \'INT4\',\n                                                          \'UNSIGNED\' => 1\n                                                        },\n                                                        \'isprivate\',\n                                                        {\n                                                          \'DEFAULT\' => 0,\n                                                          \'NOTNULL\' => 1,\n                                                          \'TYPE\' => \'BOOLEAN\'\n                                                        }\n                                                      ],\n                                          \'INDEXES\' => [\n                                                         \'test_environment_element_key1\',\n                                                         {\n                                                           \'FIELDS\' => [\n                                                                         \'element_id\',\n                                                                         \'env_category_id\'\n                                                                       ],\n                                                           \'TYPE\' => \'UNIQUE\'\n                                                         },\n                                                         \'test_environment_element_key2\',\n                                                         {\n                                                           \'FIELDS\' => [\n                                                                         \'env_category_id\',\n                                                                         \'name\'\n                                                                       ],\n                                                           \'TYPE\' => \'UNIQUE\'\n                                                         }\n                                                       ]\n                                        },\n          \'test_environment_map\' => {\n                                      \'FIELDS\' => [\n                                                    \'environment_id\',\n                                                    {\n                                                      \'NOTNULL\' => 1,\n                                                      \'TYPE\' => \'INT4\',\n                                                      \'UNSIGNED\' => 1\n                                                    },\n                                                    \'property_id\',\n                                                    {\n                                                      \'NOTNULL\' => 1,\n                                                      \'TYPE\' => \'INT4\',\n                                                      \'UNSIGNED\' => 1\n                                                    },\n                                                    \'element_id\',\n                                                    {\n                                                      \'NOTNULL\' => 1,\n                                                      \'TYPE\' => \'INT4\',\n                                                      \'UNSIGNED\' => 1\n                                                    },\n                                                    \'value_selected\',\n                                                    {\n                                                      \'TYPE\' => \'TINYTEXT\'\n                                                    }\n                                                  ],\n                                      \'INDEXES\' => [\n                                                     \'env_map_env_element_idx\',\n                                                     [\n                                                       \'environment_id\',\n                                                       \'element_id\'\n                                                     ],\n                                                     \'env_map_property_idx\',\n                                                     [\n                                                       \'environment_id\',\n                                                       \'property_id\'\n                                                     ],\n                                                     \'test_environment_map_key3\',\n                                                     {\n                                                       \'FIELDS\' => [\n                                                                     \'environment_id\',\n                                                                     \'element_id\',\n                                                                     \'property_id\'\n                                                                   ],\n                                                       \'TYPE\' => \'UNIQUE\'\n                                                     }\n                                                   ]\n                                    },\n          \'test_environment_property\' => {\n                                           \'FIELDS\' => [\n                                                         \'property_id\',\n                                                         {\n                                                           \'NOTNULL\' => 1,\n                                                           \'PRIMARYKEY\' => 1,\n                                                           \'TYPE\' => \'INTSERIAL\'\n                                                         },\n                                                         \'element_id\',\n                                                         {\n                                                           \'NOTNULL\' => 1,\n                                                           \'TYPE\' => \'INT4\',\n                                                           \'UNSIGNED\' => 1\n                                                         },\n                                                         \'name\',\n                                                         {\n                                                           \'TYPE\' => \'varchar(255)\'\n                                                         },\n                                                         \'validexp\',\n                                                         {\n                                                           \'TYPE\' => \'TEXT\'\n                                                         }\n                                                       ],\n                                           \'INDEXES\' => [\n                                                          \'test_environment_property_key1\',\n                                                          {\n                                                            \'FIELDS\' => [\n                                                                          \'property_id\',\n                                                                          \'element_id\'\n                                                                        ],\n                                                            \'TYPE\' => \'UNIQUE\'\n                                                          },\n                                                          \'test_environment_property_key2\',\n                                                          {\n                                                            \'FIELDS\' => [\n                                                                          \'element_id\',\n                                                                          \'name\'\n                                                                        ],\n                                                            \'TYPE\' => \'UNIQUE\'\n                                                          }\n                                                        ]\n                                         },\n          \'test_environments\' => {\n                                   \'FIELDS\' => [\n                                                 \'environment_id\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'PRIMARYKEY\' => 1,\n                                                   \'TYPE\' => \'INTSERIAL\'\n                                                 },\n                                                 \'product_id\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'INT2\'\n                                                 },\n                                                 \'name\',\n                                                 {\n                                                   \'TYPE\' => \'varchar(255)\'\n                                                 },\n                                                 \'isactive\',\n                                                 {\n                                                   \'DEFAULT\' => \'1\',\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'BOOLEAN\'\n                                                 }\n                                               ],\n                                   \'INDEXES\' => [\n                                                  \'test_environments_key1\',\n                                                  {\n                                                    \'FIELDS\' => [\n                                                                  \'environment_id\',\n                                                                  \'product_id\'\n                                                                ],\n                                                    \'TYPE\' => \'UNIQUE\'\n                                                  },\n                                                  \'test_environments_key2\',\n                                                  {\n                                                    \'FIELDS\' => [\n                                                                  \'product_id\',\n                                                                  \'name\'\n                                                                ],\n                                                    \'TYPE\' => \'UNIQUE\'\n                                                  },\n                                                  \'environment_name_idx_v2\',\n                                                  [\n                                                    \'name\'\n                                                  ]\n                                                ]\n                                 },\n          \'test_events\' => {\n                             \'FIELDS\' => [\n                                           \'eventid\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'PRIMARYKEY\' => 1,\n                                             \'TYPE\' => \'INT1\',\n                                             \'UNSIGNED\' => 1\n                                           },\n                                           \'name\',\n                                           {\n                                             \'TYPE\' => \'varchar(50)\'\n                                           }\n                                         ],\n                             \'INDEXES\' => [\n                                            \'test_event_name_idx\',\n                                            [\n                                              \'name\'\n                                            ]\n                                          ]\n                           },\n          \'test_fielddefs\' => {\n                                \'FIELDS\' => [\n                                              \'fieldid\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'PRIMARYKEY\' => 1,\n                                                \'TYPE\' => \'SMALLSERIAL\'\n                                              },\n                                              \'name\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'varchar(100)\'\n                                              },\n                                              \'description\',\n                                              {\n                                                \'TYPE\' => \'MEDIUMTEXT\'\n                                              },\n                                              \'table_name\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'varchar(100)\'\n                                              }\n                                            ]\n                              },\n          \'test_named_queries\' => {\n                                    \'FIELDS\' => [\n                                                  \'userid\',\n                                                  {\n                                                    \'NOTNULL\' => 1,\n                                                    \'TYPE\' => \'INT3\'\n                                                  },\n                                                  \'name\',\n                                                  {\n                                                    \'NOTNULL\' => 1,\n                                                    \'TYPE\' => \'varchar(64)\'\n                                                  },\n                                                  \'isvisible\',\n                                                  {\n                                                    \'DEFAULT\' => 1,\n                                                    \'NOTNULL\' => 1,\n                                                    \'TYPE\' => \'BOOLEAN\'\n                                                  },\n                                                  \'query\',\n                                                  {\n                                                    \'NOTNULL\' => 1,\n                                                    \'TYPE\' => \'MEDIUMTEXT\'\n                                                  },\n                                                  \'type\',\n                                                  {\n                                                    \'DEFAULT\' => 0,\n                                                    \'NOTNULL\' => 1,\n                                                    \'TYPE\' => \'INT3\'\n                                                  }\n                                                ],\n                                    \'INDEXES\' => [\n                                                   \'test_namedquery_primary_idx\',\n                                                   {\n                                                     \'FIELDS\' => [\n                                                                   \'userid\',\n                                                                   \'name\'\n                                                                 ],\n                                                     \'TYPE\' => \'UNIQUE\'\n                                                   },\n                                                   \'test_namedquery_name_idx\',\n                                                   [\n                                                     \'name\'\n                                                   ]\n                                                 ]\n                                  },\n          \'test_plan_activity\' => {\n                                    \'FIELDS\' => [\n                                                  \'plan_id\',\n                                                  {\n                                                    \'NOTNULL\' => 1,\n                                                    \'TYPE\' => \'INT4\',\n                                                    \'UNSIGNED\' => 1\n                                                  },\n                                                  \'fieldid\',\n                                                  {\n                                                    \'NOTNULL\' => 1,\n                                                    \'TYPE\' => \'INT2\',\n                                                    \'UNSIGNED\' => 1\n                                                  },\n                                                  \'who\',\n                                                  {\n                                                    \'NOTNULL\' => 1,\n                                                    \'TYPE\' => \'INT3\'\n                                                  },\n                                                  \'changed\',\n                                                  {\n                                                    \'NOTNULL\' => 1,\n                                                    \'TYPE\' => \'DATETIME\'\n                                                  },\n                                                  \'oldvalue\',\n                                                  {\n                                                    \'TYPE\' => \'MEDIUMTEXT\'\n                                                  },\n                                                  \'newvalue\',\n                                                  {\n                                                    \'TYPE\' => \'MEDIUMTEXT\'\n                                                  }\n                                                ],\n                                    \'INDEXES\' => [\n                                                   \'plan_activity_primary_idx\',\n                                                   [\n                                                     \'plan_id\'\n                                                   ],\n                                                   \'plan_activity_field_idx\',\n                                                   [\n                                                     \'fieldid\'\n                                                   ],\n                                                   \'plan_activity_who_idx\',\n                                                   [\n                                                     \'who\'\n                                                   ],\n                                                   \'plan_activity_changed_idx\',\n                                                   [\n                                                     \'changed\'\n                                                   ]\n                                                 ]\n                                  },\n          \'test_plan_attachments\' => {\n                                       \'FIELDS\' => [\n                                                     \'attachment_id\',\n                                                     {\n                                                       \'NOTNULL\' => 1,\n                                                       \'TYPE\' => \'INT4\'\n                                                     },\n                                                     \'plan_id\',\n                                                     {\n                                                       \'NOTNULL\' => 1,\n                                                       \'TYPE\' => \'INT4\',\n                                                       \'UNSIGNED\' => 1\n                                                     }\n                                                   ],\n                                       \'INDEXES\' => [\n                                                      \'test_plan_attachments_primary_idx\',\n                                                      [\n                                                        \'attachment_id\'\n                                                      ],\n                                                      \'attachment_plan_id_idx\',\n                                                      [\n                                                        \'plan_id\'\n                                                      ]\n                                                    ]\n                                     },\n          \'test_plan_permissions\' => {\n                                       \'FIELDS\' => [\n                                                     \'userid\',\n                                                     {\n                                                       \'NOTNULL\' => 1,\n                                                       \'TYPE\' => \'INT3\'\n                                                     },\n                                                     \'plan_id\',\n                                                     {\n                                                       \'NOTNULL\' => 1,\n                                                       \'TYPE\' => \'INT4\',\n                                                       \'UNSIGNED\' => 1\n                                                     },\n                                                     \'permissions\',\n                                                     {\n                                                       \'NOTNULL\' => 1,\n                                                       \'TYPE\' => \'INT1\'\n                                                     },\n                                                     \'grant_type\',\n                                                     {\n                                                       \'NOTNULL\' => 1,\n                                                       \'TYPE\' => \'INT1\'\n                                                     }\n                                                   ],\n                                       \'INDEXES\' => [\n                                                      \'testers_plan_user_idx\',\n                                                      {\n                                                        \'FIELDS\' => [\n                                                                      \'userid\',\n                                                                      \'plan_id\',\n                                                                      \'grant_type\'\n                                                                    ],\n                                                        \'TYPE\' => \'UNIQUE\'\n                                                      },\n                                                      \'testers_plan_user_plan_idx\',\n                                                      [\n                                                        \'plan_id\'\n                                                      ],\n                                                      \'testers_plan_grant_idx\',\n                                                      [\n                                                        \'grant_type\'\n                                                      ]\n                                                    ]\n                                     },\n          \'test_plan_permissions_regexp\' => {\n                                              \'FIELDS\' => [\n                                                            \'plan_id\',\n                                                            {\n                                                              \'NOTNULL\' => 1,\n                                                              \'TYPE\' => \'INT4\',\n                                                              \'UNSIGNED\' => 1\n                                                            },\n                                                            \'user_regexp\',\n                                                            {\n                                                              \'NOTNULL\' => 1,\n                                                              \'TYPE\' => \'TEXT\'\n                                                            },\n                                                            \'permissions\',\n                                                            {\n                                                              \'NOTNULL\' => 1,\n                                                              \'TYPE\' => \'INT1\'\n                                                            }\n                                                          ],\n                                              \'INDEXES\' => [\n                                                             \'testers_plan_regexp_idx\',\n                                                             {\n                                                               \'FIELDS\' => [\n                                                                             \'plan_id\'\n                                                                           ],\n                                                               \'TYPE\' => \'UNIQUE\'\n                                                             }\n                                                           ]\n                                            },\n          \'test_plan_tags\' => {\n                                \'FIELDS\' => [\n                                              \'tag_id\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT4\',\n                                                \'UNSIGNED\' => 1\n                                              },\n                                              \'plan_id\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT4\',\n                                                \'UNSIGNED\' => 1\n                                              },\n                                              \'userid\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT3\'\n                                              }\n                                            ],\n                                \'INDEXES\' => [\n                                               \'plan_tags_primary_idx\',\n                                               {\n                                                 \'FIELDS\' => [\n                                                               \'tag_id\',\n                                                               \'plan_id\',\n                                                               \'userid\'\n                                                             ],\n                                                 \'TYPE\' => \'UNIQUE\'\n                                               },\n                                               \'plan_tags_secondary_idx\',\n                                               {\n                                                 \'FIELDS\' => [\n                                                               \'tag_id\',\n                                                               \'plan_id\'\n                                                             ],\n                                                 \'TYPE\' => \'UNIQUE\'\n                                               },\n                                               \'plan_tags_plan_id_idx\',\n                                               [\n                                                 \'plan_id\'\n                                               ],\n                                               \'plan_tags_userid_idx\',\n                                               [\n                                                 \'userid\'\n                                               ]\n                                             ]\n                              },\n          \'test_plan_texts\' => {\n                                 \'FIELDS\' => [\n                                               \'plan_id\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'INT4\',\n                                                 \'UNSIGNED\' => 1\n                                               },\n                                               \'plan_text_version\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'INT4\'\n                                               },\n                                               \'who\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'INT3\'\n                                               },\n                                               \'creation_ts\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'DATETIME\'\n                                               },\n                                               \'plan_text\',\n                                               {\n                                                 \'TYPE\' => \'MEDIUMTEXT\'\n                                               }\n                                             ],\n                                 \'INDEXES\' => [\n                                                \'test_plan_text_version_idx\',\n                                                [\n                                                  \'plan_id\',\n                                                  \'plan_text_version\'\n                                                ],\n                                                \'test_plan_text_who_idx\',\n                                                [\n                                                  \'who\'\n                                                ]\n                                              ]\n                               },\n          \'test_plan_types\' => {\n                                 \'FIELDS\' => [\n                                               \'type_id\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'PRIMARYKEY\' => 1,\n                                                 \'TYPE\' => \'SMALLSERIAL\'\n                                               },\n                                               \'name\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'varchar(64)\'\n                                               },\n                                               \'description\',\n                                               {\n                                                 \'TYPE\' => \'MEDIUMTEXT\'\n                                               }\n                                             ]\n                               },\n          \'test_plans\' => {\n                            \'FIELDS\' => [\n                                          \'plan_id\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'PRIMARYKEY\' => 1,\n                                            \'TYPE\' => \'INTSERIAL\'\n                                          },\n                                          \'product_id\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'INT2\'\n                                          },\n                                          \'author_id\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'INT3\'\n                                          },\n                                          \'type_id\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'INT1\',\n                                            \'UNSIGNED\' => 1\n                                          },\n                                          \'default_product_version\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'MEDIUMTEXT\'\n                                          },\n                                          \'name\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'varchar(255)\'\n                                          },\n                                          \'creation_date\',\n                                          {\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'DATETIME\'\n                                          },\n                                          \'isactive\',\n                                          {\n                                            \'DEFAULT\' => \'1\',\n                                            \'NOTNULL\' => 1,\n                                            \'TYPE\' => \'BOOLEAN\'\n                                          }\n                                        ],\n                            \'INDEXES\' => [\n                                           \'plan_product_plan_id_idx\',\n                                           [\n                                             \'product_id\',\n                                             \'plan_id\'\n                                           ],\n                                           \'plan_author_idx\',\n                                           [\n                                             \'author_id\'\n                                           ],\n                                           \'plan_type_idx\',\n                                           [\n                                             \'type_id\'\n                                           ],\n                                           \'plan_isactive_idx\',\n                                           [\n                                             \'isactive\'\n                                           ],\n                                           \'plan_name_idx\',\n                                           [\n                                             \'name\'\n                                           ]\n                                         ]\n                          },\n          \'test_relationships\' => {\n                                    \'FIELDS\' => [\n                                                  \'relationship_id\',\n                                                  {\n                                                    \'NOTNULL\' => 1,\n                                                    \'PRIMARYKEY\' => 1,\n                                                    \'TYPE\' => \'INT1\',\n                                                    \'UNSIGNED\' => 1\n                                                  },\n                                                  \'name\',\n                                                  {\n                                                    \'TYPE\' => \'varchar(50)\'\n                                                  }\n                                                ]\n                                  },\n          \'test_run_activity\' => {\n                                   \'FIELDS\' => [\n                                                 \'run_id\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'INT4\',\n                                                   \'UNSIGNED\' => 1\n                                                 },\n                                                 \'fieldid\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'INT2\',\n                                                   \'UNSIGNED\' => 1\n                                                 },\n                                                 \'who\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'INT3\'\n                                                 },\n                                                 \'changed\',\n                                                 {\n                                                   \'NOTNULL\' => 1,\n                                                   \'TYPE\' => \'DATETIME\'\n                                                 },\n                                                 \'oldvalue\',\n                                                 {\n                                                   \'TYPE\' => \'MEDIUMTEXT\'\n                                                 },\n                                                 \'newvalue\',\n                                                 {\n                                                   \'TYPE\' => \'MEDIUMTEXT\'\n                                                 }\n                                               ],\n                                   \'INDEXES\' => [\n                                                  \'run_activity_run_id_idx\',\n                                                  [\n                                                    \'run_id\'\n                                                  ],\n                                                  \'run_activity_field_idx\',\n                                                  [\n                                                    \'fieldid\'\n                                                  ],\n                                                  \'run_activity_who_idx\',\n                                                  [\n                                                    \'who\'\n                                                  ],\n                                                  \'run_activity_when_idx\',\n                                                  [\n                                                    \'changed\'\n                                                  ]\n                                                ]\n                                 },\n          \'test_run_cc\' => {\n                             \'FIELDS\' => [\n                                           \'run_id\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'INT4\',\n                                             \'UNSIGNED\' => 1\n                                           },\n                                           \'who\',\n                                           {\n                                             \'NOTNULL\' => 1,\n                                             \'TYPE\' => \'INT3\'\n                                           }\n                                         ],\n                             \'INDEXES\' => [\n                                            \'test_run_cc_primary_idx\',\n                                            {\n                                              \'FIELDS\' => [\n                                                            \'run_id\',\n                                                            \'who\'\n                                                          ],\n                                              \'TYPE\' => \'UNIQUE\'\n                                            },\n                                            \'test_run_cc_who_idx\',\n                                            [\n                                              \'who\'\n                                            ]\n                                          ]\n                           },\n          \'test_run_tags\' => {\n                               \'FIELDS\' => [\n                                             \'tag_id\',\n                                             {\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'INT4\',\n                                               \'UNSIGNED\' => 1\n                                             },\n                                             \'run_id\',\n                                             {\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'INT4\',\n                                               \'UNSIGNED\' => 1\n                                             },\n                                             \'userid\',\n                                             {\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'INT3\'\n                                             }\n                                           ],\n                               \'INDEXES\' => [\n                                              \'run_tags_primary_idx\',\n                                              {\n                                                \'FIELDS\' => [\n                                                              \'tag_id\',\n                                                              \'run_id\',\n                                                              \'userid\'\n                                                            ],\n                                                \'TYPE\' => \'UNIQUE\'\n                                              },\n                                              \'run_tags_secondary_idx\',\n                                              {\n                                                \'FIELDS\' => [\n                                                              \'tag_id\',\n                                                              \'run_id\'\n                                                            ],\n                                                \'TYPE\' => \'UNIQUE\'\n                                              },\n                                              \'run_tags_run_id_idx\',\n                                              [\n                                                \'run_id\'\n                                              ],\n                                              \'run_tags_userid_idx\',\n                                              [\n                                                \'userid\'\n                                              ]\n                                            ]\n                             },\n          \'test_runs\' => {\n                           \'FIELDS\' => [\n                                         \'run_id\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'PRIMARYKEY\' => 1,\n                                           \'TYPE\' => \'INTSERIAL\'\n                                         },\n                                         \'plan_id\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'INT4\',\n                                           \'UNSIGNED\' => 1\n                                         },\n                                         \'environment_id\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'INT4\',\n                                           \'UNSIGNED\' => 1\n                                         },\n                                         \'product_version\',\n                                         {\n                                           \'TYPE\' => \'MEDIUMTEXT\'\n                                         },\n                                         \'build_id\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'INT4\',\n                                           \'UNSIGNED\' => 1\n                                         },\n                                         \'plan_text_version\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'INT4\'\n                                         },\n                                         \'manager_id\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'INT3\'\n                                         },\n                                         \'default_tester_id\',\n                                         {\n                                           \'TYPE\' => \'INT3\'\n                                         },\n                                         \'start_date\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'DATETIME\'\n                                         },\n                                         \'stop_date\',\n                                         {\n                                           \'TYPE\' => \'DATETIME\'\n                                         },\n                                         \'summary\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'TINYTEXT\'\n                                         },\n                                         \'notes\',\n                                         {\n                                           \'TYPE\' => \'MEDIUMTEXT\'\n                                         },\n                                         \'target_pass\',\n                                         {\n                                           \'TYPE\' => \'INT1\'\n                                         },\n                                         \'target_completion\',\n                                         {\n                                           \'TYPE\' => \'INT1\'\n                                         }\n                                       ],\n                           \'INDEXES\' => [\n                                          \'test_run_plan_id_run_id_idx\',\n                                          [\n                                            \'plan_id\',\n                                            \'run_id\'\n                                          ],\n                                          \'test_run_manager_idx\',\n                                          [\n                                            \'manager_id\'\n                                          ],\n                                          \'test_run_start_date_idx\',\n                                          [\n                                            \'start_date\'\n                                          ],\n                                          \'test_run_stop_date_idx\',\n                                          [\n                                            \'stop_date\'\n                                          ],\n                                          \'test_run_env_idx\',\n                                          [\n                                            \'environment_id\'\n                                          ],\n                                          \'test_run_build_idx\',\n                                          [\n                                            \'build_id\'\n                                          ],\n                                          \'test_run_plan_ver_idx\',\n                                          [\n                                            \'plan_text_version\'\n                                          ],\n                                          \'test_run_tester_idx\',\n                                          [\n                                            \'default_tester_id\'\n                                          ]\n                                        ]\n                         },\n          \'test_tags\' => {\n                           \'FIELDS\' => [\n                                         \'tag_id\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'PRIMARYKEY\' => 1,\n                                           \'TYPE\' => \'INTSERIAL\'\n                                         },\n                                         \'tag_name\',\n                                         {\n                                           \'NOTNULL\' => 1,\n                                           \'TYPE\' => \'varchar(255)\'\n                                         }\n                                       ],\n                           \'INDEXES\' => [\n                                          \'test_tag_name_idx_v2\',\n                                          [\n                                            \'tag_name\'\n                                          ]\n                                        ]\n                         },\n          \'tokens\' => {\n                        \'FIELDS\' => [\n                                      \'userid\',\n                                      {\n                                        \'TYPE\' => \'INT3\'\n                                      },\n                                      \'issuedate\',\n                                      {\n                                        \'NOTNULL\' => 1,\n                                        \'TYPE\' => \'DATETIME\'\n                                      },\n                                      \'token\',\n                                      {\n                                        \'NOTNULL\' => 1,\n                                        \'PRIMARYKEY\' => 1,\n                                        \'TYPE\' => \'varchar(16)\'\n                                      },\n                                      \'tokentype\',\n                                      {\n                                        \'NOTNULL\' => 1,\n                                        \'TYPE\' => \'varchar(8)\'\n                                      },\n                                      \'eventdata\',\n                                      {\n                                        \'TYPE\' => \'TINYTEXT\'\n                                      }\n                                    ],\n                        \'INDEXES\' => [\n                                       \'tokens_userid_idx\',\n                                       [\n                                         \'userid\'\n                                       ]\n                                     ]\n                      },\n          \'user_group_map\' => {\n                                \'FIELDS\' => [\n                                              \'user_id\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT3\'\n                                              },\n                                              \'group_id\',\n                                              {\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT3\'\n                                              },\n                                              \'isbless\',\n                                              {\n                                                \'DEFAULT\' => \'FALSE\',\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'BOOLEAN\'\n                                              },\n                                              \'grant_type\',\n                                              {\n                                                \'DEFAULT\' => 0,\n                                                \'NOTNULL\' => 1,\n                                                \'TYPE\' => \'INT1\'\n                                              }\n                                            ],\n                                \'INDEXES\' => [\n                                               \'user_group_map_user_id_idx\',\n                                               {\n                                                 \'FIELDS\' => [\n                                                               \'user_id\',\n                                                               \'group_id\',\n                                                               \'grant_type\',\n                                                               \'isbless\'\n                                                             ],\n                                                 \'TYPE\' => \'UNIQUE\'\n                                               }\n                                             ]\n                              },\n          \'versions\' => {\n                          \'FIELDS\' => [\n                                        \'id\',\n                                        {\n                                          \'NOTNULL\' => 1,\n                                          \'PRIMARYKEY\' => 1,\n                                          \'TYPE\' => \'MEDIUMSERIAL\'\n                                        },\n                                        \'value\',\n                                        {\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'varchar(64)\'\n                                        },\n                                        \'product_id\',\n                                        {\n                                          \'NOTNULL\' => 1,\n                                          \'TYPE\' => \'INT2\'\n                                        }\n                                      ],\n                          \'INDEXES\' => [\n                                         \'versions_product_id_idx\',\n                                         {\n                                           \'FIELDS\' => [\n                                                         \'product_id\',\n                                                         \'value\'\n                                                       ],\n                                           \'TYPE\' => \'UNIQUE\'\n                                         }\n                                       ]\n                        },\n          \'votes\' => {\n                       \'FIELDS\' => [\n                                     \'who\',\n                                     {\n                                       \'NOTNULL\' => 1,\n                                       \'TYPE\' => \'INT3\'\n                                     },\n                                     \'bug_id\',\n                                     {\n                                       \'NOTNULL\' => 1,\n                                       \'TYPE\' => \'INT3\'\n                                     },\n                                     \'vote_count\',\n                                     {\n                                       \'NOTNULL\' => 1,\n                                       \'TYPE\' => \'INT2\'\n                                     }\n                                   ],\n                       \'INDEXES\' => [\n                                      \'votes_who_idx\',\n                                      [\n                                        \'who\'\n                                      ],\n                                      \'votes_bug_id_idx\',\n                                      [\n                                        \'bug_id\'\n                                      ]\n                                    ]\n                     },\n          \'watch\' => {\n                       \'FIELDS\' => [\n                                     \'watcher\',\n                                     {\n                                       \'NOTNULL\' => 1,\n                                       \'TYPE\' => \'INT3\'\n                                     },\n                                     \'watched\',\n                                     {\n                                       \'NOTNULL\' => 1,\n                                       \'TYPE\' => \'INT3\'\n                                     }\n                                   ],\n                       \'INDEXES\' => [\n                                      \'watch_watcher_idx\',\n                                      {\n                                        \'FIELDS\' => [\n                                                      \'watcher\',\n                                                      \'watched\'\n                                                    ],\n                                        \'TYPE\' => \'UNIQUE\'\n                                      },\n                                      \'watch_watched_idx\',\n                                      [\n                                        \'watched\'\n                                      ]\n                                    ]\n                     },\n          \'whine_events\' => {\n                              \'FIELDS\' => [\n                                            \'id\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'PRIMARYKEY\' => 1,\n                                              \'TYPE\' => \'MEDIUMSERIAL\'\n                                            },\n                                            \'owner_userid\',\n                                            {\n                                              \'NOTNULL\' => 1,\n                                              \'TYPE\' => \'INT3\'\n                                            },\n                                            \'subject\',\n                                            {\n                                              \'TYPE\' => \'varchar(128)\'\n                                            },\n                                            \'body\',\n                                            {\n                                              \'TYPE\' => \'MEDIUMTEXT\'\n                                            }\n                                          ]\n                            },\n          \'whine_queries\' => {\n                               \'FIELDS\' => [\n                                             \'id\',\n                                             {\n                                               \'NOTNULL\' => 1,\n                                               \'PRIMARYKEY\' => 1,\n                                               \'TYPE\' => \'MEDIUMSERIAL\'\n                                             },\n                                             \'eventid\',\n                                             {\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'INT3\'\n                                             },\n                                             \'query_name\',\n                                             {\n                                               \'DEFAULT\' => \'\\\'\\\'\',\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'varchar(64)\'\n                                             },\n                                             \'sortkey\',\n                                             {\n                                               \'DEFAULT\' => \'0\',\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'INT2\'\n                                             },\n                                             \'onemailperbug\',\n                                             {\n                                               \'DEFAULT\' => \'FALSE\',\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'BOOLEAN\'\n                                             },\n                                             \'title\',\n                                             {\n                                               \'DEFAULT\' => \'\\\'\\\'\',\n                                               \'NOTNULL\' => 1,\n                                               \'TYPE\' => \'varchar(128)\'\n                                             }\n                                           ],\n                               \'INDEXES\' => [\n                                              \'whine_queries_eventid_idx\',\n                                              [\n                                                \'eventid\'\n                                              ]\n                                            ]\n                             },\n          \'whine_schedules\' => {\n                                 \'FIELDS\' => [\n                                               \'id\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'PRIMARYKEY\' => 1,\n                                                 \'TYPE\' => \'MEDIUMSERIAL\'\n                                               },\n                                               \'eventid\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'INT3\'\n                                               },\n                                               \'run_day\',\n                                               {\n                                                 \'TYPE\' => \'varchar(32)\'\n                                               },\n                                               \'run_time\',\n                                               {\n                                                 \'TYPE\' => \'varchar(32)\'\n                                               },\n                                               \'run_next\',\n                                               {\n                                                 \'TYPE\' => \'DATETIME\'\n                                               },\n                                               \'mailto\',\n                                               {\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'INT3\'\n                                               },\n                                               \'mailto_type\',\n                                               {\n                                                 \'DEFAULT\' => \'0\',\n                                                 \'NOTNULL\' => 1,\n                                                 \'TYPE\' => \'INT2\'\n                                               }\n                                             ],\n                                 \'INDEXES\' => [\n                                                \'whine_schedules_run_next_idx\',\n                                                [\n                                                  \'run_next\'\n                                                ],\n                                                \'whine_schedules_eventid_idx\',\n                                                [\n                                                  \'eventid\'\n                                                ]\n                                              ]\n                               }\n        };\n','2.00');
-/*!40000 ALTER TABLE `bz_schema` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `category_group_map`
@@ -286,15 +335,6 @@ CREATE TABLE `category_group_map` (
   UNIQUE KEY `category_group_map_category_id_idx` (`category_id`,`group_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `category_group_map`
---
-
-LOCK TABLES `category_group_map` WRITE;
-/*!40000 ALTER TABLE `category_group_map` DISABLE KEYS */;
-/*!40000 ALTER TABLE `category_group_map` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `cc`
@@ -312,15 +352,6 @@ CREATE TABLE `cc` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `cc`
---
-
-LOCK TABLES `cc` WRITE;
-/*!40000 ALTER TABLE `cc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `cc` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `classifications`
 --
 
@@ -328,24 +359,14 @@ DROP TABLE IF EXISTS `classifications`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `classifications` (
-  `id` smallint(6) NOT NULL AUTO_INCREMENT,
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
   `description` mediumtext,
   `sortkey` smallint(6) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `classifications_name_idx` (`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `classifications`
---
-
-LOCK TABLES `classifications` WRITE;
-/*!40000 ALTER TABLE `classifications` DISABLE KEYS */;
-INSERT INTO `classifications` VALUES (1,'Unclassified','Not assigned to any classification',0);
-/*!40000 ALTER TABLE `classifications` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `component_cc`
@@ -362,15 +383,6 @@ CREATE TABLE `component_cc` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `component_cc`
---
-
-LOCK TABLES `component_cc` WRITE;
-/*!40000 ALTER TABLE `component_cc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `component_cc` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `components`
 --
 
@@ -378,7 +390,7 @@ DROP TABLE IF EXISTS `components`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `components` (
-  `id` smallint(6) NOT NULL AUTO_INCREMENT,
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
   `product_id` smallint(6) NOT NULL,
   `initialowner` mediumint(9) NOT NULL,
@@ -387,18 +399,8 @@ CREATE TABLE `components` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `components_product_id_idx` (`product_id`,`name`),
   KEY `components_name_idx` (`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=59267 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `components`
---
-
-LOCK TABLES `components` WRITE;
-/*!40000 ALTER TABLE `components` DISABLE KEYS */;
-INSERT INTO `components` VALUES (1,'TestComponent',1,1,NULL,'This is a test component in the test product database. This ought to be blown away and replaced with real stuff in a finished installation of Bugzilla.');
-/*!40000 ALTER TABLE `components` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `dependencies`
@@ -416,13 +418,120 @@ CREATE TABLE `dependencies` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `dependencies`
+-- Table structure for table `django_admin_log`
 --
 
-LOCK TABLES `dependencies` WRITE;
-/*!40000 ALTER TABLE `dependencies` DISABLE KEYS */;
-/*!40000 ALTER TABLE `dependencies` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `django_admin_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `django_admin_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `action_time` datetime NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `content_type_id` int(11) DEFAULT NULL,
+  `object_id` longtext,
+  `object_repr` varchar(200) NOT NULL,
+  `action_flag` smallint(5) unsigned NOT NULL,
+  `change_message` longtext NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `django_admin_log_user_id` (`user_id`),
+  KEY `django_admin_log_content_type_id` (`content_type_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=6331 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `django_comment_flags`
+--
+
+DROP TABLE IF EXISTS `django_comment_flags`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `django_comment_flags` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `comment_id` int(11) NOT NULL,
+  `flag` varchar(30) NOT NULL,
+  `flag_date` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`,`comment_id`,`flag`),
+  KEY `comment_id_refs_id_373a05f7` (`comment_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=5670 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `django_comments`
+--
+
+DROP TABLE IF EXISTS `django_comments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `django_comments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `content_type_id` int(11) NOT NULL,
+  `object_pk` longtext NOT NULL,
+  `site_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `user_name` varchar(50) NOT NULL,
+  `user_email` varchar(75) NOT NULL,
+  `user_url` varchar(200) NOT NULL,
+  `comment` longtext NOT NULL,
+  `submit_date` datetime NOT NULL,
+  `ip_address` char(15) DEFAULT NULL,
+  `is_public` tinyint(1) NOT NULL,
+  `is_removed` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `content_type_id_refs_id_f2a7975b` (`content_type_id`),
+  KEY `site_id_refs_id_8db720f8` (`site_id`),
+  KEY `user_id_refs_id_81622011` (`user_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=607940 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `django_content_type`
+--
+
+DROP TABLE IF EXISTS `django_content_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `django_content_type` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `app_label` varchar(100) NOT NULL,
+  `model` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `app_label` (`app_label`,`model`)
+) ENGINE=MyISAM AUTO_INCREMENT=79 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `django_session`
+--
+
+DROP TABLE IF EXISTS `django_session`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `django_session` (
+  `session_key` varchar(40) NOT NULL,
+  `session_data` longtext NOT NULL,
+  `expire_date` datetime NOT NULL,
+  PRIMARY KEY (`session_key`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `django_site`
+--
+
+DROP TABLE IF EXISTS `django_site`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `django_site` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `domain` varchar(100) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `duplicates`
@@ -437,15 +546,6 @@ CREATE TABLE `duplicates` (
   PRIMARY KEY (`dupe`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `duplicates`
---
-
-LOCK TABLES `duplicates` WRITE;
-/*!40000 ALTER TABLE `duplicates` DISABLE KEYS */;
-/*!40000 ALTER TABLE `duplicates` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `email_setting`
@@ -463,16 +563,6 @@ CREATE TABLE `email_setting` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `email_setting`
---
-
-LOCK TABLES `email_setting` WRITE;
-/*!40000 ALTER TABLE `email_setting` DISABLE KEYS */;
-INSERT INTO `email_setting` VALUES (1,0,0),(1,0,1),(1,0,2),(1,0,3),(1,0,4),(1,0,5),(1,0,6),(1,0,7),(1,0,9),(1,0,50),(1,1,0),(1,1,1),(1,1,2),(1,1,3),(1,1,4),(1,1,5),(1,1,6),(1,1,7),(1,1,9),(1,1,50),(1,2,0),(1,2,1),(1,2,2),(1,2,3),(1,2,4),(1,2,5),(1,2,6),(1,2,7),(1,2,8),(1,2,9),(1,2,50),(1,3,0),(1,3,1),(1,3,2),(1,3,3),(1,3,4),(1,3,5),(1,3,6),(1,3,7),(1,3,9),(1,3,50),(1,4,0),(1,4,1),(1,4,2),(1,4,3),(1,4,4),(1,4,5),(1,4,6),(1,4,7),(1,4,9),(1,4,50),(1,5,0),(1,5,1),(1,5,2),(1,5,3),(1,5,4),(1,5,5),(1,5,6),(1,5,7),(1,5,9),(1,5,50),(1,100,100),(1,100,101);
-/*!40000 ALTER TABLE `email_setting` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `fielddefs`
 --
 
@@ -482,28 +572,18 @@ DROP TABLE IF EXISTS `fielddefs`;
 CREATE TABLE `fielddefs` (
   `id` mediumint(9) NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
-  `type` smallint(6) NOT NULL DEFAULT '0',
-  `custom` tinyint(4) NOT NULL DEFAULT '0',
   `description` mediumtext NOT NULL,
   `mailhead` tinyint(4) NOT NULL DEFAULT '0',
   `sortkey` smallint(6) NOT NULL,
   `obsolete` tinyint(4) NOT NULL DEFAULT '0',
+  `type` smallint(6) NOT NULL DEFAULT '0',
+  `custom` tinyint(4) NOT NULL DEFAULT '0',
   `enter_bug` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `fielddefs_name_idx` (`name`),
   KEY `fielddefs_sortkey_idx` (`sortkey`)
 ) ENGINE=MyISAM AUTO_INCREMENT=54 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `fielddefs`
---
-
-LOCK TABLES `fielddefs` WRITE;
-/*!40000 ALTER TABLE `fielddefs` DISABLE KEYS */;
-INSERT INTO `fielddefs` VALUES (1,'bug_id',0,0,'Bug #',1,100,0,0),(2,'short_desc',0,0,'Summary',1,200,0,0),(3,'classification',0,0,'Classification',1,300,0,0),(4,'product',0,0,'Product',1,400,0,0),(5,'version',0,0,'Version',1,500,0,0),(6,'rep_platform',0,0,'Platform',1,600,0,0),(7,'bug_file_loc',0,0,'URL',1,700,0,0),(8,'op_sys',0,0,'OS/Version',1,800,0,0),(9,'bug_status',0,0,'Status',1,900,0,0),(10,'status_whiteboard',0,0,'Status Whiteboard',1,1000,0,0),(11,'keywords',0,0,'Keywords',1,1100,0,0),(12,'resolution',0,0,'Resolution',0,1200,0,0),(13,'bug_severity',0,0,'Severity',1,1300,0,0),(14,'priority',0,0,'Priority',1,1400,0,0),(15,'component',0,0,'Component',1,1500,0,0),(16,'assigned_to',0,0,'AssignedTo',1,1600,0,0),(17,'reporter',0,0,'ReportedBy',1,1700,0,0),(18,'votes',0,0,'Votes',0,1800,0,0),(19,'qa_contact',0,0,'QAContact',1,1900,0,0),(20,'cc',0,0,'CC',1,2000,0,0),(21,'dependson',0,0,'Depends on',1,2100,0,0),(22,'blocked',0,0,'Blocks',1,2200,0,0),(23,'attachments.description',0,0,'Attachment description',0,2300,0,0),(24,'attachments.filename',0,0,'Attachment filename',0,2400,0,0),(25,'attachments.mimetype',0,0,'Attachment mime type',0,2500,0,0),(26,'attachments.ispatch',0,0,'Attachment is patch',0,2600,0,0),(27,'attachments.isobsolete',0,0,'Attachment is obsolete',0,2700,0,0),(28,'attachments.isprivate',0,0,'Attachment is private',0,2800,0,0),(29,'attachments.submitter',0,0,'Attachment creator',0,2900,0,0),(30,'target_milestone',0,0,'Target Milestone',0,3000,0,0),(31,'creation_ts',0,0,'Creation date',1,3100,0,0),(32,'delta_ts',0,0,'Last changed date',1,3200,0,0),(33,'longdesc',0,0,'Comment',0,3300,0,0),(34,'longdescs.isprivate',0,0,'Comment is private',0,3400,0,0),(35,'alias',0,0,'Alias',0,3500,0,0),(36,'everconfirmed',0,0,'Ever Confirmed',0,3600,0,0),(37,'reporter_accessible',0,0,'Reporter Accessible',0,3700,0,0),(38,'cclist_accessible',0,0,'CC Accessible',0,3800,0,0),(39,'bug_group',0,0,'Group',0,3900,0,0),(40,'estimated_time',0,0,'Estimated Hours',1,4000,0,0),(41,'remaining_time',0,0,'Remaining Hours',0,4100,0,0),(42,'deadline',0,0,'Deadline',1,4200,0,0),(43,'commenter',0,0,'Commenter',0,4300,0,0),(44,'flagtypes.name',0,0,'Flag',0,4400,0,0),(45,'requestees.login_name',0,0,'Flag Requestee',0,4500,0,0),(46,'setters.login_name',0,0,'Flag Setter',0,4600,0,0),(47,'work_time',0,0,'Hours Worked',0,4700,0,0),(48,'percentage_complete',0,0,'Percentage Complete',0,4800,0,0),(49,'content',0,0,'Content',0,4900,0,0),(50,'attach_data.thedata',0,0,'Attachment data',0,5000,0,0),(51,'attachments.isurl',0,0,'Attachment is a URL',0,5100,0,0),(52,'owner_idle_time',0,0,'Time Since Assignee Touched',0,5200,0,0),(53,'days_elapsed',0,0,'Days since bug changed',0,5300,0,0);
-/*!40000 ALTER TABLE `fielddefs` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `flagexclusions`
@@ -521,15 +601,6 @@ CREATE TABLE `flagexclusions` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `flagexclusions`
---
-
-LOCK TABLES `flagexclusions` WRITE;
-/*!40000 ALTER TABLE `flagexclusions` DISABLE KEYS */;
-/*!40000 ALTER TABLE `flagexclusions` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `flaginclusions`
 --
 
@@ -543,15 +614,6 @@ CREATE TABLE `flaginclusions` (
   KEY `flaginclusions_type_id_idx` (`type_id`,`product_id`,`component_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `flaginclusions`
---
-
-LOCK TABLES `flaginclusions` WRITE;
-/*!40000 ALTER TABLE `flaginclusions` DISABLE KEYS */;
-/*!40000 ALTER TABLE `flaginclusions` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `flags`
@@ -579,15 +641,6 @@ CREATE TABLE `flags` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `flags`
---
-
-LOCK TABLES `flags` WRITE;
-/*!40000 ALTER TABLE `flags` DISABLE KEYS */;
-/*!40000 ALTER TABLE `flags` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `flagtypes`
 --
 
@@ -612,15 +665,6 @@ CREATE TABLE `flagtypes` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `flagtypes`
---
-
-LOCK TABLES `flagtypes` WRITE;
-/*!40000 ALTER TABLE `flagtypes` DISABLE KEYS */;
-/*!40000 ALTER TABLE `flagtypes` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `group_control_map`
 --
 
@@ -643,15 +687,6 @@ CREATE TABLE `group_control_map` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `group_control_map`
---
-
-LOCK TABLES `group_control_map` WRITE;
-/*!40000 ALTER TABLE `group_control_map` DISABLE KEYS */;
-/*!40000 ALTER TABLE `group_control_map` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `group_group_map`
 --
 
@@ -667,16 +702,6 @@ CREATE TABLE `group_group_map` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `group_group_map`
---
-
-LOCK TABLES `group_group_map` WRITE;
-/*!40000 ALTER TABLE `group_group_map` DISABLE KEYS */;
-INSERT INTO `group_group_map` VALUES (2,2,0),(2,2,1),(2,2,2),(2,3,0),(2,3,1),(2,3,2),(2,4,0),(2,4,1),(2,4,2),(2,5,0),(2,5,1),(2,5,2),(2,6,0),(2,6,1),(2,6,2),(2,7,0),(2,7,1),(2,7,2),(2,8,0),(2,8,1),(2,8,2),(2,9,0),(2,9,1),(2,9,2),(2,10,0),(2,10,1),(2,10,2),(2,11,0),(2,11,1),(2,11,2),(2,12,0),(2,12,1),(2,12,2),(2,13,0),(2,13,1),(2,13,2),(2,14,0),(2,14,1),(2,14,2),(12,14,0),(13,11,0);
-/*!40000 ALTER TABLE `group_group_map` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `groups`
 --
 
@@ -684,7 +709,7 @@ DROP TABLE IF EXISTS `groups`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `groups` (
-  `id` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `description` text NOT NULL,
   `isbuggroup` tinyint(4) NOT NULL,
@@ -692,18 +717,8 @@ CREATE TABLE `groups` (
   `isactive` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `groups_name_idx` (`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `groups`
---
-
-LOCK TABLES `groups` WRITE;
-/*!40000 ALTER TABLE `groups` DISABLE KEYS */;
-INSERT INTO `groups` VALUES (1,'Testers','Can read and write all test plans, runs, and cases.',0,'',1),(2,'admin','Administrators',0,'',1),(3,'tweakparams','Can change Parameters',0,'',1),(4,'editusers','Can edit or disable users',0,'',1),(5,'creategroups','Can create and destroy groups',0,'',1),(6,'editclassifications','Can create, destroy, and edit classifications',0,'',1),(7,'editcomponents','Can create, destroy, and edit components',0,'',1),(8,'editkeywords','Can create, destroy, and edit keywords',0,'',1),(9,'editbugs','Can edit all bug fields',0,'.*',1),(10,'canconfirm','Can confirm a bug or mark it a duplicate',0,'',1),(11,'bz_canusewhines','User can configure whine reports for self',0,'',1),(12,'bz_sudoers','Can perform actions as other users',0,'',1),(13,'bz_canusewhineatothers','Can configure whine reports for other users',0,'',1),(14,'bz_sudo_protect','Can not be impersonated by other users',0,'',1);
-/*!40000 ALTER TABLE `groups` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `keyworddefs`
@@ -722,15 +737,6 @@ CREATE TABLE `keyworddefs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `keyworddefs`
---
-
-LOCK TABLES `keyworddefs` WRITE;
-/*!40000 ALTER TABLE `keyworddefs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `keyworddefs` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `keywords`
 --
 
@@ -744,15 +750,6 @@ CREATE TABLE `keywords` (
   KEY `keywords_keywordid_idx` (`keywordid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `keywords`
---
-
-LOCK TABLES `keywords` WRITE;
-/*!40000 ALTER TABLE `keywords` DISABLE KEYS */;
-/*!40000 ALTER TABLE `keywords` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `logincookies`
@@ -772,15 +769,6 @@ CREATE TABLE `logincookies` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `logincookies`
---
-
-LOCK TABLES `logincookies` WRITE;
-/*!40000 ALTER TABLE `logincookies` DISABLE KEYS */;
-/*!40000 ALTER TABLE `logincookies` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `longdescs`
 --
 
@@ -788,7 +776,6 @@ DROP TABLE IF EXISTS `longdescs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `longdescs` (
-  `comment_id` mediumint(9) NOT NULL AUTO_INCREMENT,
   `bug_id` mediumint(9) NOT NULL,
   `who` mediumint(9) NOT NULL,
   `bug_when` datetime NOT NULL,
@@ -796,24 +783,16 @@ CREATE TABLE `longdescs` (
   `thetext` mediumtext NOT NULL,
   `isprivate` tinyint(4) NOT NULL DEFAULT '0',
   `already_wrapped` tinyint(4) NOT NULL DEFAULT '0',
+  `comment_id` mediumint(9) NOT NULL AUTO_INCREMENT,
   `type` smallint(6) NOT NULL DEFAULT '0',
   `extra_data` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`comment_id`),
   KEY `longdescs_bug_id_idx` (`bug_id`),
-  KEY `longdescs_who_idx` (`who`,`bug_id`),
   KEY `longdescs_bug_when_idx` (`bug_when`),
+  KEY `longdescs_who_idx` (`who`,`bug_id`),
   FULLTEXT KEY `longdescs_thetext_idx` (`thetext`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `longdescs`
---
-
-LOCK TABLES `longdescs` WRITE;
-/*!40000 ALTER TABLE `longdescs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `longdescs` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `milestones`
@@ -823,24 +802,14 @@ DROP TABLE IF EXISTS `milestones`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `milestones` (
-  `id` mediumint(9) NOT NULL AUTO_INCREMENT,
   `product_id` smallint(6) NOT NULL,
   `value` varchar(20) NOT NULL,
   `sortkey` smallint(6) NOT NULL DEFAULT '0',
+  `id` mediumint(9) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`),
   UNIQUE KEY `milestones_product_id_idx` (`product_id`,`value`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=160 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `milestones`
---
-
-LOCK TABLES `milestones` WRITE;
-/*!40000 ALTER TABLE `milestones` DISABLE KEYS */;
-INSERT INTO `milestones` VALUES (1,1,'---',0);
-/*!40000 ALTER TABLE `milestones` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `namedqueries`
@@ -850,24 +819,15 @@ DROP TABLE IF EXISTS `namedqueries`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `namedqueries` (
-  `id` mediumint(9) NOT NULL AUTO_INCREMENT,
   `userid` mediumint(9) NOT NULL,
   `name` varchar(64) NOT NULL,
   `query` mediumtext NOT NULL,
   `query_type` tinyint(4) NOT NULL,
+  `id` mediumint(9) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`),
   UNIQUE KEY `namedqueries_userid_idx` (`userid`,`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `namedqueries`
---
-
-LOCK TABLES `namedqueries` WRITE;
-/*!40000 ALTER TABLE `namedqueries` DISABLE KEYS */;
-/*!40000 ALTER TABLE `namedqueries` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `namedqueries_link_in_footer`
@@ -885,15 +845,6 @@ CREATE TABLE `namedqueries_link_in_footer` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `namedqueries_link_in_footer`
---
-
-LOCK TABLES `namedqueries_link_in_footer` WRITE;
-/*!40000 ALTER TABLE `namedqueries_link_in_footer` DISABLE KEYS */;
-/*!40000 ALTER TABLE `namedqueries_link_in_footer` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `namedquery_group_map`
 --
 
@@ -909,15 +860,6 @@ CREATE TABLE `namedquery_group_map` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `namedquery_group_map`
---
-
-LOCK TABLES `namedquery_group_map` WRITE;
-/*!40000 ALTER TABLE `namedquery_group_map` DISABLE KEYS */;
-/*!40000 ALTER TABLE `namedquery_group_map` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `op_sys`
 --
 
@@ -925,7 +867,7 @@ DROP TABLE IF EXISTS `op_sys`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `op_sys` (
-  `id` smallint(6) NOT NULL AUTO_INCREMENT,
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `value` varchar(64) NOT NULL,
   `sortkey` smallint(6) NOT NULL DEFAULT '0',
   `isactive` tinyint(4) NOT NULL DEFAULT '1',
@@ -936,16 +878,6 @@ CREATE TABLE `op_sys` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `op_sys`
---
-
-LOCK TABLES `op_sys` WRITE;
-/*!40000 ALTER TABLE `op_sys` DISABLE KEYS */;
-INSERT INTO `op_sys` VALUES (1,'All',100,1),(2,'Windows',200,1),(3,'Mac OS',300,1),(4,'Linux',400,1),(5,'Other',500,1);
-/*!40000 ALTER TABLE `op_sys` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `priority`
 --
 
@@ -953,7 +885,7 @@ DROP TABLE IF EXISTS `priority`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `priority` (
-  `id` smallint(6) NOT NULL AUTO_INCREMENT,
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `value` varchar(64) NOT NULL,
   `sortkey` smallint(6) NOT NULL DEFAULT '0',
   `isactive` tinyint(4) NOT NULL DEFAULT '1',
@@ -964,16 +896,6 @@ CREATE TABLE `priority` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `priority`
---
-
-LOCK TABLES `priority` WRITE;
-/*!40000 ALTER TABLE `priority` DISABLE KEYS */;
-INSERT INTO `priority` VALUES (1,'P1',100,1),(2,'P2',200,1),(3,'P3',300,1),(4,'P4',400,1),(5,'P5',500,1);
-/*!40000 ALTER TABLE `priority` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `products`
 --
 
@@ -981,7 +903,7 @@ DROP TABLE IF EXISTS `products`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `products` (
-  `id` smallint(6) NOT NULL AUTO_INCREMENT,
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
   `classification_id` smallint(6) NOT NULL DEFAULT '1',
   `description` mediumtext,
@@ -993,18 +915,8 @@ CREATE TABLE `products` (
   `defaultmilestone` varchar(20) NOT NULL DEFAULT '---',
   PRIMARY KEY (`id`),
   UNIQUE KEY `products_name_idx` (`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=346 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `products`
---
-
-LOCK TABLES `products` WRITE;
-/*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (1,'TestProduct',1,'This is a test product. This ought to be blown away and replaced with real stuff in a finished installation of bugzilla.','',0,0,10000,0,'---');
-/*!40000 ALTER TABLE `products` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `profile_setting`
@@ -1022,15 +934,6 @@ CREATE TABLE `profile_setting` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `profile_setting`
---
-
-LOCK TABLES `profile_setting` WRITE;
-/*!40000 ALTER TABLE `profile_setting` DISABLE KEYS */;
-/*!40000 ALTER TABLE `profile_setting` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `profiles`
 --
 
@@ -1038,28 +941,18 @@ DROP TABLE IF EXISTS `profiles`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `profiles` (
-  `userid` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `userid` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `login_name` varchar(255) NOT NULL,
   `cryptpassword` varchar(128) DEFAULT NULL,
   `realname` varchar(255) NOT NULL DEFAULT '',
   `disabledtext` mediumtext NOT NULL,
-  `disable_mail` tinyint(4) NOT NULL DEFAULT '0',
   `mybugslink` tinyint(4) NOT NULL DEFAULT '1',
   `extern_id` varchar(64) DEFAULT NULL,
+  `disable_mail` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`userid`),
   UNIQUE KEY `profiles_login_name_idx` (`login_name`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=2378 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `profiles`
---
-
-LOCK TABLES `profiles` WRITE;
-/*!40000 ALTER TABLE `profiles` DISABLE KEYS */;
-INSERT INTO `profiles` VALUES (1,'xkuang@redhat.com','3A/R.RyPQaJr6','Xuqing Kuang','',0,1,NULL);
-/*!40000 ALTER TABLE `profiles` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `profiles_activity`
@@ -1082,16 +975,6 @@ CREATE TABLE `profiles_activity` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `profiles_activity`
---
-
-LOCK TABLES `profiles_activity` WRITE;
-/*!40000 ALTER TABLE `profiles_activity` DISABLE KEYS */;
-INSERT INTO `profiles_activity` VALUES (1,1,'2009-07-24 17:52:03',31,NULL,'2009-07-24 17:52:03');
-/*!40000 ALTER TABLE `profiles_activity` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `quips`
 --
 
@@ -1099,22 +982,13 @@ DROP TABLE IF EXISTS `quips`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `quips` (
-  `quipid` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `quipid` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `userid` mediumint(9) DEFAULT NULL,
   `quip` text NOT NULL,
   `approved` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`quipid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `quips`
---
-
-LOCK TABLES `quips` WRITE;
-/*!40000 ALTER TABLE `quips` DISABLE KEYS */;
-/*!40000 ALTER TABLE `quips` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `rep_platform`
@@ -1124,7 +998,7 @@ DROP TABLE IF EXISTS `rep_platform`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `rep_platform` (
-  `id` smallint(6) NOT NULL AUTO_INCREMENT,
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `value` varchar(64) NOT NULL,
   `sortkey` smallint(6) NOT NULL DEFAULT '0',
   `isactive` tinyint(4) NOT NULL DEFAULT '1',
@@ -1135,16 +1009,6 @@ CREATE TABLE `rep_platform` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `rep_platform`
---
-
-LOCK TABLES `rep_platform` WRITE;
-/*!40000 ALTER TABLE `rep_platform` DISABLE KEYS */;
-INSERT INTO `rep_platform` VALUES (1,'All',100,1),(2,'PC',200,1),(3,'Macintosh',300,1),(4,'Other',400,1);
-/*!40000 ALTER TABLE `rep_platform` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `resolution`
 --
 
@@ -1152,25 +1016,15 @@ DROP TABLE IF EXISTS `resolution`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `resolution` (
-  `id` smallint(6) NOT NULL AUTO_INCREMENT,
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `value` varchar(64) NOT NULL,
   `sortkey` smallint(6) NOT NULL DEFAULT '0',
   `isactive` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `resolution_value_idx` (`value`),
   KEY `resolution_sortkey_idx` (`sortkey`,`value`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `resolution`
---
-
-LOCK TABLES `resolution` WRITE;
-/*!40000 ALTER TABLE `resolution` DISABLE KEYS */;
-INSERT INTO `resolution` VALUES (1,'',100,1),(2,'FIXED',200,1),(3,'INVALID',300,1),(4,'WONTFIX',400,1),(5,'DUPLICATE',500,1),(6,'WORKSFORME',600,1),(7,'MOVED',700,1);
-/*!40000 ALTER TABLE `resolution` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `series`
@@ -1180,7 +1034,7 @@ DROP TABLE IF EXISTS `series`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `series` (
-  `series_id` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `series_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `creator` mediumint(9) DEFAULT NULL,
   `category` smallint(6) NOT NULL,
   `subcategory` smallint(6) NOT NULL,
@@ -1191,17 +1045,8 @@ CREATE TABLE `series` (
   `is_public` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`series_id`),
   UNIQUE KEY `series_creator_idx` (`creator`,`category`,`subcategory`,`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=543 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `series`
---
-
-LOCK TABLES `series` WRITE;
-/*!40000 ALTER TABLE `series` DISABLE KEYS */;
-/*!40000 ALTER TABLE `series` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `series_categories`
@@ -1211,21 +1056,12 @@ DROP TABLE IF EXISTS `series_categories`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `series_categories` (
-  `id` smallint(6) NOT NULL AUTO_INCREMENT,
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `series_categories_name_idx` (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=228 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `series_categories`
---
-
-LOCK TABLES `series_categories` WRITE;
-/*!40000 ALTER TABLE `series_categories` DISABLE KEYS */;
-/*!40000 ALTER TABLE `series_categories` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `series_data`
@@ -1241,15 +1077,6 @@ CREATE TABLE `series_data` (
   UNIQUE KEY `series_data_series_id_idx` (`series_id`,`series_date`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `series_data`
---
-
-LOCK TABLES `series_data` WRITE;
-/*!40000 ALTER TABLE `series_data` DISABLE KEYS */;
-/*!40000 ALTER TABLE `series_data` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `setting`
@@ -1268,16 +1095,6 @@ CREATE TABLE `setting` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `setting`
---
-
-LOCK TABLES `setting` WRITE;
-/*!40000 ALTER TABLE `setting` DISABLE KEYS */;
-INSERT INTO `setting` VALUES ('skin','standard',1,'Skin'),('lang','en',1,NULL),('post_bug_submit_action','next_bug',1,NULL),('per_bug_queries','off',1,NULL),('zoom_textareas','on',1,NULL),('csv_colsepchar',',',1,NULL),('state_addselfcc','cc_unless_role',1,NULL),('comment_sort_order','oldest_to_newest',1,NULL),('display_quips','on',1,NULL);
-/*!40000 ALTER TABLE `setting` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `setting_value`
 --
 
@@ -1294,14 +1111,334 @@ CREATE TABLE `setting_value` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `setting_value`
+-- Table structure for table `tcms_bookmark_categories`
 --
 
-LOCK TABLES `setting_value` WRITE;
-/*!40000 ALTER TABLE `setting_value` DISABLE KEYS */;
-INSERT INTO `setting_value` VALUES ('lang','en',5),('post_bug_submit_action','next_bug',5),('post_bug_submit_action','same_bug',10),('post_bug_submit_action','nothing',15),('per_bug_queries','on',5),('per_bug_queries','off',10),('zoom_textareas','on',5),('zoom_textareas','off',10),('csv_colsepchar',',',5),('csv_colsepchar',';',10),('state_addselfcc','always',5),('state_addselfcc','never',10),('state_addselfcc','cc_unless_role',15),('comment_sort_order','oldest_to_newest',5),('comment_sort_order','newest_to_oldest',10),('comment_sort_order','newest_to_oldest_desc_first',15),('display_quips','on',5),('display_quips','off',10);
-/*!40000 ALTER TABLE `setting_value` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `tcms_bookmark_categories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tcms_bookmark_categories` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `name` varchar(1024) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `tcms_bookmark_categories_fbfc09f1` (`user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tcms_bookmarks`
+--
+
+DROP TABLE IF EXISTS `tcms_bookmarks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tcms_bookmarks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `content_type_id` int(11) DEFAULT NULL,
+  `object_pk` longtext,
+  `site_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `category_id` int(11) DEFAULT NULL,
+  `name` varchar(1024) NOT NULL,
+  `description` longtext,
+  `url` varchar(8192) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `tcms_bookmarks_e4470c6e` (`content_type_id`),
+  KEY `tcms_bookmarks_6223029` (`site_id`),
+  KEY `tcms_bookmarks_fbfc09f1` (`user_id`),
+  KEY `tcms_bookmarks_42dc49bc` (`category_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=312 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tcms_contacts`
+--
+
+DROP TABLE IF EXISTS `tcms_contacts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tcms_contacts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `content_type_id` int(11) DEFAULT NULL,
+  `object_pk` longtext,
+  `site_id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `email` varchar(75) NOT NULL,
+  `date_joined` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `content_type_id_refs_id_ffc690d8` (`content_type_id`),
+  KEY `site_id_refs_id_cd57d185` (`site_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=363 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tcms_env_group_property_map`
+--
+
+DROP TABLE IF EXISTS `tcms_env_group_property_map`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tcms_env_group_property_map` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `group_id` int(11) NOT NULL,
+  `property_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `tcms_env_group_property_map_group_id` (`group_id`),
+  KEY `tcms_env_group_property_map_property_id` (`property_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1236 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tcms_env_groups`
+--
+
+DROP TABLE IF EXISTS `tcms_env_groups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tcms_env_groups` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `manager_id` int(11) NOT NULL,
+  `modified_by_id` int(11) DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  KEY `tcms_env_groups_manager_id` (`manager_id`),
+  KEY `tcms_env_groups_modified_by_id` (`modified_by_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=75 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tcms_env_plan_map`
+--
+
+DROP TABLE IF EXISTS `tcms_env_plan_map`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tcms_env_plan_map` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `plan_id` int(11) NOT NULL,
+  `group_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `tcms_env_plan_map_plan_id` (`plan_id`),
+  KEY `tcms_env_plan_map_group_id` (`group_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=13010 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tcms_env_properties`
+--
+
+DROP TABLE IF EXISTS `tcms_env_properties`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tcms_env_properties` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `is_active` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=MyISAM AUTO_INCREMENT=216 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tcms_env_run_value_map`
+--
+
+DROP TABLE IF EXISTS `tcms_env_run_value_map`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tcms_env_run_value_map` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `run_id` int(11) NOT NULL,
+  `value_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `tcms_env_run_value_map_run_id` (`run_id`),
+  KEY `tcms_env_run_value_map_value_id` (`value_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=108995 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tcms_env_values`
+--
+
+DROP TABLE IF EXISTS `tcms_env_values`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tcms_env_values` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `value` varchar(255) NOT NULL,
+  `property_id` int(11) NOT NULL,
+  `is_active` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `property_id` (`property_id`,`value`),
+  KEY `tcms_env_values_property_id` (`property_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2566 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tcms_linkrefs`
+--
+
+DROP TABLE IF EXISTS `tcms_linkrefs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tcms_linkrefs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `content_type_id` int(11) DEFAULT NULL,
+  `object_pk` longtext,
+  `site_id` int(11) NOT NULL,
+  `name` varchar(64) NOT NULL,
+  `url` longtext NOT NULL,
+  `created_on` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `tcms_linkrefs_1bb8f392` (`content_type_id`),
+  KEY `tcms_linkrefs_6223029` (`site_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=189033 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tcms_logs`
+--
+
+DROP TABLE IF EXISTS `tcms_logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tcms_logs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `content_type_id` int(11) NOT NULL,
+  `object_pk` longtext NOT NULL,
+  `site_id` int(11) NOT NULL,
+  `who_id` int(11) NOT NULL,
+  `date` datetime NOT NULL,
+  `action` longtext NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `tcms_logs_content_type_id` (`content_type_id`),
+  KEY `tcms_logs_site_id` (`site_id`),
+  KEY `tcms_logs_who_id` (`who_id`),
+  KEY `object_pk` (`object_pk`(20))
+) ENGINE=MyISAM AUTO_INCREMENT=4632389 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tcms_review_cases`
+--
+
+DROP TABLE IF EXISTS `tcms_review_cases`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tcms_review_cases` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `review_id` int(11) NOT NULL,
+  `case_id` int(11) NOT NULL,
+  `reviewer_id` int(11) DEFAULT NULL,
+  `case_text_version` int(11) NOT NULL,
+  `running_date` datetime NOT NULL,
+  `close_date` datetime DEFAULT NULL,
+  `is_current` tinyint(1) NOT NULL,
+  `sort_key` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `review_id_refs_id_ba4bea5f` (`review_id`),
+  KEY `case_id_refs_case_id_1ef737b6` (`case_id`),
+  KEY `reviewer_id_refs_id_e9321e9b` (`reviewer_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2232 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tcms_reviews`
+--
+
+DROP TABLE IF EXISTS `tcms_reviews`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tcms_reviews` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `plan_id` int(11) NOT NULL,
+  `summary` varchar(255) NOT NULL,
+  `notes` longtext,
+  `author_id` int(11) NOT NULL,
+  `build_id` int(11) NOT NULL,
+  `start_date` datetime NOT NULL,
+  `stop_date` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `plan_id_refs_plan_id_c18f7675` (`plan_id`),
+  KEY `author_id_refs_id_ce2c30ff` (`author_id`),
+  KEY `build_id_refs_build_id_4aacd99b` (`build_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=140 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tcms_reviews_default_reviewer`
+--
+
+DROP TABLE IF EXISTS `tcms_reviews_default_reviewer`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tcms_reviews_default_reviewer` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `testreview_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `testreview_id` (`testreview_id`,`user_id`),
+  KEY `user_id_refs_id_f84ca972` (`user_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=92 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tcms_reviews_env_value`
+--
+
+DROP TABLE IF EXISTS `tcms_reviews_env_value`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tcms_reviews_env_value` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `testreview_id` int(11) NOT NULL,
+  `tcmsenvvalue_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `testreview_id` (`testreview_id`,`tcmsenvvalue_id`),
+  KEY `tcmsenvvalue_id_refs_id_6ddc756d` (`tcmsenvvalue_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tcms_user_activate_keys`
+--
+
+DROP TABLE IF EXISTS `tcms_user_activate_keys`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tcms_user_activate_keys` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `activation_key` varchar(40) DEFAULT NULL,
+  `key_expires` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `tcms_user_activate_keys_user_id` (`user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tcms_user_profiles`
+--
+
+DROP TABLE IF EXISTS `tcms_user_profiles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tcms_user_profiles` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `phone_number` varchar(128) NOT NULL,
+  `url` varchar(200) NOT NULL,
+  `im` varchar(128) NOT NULL,
+  `im_type_id` int(11) DEFAULT NULL,
+  `address` longtext NOT NULL,
+  `notes` longtext NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1009 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `test_attachment_data`
@@ -1318,15 +1455,6 @@ CREATE TABLE `test_attachment_data` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `test_attachment_data`
---
-
-LOCK TABLES `test_attachment_data` WRITE;
-/*!40000 ALTER TABLE `test_attachment_data` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_attachment_data` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `test_attachments`
 --
 
@@ -1334,25 +1462,17 @@ DROP TABLE IF EXISTS `test_attachments`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `test_attachments` (
-  `attachment_id` int(11) NOT NULL AUTO_INCREMENT,
+  `attachment_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `submitter_id` mediumint(9) NOT NULL,
   `description` mediumtext,
   `filename` mediumtext,
   `creation_ts` datetime NOT NULL,
   `mime_type` varchar(100) NOT NULL,
+  `stored_name` mediumtext,
   PRIMARY KEY (`attachment_id`),
   KEY `test_attachments_submitter_idx` (`submitter_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=3550 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_attachments`
---
-
-LOCK TABLES `test_attachments` WRITE;
-/*!40000 ALTER TABLE `test_attachments` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_attachments` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_builds`
@@ -1362,7 +1482,7 @@ DROP TABLE IF EXISTS `test_builds`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `test_builds` (
-  `build_id` int(11) NOT NULL AUTO_INCREMENT,
+  `build_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `product_id` smallint(6) NOT NULL,
   `milestone` varchar(20) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
@@ -1373,17 +1493,8 @@ CREATE TABLE `test_builds` (
   UNIQUE KEY `build_product_id_name_idx` (`product_id`,`name`),
   KEY `build_name_idx` (`name`),
   KEY `build_milestone_idx` (`milestone`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=3979 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_builds`
---
-
-LOCK TABLES `test_builds` WRITE;
-/*!40000 ALTER TABLE `test_builds` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_builds` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_case_activity`
@@ -1407,15 +1518,6 @@ CREATE TABLE `test_case_activity` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `test_case_activity`
---
-
-LOCK TABLES `test_case_activity` WRITE;
-/*!40000 ALTER TABLE `test_case_activity` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_case_activity` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `test_case_attachments`
 --
 
@@ -1433,13 +1535,20 @@ CREATE TABLE `test_case_attachments` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `test_case_attachments`
+-- Table structure for table `test_case_bug_systems`
 --
 
-LOCK TABLES `test_case_attachments` WRITE;
-/*!40000 ALTER TABLE `test_case_attachments` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_case_attachments` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `test_case_bug_systems`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `test_case_bug_systems` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `description` longtext NOT NULL,
+  `url_reg_exp` varchar(8192) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `test_case_bugs`
@@ -1449,23 +1558,20 @@ DROP TABLE IF EXISTS `test_case_bugs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `test_case_bugs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `bug_id` mediumint(9) NOT NULL,
   `case_run_id` int(11) DEFAULT NULL,
   `case_id` int(11) NOT NULL,
+  `bug_system_id` int(11) NOT NULL,
+  `summary` varchar(255) DEFAULT NULL,
+  `description` mediumtext,
+  PRIMARY KEY (`id`),
   KEY `case_bugs_bug_id_idx` (`bug_id`),
   KEY `case_bugs_case_id_idx` (`case_id`),
-  KEY `case_bugs_case_run_id_idx` (`case_run_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  KEY `case_bugs_case_run_id_idx` (`case_run_id`),
+  KEY `case_bugs_case_bug_system_id_idx` (`bug_system_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=74466 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_case_bugs`
---
-
-LOCK TABLES `test_case_bugs` WRITE;
-/*!40000 ALTER TABLE `test_case_bugs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_case_bugs` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_case_categories`
@@ -1475,7 +1581,7 @@ DROP TABLE IF EXISTS `test_case_categories`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `test_case_categories` (
-  `category_id` smallint(6) NOT NULL AUTO_INCREMENT,
+  `category_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `product_id` smallint(6) NOT NULL,
   `name` varchar(240) NOT NULL,
   `description` mediumtext,
@@ -1483,17 +1589,8 @@ CREATE TABLE `test_case_categories` (
   UNIQUE KEY `category_product_id_name_idx` (`product_id`,`name`),
   UNIQUE KEY `category_product_idx` (`category_id`,`product_id`),
   KEY `category_name_idx_v2` (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=836 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_case_categories`
---
-
-LOCK TABLES `test_case_categories` WRITE;
-/*!40000 ALTER TABLE `test_case_categories` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_case_categories` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_case_components`
@@ -1504,20 +1601,11 @@ DROP TABLE IF EXISTS `test_case_components`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `test_case_components` (
   `case_id` int(11) NOT NULL,
-  `component_id` smallint(6) NOT NULL,
+  `component_id` smallint(5) unsigned NOT NULL,
   UNIQUE KEY `components_case_id_idx` (`case_id`,`component_id`),
   KEY `components_component_id_idx` (`component_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_case_components`
---
-
-LOCK TABLES `test_case_components` WRITE;
-/*!40000 ALTER TABLE `test_case_components` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_case_components` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_case_dependencies`
@@ -1535,15 +1623,6 @@ CREATE TABLE `test_case_dependencies` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `test_case_dependencies`
---
-
-LOCK TABLES `test_case_dependencies` WRITE;
-/*!40000 ALTER TABLE `test_case_dependencies` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_case_dependencies` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `test_case_plans`
 --
 
@@ -1551,21 +1630,15 @@ DROP TABLE IF EXISTS `test_case_plans`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `test_case_plans` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `plan_id` int(11) NOT NULL,
   `case_id` int(11) NOT NULL,
+  `sortkey` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
   UNIQUE KEY `test_case_plans_primary_idx` (`plan_id`,`case_id`),
   KEY `test_case_plans_case_idx` (`case_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=768746 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_case_plans`
---
-
-LOCK TABLES `test_case_plans` WRITE;
-/*!40000 ALTER TABLE `test_case_plans` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_case_plans` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_case_run_status`
@@ -1578,20 +1651,11 @@ CREATE TABLE `test_case_run_status` (
   `case_run_status_id` smallint(6) NOT NULL AUTO_INCREMENT,
   `name` varchar(20) DEFAULT NULL,
   `sortkey` int(11) DEFAULT NULL,
-  `description` text,
+  `description` mediumtext,
+  `auto_blinddown` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`case_run_status_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_case_run_status`
---
-
-LOCK TABLES `test_case_run_status` WRITE;
-/*!40000 ALTER TABLE `test_case_run_status` DISABLE KEYS */;
-INSERT INTO `test_case_run_status` VALUES (1,'IDLE',1,NULL),(2,'PASSED',4,NULL),(3,'FAILED',5,NULL),(4,'RUNNING',2,NULL),(5,'PAUSED',3,NULL),(6,'BLOCKED',6,NULL),(7,'ERROR',7,NULL);
-/*!40000 ALTER TABLE `test_case_run_status` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_case_runs`
@@ -1601,41 +1665,122 @@ DROP TABLE IF EXISTS `test_case_runs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `test_case_runs` (
-  `case_run_id` int(11) NOT NULL AUTO_INCREMENT,
+  `case_run_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `run_id` int(11) NOT NULL,
   `case_id` int(11) NOT NULL,
-  `assignee` mediumint(9) DEFAULT NULL,
-  `testedby` mediumint(9) DEFAULT NULL,
+  `assignee_id` mediumint(9) DEFAULT NULL,
+  `tested_by_id` mediumint(9) DEFAULT NULL,
   `case_run_status_id` tinyint(4) NOT NULL,
   `case_text_version` mediumint(9) NOT NULL,
   `build_id` int(11) NOT NULL,
-  `running_date` datetime DEFAULT NULL,
   `close_date` datetime DEFAULT NULL,
   `notes` text,
   `iscurrent` tinyint(4) NOT NULL DEFAULT '0',
   `sortkey` int(11) DEFAULT NULL,
   `environment_id` int(11) NOT NULL,
+  `running_date` datetime DEFAULT NULL,
   PRIMARY KEY (`case_run_id`),
   UNIQUE KEY `case_run_build_env_idx` (`run_id`,`case_id`,`build_id`,`environment_id`),
   KEY `case_run_case_id_idx` (`case_id`),
-  KEY `case_run_assignee_idx` (`assignee`),
-  KEY `case_run_testedby_idx` (`testedby`),
+  KEY `case_run_assignee_idx` (`assignee_id`),
+  KEY `case_run_testedby_idx` (`tested_by_id`),
   KEY `case_run_close_date_idx` (`close_date`),
-  KEY `case_run_status_idx` (`case_run_status_id`),
-  KEY `case_run_text_ver_idx` (`case_text_version`),
   KEY `case_run_build_idx_v2` (`build_id`),
-  KEY `case_run_env_idx_v2` (`environment_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  KEY `case_run_env_idx_v2` (`environment_id`),
+  KEY `case_run_status_idx` (`case_run_status_id`),
+  KEY `case_run_text_ver_idx` (`case_text_version`)
+) ENGINE=MyISAM AUTO_INCREMENT=3479424 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_case_runs`
---
-
-LOCK TABLES `test_case_runs` WRITE;
-/*!40000 ALTER TABLE `test_case_runs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_case_runs` ENABLE KEYS */;
-UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `case_run_status_trigger_insert` AFTER INSERT ON `test_case_runs` FOR EACH ROW BEGIN
+        UPDATE test_runs SET case_run_status = (
+            SELECT
+                group_concat(concat(a.status, ':', a.count)) AS status_count
+            FROM (
+                SELECT 
+                    case_run_status_id AS status,
+                    count(*) AS count FROM test_case_runs
+                WHERE
+                    run_id = NEW.run_id
+                GROUP BY case_run_status_id
+                ORDER BY status
+            ) AS a
+        )
+        WHERE run_id = NEW.run_id;
+    END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `case_run_status_trigger_update` AFTER UPDATE ON `test_case_runs` FOR EACH ROW BEGIN
+        UPDATE test_runs SET case_run_status = (
+            SELECT
+                group_concat(concat(a.status, ':', a.count)) AS status_count
+            FROM (
+                SELECT 
+                    case_run_status_id AS status,
+                    count(*) AS count FROM test_case_runs
+                WHERE
+                    run_id = NEW.run_id
+                GROUP BY case_run_status_id
+                ORDER BY status
+            ) AS a
+        )
+        WHERE run_id = NEW.run_id;
+    END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `case_run_status_trigger_delete` AFTER DELETE ON `test_case_runs` FOR EACH ROW BEGIN
+        UPDATE test_runs SET case_run_status = (
+            SELECT
+                group_concat(concat(a.status, ':', a.count)) AS status_count
+            FROM (
+                SELECT 
+                    case_run_status_id AS status,
+                    count(*) AS count FROM test_case_runs
+                WHERE
+                    run_id = OLD.run_id
+                GROUP BY case_run_status_id
+                ORDER BY status
+            ) AS a
+        )
+        WHERE run_id = OLD.run_id;
+    END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `test_case_status`
@@ -1647,20 +1792,10 @@ DROP TABLE IF EXISTS `test_case_status`;
 CREATE TABLE `test_case_status` (
   `case_status_id` smallint(6) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
-  `description` text,
+  `description` mediumtext,
   PRIMARY KEY (`case_status_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_case_status`
---
-
-LOCK TABLES `test_case_status` WRITE;
-/*!40000 ALTER TABLE `test_case_status` DISABLE KEYS */;
-INSERT INTO `test_case_status` VALUES (1,'PROPOSED',NULL),(2,'CONFIRMED',NULL),(3,'DISABLED',NULL);
-/*!40000 ALTER TABLE `test_case_status` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_case_tags`
@@ -1673,21 +1808,14 @@ CREATE TABLE `test_case_tags` (
   `tag_id` int(11) NOT NULL,
   `case_id` int(11) NOT NULL,
   `userid` mediumint(9) NOT NULL,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`),
   UNIQUE KEY `case_tags_primary_idx` (`tag_id`,`case_id`,`userid`),
   UNIQUE KEY `case_tags_secondary_idx` (`tag_id`,`case_id`),
   KEY `case_tags_case_id_idx_v3` (`case_id`),
   KEY `case_tags_userid_idx` (`userid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=390431 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_case_tags`
---
-
-LOCK TABLES `test_case_tags` WRITE;
-/*!40000 ALTER TABLE `test_case_tags` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_case_tags` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_case_texts`
@@ -1705,20 +1833,13 @@ CREATE TABLE `test_case_texts` (
   `effect` mediumtext,
   `setup` mediumtext,
   `breakdown` mediumtext,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`),
   UNIQUE KEY `case_versions_idx` (`case_id`,`case_text_version`),
   KEY `case_versions_who_idx` (`who`),
   KEY `case_versions_creation_ts_idx` (`creation_ts`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=463034 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_case_texts`
---
-
-LOCK TABLES `test_case_texts` WRITE;
-/*!40000 ALTER TABLE `test_case_texts` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_case_texts` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_cases`
@@ -1728,41 +1849,34 @@ DROP TABLE IF EXISTS `test_cases`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `test_cases` (
-  `case_id` int(11) NOT NULL AUTO_INCREMENT,
+  `case_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `case_status_id` tinyint(4) NOT NULL,
   `category_id` smallint(6) NOT NULL,
   `priority_id` smallint(6) DEFAULT NULL,
   `author_id` mediumint(9) NOT NULL,
   `default_tester_id` mediumint(9) DEFAULT NULL,
+  `reviewer_id` int(11) DEFAULT NULL,
   `creation_date` datetime NOT NULL,
-  `estimated_time` time DEFAULT NULL,
   `isautomated` tinyint(4) NOT NULL DEFAULT '0',
-  `sortkey` int(11) DEFAULT NULL,
+  `is_automated_proposed` tinyint(4) NOT NULL DEFAULT '0',
   `script` mediumtext,
   `arguments` mediumtext,
   `summary` varchar(255) DEFAULT NULL,
   `requirement` varchar(255) DEFAULT NULL,
   `alias` varchar(255) DEFAULT NULL,
+  `estimated_time` time DEFAULT NULL,
+  `notes` mediumtext,
+  `extra_link` varchar(1024) DEFAULT NULL,
   PRIMARY KEY (`case_id`),
   KEY `test_case_category_idx` (`category_id`),
   KEY `test_case_author_idx` (`author_id`),
   KEY `test_case_creation_date_idx` (`creation_date`),
-  KEY `test_case_sortkey_idx` (`sortkey`),
-  KEY `test_case_shortname_idx` (`alias`),
   KEY `test_case_requirement_idx` (`requirement`),
+  KEY `test_case_shortname_idx` (`alias`),
   KEY `test_case_status_idx` (`case_status_id`),
   KEY `test_case_tester_idx` (`default_tester_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=315656 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_cases`
---
-
-LOCK TABLES `test_cases` WRITE;
-/*!40000 ALTER TABLE `test_cases` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_cases` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_email_settings`
@@ -1780,15 +1894,6 @@ CREATE TABLE `test_email_settings` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `test_email_settings`
---
-
-LOCK TABLES `test_email_settings` WRITE;
-/*!40000 ALTER TABLE `test_email_settings` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_email_settings` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `test_environment_category`
 --
 
@@ -1796,24 +1901,14 @@ DROP TABLE IF EXISTS `test_environment_category`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `test_environment_category` (
-  `env_category_id` int(11) NOT NULL AUTO_INCREMENT,
+  `env_category_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `product_id` smallint(6) NOT NULL,
   `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`env_category_id`),
   UNIQUE KEY `test_environment_category_key1` (`env_category_id`,`product_id`),
   UNIQUE KEY `test_environment_category_key2` (`product_id`,`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_environment_category`
---
-
-LOCK TABLES `test_environment_category` WRITE;
-/*!40000 ALTER TABLE `test_environment_category` DISABLE KEYS */;
-INSERT INTO `test_environment_category` VALUES (1,0,'Operating System'),(2,0,'Hardware');
-/*!40000 ALTER TABLE `test_environment_category` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_environment_element`
@@ -1823,7 +1918,7 @@ DROP TABLE IF EXISTS `test_environment_element`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `test_environment_element` (
-  `element_id` int(11) NOT NULL AUTO_INCREMENT,
+  `element_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `env_category_id` int(11) NOT NULL,
   `name` varchar(255) DEFAULT NULL,
   `parent_id` int(11) DEFAULT NULL,
@@ -1831,18 +1926,8 @@ CREATE TABLE `test_environment_element` (
   PRIMARY KEY (`element_id`),
   UNIQUE KEY `test_environment_element_key1` (`element_id`,`env_category_id`),
   UNIQUE KEY `test_environment_element_key2` (`env_category_id`,`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=45 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_environment_element`
---
-
-LOCK TABLES `test_environment_element` WRITE;
-/*!40000 ALTER TABLE `test_environment_element` DISABLE KEYS */;
-INSERT INTO `test_environment_element` VALUES (1,1,'All',0,0),(2,1,'Linux',0,0),(3,1,'Mac OS',0,0),(4,1,'Other',0,0),(5,1,'Windows',0,0),(6,2,'All',0,0),(7,2,'Macintosh',0,0),(8,2,'Other',0,0),(9,2,'PC',0,0);
-/*!40000 ALTER TABLE `test_environment_element` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_environment_map`
@@ -1863,15 +1948,6 @@ CREATE TABLE `test_environment_map` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `test_environment_map`
---
-
-LOCK TABLES `test_environment_map` WRITE;
-/*!40000 ALTER TABLE `test_environment_map` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_environment_map` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `test_environment_property`
 --
 
@@ -1879,24 +1955,15 @@ DROP TABLE IF EXISTS `test_environment_property`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `test_environment_property` (
-  `property_id` int(11) NOT NULL AUTO_INCREMENT,
+  `property_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `element_id` int(11) NOT NULL,
   `name` varchar(255) DEFAULT NULL,
   `validexp` text,
   PRIMARY KEY (`property_id`),
   UNIQUE KEY `test_environment_property_key1` (`property_id`,`element_id`),
   UNIQUE KEY `test_environment_property_key2` (`element_id`,`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=42 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_environment_property`
---
-
-LOCK TABLES `test_environment_property` WRITE;
-/*!40000 ALTER TABLE `test_environment_property` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_environment_property` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_environments`
@@ -1906,7 +1973,7 @@ DROP TABLE IF EXISTS `test_environments`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `test_environments` (
-  `environment_id` int(11) NOT NULL AUTO_INCREMENT,
+  `environment_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `product_id` smallint(6) NOT NULL,
   `name` varchar(255) DEFAULT NULL,
   `isactive` tinyint(4) NOT NULL DEFAULT '1',
@@ -1914,17 +1981,8 @@ CREATE TABLE `test_environments` (
   UNIQUE KEY `test_environments_key1` (`environment_id`,`product_id`),
   UNIQUE KEY `test_environments_key2` (`product_id`,`name`),
   KEY `environment_name_idx_v2` (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=225 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_environments`
---
-
-LOCK TABLES `test_environments` WRITE;
-/*!40000 ALTER TABLE `test_environments` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_environments` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_events`
@@ -1942,15 +2000,6 @@ CREATE TABLE `test_events` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `test_events`
---
-
-LOCK TABLES `test_events` WRITE;
-/*!40000 ALTER TABLE `test_events` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_events` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `test_fielddefs`
 --
 
@@ -1958,23 +2007,13 @@ DROP TABLE IF EXISTS `test_fielddefs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `test_fielddefs` (
-  `fieldid` smallint(6) NOT NULL AUTO_INCREMENT,
+  `fieldid` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `description` mediumtext,
   `table_name` varchar(100) NOT NULL,
   PRIMARY KEY (`fieldid`)
-) ENGINE=MyISAM AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_fielddefs`
---
-
-LOCK TABLES `test_fielddefs` WRITE;
-/*!40000 ALTER TABLE `test_fielddefs` DISABLE KEYS */;
-INSERT INTO `test_fielddefs` VALUES (1,'isactive','Archived','test_plans'),(2,'name','Plan Name','test_plans'),(3,'type_id','Plan Type','test_plans'),(4,'case_status_id','Case Status','test_cases'),(5,'category_id','Category','test_cases'),(6,'priority_id','Priority','test_cases'),(7,'summary','Run Summary','test_cases'),(8,'isautomated','Automated','test_cases'),(9,'alias','Alias','test_cases'),(10,'requirement','Requirement','test_cases'),(11,'script','Script','test_cases'),(12,'arguments','Argument','test_cases'),(13,'product_id','Product','test_plans'),(14,'default_product_version','Default Product Version','test_plans'),(15,'environment_id','Environment','test_runs'),(16,'product_version','Product Version','test_runs'),(17,'build_id','Default Build','test_runs'),(18,'plan_text_version','Plan Text Version','test_runs'),(19,'manager_id','Manager','test_runs'),(20,'default_tester_id','Default Tester','test_cases'),(21,'stop_date','Stop Date','test_runs'),(22,'summary','Run Summary','test_runs'),(23,'notes','Notes','test_runs'),(24,'estimated_time','Estimated Time','test_cases');
-/*!40000 ALTER TABLE `test_fielddefs` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_named_queries`
@@ -1995,15 +2034,6 @@ CREATE TABLE `test_named_queries` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `test_named_queries`
---
-
-LOCK TABLES `test_named_queries` WRITE;
-/*!40000 ALTER TABLE `test_named_queries` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_named_queries` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `test_plan_activity`
 --
 
@@ -2017,21 +2047,12 @@ CREATE TABLE `test_plan_activity` (
   `changed` datetime NOT NULL,
   `oldvalue` mediumtext,
   `newvalue` mediumtext,
-  KEY `plan_activity_primary_idx` (`plan_id`),
-  KEY `plan_activity_field_idx` (`fieldid`),
   KEY `plan_activity_who_idx` (`who`),
-  KEY `plan_activity_changed_idx` (`changed`)
+  KEY `plan_activity_changed_idx` (`changed`),
+  KEY `plan_activity_field_idx` (`fieldid`),
+  KEY `plan_activity_primary_idx` (`plan_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_plan_activity`
---
-
-LOCK TABLES `test_plan_activity` WRITE;
-/*!40000 ALTER TABLE `test_plan_activity` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_plan_activity` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_plan_attachments`
@@ -2049,13 +2070,22 @@ CREATE TABLE `test_plan_attachments` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `test_plan_attachments`
+-- Table structure for table `test_plan_components`
 --
 
-LOCK TABLES `test_plan_attachments` WRITE;
-/*!40000 ALTER TABLE `test_plan_attachments` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_plan_attachments` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `test_plan_components`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `test_plan_components` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `plan_id` int(11) NOT NULL,
+  `component_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `plan_id` (`plan_id`,`component_id`),
+  KEY `test_plan_components_plan_id` (`plan_id`),
+  KEY `test_plan_components_component_id` (`component_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=815 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `test_plan_permissions`
@@ -2076,15 +2106,6 @@ CREATE TABLE `test_plan_permissions` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `test_plan_permissions`
---
-
-LOCK TABLES `test_plan_permissions` WRITE;
-/*!40000 ALTER TABLE `test_plan_permissions` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_plan_permissions` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `test_plan_permissions_regexp`
 --
 
@@ -2100,15 +2121,6 @@ CREATE TABLE `test_plan_permissions_regexp` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `test_plan_permissions_regexp`
---
-
-LOCK TABLES `test_plan_permissions_regexp` WRITE;
-/*!40000 ALTER TABLE `test_plan_permissions_regexp` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_plan_permissions_regexp` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `test_plan_tags`
 --
 
@@ -2119,21 +2131,14 @@ CREATE TABLE `test_plan_tags` (
   `tag_id` int(11) NOT NULL,
   `plan_id` int(11) NOT NULL,
   `userid` mediumint(9) NOT NULL,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`),
   UNIQUE KEY `plan_tags_primary_idx` (`tag_id`,`plan_id`,`userid`),
   UNIQUE KEY `plan_tags_secondary_idx` (`tag_id`,`plan_id`),
   KEY `plan_tags_plan_id_idx` (`plan_id`),
   KEY `plan_tags_userid_idx` (`userid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=2349 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_plan_tags`
---
-
-LOCK TABLES `test_plan_tags` WRITE;
-/*!40000 ALTER TABLE `test_plan_tags` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_plan_tags` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_plan_texts`
@@ -2148,19 +2153,12 @@ CREATE TABLE `test_plan_texts` (
   `who` mediumint(9) NOT NULL,
   `creation_ts` datetime NOT NULL,
   `plan_text` mediumtext,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`),
   KEY `test_plan_text_version_idx` (`plan_id`,`plan_text_version`),
   KEY `test_plan_text_who_idx` (`who`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=23237 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_plan_texts`
---
-
-LOCK TABLES `test_plan_texts` WRITE;
-/*!40000 ALTER TABLE `test_plan_texts` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_plan_texts` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_plan_types`
@@ -2170,22 +2168,12 @@ DROP TABLE IF EXISTS `test_plan_types`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `test_plan_types` (
-  `type_id` smallint(6) NOT NULL AUTO_INCREMENT,
+  `type_id` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
   `description` mediumtext,
   PRIMARY KEY (`type_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=40 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_plan_types`
---
-
-LOCK TABLES `test_plan_types` WRITE;
-/*!40000 ALTER TABLE `test_plan_types` DISABLE KEYS */;
-INSERT INTO `test_plan_types` VALUES (1,'Unit',NULL),(2,'Integration',NULL),(3,'Function',NULL),(4,'System',NULL),(5,'Acceptance',NULL),(6,'Installation',NULL),(7,'Performance',NULL),(8,'Product',NULL),(9,'Interoperability',NULL);
-/*!40000 ALTER TABLE `test_plan_types` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_plans`
@@ -2195,7 +2183,7 @@ DROP TABLE IF EXISTS `test_plans`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `test_plans` (
-  `plan_id` int(11) NOT NULL AUTO_INCREMENT,
+  `plan_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `product_id` smallint(6) NOT NULL,
   `author_id` mediumint(9) NOT NULL,
   `type_id` tinyint(4) NOT NULL,
@@ -2203,23 +2191,18 @@ CREATE TABLE `test_plans` (
   `name` varchar(255) NOT NULL,
   `creation_date` datetime NOT NULL,
   `isactive` tinyint(4) NOT NULL DEFAULT '1',
+  `extra_link` varchar(1024) DEFAULT NULL,
+  `parent_id` int(10) unsigned DEFAULT NULL,
+  `owner_id` mediumint(9) DEFAULT NULL,
+  `product_version_id` mediumint(9) DEFAULT NULL,
   PRIMARY KEY (`plan_id`),
   KEY `plan_product_plan_id_idx` (`product_id`,`plan_id`),
   KEY `plan_author_idx` (`author_id`),
   KEY `plan_type_idx` (`type_id`),
   KEY `plan_isactive_idx` (`isactive`),
   KEY `plan_name_idx` (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=11266 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_plans`
---
-
-LOCK TABLES `test_plans` WRITE;
-/*!40000 ALTER TABLE `test_plans` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_plans` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_relationships`
@@ -2236,15 +2219,6 @@ CREATE TABLE `test_relationships` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `test_relationships`
---
-
-LOCK TABLES `test_relationships` WRITE;
-/*!40000 ALTER TABLE `test_relationships` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_relationships` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `test_run_activity`
 --
 
@@ -2259,20 +2233,11 @@ CREATE TABLE `test_run_activity` (
   `oldvalue` mediumtext,
   `newvalue` mediumtext,
   KEY `run_activity_run_id_idx` (`run_id`),
-  KEY `run_activity_field_idx` (`fieldid`),
   KEY `run_activity_who_idx` (`who`),
-  KEY `run_activity_when_idx` (`changed`)
+  KEY `run_activity_when_idx` (`changed`),
+  KEY `run_activity_field_idx` (`fieldid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_run_activity`
---
-
-LOCK TABLES `test_run_activity` WRITE;
-/*!40000 ALTER TABLE `test_run_activity` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_run_activity` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_run_cc`
@@ -2290,15 +2255,6 @@ CREATE TABLE `test_run_cc` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `test_run_cc`
---
-
-LOCK TABLES `test_run_cc` WRITE;
-/*!40000 ALTER TABLE `test_run_cc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_run_cc` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `test_run_tags`
 --
 
@@ -2309,21 +2265,14 @@ CREATE TABLE `test_run_tags` (
   `tag_id` int(11) NOT NULL,
   `run_id` int(11) NOT NULL,
   `userid` mediumint(9) NOT NULL,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`),
   UNIQUE KEY `run_tags_primary_idx` (`tag_id`,`run_id`,`userid`),
   UNIQUE KEY `run_tags_secondary_idx` (`tag_id`,`run_id`),
   KEY `run_tags_run_id_idx` (`run_id`),
   KEY `run_tags_userid_idx` (`userid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=10789 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_run_tags`
---
-
-LOCK TABLES `test_run_tags` WRITE;
-/*!40000 ALTER TABLE `test_run_tags` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_run_tags` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_runs`
@@ -2333,7 +2282,7 @@ DROP TABLE IF EXISTS `test_runs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `test_runs` (
-  `run_id` int(11) NOT NULL AUTO_INCREMENT,
+  `run_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `plan_id` int(11) NOT NULL,
   `environment_id` int(11) NOT NULL,
   `product_version` mediumtext,
@@ -2347,26 +2296,21 @@ CREATE TABLE `test_runs` (
   `notes` mediumtext,
   `target_pass` tinyint(4) DEFAULT NULL,
   `target_completion` tinyint(4) DEFAULT NULL,
+  `estimated_time` time DEFAULT '00:00:00',
+  `case_run_status` varchar(100) DEFAULT '',
+  `errata_id` mediumint(9) DEFAULT NULL,
+  `auto_update_run_status` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`run_id`),
   KEY `test_run_plan_id_run_id_idx` (`plan_id`,`run_id`),
   KEY `test_run_manager_idx` (`manager_id`),
   KEY `test_run_start_date_idx` (`start_date`),
   KEY `test_run_stop_date_idx` (`stop_date`),
-  KEY `test_run_env_idx` (`environment_id`),
   KEY `test_run_build_idx` (`build_id`),
+  KEY `test_run_env_idx` (`environment_id`),
   KEY `test_run_plan_ver_idx` (`plan_text_version`),
   KEY `test_run_tester_idx` (`default_tester_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=89582 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_runs`
---
-
-LOCK TABLES `test_runs` WRITE;
-/*!40000 ALTER TABLE `test_runs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_runs` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `test_tags`
@@ -2376,21 +2320,57 @@ DROP TABLE IF EXISTS `test_tags`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `test_tags` (
-  `tag_id` int(11) NOT NULL AUTO_INCREMENT,
-  `tag_name` varchar(255) NOT NULL,
+  `tag_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `tag_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`tag_id`),
   KEY `test_tag_name_idx_v2` (`tag_name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=5429 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `test_tags`
+-- Table structure for table `testcases_testcaseemailsettings`
 --
 
-LOCK TABLES `test_tags` WRITE;
-/*!40000 ALTER TABLE `test_tags` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test_tags` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `testcases_testcaseemailsettings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `testcases_testcaseemailsettings` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `case_id` int(11) NOT NULL,
+  `notify_on_case_update` tinyint(1) NOT NULL,
+  `notify_on_case_delete` tinyint(1) NOT NULL,
+  `auto_to_case_author` tinyint(1) NOT NULL,
+  `auto_to_case_tester` tinyint(1) NOT NULL,
+  `auto_to_run_manager` tinyint(1) NOT NULL,
+  `auto_to_run_tester` tinyint(1) NOT NULL,
+  `auto_to_case_run_assignee` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `case_id` (`case_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=72506 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `testplans_testplanemailsettings`
+--
+
+DROP TABLE IF EXISTS `testplans_testplanemailsettings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `testplans_testplanemailsettings` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `plan_id` int(11) NOT NULL,
+  `is_active` tinyint(1) NOT NULL,
+  `auto_to_plan_owner` tinyint(1) NOT NULL,
+  `auto_to_plan_author` tinyint(1) NOT NULL,
+  `auto_to_case_owner` tinyint(1) NOT NULL,
+  `auto_to_case_default_tester` tinyint(1) NOT NULL,
+  `notify_on_plan_update` tinyint(1) NOT NULL,
+  `notify_on_plan_delete` tinyint(1) NOT NULL,
+  `notify_on_case_update` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `plan_id` (`plan_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=9101 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `tokens`
@@ -2411,15 +2391,6 @@ CREATE TABLE `tokens` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `tokens`
---
-
-LOCK TABLES `tokens` WRITE;
-/*!40000 ALTER TABLE `tokens` DISABLE KEYS */;
-/*!40000 ALTER TABLE `tokens` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `user_group_map`
 --
 
@@ -2436,16 +2407,6 @@ CREATE TABLE `user_group_map` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_group_map`
---
-
-LOCK TABLES `user_group_map` WRITE;
-/*!40000 ALTER TABLE `user_group_map` DISABLE KEYS */;
-INSERT INTO `user_group_map` VALUES (1,2,0,0),(1,2,1,0),(1,4,0,0),(1,9,0,2);
-/*!40000 ALTER TABLE `user_group_map` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `versions`
 --
 
@@ -2453,23 +2414,13 @@ DROP TABLE IF EXISTS `versions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `versions` (
-  `id` mediumint(9) NOT NULL AUTO_INCREMENT,
   `value` varchar(64) NOT NULL,
   `product_id` smallint(6) NOT NULL,
+  `id` mediumint(9) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`),
   UNIQUE KEY `versions_product_id_idx` (`product_id`,`value`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=1490 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `versions`
---
-
-LOCK TABLES `versions` WRITE;
-/*!40000 ALTER TABLE `versions` DISABLE KEYS */;
-INSERT INTO `versions` VALUES (1,'unspecified',1);
-/*!40000 ALTER TABLE `versions` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `votes`
@@ -2488,15 +2439,6 @@ CREATE TABLE `votes` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `votes`
---
-
-LOCK TABLES `votes` WRITE;
-/*!40000 ALTER TABLE `votes` DISABLE KEYS */;
-/*!40000 ALTER TABLE `votes` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `watch`
 --
 
@@ -2512,15 +2454,6 @@ CREATE TABLE `watch` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `watch`
---
-
-LOCK TABLES `watch` WRITE;
-/*!40000 ALTER TABLE `watch` DISABLE KEYS */;
-/*!40000 ALTER TABLE `watch` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `whine_events`
 --
 
@@ -2528,22 +2461,13 @@ DROP TABLE IF EXISTS `whine_events`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `whine_events` (
-  `id` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `owner_userid` mediumint(9) NOT NULL,
   `subject` varchar(128) DEFAULT NULL,
   `body` mediumtext,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `whine_events`
---
-
-LOCK TABLES `whine_events` WRITE;
-/*!40000 ALTER TABLE `whine_events` DISABLE KEYS */;
-/*!40000 ALTER TABLE `whine_events` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `whine_queries`
@@ -2553,7 +2477,7 @@ DROP TABLE IF EXISTS `whine_queries`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `whine_queries` (
-  `id` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `eventid` mediumint(9) NOT NULL,
   `query_name` varchar(64) NOT NULL DEFAULT '',
   `sortkey` smallint(6) NOT NULL DEFAULT '0',
@@ -2565,15 +2489,6 @@ CREATE TABLE `whine_queries` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `whine_queries`
---
-
-LOCK TABLES `whine_queries` WRITE;
-/*!40000 ALTER TABLE `whine_queries` DISABLE KEYS */;
-/*!40000 ALTER TABLE `whine_queries` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `whine_schedules`
 --
 
@@ -2581,7 +2496,7 @@ DROP TABLE IF EXISTS `whine_schedules`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `whine_schedules` (
-  `id` mediumint(9) NOT NULL AUTO_INCREMENT,
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `eventid` mediumint(9) NOT NULL,
   `run_day` varchar(32) DEFAULT NULL,
   `run_time` varchar(32) DEFAULT NULL,
@@ -2595,13 +2510,22 @@ CREATE TABLE `whine_schedules` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `whine_schedules`
+-- Table structure for table `xmlrpc_xmlrpclog`
 --
 
-LOCK TABLES `whine_schedules` WRITE;
-/*!40000 ALTER TABLE `whine_schedules` DISABLE KEYS */;
-/*!40000 ALTER TABLE `whine_schedules` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `xmlrpc_xmlrpclog`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `xmlrpc_xmlrpclog` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `dt_inserted` datetime NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `method` varchar(255) NOT NULL,
+  `args` longtext NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id_refs_id_317d1de3` (`user_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4634987 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -2612,4 +2536,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2009-07-24  9:52:32
+-- Dump completed on 2013-11-12 11:49:19

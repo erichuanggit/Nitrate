@@ -564,18 +564,21 @@ Nitrate.TestPlans.Details = {
     showRemainingCasesCount: function(container) {
         var contentContainer = jQ('#' + container);
         var casesListContainer = contentContainer.find('.js-cases-list');
-        var totalCasesCount = contentContainer.find('.js-total-cases-count').text();
+        var totalCasesCount = contentContainer
+			.find('.js-remaining-cases-count').attr('data-cases-count');
         var loadedCasesCount = casesListContainer.find('tr[id]').length;
         var remainingCount = parseInt(totalCasesCount) - parseInt(loadedCasesCount);
+        contentContainer.find('.js-number-of-loaded-cases').text(loadedCasesCount);
         if (remainingCount === 0) {
             contentContainer.find('a.js-load-more').die('click').toggle();
             contentContainer.find('span.js-loading-progress').toggle();
             contentContainer.find('span.js-nomore-msg').toggle();
             setTimeout(function() {
                 contentContainer.find('span.js-nomore-msg').toggle('slow');
-            }, 2000)
+            }, 2000);
+        } else {
+            contentContainer.find('.js-remaining-cases-count').text(remainingCount);
         }
-        contentContainer.find('.js-remaining-cases-count').text(remainingCount);
     },
 
     /*
@@ -718,6 +721,7 @@ Nitrate.TestPlans.Details = {
             clickedSelectAll(this, 'testruns_table', 'run');
         });
 
+        Nitrate.TestPlans.Runs.initializaRunTab();
         jQ('#show_more_runs').live('click', Nitrate.TestPlans.Runs.showMore);
         jQ('#reload_runs').live('click', Nitrate.TestPlans.Runs.reload);
         jQ('#tab_testruns').live('click', Nitrate.TestPlans.Runs.initializaRunTab);
@@ -1958,11 +1962,19 @@ Nitrate.TestPlans.Runs = {
     }
 
     , initializaRunTab: function () {
+        /**
+         * Load the first page of the runs when:
+         * 1. Current active tab is #testrun;
+         * AND
+         * 2. No testruns are ever loaded.
+         *
+        */
         var that = Nitrate.TestPlans.Runs;
-        // When the testruns tab first clicked.
-        var tbody = jQ('#testruns_body');
-        if (tbody.children().length === 0) {
-            that.reload();
+        if (jQ('#tab_testruns').hasClass('tab_focus')) {
+            var tbody = jQ('#testruns_body');
+            if (tbody.children().length === 0) {
+                that.reload();
+            }
         }
     }
 

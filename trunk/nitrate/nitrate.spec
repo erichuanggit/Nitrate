@@ -119,19 +119,22 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 
-*Fri Oct 25 2013 Chenxiong Qi <cqi@redhat.com> - 3.8.5-1
+* Fri Oct 25 2013 Chenxiong Qi <cqi@redhat.com> - 3.8.5-1
 - Bug 1017112 - [Performance] Loading TestRuns in pagination way in the TestPlan page
 - Bug 1018021 - [Performance] Search TestPlan without any criteria causes MySQL occurpies nearly 100% CPU time
 - Bug 1019641 - Lazy-loading TreeView tab in a TestPlan page
 - Bug 1017110 - [Performace] Loading Reviewing TestCases in pagination way in the TestPlan page
 - Bug 1017102 - [Performace] Loading TestCases in pagination way in the TestPlan page
-- Bug 1017255 - [Performance] Rewrite implementation of TestCase' progressbar 
+- Bug 1017255 - [Performance] Rewrite implementation of TestCase' progressbar
+- Bug 1024289 - [Advanced Search] Components/Versions/Categories/Builds are not shown after select a Product in 'Advanced Search' page
+- Bug 1025657 - [Cases] Python error page is shown if input full-width characters in 'Default Tester' when add/edit a case
+- Bug 1024680 - [Home][Basic Information] The Python error page is shown if Name is invalid in Basic Information
 
 *Tue Sep 17 2013 Jian Chen <jianchen@redhat.com> - 3.8.4
 - Add a column with number of comments into Case Runs table
 - Several Bug Fixes (Refer to ChangeLog)
 
-*Fri Jul 25 2013 Chaobin Tang <ctang@redhat.com> - 3.8.2
+* Fri Jul 25 2013 Chaobin Tang <ctang@redhat.com> - 3.8.2
 - XMLRPC API (Refer to ChangeLog)
 
 *Fri Jul 11 2011 Chaobin Tang <ctang@redhat.com> - 3.5

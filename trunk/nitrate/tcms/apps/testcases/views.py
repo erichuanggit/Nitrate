@@ -259,10 +259,12 @@ def new(request, template_name='case/new.html'):
     })
 
 
-def get_testcaseplan_sortkey_pk_for_testcases(plan_id, tc_ids):
+def get_testcaseplan_sortkey_pk_for_testcases(plan, tc_ids):
     '''Get each TestCase' sortkey and related TestCasePlan's pk'''
-    qs = TestCasePlan.objects.filter(
-        plan__pk=plan_id, case__in=tc_ids).values('pk', 'sortkey', 'case')
+    qs = TestCasePlan.objects.filter(case__in=tc_ids)
+    if plan is not None:
+        qs = qs.filter(plan__pk=plan.pk)
+    qs = qs.values('pk', 'sortkey', 'case')
     return dict([(
         item['case'], {
             'testcaseplan_pk': item['pk'],
@@ -281,19 +283,20 @@ def calculate_number_of_bugs_for_testcases(tc_ids):
     return dict([(item['case'], item['total_count']) for item in qs])
 
 
-def calculate_for_testcases(plan_id, testcases):
+def calculate_for_testcases(plan, testcases):
     '''Calculate extra data for TestCases
 
     Attach TestCasePlan.sortkey, TestCasePlan.pk, and the number of bugs of
     each TestCase.
 
     Arguments:
-    - plan_id: the ID of a TestPlan, whose testcase is querying.
+    - plan: the TestPlan containing searched TestCases. None means testcases
+      are not limited to a specific TestPlan.
     - testcases: a queryset of TestCases.
     '''
     tc_ids = [tc.pk for tc in testcases]
     sortkey_tcpkan_pks = get_testcaseplan_sortkey_pk_for_testcases(
-        plan_id, tc_ids)
+        plan, tc_ids)
     num_bugs = calculate_number_of_bugs_for_testcases(tc_ids)
 
     # FIXME: strongly recommended to upgrade to Python +2.6
@@ -341,8 +344,6 @@ def build_cases_search_form(request, populate=None, plan=None):
         search_form = SearchForm(initial={'case_status': d_status_ids})
 
     if populate:
-        if plan is None:
-            raise ValueError('A TestPlan should be passed when populate form.')
         if request.REQUEST.get('product'):
             search_form.populate(product_id=request.REQUEST['product'])
         elif plan and plan.product_id:
@@ -422,7 +423,7 @@ def load_more_cases(request, template_name='plan/cases_rows.html'):
         search_form = build_cases_search_form(request)
         cases = query_testcases(request, plan, search_form)
         cases = paginate_testcases(request, cases)
-        cases = calculate_for_testcases(plan.pk, cases)
+        cases = calculate_for_testcases(plan, cases)
         selected_case_ids = [tc.pk for tc in cases]
     return direct_to_template(request, template_name, {
         'test_plan': plan,
@@ -483,7 +484,7 @@ def all(request, template_name="case/all.html"):
     # also. This step must be the very final one, because the calculation of
     # related data requires related TestCases' IDs, that is the queryset of
     # TestCases should be evaluated in advance.
-    tcs = calculate_for_testcases(tp.pk, tcs)
+    tcs = calculate_for_testcases(tp, tcs)
 
     # generating a query_url with order options
     #

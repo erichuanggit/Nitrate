@@ -69,10 +69,6 @@ jQ(function(){
     });
 });
 
-jQ(function () {
-    jQ('.btn-statistics').live('click', Nitrate.TestRuns.Progress.percent);
-});
-
 jQ(function(){
     // product select on change event binding
     updateOptionOnProdChange('version', 'pl_product', 'pl_version');

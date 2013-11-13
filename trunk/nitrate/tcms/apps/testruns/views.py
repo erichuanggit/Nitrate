@@ -343,7 +343,7 @@ def load_runs_of_one_plan(request, plan_id, template_name='plan/plan_runs_part.h
     page_size = int(data.pop('page_size', settings.PLAN_RUNS_PAGE_SIZE))
 
     # clean the query parameters
-    data = dict([(k, v) for k, v in data.iteritems() if v.strip()])
+    data = dict([(str(k), v) for k, v in data.iteritems() if v.strip()])
 
     queryset = tp.run.filter(**data).select_related('build',
                 'manager', 'default_tester')
@@ -366,7 +366,6 @@ def load_runs_of_one_plan(request, plan_id, template_name='plan/plan_runs_part.h
             'numPages': paginator.num_pages,
             'pageNum': page_num
         }))
-    
 
 def ajax_search(request, template_name ='run/common/json_runs.txt'):
     """Read the test runs from database and display them."""
