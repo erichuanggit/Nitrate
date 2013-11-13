@@ -3,7 +3,7 @@
 
 Name:           nitrate
 Version:        3.8.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -109,7 +109,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc docs/INSTALL docs/AUTHORS docs/ChangeLog docs/README docs/RELEASENOTES docs/UPGRADING docs/XMLRPC docs/testopia-dump-blank.sql docs/mysql_initial.sql
+%doc docs/INSTALL docs/AUTHORS docs/ChangeLog docs/README docs/RELEASENOTES docs/UPGRADING docs/XMLRPC docs/testopia-dump-blank.sql docs/mysql_initial.sql docs/db-updates.sql
 %{python_sitelib}/tcms/
 %{python_sitelib}/Nitrate-%{version}-py*.egg-info/
 %{_datadir}/%{name}
