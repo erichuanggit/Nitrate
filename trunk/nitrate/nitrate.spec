@@ -119,7 +119,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 
-* Fri Oct 25 2013 Chenxiong Qi <cqi@redhat.com> - 3.8.5-1
+* Tue Nov 13 2013 Chenxiong Qi <cqi@redhat.com> - 3.8.5-2
+- Using a separated file to track all database changes
+
+* Tue Nov 12 2013 Chenxiong Qi <cqi@redhat.com> - 3.8.5-1
 - Bug 1017112 - [Performance] Loading TestRuns in pagination way in the TestPlan page
 - Bug 1018021 - [Performance] Search TestPlan without any criteria causes MySQL occurpies nearly 100% CPU time
 - Bug 1019641 - Lazy-loading TreeView tab in a TestPlan page
