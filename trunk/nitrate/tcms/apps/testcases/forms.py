@@ -44,6 +44,12 @@ AUTOMATED_SERCH_CHOICES = (
     (2, 'Both'),
 )
 
+ITEMS_PER_PAGE_CHOICES = (
+    ('20', '20'),
+    ('50', '50'),
+    ('100', '100')
+)
+
 class BugField(forms.CharField):
     """
     Customizing forms CharFiled validation.
@@ -385,6 +391,9 @@ class BaseCaseSearchForm(forms.Form):
     is_automated_proposed = forms.BooleanField(
         label = 'Autoproposed', required = False
     )
+    items_per_page = forms.ChoiceField(label='Items per page',
+                                       required=True,
+                                       choices=ITEMS_PER_PAGE_CHOICES)
 
     def clean_bug_id(self):
         from tcms.core.utils import string_to_list
