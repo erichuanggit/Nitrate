@@ -396,10 +396,19 @@ def query_testcases(request, plan, search_form):
                              'priority',
                              'category')
     tcs = tcs.distinct()
-    # sorting
+    return tcs
+
+
+def sort_queried_testcases(request, testcases):
+    '''Sort querid TestCases according to sort key
+
+    Arguments:
+    - request: REQUEST object
+    - testcases: object of QuerySet containing queried TestCases
+    '''
     order_by = request.REQUEST.get('order_by', 'create_date')
     asc = bool(request.REQUEST.get('asc', None))
-    tcs = order_case_queryset(tcs, order_by, asc)
+    tcs = order_case_queryset(testcases, order_by, asc)
     # default sorted by sortkey
     tcs = tcs.order_by('testcaseplan__sortkey')
     # Resort the order
@@ -412,8 +421,19 @@ def query_testcases(request, plan, search_form):
             tcs = tcs.order_by('testcaseplan__sortkey')
         else:
             tcs = tcs.order_by('-testcaseplan__sortkey')
-
     return tcs
+
+
+def query_testcases_from_request(request, plan=None):
+    '''Query TestCases according to criterias coming within REQUEST
+
+    Arguments:
+    - request: the REQUEST object.
+    - plan: instance of TestPlan to restrict only those TestCases belongs to
+      the TestPlan. Can be None. As you know, query from all TestCases.
+    '''
+    search_form = build_cases_search_form(request)
+    return query_testcases(request, plan, search_form)
 
 
 def load_more_cases(request, template_name='plan/cases_rows.html'):
@@ -422,8 +442,8 @@ def load_more_cases(request, template_name='plan/cases_rows.html'):
     cases = []
     selected_case_ids = []
     if plan is not None:
-        search_form = build_cases_search_form(request)
-        cases = query_testcases(request, plan, search_form)
+        cases = query_testcases_from_request(request, plan)
+        cases = sort_queried_testcases(request, cases)
         cases = paginate_testcases(request, cases)
         cases = calculate_for_testcases(plan, cases)
         selected_case_ids = [tc.pk for tc in cases]
@@ -472,6 +492,7 @@ def all(request, template_name="case/all.html"):
     tp = plan_from_request_or_none(request)
     search_form = build_cases_search_form(request, populate=True, plan=tp)
     tcs = query_testcases(request, tp, search_form)
+    tcs = sort_queried_testcases(request, tcs)
     total_cases_count = tcs.count()
 
     # Initial the case ids
