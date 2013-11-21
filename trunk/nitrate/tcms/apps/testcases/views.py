@@ -829,35 +829,34 @@ def get(request, case_id, template_name='case/get.html'):
 
 def printable(request, template_name='case/printable.html'):
     """Create the printable copy for plan/case"""
-    if (not request.REQUEST.get('plan') and
-            not request.REQUEST.get('case') and
-            not request.REQUEST.get('case_status')):
+    req_get = request.REQUEST.get
+    req_getlist = request.REQUEST.getlist
+
+    if (not req_get('plan') and
+            not req_get('case') and
+            not req_get('case_status')):
         return HttpResponse(Prompt.render(
                 request=request,
                 info_type=Prompt.Info,
                 info='At least one target is required.',))
 
-    if request.REQUEST.get('plan'):
-        tps = TestPlan.objects.filter(pk__in=request.REQUEST.getlist('plan'))
+    if req_get('plan'):
+        tps = TestPlan.objects.filter(pk__in=req_getlist('plan'))
     else:
         tps = TestPlan.objects.none()
 
-    if tps:
-        for tp in tps:
-            tp.case_list = tp.case.values_list('pk', flat=True)
+    for tp in tps:
+        tp.case_list = tp.case.values_list('pk', flat=True)
 
-    internal_query_maps = (
-        # [Web request string, database queryset]
-            ('plan', 'plan__pk__in'),
-            ('case', 'pk__in'),
-            ('case_status', 'case_status__pk__in'))
-
-    query = {}
-    for iqm in internal_query_maps:
-        if request.REQUEST.get(iqm[0]):
-            query[iqm[1]] = request.REQUEST.getlist(iqm[0])
+    query = {
+        'plan__pk__in': req_getlist('plan'),
+        'case_status__pk__in': req_getlist('case_status'),
+        'pk__in': get_selected_testcases(request),
+    }
 
     # Disabled cases ignored in default
+    # FIXME: case_status__pk__in must exist when code execution flows here. Why
+    #        check the existance again?
     if not query.get('case_status__pk__in'):
         query['case_status__pk__in'] = TestCaseStatus.objects.exclude(
             name='DISABLED'
@@ -868,10 +867,14 @@ def printable(request, template_name='case/printable.html'):
             'test_plans': tps,
             'test_cases': tcs,})
 
+
 def export(request, template_name='case/export.xml'):
     """Export the plan"""
-    if not request.REQUEST.get('plan') and not request.REQUEST.get('case')\
-    and not request.REQUEST.get('case_status'):
+    REQ = request.REQUEST
+    # FIXME: is it necessary to confirm this repeatedly? No.
+    miss_criteria = not REQ.get('plan') and not REQ.get('case_status') and \
+        not REQ.get('selectAll') and not REQ.get('case')
+    if miss_criteria:
         return HttpResponse(Prompt.render(
                 request=request,
                 info_type=Prompt.Info,
@@ -882,6 +885,7 @@ def export(request, template_name='case/export.xml'):
     response = printable(request, template_name)
     response['Content-Disposition'] = 'attachment; filename=tcms-testcases-%s.xml' % timestamp_str
     return response
+
 
 def update_testcase(request, tc, tc_form):
     '''Updating information of specific TestCase

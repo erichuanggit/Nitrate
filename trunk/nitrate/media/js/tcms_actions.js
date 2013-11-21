@@ -1431,11 +1431,18 @@ function popupAddAnotherWindow(triggeringLink, parameters)
     return false;
 }
 
-function exportCase(url, case_ids){
-    if(case_ids.case.length==0){
-        alert('At least one case is required.');
+function exportCase(url, form, table) {
+    var selection = serializeCaseFromInputList2(table);
+    var emptySelection = !selection.selectAll & selection.selectedCasesIds.length === 0;
+    if (emptySelection) {
+        alert(default_messages.alert.no_case_selected);
         return false;
     }
-    postToURL(url, case_ids);
+    var params = serialzeCaseForm(form, table, true);
+    if (selection.selectAll) {
+        params.selectAll = selection.selectAll;
+    }
+    // replace with selected cases' IDs
+    params.case = selection.selectedCasesIds;
+    postToURL(url, params);
 }
-
