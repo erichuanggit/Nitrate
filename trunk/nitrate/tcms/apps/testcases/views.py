@@ -57,7 +57,8 @@ from fields import CC_LIST_DEFAULT_DELIMITER
 
 MODULE_NAME = "testcases"
 
-TESTCASE_OPERATION_ACTIONS = ('search', 'sort', 'update', 'remove', 'add')
+TESTCASE_OPERATION_ACTIONS = ('search', 'sort', 'update',
+                              'remove', 'add', 'change')
 
 
 #_____________________________________________________________________________
@@ -143,12 +144,14 @@ def automated(request):
 
     form = CaseAutomatedForm(request.REQUEST)
     if form.is_valid():
-        tcs = TestCase.objects.filter(pk__in=request.REQUEST.getlist('case'))
-        if not tcs:
-            raise Http404
+        tcs = get_selected_testcases(request)
 
         if form.cleaned_data['a'] == 'change':
             if isinstance(form.cleaned_data['is_automated'], int):
+                # FIXME: inconsistent operation updating automated property
+                #        upon TestCases. Other place to update property upon
+                #        TestCase via Model.save, that will trigger model
+                #        singal handlers.
                 tcs.update(is_automated=form.cleaned_data['is_automated'])
             if isinstance(form.cleaned_data['is_automated_proposed'], bool):
                 tcs.update(
@@ -159,6 +162,7 @@ def automated(request):
         ajax_response['response'] = forms.errors_to_list(form)
 
     return HttpResponse(simplejson.dumps(ajax_response))
+
 
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcase'))
 def new(request, template_name='case/new.html'):

@@ -1086,7 +1086,7 @@ function bindEventsOnLoadedCases(options) {
  *
  * Used in function `constructPlanDetailsCasesZone'.
  */
-function serializeFromData(options) {
+function serializeFormData(options) {
     var form = options.form;
     var container = options.zoneContainer;
     var selection = options.casesSelection;
@@ -1281,32 +1281,40 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         if (form.adjacent('input.btn_automated').length > 0) {
             var element = form.adjacent('input.btn_automated')[0];
             element.observe('click', function(e) {
-                var params = serialzeCaseForm(form, table);
-               
-                if(params['case'] && params['case'].length == 0){
+                var selection = serializeCaseFromInputList2(table);
+                var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0;
+                if(noCasesSelected) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
 
-                params['a'] = 'change';
-                var c = getDialog();
+                var dialogContainer = getDialog();
                 var callback = function(t) {
                     returnobj = t.responseText.evalJSON(true);
-                    
+
                     if(returnobj.rc != 0) {
                         alert(returnobj.response);
                         return false
                     };
-                    
-                    params.a = 'initial';
+
+                    var params = serialzeCaseForm(form, table, true, true);
+                    /*
+                     * FIXME: this is confuse. There is no need to assign this
+                     *        value explicitly when update component and category.
+                     */
+                    params.a = 'search';
+                    params.case = selection.selectedCasesIds;
                     constructPlanDetailsCasesZone(container, plan_id, params);
-                    clearDialog(c);
+                    clearDialog(dialogContainer);
                 };
-                
-                constructCaseAutomatedForm(c, params, callback);
+
+                constructCaseAutomatedForm(dialogContainer, callback, {
+                    zoneContainer: container,
+                    casesSelection: selection
+                });
             })
         }
-        
+
         if(form.adjacent('input.btn_component').length > 0) {
             var element = form.adjacent('input.btn_component')[0];
             element.observe('click', function(e) {
@@ -1314,6 +1322,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     return false;
                 var c = getDialog();
                 var params = {
+                    // FIXME: remove this line. It's unnecessary any more.
                     'case': serializeCaseFromInputList(table),
                     'product': Nitrate.TestPlans.Instance.fields.product_id
                 };
@@ -1325,13 +1334,13 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     e.stop();
 
                     var selection = serializeCaseFromInputList2(table);
-                    var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0
+                    var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0;
                     if(noCasesSelected) {
                         alert(default_messages.alert.no_case_selected);
                         return false;
                     }
 
-                    var params = serializeFromData({
+                    var params = serializeFormData({
                         form: this,
                         zoneContainer: container,
                         casesSelection: selection
@@ -1378,13 +1387,13 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     e.stop();
 
                     var selection = serializeCaseFromInputList2(table);
-                    var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0
+                    var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0;
                     if(noCasesSelected) {
                         alert(default_messages.alert.no_case_selected);
                         return false;
                     }
 
-                    var params = serializeFromData({
+                    var params = serializeFormData({
                         form: this,
                         zoneContainer: container,
                         casesSelection: selection

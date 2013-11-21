@@ -931,12 +931,8 @@ function updateCaseCategory(url, parameters, callback)
     })
 }
 
-function constructCaseAutomatedForm(container, parameters, callback)
+function constructCaseAutomatedForm(container, callback, options)
 {
-    if (!parameters['case']) {
-        alert(default_messages.alert.no_case_selected);
-        return false;
-    };
     container.update(getAjaxLoading());
     container.show();
     var d = new Element('div', { 'class': 'automated_form' });
@@ -945,13 +941,23 @@ function constructCaseAutomatedForm(container, parameters, callback)
         var action = '/cases/automated/';
         var form_observe = function(e) {
             e.stop();
+
             if(this.getElementsBySelector('input[type="checkbox"]:checked').length == 0) {
                 alert('Nothing selected');
                 return false;
             }
 
-            var params = this.serialize(true);
-            params['case'] = parameters['case'];
+            var params = serializeFormData({
+                form: this,
+                zoneContainer: options.zoneContainer,
+                casesSelection: options.casesSelection
+            });
+            /*
+             * Have to add this. The form generated before does not contain a
+             * default value `change'. In fact, the field a onust contain the
+             * only value `change', here.
+             */
+            params = params.replace(/a=\w*/, 'a=change');
             new Ajax.Request(getURLParam().url_cases_automated, {
                 method: 'post',
                 parameters: params,
@@ -962,7 +968,7 @@ function constructCaseAutomatedForm(container, parameters, callback)
         container.update(f);
     }
 
-    getForm(d, 'testcases.CaseAutomatedForm', parameters, c);
+    getForm(d, 'testcases.CaseAutomatedForm', {}, c);
 }
 
 /*
