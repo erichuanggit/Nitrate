@@ -39,6 +39,7 @@ from tcms.search.order import order_case_queryset
 from tcms.search import remove_from_request_path
 
 from tcms.apps.testcases.actions import CategoryActions
+from tcms.apps.testcases.actions import ComponentActions
 from tcms.apps.testcases.models import TestCase, TestCaseStatus, \
         TestCaseAttachment, TestCasePlan, TestCaseCategory
 from tcms.apps.testcases.models import TestCaseBug
@@ -55,6 +56,8 @@ from tcms.apps.testplans.forms import SearchPlanForm
 from fields import CC_LIST_DEFAULT_DELIMITER
 
 MODULE_NAME = "testcases"
+
+TESTCASE_OPERATION_ACTIONS = ('search', 'sort', 'update', 'remove', 'add')
 
 
 #_____________________________________________________________________________
@@ -337,7 +340,8 @@ def build_cases_search_form(request, populate=None, plan=None):
         SearchForm = SearchCaseForm
 
     # Initial the form and template
-    if request.REQUEST.get('a') in ('search', 'sort', 'update'):
+    action = request.REQUEST.get('a')
+    if action in TESTCASE_OPERATION_ACTIONS:
         search_form = SearchForm(request.REQUEST)
     else:
         d_status = get_case_status(request.REQUEST.get('template_type'))
@@ -379,9 +383,10 @@ def paginate_testcases(request, testcases):
 def query_testcases(request, plan, search_form):
     '''Query TestCases according to the criterias along with REQUEST'''
     # FIXME: search_form is not defined before being used.
-    if request.REQUEST.get('a') in ('search', 'sort', 'update') and search_form.is_valid():
+    action = request.REQUEST.get('a')
+    if action in TESTCASE_OPERATION_ACTIONS and search_form.is_valid():
         tcs = TestCase.list(search_form.cleaned_data, plan)
-    elif request.REQUEST.get('a') == 'initial':
+    elif action == 'initial':
         d_status = get_case_status(request.REQUEST.get('template_type'))
         tcs = TestCase.objects.filter(case_status__in=d_status)
     else:
@@ -1301,108 +1306,9 @@ def component(request):
     """
     # FIXME: It will update product/category/component at one time so far.
     # We may disconnect the component from case product in future.
-
-    class ComponentActions(object):
-        """Component actions"""
-        def __init__(self, request, tcs):
-            self.ajax_response = {'rc': 0, 'response': 'ok', 'errors_list': []}
-            self.request = request
-            self.tcs = tcs
-            self.product_id = request.REQUEST.get('product')
-
-        def __get_form(self):
-            self.form = CaseComponentForm(request.REQUEST)
-            self.form.populate(product_id = self.product_id)
-            return self.form
-
-        def __check_form_validation(self):
-            form = self.__get_form()
-            if not form.is_valid():
-                return 0, self.render_ajax(forms.errors_to_list(form))
-
-            return 1, form
-
-        def __check_perms(self, perm):
-            if not self.request.user.has_perm('testcases.' + perm + '_testcasecomponent'):
-                self.ajax_response['rc'] = 1
-                self.ajax_response['response'] = 'Permission denied - ' + perm
-
-                return 0, self.render_ajax(self.ajax_response)
-
-            return 1, True
-
-        def add(self):
-            is_valid, perm = self.__check_perms('add')
-            if not is_valid:
-                return perm
-
-            is_valid, form = self.__check_form_validation()
-            if not is_valid:
-                return form
-
-            for tc in self.tcs:
-                for c in form.cleaned_data['o_component']:
-                    try:
-                        tc.add_component(component = c)
-                    except:
-                        self.ajax_response['errors_list'].append({'case': tc.pk, 'component': c.pk})
-
-            return self.render_ajax(self.ajax_response)
-
-        def remove(self):
-            is_valid, perm = self.__check_perms('delete')
-            if not is_valid:
-                return perm
-
-            is_valid, form = self.__check_form_validation()
-            if not is_valid:
-                return form
-
-            for tc in self.tcs:
-                for c in form.cleaned_data['o_component']:
-                    try:
-                        tc.remove_component(component = c)
-                    except:
-                        self.ajax_response['errors_list'].append({'case': tc.pk, 'component': c.pk})
-
-            return self.render_ajax(self.ajax_response)
-
-        def update(self):
-            is_valid, perm = self.__check_perms('change')
-            if not is_valid:
-                return perm
-
-            is_valid, form = self.__check_form_validation()
-            if not is_valid:
-                return form
-
-            #self.tcs.update(category = self.form.cleaned_data['category'])
-            for tc in self.tcs:
-                tc.clear_components()
-                for c in form.cleaned_data['o_component']:
-                    tc.add_component(component=c)
-
-            return self.render_ajax(self.ajax_response)
-
-        def render_ajax(self, response):
-            return HttpResponse(simplejson.dumps(self.ajax_response))
-
-        def render_form(self):
-            form = CaseComponentForm(initial={
-                'product': self.product_id,
-                #'category': self.request.REQUEST.get('category'),
-                'component': self.request.REQUEST.getlist('o_component'),
-            })
-            form.populate(product_id = self.product_id)
-
-            return HttpResponse(form.as_p())
-
-    tcs = TestCase.objects.filter(pk__in = request.REQUEST.getlist('case'))
-    if not tcs:
-        raise Http404
-
-    cas = ComponentActions(request = request, tcs = tcs)
-    func = getattr(cas, request.REQUEST.get('a', 'render_form').lower())
+    cas = ComponentActions(request)
+    action = request.REQUEST.get('a', 'render_form')
+    func = getattr(cas, action.lower())
     return func()
 
 

@@ -1080,6 +1080,35 @@ function bindEventsOnLoadedCases(options) {
     }
 }
 
+
+/*
+ * Serialize form data including the selected cases for AJAX requst.
+ *
+ * Used in function `constructPlanDetailsCasesZone'.
+ */
+function serializeFromData(options) {
+    var form = options.form;
+    var container = options.zoneContainer;
+    var selection = options.casesSelection;
+
+    var params = form.serialize();
+    var prevCriterias = jQ(container).find('.js-load-more')
+                                     .attr('data-criterias')
+                                     .replace(/a=\w+/, '');
+    if (selection.selectAll) {
+        params += '&' + prevCriterias + '&selectAll=1';
+    }
+    var casepks = [''];
+    var loopCount = selection.selectedCasesIds.length;
+    var selectedCasesIds = selection.selectedCasesIds;
+    for (var i = 0; i < loopCount; i++) {
+        casepks.push('case=' + selectedCasesIds[i]);
+    }
+    params += casepks.join('&');
+
+    return params;
+}
+
 function constructPlanDetailsCasesZone(container, plan_id, parameters)
 {
     if (typeof(container) != 'object')
@@ -1294,27 +1323,33 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 }
                 var form_observe = function(e) {
                     e.stop();
-                    
-                    var params = this.serialize(true);
-                    params['case'] = serializeCaseFromInputList(table);
-                    if(params['case'].length == 0){
+
+                    var selection = serializeCaseFromInputList2(table);
+                    var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0
+                    if(noCasesSelected) {
                         alert(default_messages.alert.no_case_selected);
                         return false;
                     }
-                    
+
+                    var params = serializeFromData({
+                        form: this,
+                        zoneContainer: container,
+                        casesSelection: selection
+                    });
+
                     var url = getURLParam().url_cases_component;
                     var callback = function(t) {
                         returnobj = t.responseText.evalJSON(true);
-                        
+
                         if (returnobj.rc != 0) {
                             alert(returnobj.response);
                             return false;
                         }
-                        parameters['case'] = params['case']
+                        parameters['case'] = selection.selectedCasesIds;
                         constructPlanDetailsCasesZone(container, plan_id, parameters);
                         clearDialog(c);
                     }
-                    
+
                     updateCaseComponent(url, params, callback);
                 }
                 renderComponentForm(c, params, form_observe);
@@ -1342,7 +1377,6 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 var form_observe = function(e) {
                     e.stop();
 
-                    var params = this.serialize();
                     var selection = serializeCaseFromInputList2(table);
                     var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0
                     if(noCasesSelected) {
@@ -1350,17 +1384,11 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                         return false;
                     }
 
-                    if (selection.selectAll) {
-                        params += '&' + jQ(container).find('.js-load-more').attr('data-criterias').replace(/a=\w+/, '');
-                        params += '&selectAll=1';
-                    }
-                    var casepks = [''];
-                    var loopCount = selection.selectedCasesIds.length;
-                    var selectedCasesIds = selection.selectedCasesIds;
-                    for (var i = 0; i < loopCount; i++) {
-                        casepks.push('case=' + selectedCasesIds[i]);
-                    }
-                    params += casepks.join('&');
+                    var params = serializeFromData({
+                        form: this,
+                        zoneContainer: container,
+                        casesSelection: selection
+                    });
 
                     var url = getURLParam().url_cases_category;
                     var callback = function(t) {
