@@ -965,6 +965,38 @@ function constructCaseAutomatedForm(container, parameters, callback)
     getForm(d, 'testcases.CaseAutomatedForm', parameters, c);
 }
 
+/*
+ * Serialize selected cases' Ids.
+ *
+ * This function inherits the ability from original definition named
+ * serializeCaseFromInputList, except that it also collects whehter all cases
+ * are also selected even through not all of cases are displayed.
+ *
+ * Return value is an object of dictionary holding two properties. `selectAll'
+ * is a boolean value indicating whether user select all cases.
+ * `selectedCasesIds' is an array containing all selected cases' Ids the
+ * current loaded set of cases.
+ *
+ * Whatever user selects all cases, above two properties appears always with
+ * proper value.
+ */
+function serializeCaseFromInputList2(table)
+{
+    var result = {};
+    var selectAll = $(table).adjacent('input[value="all"]:checked').length > 0;
+    if (selectAll)
+        result.selectAll = true;
+
+    var elements = $(table).adjacent('input[name="case"]:checked');
+    var case_ids = new Array();
+    for (i in elements) {
+        if (typeof(elements[i].value) == 'string')
+        case_ids.push(elements[i].value);
+    };
+    result.selectedCasesIds = case_ids;
+    return result;
+}
+
 function serializeCaseFromInputList(table)
 {
     var elements = $(table).adjacent('input[name="case"]:checked');

@@ -392,7 +392,7 @@ class BaseCaseSearchForm(forms.Form):
         label = 'Autoproposed', required = False
     )
     items_per_page = forms.ChoiceField(label='Items per page',
-                                       required=True,
+                                       required=False,
                                        choices=ITEMS_PER_PAGE_CHOICES)
 
     def clean_bug_id(self):

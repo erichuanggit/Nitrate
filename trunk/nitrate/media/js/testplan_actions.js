@@ -1328,6 +1328,10 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     return false;
                 var c = getDialog();
                 var params = {
+                    /*
+                     * FIXME: the first time execute this code, it's unnecessary
+                     *        to pass selected cases' ids to the server.
+                     */
                     'case': serializeCaseFromInputList(table),
                     'product': Nitrate.TestPlans.Instance.fields.product_id
                 };
@@ -1337,27 +1341,41 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 }
                 var form_observe = function(e) {
                     e.stop();
-                    
-                    var params = this.serialize(true);
-                    params['case'] = serializeCaseFromInputList(table);
-                    if(params['case'].length == 0){
+
+                    var params = this.serialize();
+                    var selection = serializeCaseFromInputList2(table);
+                    var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0
+                    if(noCasesSelected) {
                         alert(default_messages.alert.no_case_selected);
                         return false;
                     }
-                    
+
+                    if (selection.selectAll) {
+                        params += '&' + jQ(container).find('.js-load-more').attr('data-criterias').replace(/a=\w+/, '');
+                        params += '&selectAll=1';
+                    }
+                    var casepks = [''];
+                    var loopCount = selection.selectedCasesIds.length;
+                    var selectedCasesIds = selection.selectedCasesIds;
+                    for (var i = 0; i < loopCount; i++) {
+                        casepks.push('case=' + selectedCasesIds[i]);
+                    }
+                    params += casepks.join('&');
+
                     var url = getURLParam().url_cases_category;
                     var callback = function(t) {
                         returnobj = t.responseText.evalJSON(true);
-                        
+
                         if (returnobj.rc != 0) {
                             alert(returnobj.response);
                             return false;
                         }
-                        parameters['case'] = params['case'];
+
+                        parameters['case'] = selection.selectedCasesIds;
                         constructPlanDetailsCasesZone(container, plan_id, parameters);
                         clearDialog(c);
                     }
-                    
+
                     updateCaseCategory(url, params, callback);
                 }
                 renderCategoryForm(c, params, form_observe);
