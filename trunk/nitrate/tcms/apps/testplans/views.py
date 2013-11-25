@@ -982,7 +982,11 @@ def cases(request, plan_id):
                 ajax_response['reponse'] = 'At least one case is required to delete.'
                 return HttpResponse(json_dumps(ajax_response))
 
-            tcs = TestCase.objects.filter(case_id__in=request.REQUEST.getlist('case'))
+            from tcms.apps.testcases.views import get_selected_testcases
+            selected_cases = get_selected_testcases(request)
+            tcs = TestCase.objects.filter(case_id__in=selected_cases)
+
+            import pdb; pdb.set_trace()
 
             # Log Action
             tp_log = TCMSLog(model=tp)
@@ -1096,7 +1100,7 @@ def cases(request, plan_id):
             else:
                 return HttpResponseRedirect(reverse('tcms.apps.testplans.views.get', args=[plan_id, ]) + '#testcases')
 
-    tp = get_object_or_404(TestPlan, plan_id=plan_id)
+    #tp = get_object_or_404(TestPlan, plan_id=plan_id)
     cas = CaseActions(request, tp)
     actions = request.REQUEST.get('a')
 
@@ -1112,7 +1116,6 @@ def cases(request, plan_id):
             info=message,
             next=reverse('tcms.apps.testplans.views.get', args = [plan_id, ]),
         ))
-
 
     func = getattr(cas, actions)
     return func()

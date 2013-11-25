@@ -58,7 +58,9 @@ from fields import CC_LIST_DEFAULT_DELIMITER
 MODULE_NAME = "testcases"
 
 TESTCASE_OPERATION_ACTIONS = ('search', 'sort', 'update',
-                              'remove', 'add', 'change')
+                              'remove', 'add', 'change',
+                              'delete_cases', # unlink cases from a TestPlan
+                              )
 
 
 #_____________________________________________________________________________

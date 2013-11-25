@@ -936,6 +936,9 @@ function createUploadPlanSummaryZone()
     });
 }
 
+/*
+ * Deprecated function. Remove it when it's confirmed that not being referenced by others any more.
+ */
 function unlinkCasePlan(container, parameters) 
 {
     parameters.a = 'delete_cases';
@@ -960,6 +963,50 @@ function unlinkCasePlan(container, parameters)
         alert(returnobj.response);
     }
     
+    var url = new String('cases/');
+    new Ajax.Request(url, {
+        method: 'post',
+        parameters: parameters,
+        onSuccess: success,
+        onFailure: json_failure
+    })
+}
+
+/*
+ * Unlink selected cases from current TestPlan.
+ *
+ * Rewrite function unlinkCasePlan to avoid conflict. Remove it when confirm it's not used any more.
+ */
+function unlinkCasesFromPlan(container, form, table)
+{
+    var selection = serializeCaseFromInputList2(table);
+    if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+        alert('At least one case is required to delete.');
+        return false;
+    }
+
+    var parameters = serialzeCaseForm(form, table, true);
+    parameters.a = 'delete_cases';
+    if (selection.selectAll) {
+        parameters.selectAll = selection.selectAll;
+    }
+    parameters.case = selection.selectedCasesIds;
+
+    var c = confirm("Are you sure you want to delete test case(s) from this test plan?");
+    if (!c) {
+        return false;
+    }
+
+    var success = function(t) {
+        returnobj = t.responseText.evalJSON(true);
+        if(returnobj.rc == 0) {
+            parameters.a = 'initial';
+            constructPlanDetailsCasesZone(container, parameters.from_plan, parameters);
+            return true;
+        }
+        alert(returnobj.response);
+    }
+
     var url = new String('cases/');
     new Ajax.Request(url, {
         method: 'post',

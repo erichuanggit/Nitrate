@@ -35,7 +35,7 @@
 						<li><input type="button" class="clone icon_plan" value="Clone" title="Clone selected cases to another test plan" disabled="true"/></li>
 						{% endif %}
 						{% if perms.testcases.delete_testcaseplan %}
-						<li><input type="button" class="delete icon_plan" value="Remove" title="Remove selected cases from this plan" onclick="unlinkCasePlan(this.up(7), serialzeCaseForm(this.up(6), this.up(6).next()));" /></li>
+						<li><input type="button" class="delete icon_plan" value="Remove" title="Remove selected cases from this plan" onclick="unlinkCasesFromPlan(this.up(7), this.up(6), this.up(6).next());" /></li>
 						{% else %}
 						<li><input type="button" class="delete icon_plan" value="Remove" title="Remove selected cases from this plan" disabled="true"/></li>
 						{% endif %}
