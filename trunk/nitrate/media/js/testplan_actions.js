@@ -1137,13 +1137,16 @@ function serializeFormData(options) {
     var form = options.form;
     var container = options.zoneContainer;
     var selection = options.casesSelection;
+    var hashable = options.hashable || false;
 
-    var params = form.serialize();
+    var formdata = form.serialize(hashable);
+
     var prevCriterias = jQ(container).find('.js-load-more')
                                      .attr('data-criterias')
                                      .replace(/a=\w+/, '');
+    var unhashableData = prevCriterias;
     if (selection.selectAll) {
-        params += '&' + prevCriterias + '&selectAll=1';
+        unhashableData += '&selectAll=1';
     }
     var casepks = [''];
     var loopCount = selection.selectedCasesIds.length;
@@ -1151,9 +1154,29 @@ function serializeFormData(options) {
     for (var i = 0; i < loopCount; i++) {
         casepks.push('case=' + selectedCasesIds[i]);
     }
-    params += casepks.join('&');
+    unhashableData += casepks.join('&');
 
-    return params;
+    if (hashable) {
+        var arr = unhashableData.split('&');
+        for (var i = 0; i < arr.length; i++) {
+            var parts = arr[i].split('=');
+            var key = parts[0], value = parts[1];
+            if (key in formdata) {
+                // Before setting value, the original value must be converted to an array object.
+                if (formdata[key].push === undefined) {
+                    formdata[key] = [formdata[key], value];
+                } else {
+                    formdata[key].push(value);
+                }
+            } else {
+                formdata[key] = value;
+            }
+        }
+    } else {
+        formdata += '&' + unhashableData;
+    }
+
+    return formdata;
 }
 
 function constructPlanDetailsCasesZone(container, plan_id, parameters)
@@ -1187,7 +1210,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         // Filter cases
         form.observe('submit', function(e) {
             e.stop();
-            var params = serialzeCaseForm(form, table);
+            var params = serializeCaseForm2(form, table, true, true);
             constructPlanDetailsCasesZone(container, plan_id, params);
         });
 
@@ -1572,21 +1595,29 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         if(form.adjacent('input.tag_add').length > 0) {
             var element = form.adjacent('input.tag_add')[0];
             element.observe('click',function(e) {
-                if(serializeCaseFromInputList(table).length == 0){
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                
+
                 constructBatchTagProcessDialog(plan_id);
-                
+
                 // Observe the batch tag form submit
                 $('id_batch_tag_form').observe('submit',function(e){
                     e.stop();
-                    var params = this.serialize(true);
-                    params['case'] = serializeCaseFromInputList(table);
-                    if(!params.tags)
+
+                    var tagData = this.serialize(true);
+                    if(!tagData.tags)
                         return false;
-                    
+                    var params = serializeFormData({
+                        form: this,
+                        zoneContainer: container,
+                        casesSelection: selection,
+                        hashable: true
+                    });
+                    params.tags = tagData.tags;
+
                     var format = 'serialized';
                     addBatchTag(params, tag_callback, format);
                 })
@@ -1753,7 +1784,6 @@ function constructPlanComponentModificationDialog(container)
 function constructBatchTagProcessDialog(plan_id){
     $('dialog').show();
     $('dialog').update('<form id="id_batch_tag_form"><div class="dia_title" style=" margin:30px 20px;">Please type tag name:</div><div class="dia_content" style=" margin:30px 20px;"><input type="text" id="add_tag_plan" name="tags" style="width:300px; height:25px; border:solid  1px #ccc"/><div id="id_batch_add_tags_autocomplete"></div></div><div style=" margin:30px 20px;"><input type="submit" value="Submit"><input type="button" value="Cancel" onclick="this.up(2).hide();"></div></div></form>');
-
     // Bind the autocomplete for tags
     new Ajax.Autocompleter("add_tag_plan", "id_batch_add_tags_autocomplete",
         getURLParam().url_get_product_info, {

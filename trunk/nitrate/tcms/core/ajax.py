@@ -191,6 +191,7 @@ def tag(request, template_name="management/get_tag.html"):
         __all__ = ['plan', 'case', 'run']
 
         def __init__(self, request, template_name):
+            self.request = request
             self.template_name = template_name
             for o in self.__all__:
                 if request.REQUEST.get(o):
@@ -206,7 +207,8 @@ def tag(request, template_name="management/get_tag.html"):
             return self.template_name, TestPlan.objects.filter(pk__in = self.object_pks)
 
         def case(self):
-            return self.template_name, TestCase.objects.filter(pk__in = self.object_pks)
+            from tcms.apps.testcases.views import get_selected_testcases
+            return self.template_name, get_selected_testcases(self.request)
 
         def run(self):
             self.template_name = 'run/get_tag.html'

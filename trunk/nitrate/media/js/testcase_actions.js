@@ -1033,6 +1033,25 @@ function serialzeCaseForm(form, table, serialized)
     return data
 }
 
+/*
+ * New implementation of serialzeCaseForm to allow to choose whether the
+ * TestCases' Ids are necessary to be serialized.
+ *
+ * Be default if no value is passed to exclude_cases, not exclude them.
+ */
+function serializeCaseForm2(form, table, serialized, exclude_cases)
+{
+    if(typeof(serialized) != 'boolean')
+    var serialized = true;
+    var data = form.serialize(serialized);
+    var _exclude = exclude_cases === undefined ? false : exclude_cases;
+    if (!_exclude) {
+        data['case'] = serializeCaseFromInputList(table);
+    }
+    return data
+}
+
+
 function toggleDiv(link, divId){
     var link = jQ(link);
     var div = jQ('#'+divId);
