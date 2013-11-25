@@ -2175,3 +2175,29 @@ Nitrate.TestPlans.Runs = {
         return false;
     }
 }
+
+/*
+ * Write new run from partial or all filtered cases.
+ *
+ * FIXME: this function is similar to some other functions within tcms_actions.js, that wraps
+ *        function postToURL. All these functions have almost same behavior. Abstraction can be done
+ *        better.
+ */
+function writeNewRunFromFilteredCases(options) {
+    var requestMethod = options.requestMethod || 'post';
+    var url = options.url;
+    var form = options.form;
+    var casesContainer = options.table;
+
+    var selection = serializeCaseFromInputList2(casesContainer);
+    if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+        alert('At least one case is required by a run.');
+        return false;
+    }
+    var params = serialzeCaseForm(form, casesContainer, true);
+    if (selection.selectAll) {
+        params.selectAll = selection.selectAll;
+    }
+    params.case = selection.selectedCasesIds;
+    postToURL(url, params, requestMethod);
+}

@@ -79,10 +79,13 @@ def new(request, template_name='run/new.html'):
         ))
 
     # Ready to write cases to test plan
-    tcs = TestCase.objects.filter(case_id__in=request.REQUEST.getlist('case'))
+    from tcms.apps.testcases.views import get_selected_testcases
+    selected_cases = get_selected_testcases(request)
+    tcs = TestCase.objects.filter(case_id__in=selected_cases)
     tp = TestPlan.objects.select_related().get(plan_id=plan_id)
     tcrs = TestCaseRun.objects.filter(case_run_id__in=request.REQUEST.getlist('case_run_id'))
 
+    # FIXME: using group by to save potential lots of SQL statements.
     num_unconfirmed_cases = 0
     for tc in tcs:
         # Hardcode here, the case_status_id is CONFIRMED
@@ -202,6 +205,7 @@ def new(request, template_name='run/new.html'):
         })
         form.populate(product_id=tp.product_id)
 
+    # FIXME: pagination cases within Create New Run page.
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,

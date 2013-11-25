@@ -53,13 +53,13 @@
                 <span class='sprites toolbar_run_disabled icon_plan'>Run</span>
                 {% endif %}
                     <ul>
-				        {% if perms.testruns.add_testrun %}
-                        <li><input class="new_run icon_plan" type="button" value="Write new run" onclick="var p = serialzeCaseForm(this.up(6), this.up(6).next()); postToURL('{% url tcms.apps.testruns.views.new %}', p, 'post');"/></li>
+			{% if perms.testruns.add_testrun %}
+                        <li><input class="new_run icon_plan" type="button" value="Write new run" onclick="writeNewRunFromFilteredCases({url: '{% url tcms.apps.testruns.views.new %}', form: this.up(6), table: this.up(6).next(), requestMethod: 'post'});"/></li>
                         <li><input type= "button" class="search icon_plan" value="Add cases to run" onclick="var p = serialzeCaseForm(this.up(6), this.up(6).next()); postToURL('{% url tcms.apps.testplans.views.choose_run test_plan.plan_id %}', p, 'get');" /></li>
-			    	    {% else %}
-				        <li><input type="button" class="new_run icon_plan" title="Make new test run from selected cases" value="Write new run" disabled="true" /></li>
+			{% else %}
+			<li><input type="button" class="new_run icon_plan" title="Make new test run from selected cases" value="Write new run" disabled="true" /></li>
                         <li><input type="button" class="search icon_plan" value="Add cases to run" disabled="true"></li>
-				        {% endif %}
+			{% endif %}
                     </ul>
                 </li>
 				<li>
