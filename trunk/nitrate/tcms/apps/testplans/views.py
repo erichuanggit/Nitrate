@@ -50,6 +50,7 @@ from tcms.core.models import TCMSLog
 from tcms.search.order import order_plan_queryset
 from tcms.search import remove_from_request_path
 
+from tcms.apps.testcases.views import get_selected_testcases
 from tcms.apps.testplans.forms import NewPlanForm, EditPlanForm, ClonePlanForm, \
         ImportCasesViaXMLForm, SearchPlanForm, PlanComponentForm
 from tcms.apps.testcases.forms import SearchCaseForm
@@ -500,9 +501,15 @@ def get(request, plan_id, slug=None, template_name = 'plan/get.html'):
 @user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
 def choose_run(request, plan_id, template_name='plan/choose_testrun.html'):
     """Choose one run to add cases"""
+
     # Define the default sub module
     SUB_MODULE_NAME = 'runs'
     if request.method == 'GET':
+        try:
+            plan_id = int(plan_id)
+        except:
+            # Raising 404 to mean the plan user is requesting does not exist.
+            raise Http404
         tp = get_object_or_404(TestPlan, plan_id=plan_id)
         testruns = TestRun.objects.filter(plan=plan_id)
 
@@ -525,8 +532,8 @@ def choose_run(request, plan_id, template_name='plan/choose_testrun.html'):
             ))
 
         # Ready to write cases to test plan
-        tcs_id = request.REQUEST.getlist('case')
-        tcs = TestCase.objects.filter(case_id__in=tcs_id)
+        tcs = get_selected_testcases(request)
+        tcs = TestCase.objects.filter(case_id__in=tcs)
 
         return direct_to_template(request, template_name, {
             'module': MODULE_NAME,
@@ -535,7 +542,6 @@ def choose_run(request, plan_id, template_name='plan/choose_testrun.html'):
             'plan': tp,
             'test_run_list': testruns,
             'test_cases': tcs,
-            'tcids': tcs_id,
         })
 
     #Add cases to runs
@@ -982,11 +988,8 @@ def cases(request, plan_id):
                 ajax_response['reponse'] = 'At least one case is required to delete.'
                 return HttpResponse(json_dumps(ajax_response))
 
-            from tcms.apps.testcases.views import get_selected_testcases
             selected_cases = get_selected_testcases(request)
             tcs = TestCase.objects.filter(case_id__in=selected_cases)
-
-            import pdb; pdb.set_trace()
 
             # Log Action
             tp_log = TCMSLog(model=tp)

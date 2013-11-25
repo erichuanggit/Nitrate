@@ -2177,14 +2177,22 @@ Nitrate.TestPlans.Runs = {
 }
 
 /*
- * Write new run from partial or all filtered cases.
+ * Request specific operation upon filtered TestCases.
+ *
+ * Default HTTP method is GET.
+ *
+ * Options:
+ * - url: the URL representing the service requesting to now.
+ * - form: containing all necessary data serialized as the data included in REQUEST.
+ * - casesContainer: containing all INPUT with type checkbox, each of them holds every filtered
+ *                   TestCase' Id. Typcicall, it's a TABLE in the current implementation.
  *
  * FIXME: this function is similar to some other functions within tcms_actions.js, that wraps
  *        function postToURL. All these functions have almost same behavior. Abstraction can be done
  *        better.
  */
-function writeNewRunFromFilteredCases(options) {
-    var requestMethod = options.requestMethod || 'post';
+function requestOperationUponFilteredCases(options) {
+    var requestMethod = options.requestMethod || 'get';
     var url = options.url;
     var form = options.form;
     var casesContainer = options.table;
@@ -2200,4 +2208,18 @@ function writeNewRunFromFilteredCases(options) {
     }
     params.case = selection.selectedCasesIds;
     postToURL(url, params, requestMethod);
+}
+
+/*
+ * Write new run from partial or all filtered cases.
+ */
+function writeNewRunFromFilteredCases(options) {
+    return requestOperationUponFilteredCases(options);
+}
+
+/*
+ * Add partial or all filtered cases to an existing TestRun.
+ */
+function addFilteredCasesToRun(options) {
+    return requestOperationUponFilteredCases(options);
 }
