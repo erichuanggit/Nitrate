@@ -803,6 +803,8 @@ def clone(request, template_name='run/clone.html'):
     SUB_MODULE_NAME = "runs"
 
     trs = TestRun.objects.select_related()
+
+    #TODO optionally get these runs from a filter string
     trs = trs.filter(pk__in=request.REQUEST.getlist('run'))
 
     if not trs:

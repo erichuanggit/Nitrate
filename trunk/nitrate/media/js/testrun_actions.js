@@ -98,7 +98,8 @@ Nitrate.TestRuns.Details.on_load = function()
         toggleAllCheckBoxes(this, 'id_table_cases', 'case_run');
     })
     
-    
+    Nitrate.Utils.enableShiftSelectOnCheckbox('caserun_selector');
+
     if($('id_check_box_highlight').checked)
         $$('.mine').invoke('addClassName','highlight');
     
