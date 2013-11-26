@@ -1094,12 +1094,13 @@ def text_history(request, case_id, template_name='case/history.html'):
         'select_case_text_version': int(request.REQUEST.get('case_text_version', 0)),
     })
 
+
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcase'))
 def clone(request, template_name='case/clone.html'):
     """Clone one case or multiple case into other plan or plans"""
     SUB_MODULE_NAME = 'cases'
 
-    if not request.REQUEST.get('case'):
+    if 'selectAll' not in request.REQUEST and 'case' not in request.REQUEST:
         return HttpResponse(Prompt.render(
             request=request,
             info_type=Prompt.Info,
@@ -1254,16 +1255,17 @@ def clone(request, template_name='case/clone.html'):
                 next=reverse('tcms.apps.testplans.views.all')
             ))
     else:
+        selected_cases = get_selected_testcases(request)
         # Initial the clone case form
         clone_form = CloneCaseForm(initial={
-            'case': request.REQUEST.getlist('case'),
+            'case': selected_cases,
             'copy_case': False,
             'maintain_case_orignal_author': True,
             'maintain_case_orignal_default_tester': True,
             'copy_component': True,
             'copy_attachment': True,
         })
-        clone_form.populate(case_ids=request.REQUEST.getlist('case'))
+        clone_form.populate(case_ids=selected_cases)
 
     # Generate search plan form
     if request.REQUEST.get('from_plan'):
@@ -1280,6 +1282,8 @@ def clone(request, template_name='case/clone.html'):
         'clone_form': clone_form,
         'submit_action': submit_action,
     })
+
+
 def tag(request):
     """
     Management test case tags

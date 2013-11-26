@@ -2232,7 +2232,8 @@ function requestOperationUponFilteredCases(options) {
         alert('At least one case is required by a run.');
         return false;
     }
-    var params = serialzeCaseForm(form, casesContainer, true);
+    // Exclude selected cases, that will be added from the selection.
+    var params = serializeCaseForm2(form, casesContainer, true, true);
     if (selection.selectAll) {
         params.selectAll = selection.selectAll;
     }
@@ -2251,5 +2252,12 @@ function writeNewRunFromFilteredCases(options) {
  * Add partial or all filtered cases to an existing TestRun.
  */
 function addFilteredCasesToRun(options) {
+    return requestOperationUponFilteredCases(options);
+}
+
+/*
+ * Request clone current selected TestCases
+ */
+function requestCloneFilteredCases(options) {
     return requestOperationUponFilteredCases(options);
 }
