@@ -53,8 +53,12 @@
 	<input type="hidden" name="product_version" value="{{ test_plan.get_version_id }}" />
 	{% if perms.testruns.add_testrun %}
 	<div class="mixbar actions">
-		<div class='marginLeft'>
-		<input class="clone icon_plan" type="submit" value="Clone" title="clone selected test runs" />
+		<div class='marginLeft fixed'>
+			<input class="clone icon_plan left_float" type="submit"
+				value="Clone" title="clone selected test runs"/>
+			<input class="progress" type="button"
+				value="Calculate Progress" id="btn_selected_progress"
+				title="calculate progress of selected test runs"/>
 		</div>
 	</div>
 	{% endif %}

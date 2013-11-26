@@ -17,63 +17,61 @@
  */
 
 (function ($) {
-    $.fn.shiftcheckbox = function()
-    {
-        var prevChecked = null;
+  $.fn.shiftcheckbox = function() {
 
-        selectorStr = this.selector;
-        $(selectorStr).live("click", handleClick);
-    };
+    var prevChecked = null;
+    var selectorStr = this.selector;
 
-    function handleClick(event)
-    {
-        var val = this.value;
-        var checkStatus = this.checked;
-        //get the checkbox number which the user has checked
+    function handleClick(event){
+      var val = this.value;
+      var checkStatus = this.checked;
+      //get the checkbox number which the user has checked
 
-        //check whether user has pressed shift
-        if (event.shiftKey) {
-            if (prevChecked != 'null') {
-                //get the current checkbox number
-                var ind = 0, found = 0, currentChecked;
-                currentChecked = getSelected(val);
+      //check whether user has pressed shift
+      if (event.shiftKey) {
+        if (prevChecked != 'null') {
+          //get the current checkbox number
+          var ind = 0, found = 0, currentChecked;
+          currentChecked = getSelected(val);
 
-                ind = 0;
-                if (currentChecked < prevChecked) {
-                    $(selectorStr).each(function(i) {
-                        if (ind >= currentChecked && ind <= prevChecked) {
-                            this.checked = checkStatus;
-                        }
-                        ind++;
-                    });
-                } else {
-                    $(selectorStr).each(function(i) {
-                        if (ind >= prevChecked && ind <= currentChecked) {
-                            this.checked = checkStatus;
-                        }
-                        ind++;
-                    });
-                }
+          ind = 0;
+          if (currentChecked < prevChecked) {
+            $(selectorStr).each(function(i) {
+              if (ind >= currentChecked && ind <= prevChecked) {
+                this.checked = checkStatus;
+              }
+              ind++;
+            });
+          } else {
+            $(selectorStr).each(function(i) {
+              if (ind >= prevChecked && ind <= currentChecked) {
+                this.checked = checkStatus;
+              }
+              ind++;
+            });
+          }
 
-                prevChecked = currentChecked;
-            }
-        } else {
-            if (checkStatus) {
-                prevChecked = getSelected(val);
-            }
+          prevChecked = currentChecked;
         }
+      } else {
+        if (checkStatus) {
+          prevChecked = getSelected(val);
+        }
+      }
     };
 
-    function getSelected(val)
-    {
-        var ind = 0, found = 0, checkedIndex;
-        $(selectorStr).each(function(i) {
-            if (val == this.value && found != 1) {
-                checkedIndex = ind;
-                found = 1;
-            }
-            ind++;
-        });
-        return checkedIndex;
+    function getSelected(val) {
+      var ind = 0, found = 0, checkedIndex;
+      $(selectorStr).each(function(i) {
+        if (val == this.value && found != 1) {
+          checkedIndex = ind;
+          found = 1;
+        }
+        ind++;
+      });
+      return checkedIndex;
     };
+
+    $(selectorStr).live("click", handleClick);
+  };
 })(jQuery);

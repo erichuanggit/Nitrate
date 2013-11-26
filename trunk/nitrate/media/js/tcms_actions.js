@@ -1,5 +1,7 @@
 // Create a dictionary to avoid polluting the global namespace:
-var Nitrate = {};
+var Nitrate = window.Nitrate || {}; // Ironically, this global name is not respected. So u r on ur own.
+window.Nitrate = Nitrate;
+
 Nitrate.Utils = {};
 var short_string_length = 100;
 var nil;
@@ -9,9 +11,13 @@ var nil;
     Set up a function callback for after the page has loaded
  */
 Nitrate.Utils.after_page_load = function(callback) {
+    var that = this;
     Event.observe(window, 'load', callback);
 };
 
+Nitrate.Utils.enableShiftSelectOnCheckbox = function (className){
+    jQ('.'+className).shiftcheckbox();
+}
 
 Nitrate.Utils.convert = function(argument, data) {
     switch(argument) {
@@ -1438,6 +1444,7 @@ function exportCase(url, form, table) {
         alert(default_messages.alert.no_case_selected);
         return false;
     }
+
     var params = serialzeCaseForm(form, table, true);
     if (selection.selectAll) {
         params.selectAll = selection.selectAll;
@@ -1446,5 +1453,3 @@ function exportCase(url, form, table) {
     params.case = selection.selectedCasesIds;
     postToURL(url, params);
 }
-
-var printableCases = exportCase;

@@ -1,6 +1,6 @@
 {% for test_run in test_runs %}
 <tr class="{% cycle 'odd' 'even' %}" id="run_{{test_run.run_id}}">
-	<td><input type="checkbox" class="shiftselect" name="run" value="{{ test_run.pk }}" /></td>
+	<td><input type="checkbox" class="run_selector" name="run" value="{{ test_run.pk }}" /></td>
 	<td	 valign="top">
 		<a href="{% url tcms.apps.testruns.views.get test_run.run_id %}?from_plan={{ test_plan.plan_id }}">{{ test_run.run_id }}</a>
 	</td>

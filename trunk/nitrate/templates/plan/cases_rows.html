@@ -16,7 +16,7 @@ test_cases should be a queryset of a list of TestCases.
 	<td>
 		{# FIXME: replacing selected_case_ids with selected_cases_ids is proper  #}
 		<input type="checkbox" name="case" value="{{ test_case.pk }}"
-		class="checkbox shiftselect" {% if not selected_case_ids or test_case.pk in selected_case_ids %}checked{% endif %} />
+		class="checkbox case_selector" {% if not selected_case_ids or test_case.pk in selected_case_ids %}checked{% endif %} />
 	</td>
 	<td>
 		<a href="{% url tcms.apps.testcases.views.get test_case.case_id %}?from_plan={{ test_plan.plan_id }}">{{ test_case.pk }}</a>

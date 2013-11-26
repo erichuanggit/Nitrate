@@ -721,11 +721,15 @@ Nitrate.TestPlans.Details = {
             clickedSelectAll(this, 'testruns_table', 'run');
         });
 
+        Nitrate.Utils.enableShiftSelectOnCheckbox('case_selector');
+        Nitrate.Utils.enableShiftSelectOnCheckbox('run_selector');
+
         Nitrate.TestPlans.Runs.initializaRunTab();
         jQ('#show_more_runs').live('click', Nitrate.TestPlans.Runs.showMore);
         jQ('#reload_runs').live('click', Nitrate.TestPlans.Runs.reload);
         jQ('#tab_testruns').live('click', Nitrate.TestPlans.Runs.initializaRunTab);
         jQ('.btn-statistics').live('click', Nitrate.TestPlans.Runs.percent);
+        jQ('#btn_selected_progress').live('click', Nitrate.TestPlans.Runs.showPercentageOfSelectedRuns);
     }
 };
 
@@ -2201,6 +2205,18 @@ Nitrate.TestPlans.Runs = {
            bar.show(); // show the progress bar
         });
         return false;
+    }
+
+    , showPercentageOfSelectedRuns: function () {
+        var checkedBoxes = jQ('.run_selector:checked');
+        checkedBoxes.each(function (index, box) {
+            jQ(box).parent().parent().find('.btn-statistics').each(function (index, elem) {
+                var clickable = jQ(elem);
+                if (clickable.css('display') != 'none') {
+                    clickable.trigger('click');
+                }
+            });
+        });
     }
 }
 

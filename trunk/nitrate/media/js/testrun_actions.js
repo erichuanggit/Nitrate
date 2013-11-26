@@ -14,7 +14,9 @@ Nitrate.TestRuns.List.on_load = function()
     bind_version_selector_to_product(true, $('id_product'));
     bind_build_selector_to_product(true, $('id_product'));
 
+    Nitrate.Utils.enableShiftSelectOnCheckbox('run_selector');
     jQ('.btn-statistics').live('click', Nitrate.TestRuns.Progress.percent);
+    jQ('#btn_selected_progress').live('click', Nitrate.TestRuns.Progress.showPercentageOfSelectedRuns);
     
     if($('relativeSearchOption_case')) {
         $('relativeSearchOption_case').observe('click', function(e) {
@@ -374,6 +376,18 @@ Nitrate.TestRuns.Progress = {
             }
         });
         return false;
+    }
+
+    , showPercentageOfSelectedRuns: function () {
+        var checkedBoxes = jQ('.run_selector:checked');
+        checkedBoxes.each(function (index, box) {
+            jQ(box).parent().parent().find('.btn-statistics').each(function (index, elem) {
+                var clickable = jQ(elem);
+                if (clickable.css('display') != 'none') {
+                    clickable.trigger('click');
+                }
+            });
+        });
     }
 }
 
