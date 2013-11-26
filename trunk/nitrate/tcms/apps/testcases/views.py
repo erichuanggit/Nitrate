@@ -58,7 +58,9 @@ from fields import CC_LIST_DEFAULT_DELIMITER
 MODULE_NAME = "testcases"
 
 TESTCASE_OPERATION_ACTIONS = ('search', 'sort', 'update',
-                              'remove', 'add', 'change',
+                              'remove', # including remove tag from cases
+                              'add', # including add tag to cases
+                              'change',
                               'delete_cases', # unlink cases from a TestPlan
                               )
 
@@ -1289,14 +1291,15 @@ def tag(request):
     Management test case tags
     """
     ajax_response = {'rc': 0, 'response': 'ok', 'errors_list':[]}
-    tcs = TestCase.objects.filter(pk__in=request.REQUEST.getlist('case'))
+    # FIXME: It's unnecessary to check existance of each case Id. Because, in
+    # the following iteration through queried testcases, this problem is solved
+    # naturally.
+    tcs = get_selected_testcases(request)
     if not tcs:
         raise Http404
 
     if request.REQUEST.get('a'):
-        case_ids = request.POST.getlist('case')
         tag_ids = request.POST.getlist('o_tag')
-        tcs = TestCase.objects.filter(pk__in=case_ids)
         tags = TestTag.objects.filter(pk__in=tag_ids)
         for tc in tcs:
             for tag in tags:
@@ -1309,9 +1312,11 @@ def tag(request):
                     })
                     return HttpResponse(simplejson.dumps(ajax_response))
         return HttpResponse(simplejson.dumps(ajax_response))
+
     form = CaseTagForm(initial={'tag': request.REQUEST.get('o_tag')})
     form.populate(case_ids=tcs)
     return HttpResponse(form.as_p())
+
 
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasecomponent'))
 def component(request):

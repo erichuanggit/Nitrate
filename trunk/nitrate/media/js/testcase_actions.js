@@ -901,6 +901,7 @@ function renderCategoryForm(container, parameters, form_observe)
     })
 }
 
+// FIXME: abstract this function
 function updateCaseTag(url, parameters, callback)
 {
     new Ajax.Request(url, {
@@ -911,6 +912,7 @@ function updateCaseTag(url, parameters, callback)
     })
 }
 
+// FIXME: this
 function updateCaseComponent(url, parameters, callback)
 {
     new Ajax.Request(url, {
@@ -921,6 +923,7 @@ function updateCaseComponent(url, parameters, callback)
     })
 }
 
+// FIXME: this, and other code that calls Ajax.Request
 function updateCaseCategory(url, parameters, callback)
 {
     new Ajax.Request(url, {

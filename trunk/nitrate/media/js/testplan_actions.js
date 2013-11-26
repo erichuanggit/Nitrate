@@ -1629,22 +1629,19 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             var element = form.adjacent('input.tag_delete')[0];
             element.observe('click',function(e) {
                 var c = getDialog();
-                var params = {
-                    'case': serializeCaseFromInputList(table)
-                    };
-                if(serializeCaseFromInputList(table).length == 0){
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
                 var form_observe = function(e) {
                     e.stop();
 
-                    var params = this.serialize(true);
-                    params['case'] = serializeCaseFromInputList(table);
-                    if(params['case'].length == 0){
-                        alert(default_messages.alert.no_case_selected);
-                        return false;
-                    }
+                    var params = serializeFormData({
+                        form: this,
+                        zoneContainer: container,
+                        casesSelection: selection,
+                    });
 
                     var url = getURLParam().url_cases_tag;
                     var callback = function(t) {
@@ -1654,15 +1651,16 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                             alert(returnobj.response);
                             return false;
                         }
-                        parameters['case'] = params['case']
+                        parameters['case'] = selection.selectedCasesIds;
                         constructPlanDetailsCasesZone(container, plan_id, parameters);
                         clearDialog(c);
                     }
 
                     updateCaseTag(url, params, callback);
                 }
-                renderTagForm(c, params, form_observe);
-                
+                renderTagForm(c, {case: selection.selectedCasesIds}, form_observe);
+
+                // FIXME: seems this piece of code never gets called. Remove it after confirmation.
                 // Observe the batch tag form submit
                 $('id_batch_tag_form').observe('submit',function(e) {
                     e.stop();
