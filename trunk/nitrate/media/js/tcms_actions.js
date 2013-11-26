@@ -1453,3 +1453,5 @@ function exportCase(url, form, table) {
     params.case = selection.selectedCasesIds;
     postToURL(url, params);
 }
+
+var printableCases = exportCase;
