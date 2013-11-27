@@ -1141,9 +1141,13 @@ function serializeFormData(options) {
 
     var formdata = form.serialize(hashable);
 
+    // some dirty data remains in the previous criteria, remove them.
+    // FIXME: however, this is not a good way. CONSIDER to reuse filter form.
     var prevCriterias = jQ(container).find('.js-load-more')
                                      .attr('data-criterias')
-                                     .replace(/a=\w+/, '');
+                                     .replace(/a=\w+/, '')
+                                     .replace(/&?selectAll=1/, '')
+                                     .replace(/&?case=\d+/g, '');
     var unhashableData = prevCriterias;
     if (selection.selectAll) {
         unhashableData += '&selectAll=1';
@@ -1161,6 +1165,10 @@ function serializeFormData(options) {
         for (var i = 0; i < arr.length; i++) {
             var parts = arr[i].split('=');
             var key = parts[0], value = parts[1];
+            // FIXME: not sure how key can be an empty string
+            if (key.length === 0) {
+                continue;
+            }
             if (key in formdata) {
                 // Before setting value, the original value must be converted to an array object.
                 if (formdata[key].push === undefined) {
@@ -1282,25 +1290,35 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             var element = form.adjacent('input[name="new_case_status_id"]')[0];
             
             element.observe('change',function(t) {
-                var params = serialzeCaseForm(form, table);
-                
-                if(!this.value)
-                    return false;
-
-                if(params['case'].length == 0){
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                
-                var c = confirm(default_messages.confirm.change_case_status);
-                if(!c)
+                var status_pk = this.value;
+                if (!status_pk) {
                     return false;
-                
+                }
+                var c = confirm(default_messages.confirm.change_case_status);
+                if (!c) {
+                    return false;
+                }
+
+                var postdata = serializeFormData({
+                    form: form,
+                    zoneContainer: container,
+                    casesSelection: selection,
+                    hashable: true
+                });
+                postdata.a = 'update';
+                postdata.target_field = 'case_status';
+                postdata.new_value = status_pk;
+
                 var callback = function(t) {
                     returnobj = t.responseText.evalJSON(true);
                     
                     if(returnobj.rc == 0) {
-                        constructPlanDetailsCasesZone(container, plan_id, params);
+                        constructPlanDetailsCasesZone(container, plan_id, postdata);
                         jQ('#run_case_count').text(returnobj.run_case_count);
                         jQ('#case_count').text(returnobj.case_count);
                         jQ('#review_case_count').text(returnobj.review_case_count);
@@ -1309,44 +1327,61 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                         return false;
                     }
                 }
-                
-                changeCasesStatus(plan_id, params['case'], this.value, callback);
+
+                new Ajax.Request('/ajax/update/cases-case-status/', {
+                    method: 'post',
+                    parameters: postdata,
+                    onSuccess: callback,
+                    onFailure: json_failure
+                });
             });
         }
 
         if(form.adjacent('input[name="new_priority_id"]').length > 0) {
             var element = form.adjacent('input[name="new_priority_id"]')[0];
-            
             element.observe('change', function(t) {
-                var params = serialzeCaseForm(form, table);
-                if(!this.value)
-                    return false;
-                
-
-                if(params['case'].length == 0){
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                
-                var c=confirm(default_messages.confirm.change_case_priority)
-                if(!c)
+                // FIXME: how about show a message to user to let user know what is happening?
+                if(!this.value) {
                     return false;
-                
+                }
+                var c = confirm(default_messages.confirm.change_case_priority);
+                if (!c) {
+                    return false;
+                }
+
+                var postdata = serializeFormData({
+                    form: form,
+                    zoneContainer: container,
+                    casesSelection: selection,
+                    hashable: true
+                });
+                postdata.a = 'update';
+                postdata.target_field = 'priority';
+                postdata.new_value = this.value;
+
                 var callback = function(t) {
                     returnobj = t.responseText.evalJSON(true);
-                    
                     if(returnobj.rc != 0) {
                         alert(returnobj.response);
                         return false
                     };
-                    
-                    constructPlanDetailsCasesZone(container, plan_id, params);
-                }
-                
-                changeCasePriority(params['case'], this.value, callback);
+                    constructPlanDetailsCasesZone(container, plan_id, postdata);
+                };
+
+                new Ajax.Request('/ajax/update/cases-priority/', {
+                    method: 'post',
+                    parameters: postdata,
+                    onSuccess: callback,
+                    onFailure: json_failure
+                });
             })
         }
-        
+
         // Observe the batch case automated status button
         if (form.adjacent('input.btn_automated').length > 0) {
             var element = form.adjacent('input.btn_automated')[0];
@@ -1492,13 +1527,20 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         if(form.adjacent('input.btn_default_tester').length != 0) {
             var element = form.adjacent('input.btn_default_tester')[0];
             element.observe('click', function(e) {
-                var case_pks = serializeCaseFromInputList(table);
-                
-                if(case_pks.length == 0){
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                
+
+                var params = serializeFormData({
+                    form: form,
+                    zoneContainer: container,
+                    casesSelection: selection,
+                    hashable: true
+                });
+                params.a = 'update';
+
                 var callback = function(t) {
                     var returnobj = t.responseText.evalJSON();
                     
@@ -1506,12 +1548,10 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                         alert(returnobj.response);
                         return false
                     };
-                    parameters['case'] = case_pks;
-                    constructPlanDetailsCasesZone(container, plan_id, parameters);
-                }
-                
-                var field = 'default_tester';
-                changeCaseMember(table, field, case_pks, callback);
+                    constructPlanDetailsCasesZone(container, plan_id, params);
+                };
+
+                changeCaseMember(params, callback);
             })
         }
 
@@ -1817,24 +1857,22 @@ function toggleMultiSelect(){
     $('filter_priority_selector_multiple').toggle();
 }
 
-function changeCaseMember(container, field, case_ids, callback)
+function changeCaseMember(parameters, callback)
 {
     var p = prompt('Please type new email or username');
-    if(!p)
+    if(!p) {
         return false;
-    
-    var parameters = {
-          'info_type': 'users',
-          'username': p,
     }
-    
-    getInfoAndUpdateObject(
-        parameters,
-        'testcases.testcase',
-        case_ids,
-        field,
-        callback
-    )
+
+    parameters.target_field = 'default_tester';
+    parameters.new_value = p;
+
+    new Ajax.Request('/ajax/update/cases-default-tester/', {
+        method: 'post',
+        parameters: parameters,
+        onSuccess: callback,
+        onFailure: json_failure
+    })   
 }
 
 function constructPlanParentPreviewDialog(plan_id, parameters, callback)

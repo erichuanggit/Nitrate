@@ -22,27 +22,34 @@ Shared functions for plan/case/run.
 Most of these functions are use for Ajax.
 """
 import datetime
+
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.models import User
+from django.core import serializers
+from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import Q
+from django.dispatch import Signal
+from django.http import Http404
 from django.http import HttpResponse
 from django.utils import simplejson
 from django.views.generic.simple import direct_to_template
-from django.contrib.auth.decorators import user_passes_test
-from django.contrib.auth.models import User
-from django.core.cache import cache
-from django.core import serializers
-from django.dispatch import Signal
 
-from tcms.apps.testplans.models import TestPlan, TestCasePlan
-from tcms.apps.testcases.models import TestCase, TestCaseTag, TestCaseBugSystem as BugSystem
-from tcms.apps.testruns.models import TestRun, TestCaseRun, TestRunTag, TestCaseRunStatus
-from tcms.apps.management.models import TestTag, TestTag
-from tcms.core.utils import get_string_combinations
-from tcms.core.helpers.comments import add_comment
-
-from tcms.apps.testcases.models import TestCaseCategory
 from tcms.apps.management.models import Component, TestBuild, Version
+from tcms.apps.management.models import Priority
+from tcms.apps.management.models import TestTag, TestTag
+from tcms.apps.testcases.models import TestCase, TestCaseTag, TestCaseBugSystem as BugSystem
+from tcms.apps.testcases.models import TestCaseCategory
+from tcms.apps.testcases.models import TestCaseStatus
+from tcms.apps.testcases.views import get_selected_testcases
+from tcms.apps.testcases.views import plan_from_request_or_none
+from tcms.apps.testplans.models import TestPlan, TestCasePlan
 from tcms.apps.testruns import signals as run_watchers
+from tcms.apps.testruns.models import TestRun, TestCaseRun, TestRunTag, TestCaseRunStatus
+from tcms.core.helpers.comments import add_comment
+from tcms.core.utils import get_string_combinations
+from tcms.core.utils.mailto import mailto
 
 post_update = Signal(providing_args=["instances", "kwargs"])
 post_update.connect(run_watchers.post_update_handler)
@@ -351,6 +358,8 @@ def update(request):
     field     = data.get('field')
     value     = data.get('value')
 
+    import pdb; pdb.set_trace()
+
     object_pk = [int(a) for a in object_pk_str.split(',')]
 
     if not field or not value or not object_pk or not ctype:
@@ -543,6 +552,8 @@ def update_case_run_status(request):
             'f_percent': test_run.failed_case_run_percent
     }))
 
+
+# Deprecated. Remove this dead code.
 def update_case_status(request):
     '''
     Update Test Case Status, return Plan's case count in json for update in real-time.
@@ -625,6 +636,127 @@ def update_case_status(request):
            'review_case_count': review_case_count
         })
     )
+
+
+class TestCaseUpdateActions(object):
+    '''Actions to update each possible proprety of TestCases
+
+    Define your own method named _update_[property name] to hold specific update
+    logic.
+    '''
+
+    ctype = 'testcases.testcase'
+
+    def __init__(self, request):
+        self.request = request
+        self.target_field = request.REQUEST.get('target_field')
+        self.new_value = request.REQUEST.get('new_value')
+
+    def get_update_action(self):
+        return getattr(self, '_update_%s' % self.target_field, None)
+
+    def update(self):
+        action = self.get_update_action()
+        if action is not None:
+            has_perms = check_permission(self.request, self.ctype)
+            if not has_perms:
+                return say_no('You don\'t have enough permission to update '
+                              'TestCases.')
+            try:
+                resp = action()
+                self._sendmail()
+            except ObjectDoesNotExist, err:
+                return say_no(err.message)
+            except Exception:
+                raise
+                # TODO: besides this message to users, what happening should be
+                #       recorded in the system log.
+                return say_no('Update failed. Please try again or request '
+                              'support from your organization.')
+            else:
+                if resp is None:
+                    resp = say_yes()
+                return resp
+        return say_no('Not know what to update.')
+
+    def get_update_targets(self):
+        self._update_objects = get_selected_testcases(self.request)
+        return self._update_objects
+
+    def _sendmail(self):
+        mail_context = TestCase.mail_scene(objects=self._update_objects,
+                                           field=self.target_field,
+                                           value=self.new_value)
+        if mail_context:
+            mail_context['request'] = self.request
+            try:
+                mailto(**mail_context)
+            except:
+                pass
+
+    def _update_priority(self):
+        exists = Priority.objects.filter(pk=self.new_value).exists()
+        if not exists:
+            raise ObjectDoesNotExist('The priority you specified to change '
+                                     'does not exist.')
+        self.get_update_targets().update(**{self.target_field: self.new_value})
+
+    def _update_default_tester(self):
+        user_pk = User.objects.filter(
+            username=self.new_value).values_list('pk', flat=True)
+        if not user_pk:
+            raise ObjectDoesNotExist('Your input is not found.')
+        self.get_update_targets().update(**{self.target_field: user_pk[0]})
+
+    def _update_case_status(self):
+        exists = TestCaseStatus.objects.filter(pk=self.new_value).exists()
+        if not exists:
+            raise ObjectDoesNotExist('The status you choose does not exist.')
+        self.get_update_targets().update(**{self.target_field: self.new_value})
+
+        # ###
+        # Case is moved between Cases and Reviewing Cases tabs accoding to the
+        # change of status. Meanwhile, the number of cases with each status
+        # should be updated also.
+
+        try:
+            plan = plan_from_request_or_none(self.request)
+        except Http404:
+            return say_no("No plan record found.")
+        else:
+            if plan is None:
+                return say_no('No plan record found.')
+
+        confirm_status_name = 'CONFIRMED'
+        plan.run_case = plan.case.filter(case_status__name=confirm_status_name)
+        plan.review_case = plan.case.exclude(case_status__name=confirm_status_name)
+        run_case_count = plan.run_case.count()
+        case_count = plan.case.count()
+        # FIXME: why not calculate review_case_count or run_case_count by using
+        # substraction, which saves one SQL query.
+        review_case_count = plan.review_case.count()
+
+        return HttpResponse(
+            simplejson.dumps({
+               'rc': 0, 'response': 'ok',
+               'run_case_count': run_case_count,
+               'case_count': case_count,
+               'review_case_count': review_case_count
+            })
+        )
+
+
+# NOTE: what permission is necessary
+# FIXME: find a good chance to map all TestCase property change request to this
+def update_cases_default_tester(request):
+    '''Update default tester upon selected TestCases'''
+    proxy = TestCaseUpdateActions(request)
+    return proxy.update()
+
+
+update_cases_priority = update_cases_default_tester
+update_cases_case_status = update_cases_default_tester
+
 
 def comment_case_runs(request):
     '''

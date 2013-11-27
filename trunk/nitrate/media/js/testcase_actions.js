@@ -591,6 +591,7 @@ function changeCaseOrder(parameters, callback)
     updateObject(ctype, object_pk, field, value, vtype, callback);
 }
 
+// Deprecated. dead code.
 function changeCasesStatus(plan_id, object_pk, value, callback)
 {
     var plan_id = plan_id;
@@ -600,6 +601,7 @@ function changeCasesStatus(plan_id, object_pk, value, callback)
     updateCaseStatus(plan_id, ctype, object_pk, field, value, vtype, callback);
 }
 
+// Deprecated. dead code.
 function changeCasePriority(object_pk, value, callback)
 {
     var ctype = 'testcases.testcase';
