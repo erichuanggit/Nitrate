@@ -1555,24 +1555,28 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             })
         }
 
-        if(form.adjacent('input.sort_list').length != 0) {
+        if (form.adjacent('input.sort_list').length != 0) {
             var element = form.adjacent('input.sort_list')[0];
             element.observe('click', function(e) {
-                var case_plan_pks = serializeCasePlanIDFromInputList(table);
-                var case_pks = serializeCaseFromInputList(table);
-                if(case_plan_pks.length == 0) {
+                // NOTE: new implemenation does not use testcaseplan.pk
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                var params = {
-                    'testcaseplan': case_plan_pks
-                };
+                var postdata = serializeFormData({
+                    form: form,
+                    zoneContainer: container,
+                    casesSelection: selection,
+                    hashable: true
+                });
+
                 var callback = function(t) {
-                    parameters['case'] = case_pks;
-                    constructPlanDetailsCasesZone(container, plan_id, parameters);
+                    postdata.case = selection.selectedCasesIds;
+                    constructPlanDetailsCasesZone(container, plan_id, postdata);
                 };
-                changeCaseOrder(params, callback);
-            })
+                changeCaseOrder2(postdata, callback);
+            });
         }
 
         if(form.adjacent('input.btn_reviewer').length > 0) {
