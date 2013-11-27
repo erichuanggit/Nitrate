@@ -1294,25 +1294,35 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             var element = form.adjacent('input[name="new_case_status_id"]')[0];
             
             element.observe('change',function(t) {
-                var params = serialzeCaseForm(form, table);
-                
-                if(!this.value)
-                    return false;
-
-                if(params['case'].length == 0){
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                
-                var c = confirm(default_messages.confirm.change_case_status);
-                if(!c)
+                var status_pk = this.value;
+                if (!status_pk) {
                     return false;
-                
+                }
+                var c = confirm(default_messages.confirm.change_case_status);
+                if (!c) {
+                    return false;
+                }
+
+                var postdata = serializeFormData({
+                    form: form,
+                    zoneContainer: container,
+                    casesSelection: selection,
+                    hashable: true
+                });
+                postdata.a = 'update';
+                postdata.target_field = 'case_status';
+                postdata.new_value = status_pk;
+
                 var callback = function(t) {
                     returnobj = t.responseText.evalJSON(true);
                     
                     if(returnobj.rc == 0) {
-                        constructPlanDetailsCasesZone(container, plan_id, params);
+                        constructPlanDetailsCasesZone(container, plan_id, postdata);
                         jQ('#run_case_count').text(returnobj.run_case_count);
                         jQ('#case_count').text(returnobj.case_count);
                         jQ('#review_case_count').text(returnobj.review_case_count);
@@ -1321,8 +1331,13 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                         return false;
                     }
                 }
-                
-                changeCasesStatus(plan_id, params['case'], this.value, callback);
+
+                new Ajax.Request('/ajax/update/cases-case-status/', {
+                    method: 'post',
+                    parameters: postdata,
+                    onSuccess: callback,
+                    onFailure: json_failure
+                });
             });
         }
 
