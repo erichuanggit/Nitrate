@@ -1145,9 +1145,13 @@ function serializeFormData(options) {
 
     var formdata = form.serialize(hashable);
 
+    // some dirty data remains in the previous criteria, remove them.
+    // FIXME: however, this is not a good way. CONSIDER to reuse filter form.
     var prevCriterias = jQ(container).find('.js-load-more')
                                      .attr('data-criterias')
-                                     .replace(/a=\w+/, '');
+                                     .replace(/a=\w+/, '')
+                                     .replace(/&?selectAll=1/, '')
+                                     .replace(/&?case=\d+/g, '');
     var unhashableData = prevCriterias;
     if (selection.selectAll) {
         unhashableData += '&selectAll=1';
@@ -1512,13 +1516,20 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         if(form.adjacent('input.btn_default_tester').length != 0) {
             var element = form.adjacent('input.btn_default_tester')[0];
             element.observe('click', function(e) {
-                var case_pks = serializeCaseFromInputList(table);
-                
-                if(case_pks.length == 0){
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                
+
+                var params = serializeFormData({
+                    form: form,
+                    zoneContainer: container,
+                    casesSelection: selection,
+                    hashable: true
+                });
+                params.a = 'update';
+
                 var callback = function(t) {
                     var returnobj = t.responseText.evalJSON();
                     
@@ -1526,12 +1537,10 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                         alert(returnobj.response);
                         return false
                     };
-                    parameters['case'] = case_pks;
-                    constructPlanDetailsCasesZone(container, plan_id, parameters);
-                }
-                
-                var field = 'default_tester';
-                changeCaseMember(table, field, case_pks, callback);
+                    constructPlanDetailsCasesZone(container, plan_id, params);
+                };
+
+                changeCaseMember(params, callback);
             })
         }
 
@@ -1837,24 +1846,22 @@ function toggleMultiSelect(){
     $('filter_priority_selector_multiple').toggle();
 }
 
-function changeCaseMember(container, field, case_ids, callback)
+function changeCaseMember(parameters, callback)
 {
     var p = prompt('Please type new email or username');
-    if(!p)
+    if(!p) {
         return false;
-    
-    var parameters = {
-          'info_type': 'users',
-          'username': p,
     }
-    
-    getInfoAndUpdateObject(
-        parameters,
-        'testcases.testcase',
-        case_ids,
-        field,
-        callback
-    )
+
+    parameters.target_field = 'default_tester';
+    parameters.new_value = p;
+
+    new Ajax.Request('/ajax/update/cases-default-tester/', {
+        method: 'post',
+        parameters: parameters,
+        onSuccess: callback,
+        onFailure: json_failure
+    })   
 }
 
 function constructPlanParentPreviewDialog(plan_id, parameters, callback)
