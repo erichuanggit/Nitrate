@@ -1165,6 +1165,10 @@ function serializeFormData(options) {
         for (var i = 0; i < arr.length; i++) {
             var parts = arr[i].split('=');
             var key = parts[0], value = parts[1];
+            // FIXME: not sure how key can be an empty string
+            if (key.length === 0) {
+                continue;
+            }
             if (key in formdata) {
                 // Before setting value, the original value must be converted to an array object.
                 if (formdata[key].push === undefined) {
