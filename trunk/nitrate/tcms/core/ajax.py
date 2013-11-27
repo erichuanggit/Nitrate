@@ -626,6 +626,34 @@ def update_case_status(request):
         })
     )
 
+
+# NOTE: what permission is necessary
+def update_cases_priority(request):
+    '''Update priority to selected TestCases'''
+    from tcms.apps.testcases.views import get_selected_testcases
+
+    REQ = request.REQUEST
+    target_field = REQ.get('target_field')
+    new_value = REQ.get('new_value')
+
+    targets = get_selected_testcases(request)
+    targets.update(**{target_field: new_value})
+
+    if hasattr(TestCase, 'mail_scene'):
+        from tcms.core.utils.mailto import mailto
+        mail_context = TestCase.mail_scene(objects=targets,
+                                           field=target_field,
+                                           value=new_value)
+        if mail_context:
+            mail_context['request'] = request
+            try:
+                mailto(**mail_context)
+            except:
+                pass
+
+    return say_yes()
+
+
 def comment_case_runs(request):
     '''
     Add comment to one or more caseruns at a time.

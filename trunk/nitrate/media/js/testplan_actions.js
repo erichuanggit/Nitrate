@@ -1320,37 +1320,49 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
 
         if(form.adjacent('input[name="new_priority_id"]').length > 0) {
             var element = form.adjacent('input[name="new_priority_id"]')[0];
-            
             element.observe('change', function(t) {
-                var params = serialzeCaseForm(form, table);
-                if(!this.value)
-                    return false;
-                
-
-                if(params['case'].length == 0){
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                
-                var c=confirm(default_messages.confirm.change_case_priority)
-                if(!c)
+                // FIXME: how about show a message to user to let user know what is happening?
+                if(!this.value) {
                     return false;
-                
+                }
+                var c = confirm(default_messages.confirm.change_case_priority);
+                if (!c) {
+                    return false;
+                }
+
+                var postdata = serializeFormData({
+                    form: form,
+                    zoneContainer: container,
+                    casesSelection: selection,
+                    hashable: true
+                });
+                postdata.a = 'update';
+                postdata.target_field = 'priority';
+                postdata.new_value = this.value;
+
                 var callback = function(t) {
                     returnobj = t.responseText.evalJSON(true);
-                    
                     if(returnobj.rc != 0) {
                         alert(returnobj.response);
                         return false
                     };
-                    
-                    constructPlanDetailsCasesZone(container, plan_id, params);
-                }
-                
-                changeCasePriority(params['case'], this.value, callback);
+                    constructPlanDetailsCasesZone(container, plan_id, postdata);
+                };
+
+                new Ajax.Request('/ajax/update/cases-priority/', {
+                    method: 'post',
+                    parameters: postdata,
+                    onSuccess: callback,
+                    onFailure: json_failure
+                });
             })
         }
-        
+
         // Observe the batch case automated status button
         if (form.adjacent('input.btn_automated').length > 0) {
             var element = form.adjacent('input.btn_automated')[0];
