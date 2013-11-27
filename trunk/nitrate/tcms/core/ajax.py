@@ -358,8 +358,6 @@ def update(request):
     field     = data.get('field')
     value     = data.get('value')
 
-    import pdb; pdb.set_trace()
-
     object_pk = [int(a) for a in object_pk_str.split(',')]
 
     if not field or not value or not object_pk or not ctype:
