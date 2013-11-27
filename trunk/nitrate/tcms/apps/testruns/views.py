@@ -329,6 +329,24 @@ def all(request, template_name = 'run/all.html'):
         'query_url': query_url,
     })
 
+def run_queryset_from_querystring(querystring):
+    """Setup a run queryset from a querystring.
+
+    A querystring is used in several places in front-end
+    to query a list of runs.
+    """
+     # 'name=alice&age=20' => {'name': 'alice', 'age': ''}
+    filter_keywords = dict(k.split('=') for k  in querystring.split('&'))
+    # get rid of empty values and several other noisy names
+    filter_keywords.pop('page_num')
+    filter_keywords.pop('page_size')
+
+    filter_keywords = dict((k, v) for (k, v) in filter_keywords.iteritems() if v.strip())
+
+    trs = TestRun.objects.filter(**filter_keywords)
+    return trs
+
+
 def load_runs_of_one_plan(request, plan_id, template_name='plan/plan_runs_part.html'):
     """A dedicated view to return a set of runs of a plan.
 
@@ -804,8 +822,11 @@ def clone(request, template_name='run/clone.html'):
 
     trs = TestRun.objects.select_related()
 
-    #TODO optionally get these runs from a filter string
-    trs = trs.filter(pk__in=request.REQUEST.getlist('run'))
+    filter_str = request.REQUEST.get('filter_str')
+    if filter_str:
+        trs = run_queryset_from_querystring(filter_str)
+    else:
+        trs = trs.filter(pk__in=request.REQUEST.getlist('run'))
 
     if not trs:
         return HttpResponse(Prompt.render(
@@ -816,7 +837,7 @@ def clone(request, template_name='run/clone.html'):
         ))
 
     # Generate the clone run page for one run
-    if len(trs) == 1 and not request.REQUEST.get('submit'):
+    if trs.count() == 1 and not request.REQUEST.get('submit'):
         tr = trs[0]
         tcrs = tr.case_run.all()
         form = RunCloneForm(initial={

@@ -38,14 +38,16 @@
           if (currentChecked < prevChecked) {
             $(selectorStr).each(function(i) {
               if (ind >= currentChecked && ind <= prevChecked) {
-                this.checked = checkStatus;
+                // I don't know why I had to manually trigger 'change' event.
+                // Maybe this plugin is drunk, or I am.
+                $(this).attr('checked', checkStatus).trigger('change');
               }
               ind++;
             });
           } else {
             $(selectorStr).each(function(i) {
               if (ind >= prevChecked && ind <= currentChecked) {
-                this.checked = checkStatus;
+                $(this).attr('checked', checkStatus).trigger('change');
               }
               ind++;
             });
@@ -58,6 +60,7 @@
           prevChecked = getSelected(val);
         }
       }
+
     };
 
     function getSelected(val) {

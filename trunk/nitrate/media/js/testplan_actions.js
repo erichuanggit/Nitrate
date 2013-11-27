@@ -725,11 +725,7 @@ Nitrate.TestPlans.Details = {
         Nitrate.Utils.enableShiftSelectOnCheckbox('run_selector');
 
         Nitrate.TestPlans.Runs.initializaRunTab();
-        jQ('#show_more_runs').live('click', Nitrate.TestPlans.Runs.showMore);
-        jQ('#reload_runs').live('click', Nitrate.TestPlans.Runs.reload);
-        jQ('#tab_testruns').live('click', Nitrate.TestPlans.Runs.initializaRunTab);
-        jQ('.btn-statistics').live('click', Nitrate.TestPlans.Runs.percent);
-        jQ('#btn_selected_progress').live('click', Nitrate.TestPlans.Runs.showPercentageOfSelectedRuns);
+        Nitrate.TestPlans.Runs.bind();
     }
 };
 
@@ -2082,7 +2078,22 @@ function expandCurrentPlan(element){
 
 Nitrate.TestPlans.Runs = {
 
-    makeUrlFromPlanId: function (planId) {
+    bind: function () {
+        /**
+         * Bind everything.
+         *
+        **/
+        var that = this;
+        jQ('#show_more_runs').live('click', that.showMore);
+        jQ('#reload_runs').live('click', that.reload);
+        jQ('#tab_testruns').live('click', that.initializaRunTab);
+        jQ('.btn-statistics').live('click', that.percent);
+        jQ('#btn_selected_progress').live('click', that.showPercentageOfSelectedRuns);
+        jQ('.run_selector').live('change', that.reactsToRunSelection);
+        jQ('#id_check_all_runs').live('change', that.reactsToAllRunSelectorChange);
+    }
+
+    , makeUrlFromPlanId: function (planId) {
         return '/plan/' + planId + '/runs/';
     }
 
@@ -2122,6 +2133,54 @@ Nitrate.TestPlans.Runs = {
         loader.hide();
     }
 
+    , reactsToRunSelection: function () {
+        var that = Nitrate.TestPlans.Runs;
+        var selection = jQ('.run_selector:not(:checked)')
+        var controller = jQ('#id_check_all_runs');
+        if (selection.length == 0) {
+            controller.attr('checked', true);
+        } else {
+            controller.attr('checked', false);
+        }
+        controller.trigger('change');
+    }
+
+    , reactsToAllRunSelectorChange: function (event) {
+        var that = Nitrate.TestPlans.Runs;
+        if (jQ(event.target).attr('checked')) {
+            that.toggleRemainingRunSelection('on');
+        } else {
+            that.toggleRemainingRunSelection('off');
+        }
+    }
+
+    , toggleRemainingRunSelection: function (status) {
+         var area = jQ('#box_select_rest');
+         if (area.length > 0) {
+            if (status === 'off') {
+            area.find('input:checkbox').attr('checked', false);
+            area.hide();
+             } else {
+                area.find('input:checkbox').attr('checked', true);
+                area.show();
+             }
+         };
+    }
+
+    , pagesLeftChanged: function (leftNumPages) {
+        /**
+         * Reacts to the number of left pages.
+         *
+        **/
+        // 1. Update the checkbox to select the rest of filtered result.
+        var area = jQ('#box_select_rest');
+        if (leftNumPages == 0) {
+            area.remove();
+        } else {
+            area.find('span').html(leftNumPages);
+        }
+    }
+
     , nextPage: function (planId) {
         var that = this;
         var url = that.makeUrlFromPlanId(planId);
@@ -2136,6 +2195,9 @@ Nitrate.TestPlans.Runs = {
 
     , filter: function (data) {
         var queryString = jQ("#run_filter").serialize();
+        // store this string into the rest result select box
+        var box = jQ('#box_select_rest');
+        box.find('input:checkbox').val(queryString);
         return queryString;
     }
 
@@ -2155,11 +2217,14 @@ Nitrate.TestPlans.Runs = {
                 localPageNum++;
                 jQ('[name=page_num]').val(localPageNum);
                 showMoreLink.html("Show More (" + remaining + " pages left)");
+                that.pagesLeftChanged(remaining);
             } else {
+                that.pagesLeftChanged(0);
                 showMoreLink.html("End");
                 showMoreLink.attr('ended', 'yes');
             }
         });
+        request.done(that.update)
         request.done(that.hideLoading);
         return false;
     }
