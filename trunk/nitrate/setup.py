@@ -18,14 +18,13 @@
 #   Xuqing Kuang <xkuang@redhat.com>
 
 import os
-import sys
-import tcms
 from setuptools import setup, find_packages
 
 PACKAGE_NAME = 'Nitrate'
 PACKAGE_VER = '3.8.5'
 PACKAGE_DESC = 'Test Case Management System'
 PACKAGE_URL = 'https://fedorahosted.org/nitrate/browser/trunk/nitrate'
+
 
 def get_files_below(path):
     # we need to generate a list of paths to static files
@@ -38,6 +37,7 @@ def get_files_below(path):
             # strip off leading "tcms/" string from each path:
             yield os.path.join(dirpath, filename)[5:]
 
+
 def get_package_data():
     # annoyingly, it appears that package_data has to list filenames; it can't
     # cope with directories, so we have to figure this out for it:
@@ -46,19 +46,30 @@ def get_package_data():
     }
     return result
 
+
+def get_install_requires():
+    requires = []
+    links = []
+    for line in open('requirements/base.txt', 'r'):
+        line = line.strip()
+        parts = line.split('#egg=')
+        if len(parts) == 2:
+            links.append(line)
+            requires.append(parts[1])
+        else:
+            requires.append(line)
+    return requires, links
+
+install_requires, dependency_links = get_install_requires()
+
+
 setup(
-    name = PACKAGE_NAME,
-    version = PACKAGE_VER,
-    description = PACKAGE_DESC,
-    url = PACKAGE_URL,
+    name=PACKAGE_NAME,
+    version=PACKAGE_VER,
+    description=PACKAGE_DESC,
+    url=PACKAGE_URL,
     packages=find_packages(exclude='tests'),
     # package_data=get_package_data(),
-    install_requires=[
-        'Django>=1.2.3',
-        'MySQLdb',
-        'kerberos',
-        'memcached',
-        'kobo',
-    ],
+    install_requires=install_requires,
+    dependency_links=dependency_links,
 )
-
