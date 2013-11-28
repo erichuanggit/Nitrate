@@ -3,7 +3,7 @@
 
 Name:           nitrate
 Version:        3.8.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -118,6 +118,12 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+
+* Tue Nov 28 2013 Chenxiong Qi <cqi@redhat.com> - 3.8.5-3
+- Bug 1028863 - [Testplan][Runs] In 'Runs' label of a Test plan, not input any thing in 'Items Per Page' then search, the site have no responce
+- Bug 1028921 - [TestPlan][Cases] It is better if the select all function can select all the cases which are filtered
+- Bug 1032897 - Test runs of a Test plan a displayed incorrectly
+- Bug 1032969 - Missing progress bar on test run search result
 
 * Tue Nov 13 2013 Chenxiong Qi <cqi@redhat.com> - 3.8.5-2
 - Using a separated file to track all database changes
