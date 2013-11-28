@@ -72,4 +72,5 @@ setup(
     # package_data=get_package_data(),
     install_requires=install_requires,
     dependency_links=dependency_links,
+    include_package_data=True,
 )

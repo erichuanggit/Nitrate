@@ -45,7 +45,7 @@ It is a database-backed web application, implemented using Django
 # RPM version-release:
 sed --in-place \
   -r 's|NITRATE_VERSION|%{version}-%{release}|' \
-  templates/tcms_base.html
+  tcms/templates/tcms_base.html
 
 %build
 %{__python} setup.py build
@@ -92,13 +92,9 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p ${RPM_BUILD_ROOT}%{_datadir}/%{name}
 mkdir -p ${RPM_BUILD_ROOT}%{_docdir}/%{name}
 
-for d in contrib templates media; do
+for d in contrib media; do
     cp -r ${d} ${RPM_BUILD_ROOT}%{_datadir}/%{name};
     # chown -R root:root ${RPM_BUILD_ROOT}%{_datadir}/%{name}/${d};
-done
-
-for f in `find tcms/core/lib -name templates`; do
-    cp -r ${f}/* ${RPM_BUILD_ROOT}%{_datadir}/%{name}/templates/;
 done
 
 # Install apache config for the app:
