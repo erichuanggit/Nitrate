@@ -1016,6 +1016,12 @@ function unlinkCasesFromPlan(container, form, table)
     })
 }
 
+function refreshCasesSelectionCheck(container) {
+    var casesMostCloseContainer = jQ(container).find('.js-cases-list');
+    var notSelectAll = casesMostCloseContainer.find('input[name="case"]:not(:checked)').length > 0;
+    casesMostCloseContainer.find('input[value="all"]')[0].checked = !notSelectAll;
+}
+
 /*
  * Bind events on loaded cases.
  *
@@ -1032,6 +1038,12 @@ function bindEventsOnLoadedCases(options) {
     var cases_container = options.cases_container;
 
     return function(container, form) {
+        jQ(cases_container).find('.js-cases-list')
+                           .find('input[name="case"]')
+                           .live('click', function(e) {
+            refreshCasesSelectionCheck(cases_container);
+        });
+
         // Observe the change sortkey
         container.adjacent('.case_sortkey.js-just-loaded').invoke('observe', 'click', function(e) {
             var c = this.next(); // Container
@@ -1232,7 +1244,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         });
 
         // Observe the check all selectbox
-        if(form.adjacent('input[value="all"]').length > 0) {
+        if (form.adjacent('input[value="all"]').length > 0) {
             var element = form.adjacent('input[value="all"]')[0];
 
             element.observe('click', function(e) {
@@ -1725,6 +1737,8 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         // Register event handler for loading more cases.
         Nitrate.TestPlans.Details.observeLoadMore(container.id);
         Nitrate.TestPlans.Details.showRemainingCasesCount(container.id);
+
+        refreshCasesSelectionCheck(container);
     };
 
     var url = getURLParam().url_search_case;
