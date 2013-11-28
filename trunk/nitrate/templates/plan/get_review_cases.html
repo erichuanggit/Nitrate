@@ -27,15 +27,15 @@
 						<li><input type="button" class="import icon_plan" disabled="true" value="Import cases from XML"	/></li>
 						<li><input type="button" class="search icon_plan" disabled="true" value="Add cases from other plans"	 /></li>
 						{% endif %}
-						<li><input type="button" class="export icon_plan" title="Export selected cases into XML file" value="Export" onclick="exportCase('{% url tcms.apps.testcases.views.export %}', this.up(6), this.up(6).next());" /></li>
-						<li><input type="button" class="print_view icon_plan" value="Print"  title="print view of selected cases" onclick="printableCases('{% url tcms.apps.testcases.views.printable %}', this.up(6), this.up(6).next());" /></li>
+						<li><input type="button" class="export icon_plan" title="Export selected cases into XML file" value="Export" onclick="exportCase('{% url tcms.apps.testcases.views.export %}', this.up(6), this.up(6).next().next());" /></li>
+						<li><input type="button" class="print_view icon_plan" value="Print"  title="print view of selected cases" onclick="printableCases('{% url tcms.apps.testcases.views.printable %}', this.up(6), this.up(6).next().next());" /></li>
 						{% if perms.testcases.add_testcase %}
-						<li><input type="button" class="clone icon_plan" value="Clone" title="Clone selected cases to another test plan" onclick="postToURL('{% url tcms.apps.testcases.views.clone %}', serialzeCaseForm(this.up(6), this.up(6).next()), 'get');" /></li>
+						<li><input type="button" class="clone icon_plan" value="Clone" title="Clone selected cases to another test plan" onclick="postToURL('{% url tcms.apps.testcases.views.clone %}', serialzeCaseForm(this.up(6), this.up(6).next().next()), 'get');" /></li>
 						{% else %}
 						<li><input type="button" class="clone icon_plan" value="Clone" title="Clone selected cases to another test plan" disabled="true"/></li>
 						{% endif %}
 						{% if perms.testcases.delete_testcaseplan %}
-						<li><input type="button" class="delete icon_plan" value="Remove" title="Remove selected cases from this plan" onclick="unlinkCasesFromPlan(this.up(7), this.up(6), this.up(6).next());" /></li>
+						<li><input type="button" class="delete icon_plan" value="Remove" title="Remove selected cases from this plan" onclick="unlinkCasesFromPlan(this.up(7), this.up(6), this.up(6).next().next());" /></li>
 						{% else %}
 						<li><input type="button" class="delete icon_plan" value="Remove" title="Remove selected cases from this plan" disabled="true"/></li>
 						{% endif %}
@@ -118,6 +118,10 @@
 		</div>
 	</div>
 </form>
+<div class="js-cases-select-all" display="display:none">
+	<input type="checkbox" id="reviewingcases-select-all" name="reviewingcases-select-all" checked />
+	<label for="reviewingcases-select-all">Also select cases that are not shown below, yet.</label>
+</div>
 <table class="list js-cases-list" cellpadding="1" cellspacing="0" border="0">
 	<thead>
 		<tr>

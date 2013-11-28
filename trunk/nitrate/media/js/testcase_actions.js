@@ -1033,7 +1033,10 @@ function constructCaseAutomatedForm(container, callback, options)
 function serializeCaseFromInputList2(table)
 {
     var result = {};
-    result.selectAll = $(table).adjacent('input[value="all"]:checked').length > 0;
+    result.selectAll = jQ(table).parent()
+                                .find('.js-cases-select-all')
+                                .find('input[type="checkbox"]')
+                                .attr('checked');
 
     var elements = $(table).adjacent('input[name="case"]:checked');
     var case_ids = new Array();

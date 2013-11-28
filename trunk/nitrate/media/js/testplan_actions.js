@@ -1020,6 +1020,27 @@ function refreshCasesSelectionCheck(container) {
     var casesMostCloseContainer = jQ(container).find('.js-cases-list');
     var notSelectAll = casesMostCloseContainer.find('input[name="case"]:not(:checked)').length > 0;
     casesMostCloseContainer.find('input[value="all"]')[0].checked = !notSelectAll;
+
+    // Toggle select all option
+    jQ(container).find('.js-cases-select-all').find('input[type="checkbox"]')[0].checked = !notSelectAll;
+    if (notSelectAll) {
+        jQ(container).find('.js-cases-select-all').hide('fast');
+    } else {
+        jQ(container).find('.js-cases-select-all').show('fast');
+    }
+}
+
+/*
+ * When check the All box, to show or hide Select All option to user.
+ */
+function toggleSelectAllInput(container, selectAll) {
+    var selectAllDiv = jQ(container).find('.js-cases-select-all');
+    selectAllDiv.find('input[type="checkbox"]')[0].checked = selectAll;
+    if (selectAll) {
+        selectAllDiv.show('fast');
+    } else {
+        selectAllDiv.hide('fast');
+    }
 }
 
 /*
@@ -1217,7 +1238,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
     
     complete = function(t) {
         var form = container.childElements()[0];
-        var table = container.childElements()[1];
+        var table = container.childElements()[2];
         
         // Presume the first form element is the form
         if (!form.tagName == 'FORM') {
@@ -1616,7 +1637,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 changeCaseMember(table, field, case_pks, callback);
             })
         }
-        
+
         // Tag call back
         // Callback for display the cases that just added tags
         var tag_callback = function(t) {
@@ -1731,6 +1752,10 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                  })
             })
             }
+
+        jQ(container).find('input[value="all"]').live('click', function(e) {
+            toggleSelectAllInput(container, this.checked);
+        });
 
         _bindEventsOnLoadedCases(table, form);
 
