@@ -341,7 +341,7 @@ def run_queryset_from_querystring(querystring):
     filter_keywords.pop('page_num')
     filter_keywords.pop('page_size')
 
-    filter_keywords = dict((k, v) for (k, v) in filter_keywords.iteritems() if v.strip())
+    filter_keywords = dict((str(k), v) for (k, v) in filter_keywords.iteritems() if v.strip())
 
     trs = TestRun.objects.filter(**filter_keywords)
     return trs
