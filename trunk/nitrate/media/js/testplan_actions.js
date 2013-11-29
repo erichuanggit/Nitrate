@@ -1016,6 +1016,33 @@ function unlinkCasesFromPlan(container, form, table)
     })
 }
 
+function refreshCasesSelectionCheck(container) {
+    var casesMostCloseContainer = jQ(container).find('.js-cases-list');
+    var notSelectAll = casesMostCloseContainer.find('input[name="case"]:not(:checked)').length > 0;
+    casesMostCloseContainer.find('input[value="all"]')[0].checked = !notSelectAll;
+
+    // Toggle select all option
+    jQ(container).find('.js-cases-select-all').find('input[type="checkbox"]')[0].checked = !notSelectAll;
+    if (notSelectAll) {
+        jQ(container).find('.js-cases-select-all').hide('fast');
+    } else {
+        jQ(container).find('.js-cases-select-all').show('fast');
+    }
+}
+
+/*
+ * When check the All box, to show or hide Select All option to user.
+ */
+function toggleSelectAllInput(container, selectAll) {
+    var selectAllDiv = jQ(container).find('.js-cases-select-all');
+    selectAllDiv.find('input[type="checkbox"]')[0].checked = selectAll;
+    if (selectAll) {
+        selectAllDiv.show('fast');
+    } else {
+        selectAllDiv.hide('fast');
+    }
+}
+
 /*
  * Bind events on loaded cases.
  *
@@ -1032,6 +1059,12 @@ function bindEventsOnLoadedCases(options) {
     var cases_container = options.cases_container;
 
     return function(container, form) {
+        jQ(cases_container).find('.js-cases-list')
+                           .find('input[name="case"]')
+                           .live('click', function(e) {
+            refreshCasesSelectionCheck(cases_container);
+        });
+
         // Observe the change sortkey
         container.adjacent('.case_sortkey.js-just-loaded').invoke('observe', 'click', function(e) {
             var c = this.next(); // Container
@@ -1205,7 +1238,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
     
     complete = function(t) {
         var form = container.childElements()[0];
-        var table = container.childElements()[1];
+        var table = container.childElements()[2];
         
         // Presume the first form element is the form
         if (!form.tagName == 'FORM') {
@@ -1232,7 +1265,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         });
 
         // Observe the check all selectbox
-        if(form.adjacent('input[value="all"]').length > 0) {
+        if (form.adjacent('input[value="all"]').length > 0) {
             var element = form.adjacent('input[value="all"]')[0];
 
             element.observe('click', function(e) {
@@ -1555,24 +1588,28 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             })
         }
 
-        if(form.adjacent('input.sort_list').length != 0) {
+        if (form.adjacent('input.sort_list').length != 0) {
             var element = form.adjacent('input.sort_list')[0];
             element.observe('click', function(e) {
-                var case_plan_pks = serializeCasePlanIDFromInputList(table);
-                var case_pks = serializeCaseFromInputList(table);
-                if(case_plan_pks.length == 0) {
+                // NOTE: new implemenation does not use testcaseplan.pk
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                var params = {
-                    'testcaseplan': case_plan_pks
-                };
+                var postdata = serializeFormData({
+                    form: form,
+                    zoneContainer: container,
+                    casesSelection: selection,
+                    hashable: true
+                });
+
                 var callback = function(t) {
-                    parameters['case'] = case_pks;
-                    constructPlanDetailsCasesZone(container, plan_id, parameters);
+                    postdata.case = selection.selectedCasesIds;
+                    constructPlanDetailsCasesZone(container, plan_id, postdata);
                 };
-                changeCaseOrder(params, callback);
-            })
+                changeCaseOrder2(postdata, callback);
+            });
         }
 
         if(form.adjacent('input.btn_reviewer').length > 0) {
@@ -1600,7 +1637,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 changeCaseMember(table, field, case_pks, callback);
             })
         }
-        
+
         // Tag call back
         // Callback for display the cases that just added tags
         var tag_callback = function(t) {
@@ -1716,11 +1753,17 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             })
             }
 
+        jQ(container).find('input[value="all"]').live('click', function(e) {
+            toggleSelectAllInput(container, this.checked);
+        });
+
         _bindEventsOnLoadedCases(table, form);
 
         // Register event handler for loading more cases.
         Nitrate.TestPlans.Details.observeLoadMore(container.id);
         Nitrate.TestPlans.Details.showRemainingCasesCount(container.id);
+
+        refreshCasesSelectionCheck(container);
     };
 
     var url = getURLParam().url_search_case;

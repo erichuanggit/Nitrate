@@ -558,6 +558,8 @@ function blindupAllCases(element)
         element.src="/media/images/t1.gif";
     }
 }
+
+// Deprecated. Remove when it's unusable any more.
 function changeCaseOrder(parameters, callback)
 {
     if(parameters.hasOwnProperty('sortkey') == true){
@@ -589,6 +591,43 @@ function changeCaseOrder(parameters, callback)
     var vtype = 'int';
     
     updateObject(ctype, object_pk, field, value, vtype, callback);
+}
+
+function changeCaseOrder2(parameters, callback) {
+    if (parameters.hasOwnProperty('sortkey') == true) {
+        nsk = prompt('Enter your new order number', parameters['sortkey']);   // New sort key
+        if(nsk == parameters['sortkey']) {
+            alert('Nothing changed');
+            return false;
+        }
+    }
+    else {
+        nsk = prompt('Enter your new order number');
+    }
+
+    if(!nsk) {
+        return false;
+    }
+
+    if(nsk != parseInt(nsk)) {
+        alert('The value must be an integer number and limit between 0 to 32300.');
+        return false;
+    }
+
+    if(nsk > 32300 || nsk < 0) {
+        alert('The value must be an integer number and limit between 0 to 32300.');
+        return false;
+    }
+
+    parameters.target_field = 'sortkey';
+    parameters.new_value = nsk;
+
+    new Ajax.Request('/ajax/update/cases-sortkey/', {
+        method: 'post',
+        parameters: parameters,
+        onSuccess: callback,
+        onFailure: json_failure
+    });
 }
 
 // Deprecated. dead code.
@@ -994,7 +1033,10 @@ function constructCaseAutomatedForm(container, callback, options)
 function serializeCaseFromInputList2(table)
 {
     var result = {};
-    result.selectAll = $(table).adjacent('input[value="all"]:checked').length > 0;
+    result.selectAll = jQ(table).parent()
+                                .find('.js-cases-select-all')
+                                .find('input[type="checkbox"]')
+                                .attr('checked');
 
     var elements = $(table).adjacent('input[name="case"]:checked');
     var case_ids = new Array();

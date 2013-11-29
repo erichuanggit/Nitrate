@@ -41,6 +41,7 @@ from tcms.apps.management.models import Priority
 from tcms.apps.management.models import TestTag, TestTag
 from tcms.apps.testcases.models import TestCase, TestCaseTag, TestCaseBugSystem as BugSystem
 from tcms.apps.testcases.models import TestCaseCategory
+from tcms.apps.testcases.models import TestCasePlan
 from tcms.apps.testcases.models import TestCaseStatus
 from tcms.apps.testcases.views import get_selected_testcases
 from tcms.apps.testcases.views import plan_from_request_or_none
@@ -357,8 +358,6 @@ def update(request):
     object_pk_str = data.get("object_pk")
     field     = data.get('field')
     value     = data.get('value')
-
-    import pdb; pdb.set_trace()
 
     object_pk = [int(a) for a in object_pk_str.split(',')]
 
@@ -683,6 +682,12 @@ class TestCaseUpdateActions(object):
         self._update_objects = get_selected_testcases(self.request)
         return self._update_objects
 
+    def get_plan(self, pk_enough=True):
+        try:
+            plan = plan_from_request_or_none(self.request, pk_enough)
+        except Http404:
+            return None
+
     def _sendmail(self):
         mail_context = TestCase.mail_scene(objects=self._update_objects,
                                            field=self.target_field,
@@ -745,6 +750,35 @@ class TestCaseUpdateActions(object):
             })
         )
 
+    def _update_sortkey(self):
+        try:
+            sortkey = int(self.new_value)
+            if sortkey < 0 or sortkey > 32300:
+                return say_no('New sortkey is out of range [0, 32300].')
+        except ValueError:
+            return say_no('New sortkey is not an integer.')
+        plan = plan_from_request_or_none(self.request, pk_enough=True)
+        if plan is None:
+            return say_no('No plan record found.')
+        update_targets = self.get_update_targets()
+
+        ###
+        # MySQL does not allow to exeucte UPDATE statement that contains
+        # subquery querying from same table. In this case, OperationError will
+        # be raised.
+        offset = 0
+        step_length = 500
+        queryset_filter = TestCasePlan.objects.filter
+        data = {self.target_field: sortkey}
+        while 1:
+            sub_cases = update_targets[offset:offset + step_length]
+            case_pks = [case.pk for case in sub_cases]
+            if len(case_pks) == 0:
+                break
+            queryset_filter(plan=plan, case__in=case_pks).update(**data)
+            # Move to next batch of cases to change.
+            offset += step_length;
+
 
 # NOTE: what permission is necessary
 # FIXME: find a good chance to map all TestCase property change request to this
@@ -756,6 +790,7 @@ def update_cases_default_tester(request):
 
 update_cases_priority = update_cases_default_tester
 update_cases_case_status = update_cases_default_tester
+update_cases_sortkey = update_cases_default_tester
 
 
 def comment_case_runs(request):
