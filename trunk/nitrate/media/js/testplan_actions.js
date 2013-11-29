@@ -2272,7 +2272,7 @@ Nitrate.TestPlans.Runs = {
         // clean the table
         var tbody = jQ('#testruns_body');
         tbody.empty();
-        var page = jQ('[name=page_num');
+        var page = jQ('[name=page_num]');
         page.val('1');
         var showMoreLink = jQ('#show_more_runs');
         showMoreLink.html('Show More');
