@@ -2184,7 +2184,12 @@ Nitrate.TestPlans.Runs = {
 
     , render: function (data, textStatus, jqXHR) {
         var tbody = jQ('#testruns_body');
-        tbody.append(data.html);
+        var html = jQ(data.html);
+        var btnCheckAll = jQ('#box_select_rest input:checkbox');
+        if (btnCheckAll.length > 0 && btnCheckAll.is(':checked')) {
+            html.find('.run_selector').attr('checked', 'checked');
+        };
+        tbody.append(html);
     }
 
     , initializaRunTab: function () {
@@ -2248,20 +2253,6 @@ Nitrate.TestPlans.Runs = {
          };
     }
 
-    , pagesLeftChanged: function (leftNumPages) {
-        /**
-         * Reacts to the number of left pages.
-         *
-        **/
-        // 1. Update the checkbox to select the rest of filtered result.
-        var area = jQ('#box_select_rest');
-        if (leftNumPages == 0) {
-            area.remove();
-        } else {
-            area.find('span').html(leftNumPages);
-        }
-    }
-
     , nextPage: function (planId) {
         var that = this;
         var url = that.makeUrlFromPlanId(planId);
@@ -2298,14 +2289,11 @@ Nitrate.TestPlans.Runs = {
                 localPageNum++;
                 jQ('[name=page_num]').val(localPageNum);
                 showMoreLink.html("Show More (" + remaining + " pages left)");
-                that.pagesLeftChanged(remaining);
             } else {
-                that.pagesLeftChanged(0);
                 showMoreLink.html("End");
                 showMoreLink.attr('ended', 'yes');
             }
         });
-        request.done(that.update)
         request.done(that.hideLoading);
         return false;
     }

@@ -61,12 +61,14 @@
 	{% if perms.testruns.add_testrun %}
 	<div class="mixbar actions">
 		<div class='marginLeft fixed'>
+			<span id="box_select_rest" style="display:none;" class="tips left_float">
+				<input type="checkbox" name="filter_str"/>
+				Also select all runs not yet shown below
+			</span>
 			<input class="clone icon_plan left_float" type="submit"
 				value="Clone" title="clone selected test runs"/>
-			<span id="box_select_rest" style="display:none;" class="tips"><input type="checkbox" name="filter_str"/>
-				Also select the rest <span>0</span> page(s)</span>
 			<input class="progress icon_plan" type="button"
-				value="Calculate Progress" id="btn_selected_progress"
+				value="Calculate progress of selected runs" id="btn_selected_progress"
 				title="calculate progress of selected test runs"/>
 		</div>
 	</div>
