@@ -845,32 +845,49 @@ def get(request, case_id, template_name='case/get.html'):
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
     })
 
+
+# TODO: better to split this method for TestPlan and TestCase respectively.
 def printable(request, template_name='case/printable.html'):
     """Create the printable copy for plan/case"""
     req_get = request.REQUEST.get
     req_getlist = request.REQUEST.getlist
 
-    if (not req_get('plan') and
-            not req_get('case') and
-            not req_get('case_status')):
+    plan_pks = req_getlist('plan')
+    case_pks = req_getlist('case')
+    select_all = req_get('selectAll')
+    case_status_pks = req_getlist('case_status')
+
+    # After supporting Select All, querying TestCase requires the existance of
+    # either case or selectAll.
+    req_fails = not plan_pks and not case_pks and \
+                (select_all is not None) and \
+                not case_status_pks
+    if req_fails:
         return HttpResponse(Prompt.render(
                 request=request,
                 info_type=Prompt.Info,
                 info='At least one target is required.',))
 
-    if req_get('plan'):
-        tps = TestPlan.objects.filter(pk__in=req_getlist('plan'))
+    # Preparing for TestPlans
+    if plan_pks:
+        tps = TestPlan.objects.filter(pk__in=plan_pks)
     else:
         tps = TestPlan.objects.none()
 
     for tp in tps:
         tp.case_list = tp.case.values_list('pk', flat=True)
 
-    query = {
-        'plan__pk__in': req_getlist('plan'),
-        'case_status__pk__in': req_getlist('case_status'),
-        'pk__in': get_selected_testcases(request),
-    }
+    # Preparing for TestCases
+    query = {}
+
+    if plan_pks:
+        query['plan__pk__in'] = plan_pks
+
+    if case_status_pks:
+        query['case_status__pk__in'] = case_status_pks
+
+    if case_pks or select_all is not None:
+        query['pk__in'] = get_selected_testcases(request)
 
     # Disabled cases ignored in default
     # FIXME: case_status__pk__in must exist when code execution flows here. Why
