@@ -92,7 +92,7 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p ${RPM_BUILD_ROOT}%{_datadir}/%{name}
 mkdir -p ${RPM_BUILD_ROOT}%{_docdir}/%{name}
 
-for d in contrib media; do
+for d in contrib tcms/media; do
     cp -r ${d} ${RPM_BUILD_ROOT}%{_datadir}/%{name};
     # chown -R root:root ${RPM_BUILD_ROOT}%{_datadir}/%{name}/${d};
 done

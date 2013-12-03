@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4. Contribution &mdash; nitrate 3.8.7 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '3.8.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="nitrate 3.8.7 documentation" href="index.html" />
+    <link rel="next" title="5. XMLRPC API" href="xmlrpc-api.html" />
+    <link rel="prev" title="3. Tutorial" href="tutorial.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="xmlrpc-api.html" title="5. XMLRPC API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="3. Tutorial"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">nitrate 3.8.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="contribution">
+<span id="id1"></span><h1>4. Contribution<a class="headerlink" href="#contribution" title="Permalink to this headline">¶</a></h1>
+<p>This guide is a comprehensive resource for contributing to Nitrate - for both
+new and experienced contributors. It is maintained by the Nitrate community.
+We welcome your contributions to Nitrate!</p>
+<div class="section" id="getting-involved">
+<h2>4.1. Getting involved<a class="headerlink" href="#getting-involved" title="Permalink to this headline">¶</a></h2>
+<p>These instructions cover how to setup development environment and recommended
+coding conventions for nitrate project.  It also gives an overview of the
+directory structure of the Nitrate source code.</p>
+<div class="section" id="getting-the-source-code">
+<h3>4.1.1. Getting the Source Code<a class="headerlink" href="#getting-the-source-code" title="Permalink to this headline">¶</a></h3>
+<p>The Nitrate source code is available at:
+<a class="reference external" href="https://git.fedorahosted.org/cgit/nitrate.git/?h=development">https://git.fedorahosted.org/cgit/nitrate.git/?h=development</a></p>
+<p>You can easy to get the latest changes with git:
+code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># git clone git://git.fedorahosted.org/nitrate.git</span>
+<span class="c"># git checkout --track origin/development</span>
+</pre></div>
+</div>
+<p>Or you also can download the tarballs from:
+<a class="reference external" href="https://git.fedorahosted.org/cgit/nitrate.git/?h=development">https://git.fedorahosted.org/cgit/nitrate.git/?h=development</a></p>
+</div>
+<div class="section" id="requirement-modules">
+<h3>4.1.2. Requirement modules<a class="headerlink" href="#requirement-modules" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="http://www.python.org/">Python</a> &gt;= 2.4</li>
+<li><a class="reference external" href="http://www.djangoproject.com/">Django</a> = 1.2.3</li>
+<li><a class="reference external" href="http://sourceforge.net/projects/mysql-python/">MySQL-python</a> = 1.2.4</li>
+<li><a class="reference external" href="https://fedorahosted.org/kobo/">Kobo</a> = 0.2.1</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/kerberos/1.1.1">kerberos</a> = 1.1.1</li>
+<li><a class="reference external" href="http://qpid.apache.org/components/messaging-api/index.html">qpid-python</a>  = 0.20</li>
+<li><a class="reference external" href="http://github.com/robhudson/django-debug-toolbar">Django debug toolbar</a> (Optional: Recommendations for development)</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/Sphinx/1.2b3">Sphinx</a> (Optional: Recommendations for development, used for building docs)</li>
+</ul>
+</div>
+<div class="section" id="install-dependence">
+<h3>4.1.3. Install dependence<a class="headerlink" href="#install-dependence" title="Permalink to this headline">¶</a></h3>
+<p>code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># cd nitrate/trunk/nitrate</span>
+<span class="c"># pip install -r requirements/devel.txt</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="setup-database">
+<h3>4.1.4. 1.1.4. Setup database<a class="headerlink" href="#setup-database" title="Permalink to this headline">¶</a></h3>
+<p>code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># mysql -uroot -p</span>
+<span class="c"># mysql&gt; create database nitrate CHARACTER SET utf8 COLLATE utf8_general_ci;</span>
+<span class="c"># mysql&gt; use nitrate; source nitrate_db_setup.sql</span>
+<span class="c"># mysql&gt; grant all privileges on nitrate.* to nitrate@&#39;%&#39; identified by &#39;nitrate&#39;;</span>
+<span class="c"># mysql&gt; flush privileges;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Remember to change db settings in <cite>settings/devel.py</cite> accordingly.</p>
+</div>
+</div>
+<div class="section" id="start-the-nitrate-app">
+<h3>4.1.5. Start the nitrate app<a class="headerlink" href="#start-the-nitrate-app" title="Permalink to this headline">¶</a></h3>
+<p>code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># cd &lt;nitrate_project_root_path&gt;/trunk/nitrate/tcms</span>
+<span class="c"># ./manage.py runserver</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><cite>settings/devel.py</cite> is used as default settings.</p>
+</div>
+</div>
+</div>
+<div class="section" id="coding-style">
+<h2>4.2. Coding style<a class="headerlink" href="#coding-style" title="Permalink to this headline">¶</a></h2>
+<p>Please follow these coding standards when writing code for inclusion in Nitrate.</p>
+<div class="section" id="python-style">
+<h3>4.2.1. Python style<a class="headerlink" href="#python-style" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">Unless otherwise specified, follow <a class="reference external" href="http://www.python.org/dev/peps/pep-0008">PEP 8</a>.</p>
+</li>
+<li><p class="first">Use underscores, not camelCase, for variable, function and method names (i.e. poll.get_unique_voters(), not poll.getUniqueVoters).</p>
+</li>
+<li><p class="first">In docstrings, use “action words” such as:</p>
+<blockquote>
+<div><p>code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">foo</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates something and returns the result.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>Here’s an example of what not to do:</p>
+<p>code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">foo</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate something and return the result.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>More details please follow <a class="reference external" href="https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/coding-style/">Django&#8217;s development version</a>.</p>
+</div></blockquote>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">4. Contribution</a><ul>
+<li><a class="reference internal" href="#getting-involved">4.1. Getting involved</a><ul>
+<li><a class="reference internal" href="#getting-the-source-code">4.1.1. Getting the Source Code</a></li>
+<li><a class="reference internal" href="#requirement-modules">4.1.2. Requirement modules</a></li>
+<li><a class="reference internal" href="#install-dependence">4.1.3. Install dependence</a></li>
+<li><a class="reference internal" href="#setup-database">4.1.4. 1.1.4. Setup database</a></li>
+<li><a class="reference internal" href="#start-the-nitrate-app">4.1.5. Start the nitrate app</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#coding-style">4.2. Coding style</a><ul>
+<li><a class="reference internal" href="#python-style">4.2.1. Python style</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="tutorial.html"
+                        title="previous chapter">3. Tutorial</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="xmlrpc-api.html"
+                        title="next chapter">5. XMLRPC API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/contribution.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="xmlrpc-api.html" title="5. XMLRPC API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="3. Tutorial"
+             >previous</a> |</li>
+        <li><a href="index.html">nitrate 3.8.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Red Hat, Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

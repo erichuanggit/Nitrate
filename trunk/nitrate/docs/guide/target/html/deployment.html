@@ -1,0 +1,577 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>2. Deployment &mdash; nitrate 3.8.7 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '3.8.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="nitrate 3.8.7 documentation" href="index.html" />
+    <link rel="next" title="3. Tutorial" href="tutorial.html" />
+    <link rel="prev" title="1. About Nitrate" href="about.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tutorial.html" title="3. Tutorial"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="about.html" title="1. About Nitrate"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">nitrate 3.8.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="deployment">
+<span id="id1"></span><h1>2. Deployment<a class="headerlink" href="#deployment" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id2">
+<h2>2.1. Deployment<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="download-the-sources">
+<h3>2.1.1. Download the sources<a class="headerlink" href="#download-the-sources" title="Permalink to this headline">¶</a></h3>
+<p>The Nitrate source code is available at:
+<a class="reference external" href="https://git.fedorahosted.org/cgit/nitrate.git/?h=development">https://git.fedorahosted.org/cgit/nitrate.git/?h=development</a></p>
+<p>You can get the latest changes with git easily:</p>
+<div class="highlight-python"><pre>git clone git://git.fedorahosted.org/nitrate.git
+git checkout --track origin/development</pre>
+</div>
+<p>Or you also can download the tarballs from:
+<a class="reference external" href="https://git.fedorahosted.org/cgit/nitrate.git/?h=development">https://git.fedorahosted.org/cgit/nitrate.git/?h=development</a></p>
+</div>
+<div class="section" id="install-from-source-code">
+<h3>2.1.2. Install from source code<a class="headerlink" href="#install-from-source-code" title="Permalink to this headline">¶</a></h3>
+<p>After download the source code, you can go to the source code directory and install this project with python setup.py:</p>
+<div class="highlight-python"><pre>cd [nitrate_download_path]/nitrate/trunk/nitrate
+python setup.py install</pre>
+</div>
+</div>
+<div class="section" id="initialize-database-schema">
+<h3>2.1.3. Initialize database schema<a class="headerlink" href="#initialize-database-schema" title="Permalink to this headline">¶</a></h3>
+<p>Database is required by Nitrate(and all of Django apps). The Django ORM supports many database backends, we recommend you to use MySQL.</p>
+<p>You can get a db dump from nitrate source code directory:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">cd</span> <span class="p">[</span><span class="n">nitrate_download_path</span><span class="p">]</span><span class="o">/</span><span class="n">nitrate</span><span class="o">/</span><span class="n">trunk</span><span class="o">/</span><span class="n">nitrate</span><span class="o">/</span><span class="n">docs</span>
+</pre></div>
+</div>
+<p>In this directory, there is a sql file of &#8216;nitrate_db_setup.sql&#8217;.</p>
+<p>Dump this file into your database. I presume the database is named &#8216;nitrate&#8217;:</p>
+<div class="highlight-python"><pre>mysql -uroot -p
+mysql&gt; create database nitrate CHARACTER SET utf8 COLLATE utf8_general_ci;
+mysql&gt; use nitrate; source nitrate_db_setup.sql
+mysql&gt; grant all privileges on nitrate.* to nitrate@'%' identified by 'nitrate';
+mysql&gt; flush privileges;</pre>
+</div>
+<p>Please notice that,we have initialized some data in this db dump:</p>
+<ol class="loweralpha">
+<li><p class="first">created a super user in this db dump with following info:</p>
+<div class="highlight-python"><pre>username: admin
+password: admin</pre>
+</div>
+</li>
+<li><p class="first">added an example site with SITE_ID = 1:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">tcms</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">com</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="settings">
+<h3>2.1.4. Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h3>
+<p>First please go to nitrate root path, it&#8217;s different based on your current OS.</p>
+<p>Like on RHEL6.3, the root path is located in:</p>
+<div class="highlight-python"><pre>/usr/lib/python2.6/site-packages/Nitrate-3.8.5-py2.6.egg/tcms</pre>
+</div>
+<p>As we plan to deploy a example server for nitrate, we can use product.py as the default settings.
+After backed up the product.py, please modify following settings based on your custom configurations in settings/product.py:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Django settings for product env.</span>
+
+<span class="kn">from</span> <span class="nn">common</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c"># Debug settings</span>
+<span class="n">DEBUG</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">TEMPLATE_DEBUG</span> <span class="o">=</span> <span class="n">DEBUG</span>
+<span class="n">DEBUG_PROPAGATE_EXCEPTIONS</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="c"># Database settings</span>
+<span class="n">DATABASE_ENGINE</span> <span class="o">=</span> <span class="s">&#39;mysql&#39;</span>          <span class="c"># &#39;postgresql_psycopg2&#39;, &#39;postgresql&#39;, &#39;mysql&#39;, &#39;sqlite3&#39; or &#39;oracle&#39;.</span>
+<span class="n">DATABASE_NAME</span> <span class="o">=</span> <span class="s">&#39;nitrate&#39;</span>          <span class="c"># Or path to database file if using sqlite3.</span>
+<span class="n">DATABASE_USER</span> <span class="o">=</span> <span class="s">&#39;nitrate&#39;</span>          <span class="c"># Not used with sqlite3.</span>
+<span class="n">DATABASE_PASSWORD</span> <span class="o">=</span> <span class="s">&#39;nitrate&#39;</span>      <span class="c"># Not used with sqlite3.</span>
+<span class="n">DATABASE_HOST</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>                 <span class="c"># Set to empty string for localhost. Not used with sqlite3.</span>
+<span class="n">DATABASE_PORT</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>                 <span class="c"># Set to empty string for default. Not used with sqlite3.</span>
+
+<span class="n">MEDIA_ROOT</span> <span class="o">=</span> <span class="s">&#39;/usr/share/nitrate/media/&#39;</span>
+
+<span class="n">CACHE_BACKEND</span> <span class="o">=</span> <span class="s">&#39;memcached://127.0.0.1:11211/&#39;</span>
+<span class="n">SESSION_ENGINE</span> <span class="o">=</span> <span class="s">&#39;django.contrib.sessions.backends.cached_db&#39;</span>
+
+<span class="c"># add RemoteUserMiddleWare if kerberos authentication is enabled</span>
+<span class="n">MIDDLEWARE_CLASSES</span> <span class="o">+=</span> <span class="p">(</span>
+<span class="c">#    &#39;django.contrib.auth.middleware.RemoteUserMiddleware&#39;,</span>
+<span class="p">)</span>
+
+<span class="c"># Remote kerberos authentication backends</span>
+<span class="c">#AUTHENTICATION_BACKENDS = (</span>
+<span class="c">#    &#39;tcms.core.contrib.auth.backends.ModAuthKerbBackend&#39;,</span>
+<span class="c">#)</span>
+<span class="c"># Kerberos realm</span>
+<span class="c">#KRB5_REALM = &#39;EXAMPLE.COM&#39;</span>
+
+<span class="c"># Bugzilla integration setttings</span>
+<span class="c"># Config following settings if your want to integrate with bugzilla</span>
+<span class="n">BUGZILLA3_RPC_SERVER</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+<span class="n">BUGZILLA_URL</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+<span class="n">BUGZILLA_USER</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+<span class="n">BUGZILLA_PASSWORD</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+
+<span class="c"># Set the default send mail address</span>
+<span class="n">EMAIL_HOST</span> <span class="o">=</span> <span class="s">&#39;smtp.corp.redhat.com&#39;</span>
+<span class="n">EMAIL_FROM</span> <span class="o">=</span> <span class="s">&#39;noreply@redhat.com&#39;</span>
+
+<span class="c"># Site-specific messages</span>
+
+<span class="c"># This one, if set, is shown on the front page.</span>
+<span class="c"># It is only shown to authenticated users</span>
+<span class="n">MOTD_AUTH</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">&lt;p&gt;This is the development server for the production instance of the TCMS, </span>
+<span class="s">connected to a copy of the testopia database.&lt;/p&gt;</span>
+<span class="s">&quot;&quot;&quot;</span>
+
+<span class="c"># First run - to detemine need port user or not.</span>
+<span class="n">FIRST_RUN</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="n">MOTD_LOGIN</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;&lt;p&gt;This is the development server of the TCMS (for testing).&lt;/p&gt;</span>
+<span class="s">&lt;p&gt;Please use your kerberos user name and password.&lt;/p&gt;</span>
+<span class="s">&quot;&quot;&quot;</span>
+
+<span class="n">FOOTER_LINKS</span> <span class="o">=</span> <span class="p">(</span>
+ <span class="p">(</span><span class="s">&#39;mailto:tcms-dev-list@redhat.com&#39;</span><span class="p">,</span> <span class="s">&#39;Contact developers&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s">&#39;mailto:eng-ops@redhat.com&#39;</span><span class="p">,</span> <span class="s">&#39;Request permissions&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s">&#39;https://bugzilla.redhat.com/enter_bug.cgi?product=TCMS&amp;version=3.0&#39;</span><span class="p">,</span> <span class="s">&#39;Report bug&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s">&#39;https://riddler.bne.redhat.com/TCMS-User_Guide/index.html&#39;</span><span class="p">,</span> <span class="s">&#39;User guide&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s">&#39;http://survey.englab.nay.redhat.com/index.php?sid=14851&amp;lang=en&#39;</span><span class="p">,</span> <span class="s">&#39;Satisfaction Survey&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s">&#39;https://fedorahosted.org/nitrate/wiki&#39;</span><span class="p">,</span> <span class="s">&#39;Release schedule&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s">&#39;/xmlrpc/&#39;</span><span class="p">,</span> <span class="s">&#39;XML-RPC service&#39;</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="c"># added for nitrate3.4 compatibility</span>
+<span class="n">DEFAULT_GROUPS</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;default&#39;</span><span class="p">]</span>
+<span class="n">TESTOPIA_XML_VERSION</span> <span class="o">=</span> <span class="s">&#39;1.0&#39;</span>
+
+<span class="c"># admin settings</span>
+<span class="n">ADMINS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="c"># (&#39;Your Name&#39;, &#39;your_email@domain.com&#39;),</span>
+<span class="p">)</span>
+
+<span class="c"># user guide URL</span>
+<span class="n">USER_GUIDE_URL</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+
+<span class="n">DEFAULT_PAGE_SIZE</span> <span class="o">=</span> <span class="mi">100</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="start-the-django-app">
+<h3>2.1.5. Start the django app<a class="headerlink" href="#start-the-django-app" title="Permalink to this headline">¶</a></h3>
+<p>After upon steps is completed, now you can try to start the web server which is built-in Django to test if the app can run successfully.
+In nitrate root path, run following command:</p>
+<div class="highlight-python"><pre>./manage.py runserver --settings=settings.product</pre>
+</div>
+<p>Then try to use web browser to open <a class="reference external" href="http://localhost:8000/">http://localhost:8000/</a> to verify the working status of this web service.</p>
+</div>
+<div class="section" id="deployment-with-apache">
+<h3>2.1.6. Deployment with Apache<a class="headerlink" href="#deployment-with-apache" title="Permalink to this headline">¶</a></h3>
+<p>Deploying Django projects with Apache and mod_wsgi is the recommended way to get them into production.</p>
+<p>You can have a try with following apache confs:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c"># Deployment using mod_python</span>
+<span class="c">#</span>
+<span class="c"># Useful documentation:</span>
+<span class="c"># http://docs.djangoproject.com/en/dev/howto/deployment/modpython/</span>
+<span class="c">#</span>
+<span class="c"># I would like the app to be below a path e.g. /nitrate</span>
+<span class="c"># Unfortunately, Django has no easy way to move all URLs</span>
+<span class="c">#</span>
+<span class="c"># So we deploy the app to /</span>
+
+<span class="c"># Force the use of ssl:</span>
+&lt;IfModule mod_rewrite.c&gt;
+    RewriteEngine on
+    RewriteCond %<span class="o">{</span>HTTPS<span class="o">}</span> off
+    RewriteRule ^<span class="o">(</span>.*<span class="o">)</span><span class="nv">$ </span>https://%<span class="o">{</span>HTTP_HOST<span class="o">}</span>%<span class="o">{</span>REQUEST_URI<span class="o">}</span>
+&lt;/IfModule&gt;
+
+Alias /media /usr/share/nitrate/media
+Alias /admin_media /usr/lib/python2.4/site-packages/django/contrib/admin/media/
+
+<span class="c"># Limit threads forked:</span>
+<span class="c"># http://blog.webfaction.com/tips-to-keep-your-django-mod-python-memory-usage-down</span>
+<span class="c"># prefork MPM </span>
+StartServers 5 
+MinSpareServers 5 
+MaxSpareServers 10 
+MaxClients 256 
+MaxRequestsPerChild 0
+
+<span class="c"># Configurations for mod_wsgi</span>
+<span class="c">#WSGIDaemonProcess daemon processes=5 threads=1</span>
+<span class="c">#WSGIProcessGroup daemon</span>
+WSGIScriptAlias / /usr/lib/python2.4/site-packages/tcms/nitrate-wsgi.py
+WSGIPassAuthorization On
+
+&lt;Location <span class="s2">&quot;/&quot;</span>&gt;
+    <span class="c"># ======================</span>
+    <span class="c"># Handler for mod_python</span>
+    <span class="c"># ======================</span>
+    <span class="c">#SetHandler python-program</span>
+    <span class="c">#PythonHandler django.core.handlers.modpython</span>
+    <span class="c">#SetEnv DJANGO_SETTINGS_MODULE tcms.product_settings</span>
+    <span class="c">#PythonDebug On</span>
+
+    <span class="c"># ====================</span>
+    <span class="c"># Handler for mod_wsgi</span>
+    <span class="c"># ====================</span>
+    SetHandler wsgi-script
+
+    <span class="c">#order deny,allow</span>
+    <span class="c">#Deny from all</span>
+    <span class="c">#Allow from 10.66.65.110</span>
+
+    LimitRequestBody 10485760
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/javascript application/x-javascript text/css
+
+    <span class="c"># ========================</span>
+    <span class="c"># Kerberos authentication:</span>
+    <span class="c"># ========================</span>
+    <span class="c">#AuthType Kerberos</span>
+    <span class="c">#AuthName &quot;TCMS - Kerberos login (if negotiate unavailable)&quot;</span>
+    <span class="c">#KrbMethodNegotiate on</span>
+    <span class="c">#KrbMethodK5Passwd on</span>
+    <span class="c">#KrbAuthoritative on</span>
+    <span class="c">#KrbServiceName HTTP</span>
+    <span class="c">#KrbAuthRealm REDHAT.COM</span>
+    <span class="c">#KrbVerifyKDC on</span>
+    <span class="c">#Krb5Keytab /etc/httpd/conf/httpd.keytab</span>
+    <span class="c">#KrbSaveCredentials off</span>
+    <span class="c">#Require valid-user</span>
+
+    ErrorDocument 401 /static/errors/unauthorized.html
+&lt;/Location&gt;
+
+&lt;Location <span class="s2">&quot;/media&quot;</span>&gt;
+    SetHandler None
+    
+    <span class="c"># Disable auth on the static content, so that we&#39;re aren&#39;t forced to</span>
+    <span class="c"># use Kerberos.  Doing so would remove &quot;Expires&quot; headers from the static</span>
+    <span class="c"># content, which would lead to poor page-load times.</span>
+    AuthType none
+    Satisfy Any
+    Allow from All
+    
+    <span class="c"># Many file types are likely to benefit from compression</span>
+    <span class="c"># Enable gzip compression on them:</span>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/javascript application/x-javascript text/css
+    
+    <span class="c"># Set far-future Expires headers on static content</span>
+    <span class="c"># (trac 184):</span>
+    ExpiresActive On
+    ExpiresDefault <span class="s2">&quot;access plus 10 years&quot;</span>
+&lt;/Location&gt;
+
+&lt;Location <span class="s2">&quot;/admin_media&quot;</span>&gt;
+    SetHandler None
+    
+    <span class="c"># Disable auth on the static content, so that we&#39;re aren&#39;t forced to</span>
+    <span class="c"># use Kerberos.  Doing so would remove &quot;Expires&quot; headers from the static</span>
+    <span class="c"># content, which would lead to poor page-load times.</span>
+    AuthType none
+    Satisfy Any
+    Allow from All
+    
+    <span class="c"># Many file types are likely to benefit from compression</span>
+    <span class="c"># Enable gzip compression on them:</span>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/javascript application/x-javascript text/css
+    
+    <span class="c"># Set far-future Expires headers on static content</span>
+    <span class="c"># (trac 184):</span>
+    ExpiresActive On
+    ExpiresDefault <span class="s2">&quot;access plus 10 years&quot;</span>
+&lt;/Location&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="deployment-with-nginx">
+<h3>2.1.7. Deployment with Nginx<a class="headerlink" href="#deployment-with-nginx" title="Permalink to this headline">¶</a></h3>
+<p>With benchmark, we found Nginx + FCGI is faster than Apache + Mod_python.
+So deploying with Nginx will also be a good idea for production environment.
+Here are deployment confs about Nginx:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="c">#######################################################################</span>
+<span class="c">#</span>
+<span class="c"># This is the main Nginx configuration file.  </span>
+<span class="c">#</span>
+<span class="c"># More information about the configuration options is available on </span>
+<span class="c">#   * the English wiki - http://wiki.codemongers.com/Main</span>
+<span class="c">#   * the Russian documentation - http://sysoev.ru/nginx/</span>
+<span class="c">#</span>
+<span class="c">#######################################################################</span>
+
+<span class="c">#----------------------------------------------------------------------</span>
+<span class="c"># Main Module - directives that cover basic functionality</span>
+<span class="c">#</span>
+<span class="c">#   http://wiki.codemongers.com/NginxMainModule</span>
+<span class="c">#</span>
+<span class="c">#----------------------------------------------------------------------</span>
+
+user              nginx;
+worker_processes  1;
+
+error_log         /var/log/nginx/error.log;
+<span class="c">#error_log        /var/log/nginx/error.log  notice;</span>
+<span class="c">#error_log        /var/log/nginx/error.log  info;</span>
+
+pid               /var/run/nginx.pid;
+
+
+
+<span class="c">#----------------------------------------------------------------------</span>
+<span class="c"># Events Module </span>
+<span class="c">#</span>
+<span class="c">#   http://wiki.codemongers.com/NginxEventsModule</span>
+<span class="c">#</span>
+<span class="c">#----------------------------------------------------------------------</span>
+
+events <span class="o">{</span>
+    worker_connections  1024;
+    <span class="c"># use epoll;</span>
+<span class="o">}</span>
+
+
+<span class="c">#----------------------------------------------------------------------</span>
+<span class="c"># HTTP Core Module</span>
+<span class="c">#</span>
+<span class="c">#   http://wiki.codemongers.com/NginxHttpCoreModule </span>
+<span class="c">#</span>
+<span class="c">#----------------------------------------------------------------------</span>
+
+http <span class="o">{</span>
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  <span class="s1">&#39;$remote_addr - $remote_user [$time_local] $request &#39;</span>
+                      <span class="s1">&#39;&quot;$status&quot; $body_bytes_sent &quot;$http_referer&quot; &#39;</span>
+                      <span class="s1">&#39;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&#39;</span>;
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+    <span class="c">#tcp_nopush     on;</span>
+
+    <span class="c">#keepalive_timeout  0;</span>
+    keepalive_timeout  65;
+
+    gzip  on;
+    gzip_min_length 1100;
+    gzip_buffers 4 8k;
+    <span class="c"># gzip_types text/plain;</span>
+    <span class="c"># gzip_types text/plain;</span>
+    
+    <span class="c"># Load config files from the /etc/nginx/conf.d directory</span>
+    include /etc/nginx/conf.d/*.conf;
+
+    <span class="c">#</span>
+    <span class="c"># The default server</span>
+    <span class="c">#</span>
+    server <span class="o">{</span>
+        listen       80;
+        server_name  _;
+
+        <span class="c">#charset koi8-r;</span>
+
+        <span class="c">#access_log  logs/host.access.log  main;</span>
+        rewrite ^/<span class="o">(</span>.*<span class="o">)</span> https://tcms.englab.nay.redhat.com/<span class="nv">$1</span> permanent;
+    <span class="o">}</span>
+
+    server <span class="o">{</span>
+        listen       443;
+
+        ssl           on;
+        ssl_certificate       /etc/ssl/certs/myssl.crt;
+        ssl_certificate_key   /etc/ssl/private/myssl.key;
+
+        server_name  tcms.englab.nay.redhat.com;
+
+        location /admin_edia <span class="o">{</span>
+            root /usr/lib/python2.4/site-packages/django/contrib/admin;
+        <span class="o">}</span>
+
+        location /media <span class="o">{</span>
+            root /usr/share/nitrate/media;
+        <span class="o">}</span>
+
+        <span class="c">#location ~* ^.+\.(jpg|jpeg|gif|png|ico|css|zip|tgz|gz|rar|bz2|doc|xls|exe|pdf|ppt|txt|tar|mid|midi|wav|bmp|rtf|js|mov) {</span>
+        <span class="c">#    access_log   off; # po co mi logi obrazków :)</span>
+        <span class="c">#    expires      30d;</span>
+        <span class="c">#}</span>
+
+        <span class="c">#location / {</span>
+        <span class="c">#    root   /usr/share/nginx/html;</span>
+        <span class="c">#    index  index.html index.htm;</span>
+        <span class="c">#}</span>
+        
+        location / <span class="o">{</span>
+              client_max_body_size 10M;
+              client_body_buffer_size 128k;
+              
+              <span class="c"># host and port to fastcgi server</span>
+              fastcgi_pass 127.0.0.1:8000;
+              fastcgi_param PATH_INFO <span class="nv">$fastcgi_script_name</span>;
+              fastcgi_param REQUEST_METHOD <span class="nv">$request_method</span>;
+              fastcgi_param QUERY_STRING <span class="nv">$query_string</span>;
+              fastcgi_param CONTENT_TYPE <span class="nv">$content_type</span>;
+              fastcgi_param CONTENT_LENGTH <span class="nv">$content_length</span>;
+              fastcgi_pass_header Authorization;
+              fastcgi_intercept_errors off;
+        <span class="o">}</span>
+
+        error_page  404              /404.html;
+        <span class="nv">location</span> <span class="o">=</span> /404.html <span class="o">{</span>
+            root   /usr/share/nitrate/static;
+        <span class="o">}</span>
+
+        <span class="c"># redirect server error pages to the static page /50x.html</span>
+        <span class="c">#</span>
+        error_page   500 502 503 504  /50x.html;
+        <span class="nv">location</span> <span class="o">=</span> /50x.html <span class="o">{</span>
+            root /usr/share/nitrate/static;
+        <span class="o">}</span>
+
+        <span class="c"># proxy the PHP scripts to Apache listening on 127.0.0.1:80</span>
+        <span class="c">#</span>
+        <span class="c">#location ~ \.php$ {</span>
+        <span class="c">#    proxy_pass   http://127.0.0.1;</span>
+        <span class="c">#}</span>
+
+        <span class="c"># pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000</span>
+        <span class="c">#</span>
+        <span class="c">#location ~ \.php$ {</span>
+        <span class="c">#    root           html;</span>
+        <span class="c">#    fastcgi_pass   127.0.0.1:9000;</span>
+        <span class="c">#    fastcgi_index  index.php;</span>
+        <span class="c">#    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;</span>
+        <span class="c">#    include        fastcgi_params;</span>
+        <span class="c">#}</span>
+
+        <span class="c"># deny access to .htaccess files, if Apache&#39;s document root</span>
+        <span class="c"># concurs with nginx&#39;s one</span>
+        <span class="c">#</span>
+        <span class="c">#location ~ /\.ht {</span>
+        <span class="c">#    deny  all;</span>
+        <span class="c">#}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="upgrading">
+<h2>2.2. Upgrading<a class="headerlink" href="#upgrading" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">2. Deployment</a><ul>
+<li><a class="reference internal" href="#id2">2.1. Deployment</a><ul>
+<li><a class="reference internal" href="#download-the-sources">2.1.1. Download the sources</a></li>
+<li><a class="reference internal" href="#install-from-source-code">2.1.2. Install from source code</a></li>
+<li><a class="reference internal" href="#initialize-database-schema">2.1.3. Initialize database schema</a></li>
+<li><a class="reference internal" href="#settings">2.1.4. Settings</a></li>
+<li><a class="reference internal" href="#start-the-django-app">2.1.5. Start the django app</a></li>
+<li><a class="reference internal" href="#deployment-with-apache">2.1.6. Deployment with Apache</a></li>
+<li><a class="reference internal" href="#deployment-with-nginx">2.1.7. Deployment with Nginx</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#upgrading">2.2. Upgrading</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="about.html"
+                        title="previous chapter">1. About Nitrate</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tutorial.html"
+                        title="next chapter">3. Tutorial</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/deployment.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="tutorial.html" title="3. Tutorial"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="about.html" title="1. About Nitrate"
+             >previous</a> |</li>
+        <li><a href="index.html">nitrate 3.8.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Red Hat, Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>
