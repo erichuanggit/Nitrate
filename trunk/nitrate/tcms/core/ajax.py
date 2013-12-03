@@ -704,20 +704,20 @@ class TestCaseUpdateActions(object):
         if not exists:
             raise ObjectDoesNotExist('The priority you specified to change '
                                      'does not exist.')
-        self.get_update_targets().update(**{self.target_field: self.new_value})
+        self.get_update_targets().update(**{str(self.target_field): self.new_value})
 
     def _update_default_tester(self):
         user_pk = User.objects.filter(
             username=self.new_value).values_list('pk', flat=True)
         if not user_pk:
             raise ObjectDoesNotExist('Your input is not found.')
-        self.get_update_targets().update(**{self.target_field: user_pk[0]})
+        self.get_update_targets().update(**{str(self.target_field): user_pk[0]})
 
     def _update_case_status(self):
         exists = TestCaseStatus.objects.filter(pk=self.new_value).exists()
         if not exists:
             raise ObjectDoesNotExist('The status you choose does not exist.')
-        self.get_update_targets().update(**{self.target_field: self.new_value})
+        self.get_update_targets().update(**{str(self.target_field): self.new_value})
 
         # ###
         # Case is moved between Cases and Reviewing Cases tabs accoding to the
