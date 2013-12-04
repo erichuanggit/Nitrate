@@ -3,7 +3,7 @@
 
 Name:           nitrate
 Version:        3.8.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -118,6 +118,19 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+
+* Tue Dec 4 2013 Chenxiong Qi <cqi@redhat.com> - 3.8.5-4
+- 1036028 [Test plan] Unable to calculate all run progress even if I select "Also select the rest XX page(s)"
+- 1036598 [Add tag]"6932 undefined" warning when add tag without select "Also select cases that are not shown below, yet."
+- 1036538 [advance search]printable copy, test cases is null even if select cases/plan from advance search list
+- 1036672 [export all cases]Export all cases result is blank
+- 1036678 [Print plan]No cases infomation in print view page
+- 1036609 [Test Plan]Unable to set default tester in test plan
+- 1036627 [Test Plan]Unable to batch set status in test plan
+- 1036629 [Test Plan]Unable to batch set priority in test plan
+- 1036508 [advance search]Can not export selected test cases/plan to download file from advance search list
+- 1036042 [RFE]Suggest change the description of "Also select cases that are not shown below, yet." in test plan
+- 1035956 [test plan]Unable to create new test run or add cases to existing run
 
 * Tue Nov 28 2013 Chenxiong Qi <cqi@redhat.com> - 3.8.5-3
 - Bug 1028863 - [Testplan][Runs] In 'Runs' label of a Test plan, not input any thing in 'Items Per Page' then search, the site have no responce
