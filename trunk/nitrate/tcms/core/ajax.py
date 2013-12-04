@@ -192,6 +192,7 @@ def form(request):
     html = getattr(form, 'as_' + q_format)
     return HttpResponse(html())
 
+
 def tag(request, template_name="management/get_tag.html"):
     """Get tags for test plan or test case"""
 
@@ -260,6 +261,7 @@ def tag(request, template_name="management/get_tag.html"):
                         except:
                             return "Remove tag %s error." % tag
                 return True, self.obj
+
     objects = Objects(request, template_name)
     template_name, obj = objects.get()
 
@@ -297,6 +299,7 @@ def tag(request, template_name="management/get_tag.html"):
             'object': obj[0],
         })
     return HttpResponse('')
+
 
 def get_value_by_type(val, v_type):
     '''

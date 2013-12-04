@@ -1669,7 +1669,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         };
         
         // Observe the batch add case button
-        if(form.adjacent('input.tag_add').length > 0) {
+        if (form.adjacent('input.tag_add').length > 0) {
             var element = form.adjacent('input.tag_add')[0];
             element.observe('click',function(e) {
                 var selection = serializeCaseFromInputList2(table);
@@ -1681,24 +1681,45 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 constructBatchTagProcessDialog(plan_id);
 
                 // Observe the batch tag form submit
-                $('id_batch_tag_form').observe('submit',function(e){
+                $('id_batch_tag_form').observe('submit', function(e){
                     e.stop();
 
                     var tagData = this.serialize(true);
-                    if(!tagData.tags)
+                    if(!tagData.tags) {
                         return false;
+                    }
                     var params = serializeFormData({
-                        form: this,
+                        form: form,
                         zoneContainer: container,
                         casesSelection: selection,
                         hashable: true
                     });
                     params.tags = tagData.tags;
 
+                    /*
+                     * Two reasons to force to remove plan from parameters here.
+                     * 1. plan is added in previous cases filter. As the design
+                     *    of Show More, previous filter criteria is added for
+                     *    selecting all cases with same filter criteria.
+                     * 2. existing plan confuses tag view method due to it
+                     *    applies to both plan and case to add tag. Thus, the
+                     *    existing plan will cause it to add tag to all cases of
+                     *    that plan always.
+                     *
+                     * Placing this line of code is not a good idea. But, it
+                     * works well for the current implementation. Possible
+                     * solution to avoid this might to split the tag view method
+                     * to add tags to plans and cases, respectively. Why to make
+                     * change to tag view method? That is, according to the
+                     * cases filter implementation, plan must exist in the
+                     * filter criteria as a parameter.
+                     */
+                    delete params.plan;
+
                     var format = 'serialized';
                     addBatchTag(params, tag_callback, format);
-                })
-            })
+                });
+            });
         }
         
         // Observe the batch remove tag function

@@ -909,7 +909,6 @@ function addBatchTag(parameters, callback, format)
     parameters.t = 'json';
     parameters.f = format;
     batchProcessTag(parameters, callback, format);
-    
 }
 
 function removeBatchTag(parameters, callback, format)
@@ -928,8 +927,9 @@ function batchProcessTag(parameters, callback, format)
             returnobj = t.responseText.evalJSON(true);
             
             if (returnobj.response == 'ok') {
-                if(callback)
+                if(callback) {
                     callback.call();
+                }
             } else {
                 alert(returnobj.response);
                 return false;
@@ -937,14 +937,14 @@ function batchProcessTag(parameters, callback, format)
         } else {
             callback(t);
         }
-    }
-    
-    var url = new String('/management/tags/')
+    };
+
+    var url = new String('/management/tags/');
     new Ajax.Request(url, {
         method: 'get',
         parameters: parameters,
         onSuccess: success,
-    })
+    });
 }
 
 function bindCommentDeleteLink(container, parameters)
