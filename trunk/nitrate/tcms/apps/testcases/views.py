@@ -847,6 +847,11 @@ def get(request, case_id, template_name='case/get.html'):
 
 
 # TODO: better to split this method for TestPlan and TestCase respectively.
+# NOTE: if you want to print cases according to case_status, you have to pass
+#       printable_case_status in the REQUEST. Why to do this rather than using
+#       case_status is that, Select All causes previous filter criteria is
+#       passed via REQUEST, whereas case_status must exist. So, we have to find
+#       a way to distinguish them for different purpose, respectively.
 def printable(request, template_name='case/printable.html'):
     """Create the printable copy for plan/case"""
     req_get = request.REQUEST.get
@@ -855,7 +860,7 @@ def printable(request, template_name='case/printable.html'):
     plan_pks = req_getlist('plan')
     case_pks = req_getlist('case')
     select_all = req_get('selectAll')
-    case_status_pks = req_getlist('case_status')
+    case_status_pks = req_getlist('printable_case_status')
 
     # After supporting Select All, querying TestCase requires the existance of
     # either case or selectAll.
