@@ -1,43 +1,101 @@
 .. _contribution:
 
-Contribution
-============
+1. Contribution
+===============
 
-.. TODO
+This guide is a comprehensive resource for contributing to Nitrate - for both
+new and experienced contributors. It is maintained by the Nitrate community.
+We welcome your contributions to Nitrate!
 
-Getting involved
-----------------
+1.1. Getting involved
+---------------------
 
-.. TODO
-   gerrit/github config
+These instructions cover how to setup development environment and recommended
+coding conventions for nitrate project.  It also gives an overview of the
+directory structure of the Nitrate source code.
 
-Code style
-----------
 
-.. TODO
-   General Layout
-   Expressions and Statements
-   Naming Conventions
-   Docstrings
-   Comments
-   git log style
+1.1.1. Getting the Source Code
+------------------------------
 
-Development environment
------------------------
+The Nitrate source code is available at:
+https://git.fedorahosted.org/cgit/nitrate.git/?h=development
 
-.. TODO
+You can easy to get the latest changes with git:
+code::
 
-Source code
------------
+    # git clone git://git.fedorahosted.org/nitrate.git
+    # git checkout --track origin/development
 
-.. TODO
+Or you also can download the tarballs from:
+https://git.fedorahosted.org/cgit/nitrate.git/?h=development
 
-Roadmap
--------
+1.1.2. Requirement modules
+---------------------------
 
-.. TODO
+* `Python <http://www.python.org/>`_ >= 2.4
+* `Django <http://www.djangoproject.com/>`_ = 1.2.3
+* `MySQL-python <http://sourceforge.net/projects/mysql-python/>`_ = 1.2.4
+* `Kobo <https://fedorahosted.org/kobo/>`_ = 0.2.1
+* `python-kerberos
+  <http://koji.fedoraproject.org/koji/buildinfo?buildID=238775>`_ = 1.1
+* `qpid-python <http://qpid.apache.org/components/messaging-api/index.html>`_  = 0.20
+* `Django debug toolbar <http://github.com/robhudson/django-debug-toolbar>`_ (Optional: Recommendations for development)
 
-Release schedule
-----------------
+1.1.3. Install dependence
+--------------------------------------
+code::
 
-.. TODO
+    # cd nitrate/trunk/nitrate
+    # pip install -r requirements/devel.txt
+
+1.1.4. Setup database
+-------------------------------
+code::
+
+    # mysql -uroot -p
+    # mysql> create database nitrate CHARACTER SET utf8 COLLATE utf8_general_ci;
+    # mysql> use nitrate; source nitrate_db_setup.sql
+
+1.1.5. Start the nitrate app
+----------------------------
+code::
+
+    # cd <nitrate_project_root_path>/trunk/nitrate
+    # export DJANGO_SETTINGS_MODULE=tcms.settings
+    # django-admin runserver
+
+Done.
+
+1.2. Coding style
+-----------------
+
+Please follow these coding standards when writing code for inclusion in Nitrate.
+
+1.2.1. Python style
+-------------------
+
+* Unless otherwise specified, follow `PEP 8 <http://www.python.org/dev/peps/pep-0008>`_.
+* Use underscores, not camelCase, for variable, function and method names (i.e. poll.get_unique_voters(), not poll.getUniqueVoters).
+* In docstrings, use “action words” such as:
+
+    code::
+
+        def foo():
+            """
+            Calculates something and returns the result.
+            """
+            pass
+
+    Here’s an example of what not to do:
+
+    code::
+
+        def foo():
+            """
+            Calculate something and return the result.
+            """
+            pass
+
+    More details please follow `Django's development version <https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/coding-style/>`_.
+
