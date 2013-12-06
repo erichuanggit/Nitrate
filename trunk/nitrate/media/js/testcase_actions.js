@@ -465,18 +465,8 @@ function changeTestCaseStatus(plan_id, selector, case_id, be_confirmed, was_conf
             var case_status = node.innerHTML;
         }
 
-        // We have to reload the other side of cases to reflect the status
-        // change. This MUST be done before selector is hided.
-        var switchMap = {
-            testcases: function() {
-                Nitrate.TestPlans.Details.reviewingCasesTabOpened = false;
-            },
-            reviewcases: function() {
-                Nitrate.TestPlans.Details.testcasesTabOpened = false;
-            }
-        };
-        var container_id = jQ(selector).parents('.tab_list').attr('id');
-        switchMap[container_id]();
+        // container should be got before selector is hidden.
+        var curCasesContainer = jQ(selector).parents('.tab_list');
 
         label.innerHTML = case_status;
         label.show();
@@ -488,6 +478,10 @@ function changeTestCaseStatus(plan_id, selector, case_id, be_confirmed, was_conf
             jQ('#review_case_count').text(returnobj.review_case_count);
             jQ('#'+case_id).next().remove();
             jQ('#'+case_id).remove();
+
+            // We have to reload the other side of cases to reflect the status
+            // change. This MUST be done before selector is hided.
+            Nitrate.TestPlans.Details.reopenTabHelper(curCasesContainer);
         }
     }
 

@@ -720,6 +720,14 @@ Nitrate.TestPlans.Details = {
         }
     },
 
+    reopenCasesTabThen: function() {
+        Nitrate.TestPlans.Details.testcasesTabOpened= false;
+    },
+
+    reopenReviewingCasesTabThen: function() {
+        Nitrate.TestPlans.Details.reviewingCasesTabOpened = false;
+    },
+
     /*
      * Show or hide the input control for Select All.
      *
@@ -753,6 +761,25 @@ Nitrate.TestPlans.Details = {
         casesMostCloseContainer.find('input[value="all"]')[0].checked = !notSelectAll;
 
         Nitrate.TestPlans.Details.toggleSelectAllInput(container);
+    },
+
+    /*
+     * Helper function to reopen other tabs.
+     *
+     * Arguments:
+     * - container: a jQuery object, where the operation happens to reopen other tabs. The container
+     *              Id is used to select the reopen operations.
+     */
+    reopenTabHelper: function(container) {
+        var switchMap = {
+            testcases: function() {
+                Nitrate.TestPlans.Details.reopenReviewingCasesTabThen();
+            },
+            reviewcases: function() {
+                Nitrate.TestPlans.Details.reopenCasesTabThen();
+            }
+        };
+        switchMap[container.attr('id')]();
     },
 
     on_load: function() {
@@ -1357,7 +1384,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         // Bind batch change case status selector
         if(form.adjacent('input[name="new_case_status_id"]').length > 0) {
             var element = form.adjacent('input[name="new_case_status_id"]')[0];
-            
+
             element.observe('change',function(t) {
                 var selection = serializeCaseFromInputList2(table);
                 if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
@@ -1385,12 +1412,14 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
 
                 var callback = function(t) {
                     returnobj = t.responseText.evalJSON(true);
-                    
+
                     if(returnobj.rc == 0) {
                         constructPlanDetailsCasesZone(container, plan_id, postdata);
                         jQ('#run_case_count').text(returnobj.run_case_count);
                         jQ('#case_count').text(returnobj.case_count);
                         jQ('#review_case_count').text(returnobj.review_case_count);
+
+                        Nitrate.TestPlans.Details.reopenTabHelper(jQ(container));
                     } else {
                         alert(returnobj.response);
                         return false;
