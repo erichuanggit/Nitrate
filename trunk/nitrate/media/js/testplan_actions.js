@@ -555,6 +555,36 @@ Nitrate.TestPlans.Details = {
     },
 
     /*
+     * No more cases to load.
+     *
+     * Arguments:
+     * - container: a jQuery object. Representing current Cases or Revieiwng Cases tab.
+     */
+    noMoreToLoad: function(container) {
+        var countInfo = Nitrate.TestPlans.Details.getLoadedCasesCountInfo(container);
+        return countInfo.remaining === 0;
+    },
+
+    /*
+     * Get cases count information.
+     *
+     * Getting all these information relies on the HTML element within page. No
+     * any interaction with backend.
+     */
+    getLoadedCasesCountInfo: function(container) {
+        var contentContainer = container;
+        var casesListContainer = contentContainer.find('.js-cases-list');
+        var totalCasesCount = contentContainer
+            .find('.js-remaining-cases-count').attr('data-cases-count');
+        var loadedCasesCount = casesListContainer.find('tr[id]').length;
+        var remainingCount = parseInt(totalCasesCount) - parseInt(loadedCasesCount);
+        return {
+            loaded: loadedCasesCount,
+            remaining: remainingCount
+        };
+    },
+
+    /*
      * Show the remaining number of TestCases to be loaded.
      *
      * A side-effect is that when there is no more TestCases to be loaded,
@@ -563,12 +593,10 @@ Nitrate.TestPlans.Details = {
      */
     showRemainingCasesCount: function(container) {
         var contentContainer = jQ('#' + container);
-        var casesListContainer = contentContainer.find('.js-cases-list');
-        var totalCasesCount = contentContainer
-			.find('.js-remaining-cases-count').attr('data-cases-count');
-        var loadedCasesCount = casesListContainer.find('tr[id]').length;
-        var remainingCount = parseInt(totalCasesCount) - parseInt(loadedCasesCount);
-        if (remainingCount === 0) {
+        var countInfo = Nitrate.TestPlans.Details.getLoadedCasesCountInfo(contentContainer);
+        var noMoreToLoad = Nitrate.TestPlans.Details.noMoreToLoad(contentContainer);
+        contentContainer.find('.js-number-of-loaded-cases').text(countInfo.loaded);
+        if (noMoreToLoad) {
             contentContainer.find('a.js-load-more').die('click').toggle();
             contentContainer.find('span.js-loading-progress').toggle();
             contentContainer.find('span.js-nomore-msg').toggle();
@@ -576,7 +604,7 @@ Nitrate.TestPlans.Details = {
                 contentContainer.find('span.js-nomore-msg').toggle('slow');
             }, 2000);
         } else {
-            contentContainer.find('.js-remaining-cases-count').text(remainingCount);
+            contentContainer.find('.js-remaining-cases-count').text(countInfo.remaining);
         }
     },
 
@@ -613,6 +641,7 @@ Nitrate.TestPlans.Details = {
 
                     // Calculate the remaining number of cases
                     Nitrate.TestPlans.Details.showRemainingCasesCount(container);
+                    Nitrate.TestPlans.Details.toggleSelectAllInput(jQ('#' + container));
                 } else {
                     elemLoadMore.unbind('click').remove();
                 }
@@ -689,6 +718,41 @@ Nitrate.TestPlans.Details = {
                 updateObject('testplans.testplan', plan_id, 'is_active', 'True', 'bool', reloadWindow);
             });
         }
+    },
+
+    /*
+     * Show or hide the input control for Select All.
+     *
+     * Arguments:
+     * - container: a jQuery object. Representing current Cases or Revieiwng Cases tab.
+     */
+    toggleSelectAllInput: function(container) {
+        var uncheckedCaseIdExists = container.find('.js-cases-list')
+                                        .find('input[name="case"]:not(:checked)').length > 0;
+        var noMoreCasesToLoad = Nitrate.TestPlans.Details.noMoreToLoad(container);
+
+        var selectAllDiv = jQ(container).find('.js-cases-select-all');
+        if (uncheckedCaseIdExists || noMoreCasesToLoad) {
+            selectAllDiv.hide();
+            selectAllDiv.find('input[type="checkbox"]')[0].checked = false;
+        } else {
+            selectAllDiv.show();
+            selectAllDiv.find('input[type="checkbox"]')[0].checked = true;
+        }
+    },
+
+    /*
+     * Uncheck select all loaded cases if any case is unchecked, or check it otherwise.
+     *
+     * Argument:
+     * - container: a jQuery object. Representing current Cases or Reviewing Cases tab.
+     */
+    refreshCasesSelectionCheck: function(container) {
+        var casesMostCloseContainer = container.find('.js-cases-list');
+        var notSelectAll = casesMostCloseContainer.find('input[name="case"]:not(:checked)').length > 0;
+        casesMostCloseContainer.find('input[value="all"]')[0].checked = !notSelectAll;
+
+        Nitrate.TestPlans.Details.toggleSelectAllInput(container);
     },
 
     on_load: function() {
@@ -1015,33 +1079,6 @@ function unlinkCasesFromPlan(container, form, table)
     })
 }
 
-function refreshCasesSelectionCheck(container) {
-    var casesMostCloseContainer = jQ(container).find('.js-cases-list');
-    var notSelectAll = casesMostCloseContainer.find('input[name="case"]:not(:checked)').length > 0;
-    casesMostCloseContainer.find('input[value="all"]')[0].checked = !notSelectAll;
-
-    // Toggle select all option
-    jQ(container).find('.js-cases-select-all').find('input[type="checkbox"]')[0].checked = !notSelectAll;
-    if (notSelectAll) {
-        jQ(container).find('.js-cases-select-all').hide('fast');
-    } else {
-        jQ(container).find('.js-cases-select-all').show('fast');
-    }
-}
-
-/*
- * When check the All box, to show or hide Select All option to user.
- */
-function toggleSelectAllInput(container, selectAll) {
-    var selectAllDiv = jQ(container).find('.js-cases-select-all');
-    selectAllDiv.find('input[type="checkbox"]')[0].checked = selectAll;
-    if (selectAll) {
-        selectAllDiv.show('fast');
-    } else {
-        selectAllDiv.hide('fast');
-    }
-}
-
 /*
  * Bind events on loaded cases.
  *
@@ -1061,7 +1098,7 @@ function bindEventsOnLoadedCases(options) {
         jQ(cases_container).find('.js-cases-list')
                            .find('input[name="case"]')
                            .live('click', function(e) {
-            refreshCasesSelectionCheck(cases_container);
+            Nitrate.TestPlans.Details.refreshCasesSelectionCheck(jQ(cases_container));
         });
 
         // Observe the change sortkey
@@ -1790,7 +1827,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             }
 
         jQ(container).find('input[value="all"]').live('click', function(e) {
-            toggleSelectAllInput(container, this.checked);
+            Nitrate.TestPlans.Details.toggleSelectAllInput(jQ(container));
         });
 
         _bindEventsOnLoadedCases(table, form);
@@ -1799,7 +1836,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         Nitrate.TestPlans.Details.observeLoadMore(container.id);
         Nitrate.TestPlans.Details.showRemainingCasesCount(container.id);
 
-        refreshCasesSelectionCheck(container);
+        Nitrate.TestPlans.Details.refreshCasesSelectionCheck(jQ(container));
     };
 
     var url = getURLParam().url_search_case;
