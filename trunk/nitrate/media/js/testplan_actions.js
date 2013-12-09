@@ -1283,26 +1283,575 @@ function serializeFormData(options) {
     return formdata;
 }
 
-function constructPlanDetailsCasesZone(container, plan_id, parameters)
-{
-    if (typeof(container) != 'object')
-        container = $(container)
-    
-    container.update('<div class="ajax_loading"></div>');
-    
-    if(!parameters)
-        var parameters = {'a': 'initial', 'from_plan': plan_id}
 
-    var _bindEventsOnLoadedCases = bindEventsOnLoadedCases({
-        cases_container: container,
-        plan_id: plan_id,
-        parameters: parameters
-    });
-    
-    complete = function(t) {
+/*
+ * Event handler invoked when TestCases' Status is changed.
+ */
+function onTestCaseStatusChange(options) {
+    var form = options.form;
+    var table = options.table;
+    var container = options.container;
+    var plan_id = options.planId;
+
+    return function(e) {
+        var selection = serializeCaseFromInputList2(table);
+        if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+            alert(default_messages.alert.no_case_selected);
+            return false;
+        }
+        var status_pk = this.value;
+        if (!status_pk) {
+            return false;
+        }
+        var c = confirm(default_messages.confirm.change_case_status);
+        if (!c) {
+            return false;
+        }
+
+        var postdata = serializeFormData({
+            form: form,
+            zoneContainer: container,
+            casesSelection: selection,
+            hashable: true
+        });
+        postdata.a = 'update';
+        postdata.target_field = 'case_status';
+        postdata.new_value = status_pk;
+
+        var afterStatusChangedCallback = function(response) {
+            var returnobj = response.responseText.evalJSON(true);
+
+            if (returnobj.rc == 0) {
+                constructPlanDetailsCasesZone(container, plan_id, postdata);
+                jQ('#run_case_count').text(returnobj.run_case_count);
+                jQ('#case_count').text(returnobj.case_count);
+                jQ('#review_case_count').text(returnobj.review_case_count);
+
+                Nitrate.TestPlans.Details.reopenTabHelper(jQ(container));
+            } else {
+                alert(returnobj.response);
+                return false;
+            }
+        };
+
+        new Ajax.Request('/ajax/update/cases-case-status/', {
+            method: 'post',
+            parameters: postdata,
+            onSuccess: afterStatusChangedCallback,
+            onFailure: json_failure
+        });
+    };
+}
+
+
+/*
+ * Event handler invoked when TestCases' Priority is changed.
+ */
+function onTestCasePriorityChange(options) {
+    var form = options.form;
+    var table = options.table;
+    var container = options.container;
+    var plan_id = options.planId;
+
+    return function(e) {
+        var selection = serializeCaseFromInputList2(table);
+        if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+            alert(default_messages.alert.no_case_selected);
+            return false;
+        }
+        // FIXME: how about show a message to user to let user know what is happening?
+        if(!this.value) {
+            return false;
+        }
+        var c = confirm(default_messages.confirm.change_case_priority);
+        if (!c) {
+            return false;
+        }
+
+        var postdata = serializeFormData({
+            form: form,
+            zoneContainer: container,
+            casesSelection: selection,
+            hashable: true
+        });
+        postdata.a = 'update';
+        postdata.target_field = 'priority';
+        postdata.new_value = this.value;
+
+        var afterPriorityChangedCallback = function(response) {
+            var returnobj = response.responseText.evalJSON(true);
+            if(returnobj.rc != 0) {
+                alert(returnobj.response);
+                return false;
+            };
+            constructPlanDetailsCasesZone(container, plan_id, postdata);
+        };
+
+        new Ajax.Request('/ajax/update/cases-priority/', {
+            method: 'post',
+            parameters: postdata,
+            onSuccess: afterPriorityChangedCallback,
+            onFailure: json_failure
+        });
+
+    };
+}
+
+
+/*
+ * Event handler invoked when TestCases' Automated is changed.
+ */
+function onTestCaseAutomatedClick(options) {
+    var form = options.form;
+    var table = options.table;
+    var plan_id = options.planId;
+    var container = options.container;
+
+    return function(e) {
+        var selection = serializeCaseFromInputList2(table);
+        var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0;
+        if(noCasesSelected) {
+            alert(default_messages.alert.no_case_selected);
+            return false;
+        }
+
+        var dialogContainer = getDialog();
+        var afterAutomatedChangedCallback = function(response) {
+            var returnobj = response.responseText.evalJSON(true);
+            if (returnobj.rc != 0) {
+                alert(returnobj.response);
+                return false;
+            };
+
+            var params = serialzeCaseForm(form, table, true, true);
+            /*
+             * FIXME: this is confuse. There is no need to assign this
+             *        value explicitly when update component and category.
+             */
+            params.a = 'search';
+            params.case = selection.selectedCasesIds;
+            constructPlanDetailsCasesZone(container, plan_id, params);
+            clearDialog(dialogContainer);
+        };
+
+        constructCaseAutomatedForm(dialogContainer, afterAutomatedChangedCallback, {
+            zoneContainer: container,
+            casesSelection: selection
+        });
+    };
+}
+
+
+/*
+ * To change selected cases' tag.
+ */
+function onTestCaseTagFormSubmitClick(options) {
+    var form = options.form;
+    var table = options.table;
+    var container = options.container;
+    var plan_id = options.planId;
+
+    return function(response) {
+        var dialog = getDialog();
+
+        var returnobj = response.responseText.evalJSON(true);
+        if (returnobj.rc && returnobj.rc == 1) {
+            alert(returnobj.response);
+            clearDialog(dialog);
+            return false;
+        };
+
+        clearDialog(dialog);
+        dialog.show();
+        var html = '<div class="dia_title" style=" margin:10px 20px;">You have successfully ' +
+                   'operate tags in the following case:</div><div class="dialog_content">';
+        dialog.update(html);
+
+        returnobj.each(function(i) {
+            html += '<div class="dia_content" style=" margin:10px 20px;">'+ i.pk + ' &nbsp; ' +
+                    i.fields.summary +'</div>';
+        });
+        dialog.update(html);
+
+        html +='</div><input class="dia_btn_close sprites" onclick="this.up(0).hide()" ' +
+               'type="button" value="Close" style=" margin:10px 20px;"/>';
+
+        dialog.update(html);
+        var params = serialzeCaseForm(form, table);
+        params.a = 'initial';
+        constructPlanDetailsCasesZone(container, plan_id, params);
+    };
+}
+
+
+function onTestCaseTagAddClick(options) {
+    var form = options.form;
+    var table = options.table;
+    var plan_id = options.planId;
+    var container = options.container;
+
+    return function(e) {
+        var selection = serializeCaseFromInputList2(table);
+        if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+            alert(default_messages.alert.no_case_selected);
+            return false;
+        }
+
+        constructBatchTagProcessDialog(plan_id);
+
+        // Observe the batch tag form submit
+        $('id_batch_tag_form').observe('submit', function(e) {
+            e.stop();
+
+            var tagData = this.serialize(true);
+            if (!tagData.tags) {
+                return false;
+            }
+            var params = serializeFormData({
+                form: form,
+                zoneContainer: container,
+                casesSelection: selection,
+                hashable: true
+            });
+            params.tags = tagData.tags;
+
+            /*
+             * Two reasons to force to remove plan from parameters here.
+             * 1. plan is added in previous cases filter. As the design
+             *    of Show More, previous filter criteria is added for
+             *    selecting all cases with same filter criteria.
+             * 2. existing plan confuses tag view method due to it
+             *    applies to both plan and case to add tag. Thus, the
+             *    existing plan will cause it to add tag to all cases of
+             *    that plan always.
+             *
+             * Placing this line of code is not a good idea. But, it
+             * works well for the current implementation. Possible
+             * solution to avoid this might to split the tag view method
+             * to add tags to plans and cases, respectively. Why to make
+             * change to tag view method? That is, according to the
+             * cases filter implementation, plan must exist in the
+             * filter criteria as a parameter.
+             */
+            delete params.plan;
+
+            var format = 'serialized';
+            var callback = onTestCaseTagFormSubmitClick({
+                container: container,
+                form: form,
+                planId: plan_id,
+                table: table
+            });
+            addBatchTag(params, callback, format);
+        });
+    };
+}
+
+
+function onTestCaseTagDeleteClick(options) {
+    var form = options.form;
+    var table = options.table;
+    var plan_id = options.planId;
+    var container = options.container;
+    var parameters = options.parameters;
+
+    return function(e) {
+        var c = getDialog();
+        var selection = serializeCaseFromInputList2(table);
+        if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+            alert(default_messages.alert.no_case_selected);
+            return false;
+        }
+        var form_observe = function(e) {
+            e.stop();
+
+            // FIXME: params is not used.
+            // FIXME: passing this is correct?
+            var params = serializeFormData({
+                form: this,
+                zoneContainer: container,
+                casesSelection: selection,
+            });
+
+            var url = getURLParam().url_cases_tag;
+            var afterTagDeletedCallback = function(response) {
+                var returnobj = response.responseText.evalJSON(true);
+                if (returnobj.rc != 0) {
+                    alert(returnobj.response);
+                    return false;
+                }
+                // TODO: test whether params is enough instead of referencing parameters.
+                parameters['case'] = selection.selectedCasesIds;
+                constructPlanDetailsCasesZone(container, plan_id, parameters);
+                clearDialog(c);
+            };
+
+            updateCaseTag(url, params, afterTagDeletedCallback);
+        }
+        renderTagForm(c, {case: selection.selectedCasesIds}, form_observe);
+    };
+}
+
+
+/*
+ * To change selected cases' sort number.
+ */
+function onTestCaseSortNumberClick(options) {
+    var form = options.form;
+    var table = options.table;
+    var plan_id = options.planId;
+    var container = options.container;
+
+    return function(e) {
+        // NOTE: new implemenation does not use testcaseplan.pk
+        var selection = serializeCaseFromInputList2(table);
+        if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+            alert(default_messages.alert.no_case_selected);
+            return false;
+        }
+        var postdata = serializeFormData({
+            form: form,
+            zoneContainer: container,
+            casesSelection: selection,
+            hashable: true
+        });
+
+        var callback = function(response) {
+            var returnobj = response.responseText.evalJSON(true);
+            if (returnobj.rc != 0) {
+                alert(returnobj.response);
+                return false;
+            }
+            postdata.case = selection.selectedCasesIds;
+            constructPlanDetailsCasesZone(container, plan_id, postdata);
+        };
+        changeCaseOrder2(postdata, callback);
+    };
+}
+
+
+/*
+ * To change selected cases' category.
+ */
+function onTestCaseCategoryClick(options) {
+    var form = options.form;
+    var table = options.table;
+    var plan_id = options.planId;
+    var container = options.container;
+    var parameters = options.parameters;
+
+    return function(e) {
+        if (this.diabled) {
+            return false;
+        }
+        var c = getDialog();
+        var params = {
+            /*
+             * FIXME: the first time execute this code, it's unnecessary
+             *        to pass selected cases' ids to the server.
+             */
+            'case': serializeCaseFromInputList(table),
+            'product': Nitrate.TestPlans.Instance.fields.product_id
+        };
+        if (params['case'] && params['case'].length == 0) {
+            alert(default_messages.alert.no_case_selected);
+            return false;
+        }
+        var form_observe = function(e) {
+            e.stop();
+
+            var selection = serializeCaseFromInputList2(table);
+            var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0;
+            if (noCasesSelected) {
+                alert(default_messages.alert.no_case_selected);
+                return false;
+            }
+
+            var params = serializeFormData({
+                form: this,
+                zoneContainer: container,
+                casesSelection: selection
+            });
+
+            var url = getURLParam().url_cases_category;
+            var callback = function(response) {
+                var returnobj = response.responseText.evalJSON(true);
+                if (returnobj.rc != 0) {
+                    alert(returnobj.response);
+                    return false;
+                }
+                // TODO: whether can use params rather than parameters.
+                parameters['case'] = selection.selectedCasesIds;
+                constructPlanDetailsCasesZone(container, plan_id, parameters);
+                clearDialog(c);
+            };
+
+            updateCaseCategory(url, params, callback);
+        };
+        renderCategoryForm(c, params, form_observe);
+    };
+}
+
+
+/*
+ * To change selected cases' default tester.
+ */
+function onTestCaseDefaultTesterClick(options) {
+    var form = options.form;
+    var table = options.table;
+    var plan_id = options.planId;
+    var container = options.container;
+
+    return function(e) {
+        var selection = serializeCaseFromInputList2(table);
+        if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+            alert(default_messages.alert.no_case_selected);
+            return false;
+        }
+
+        var params = serializeFormData({
+            form: form,
+            zoneContainer: container,
+            casesSelection: selection,
+            hashable: true
+        });
+        params.a = 'update';
+
+        var cbAfterDefaultTesterChanged = function(response) {
+            var returnobj = response.responseText.evalJSON();
+            if (returnobj.rc != 0) {
+                alert(returnobj.response);
+                return false;
+            };
+            constructPlanDetailsCasesZone(container, plan_id, params);
+        };
+
+        changeCaseMember(params, cbAfterDefaultTesterChanged);
+    };
+}
+
+
+/*
+ * To change selected cases' component.
+ */
+function onTestCaseComponentClick(options) {
+    var form = options.form;
+    var table = options.table;
+    var plan_id = options.planId;
+    var container = options.container;
+    var parameters = options.parameters;
+
+    return function(e) {
+        if (this.diabled) {
+            return false;
+        }
+        var c = getDialog();
+        var params = {
+            // FIXME: remove this line. It's unnecessary any more.
+            'case': serializeCaseFromInputList(table),
+            'product': Nitrate.TestPlans.Instance.fields.product_id
+        };
+        if (params['case'] && params['case'].length == 0) {
+            alert(default_messages.alert.no_case_selected);
+            return false;
+        }
+        var form_observe = function(e) {
+            e.stop();
+
+            var selection = serializeCaseFromInputList2(table);
+            var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0;
+            if (noCasesSelected) {
+                alert(default_messages.alert.no_case_selected);
+                return false;
+            }
+
+            var params = serializeFormData({
+                form: this,
+                zoneContainer: container,
+                casesSelection: selection
+            });
+
+            var url = getURLParam().url_cases_component;
+            var cbAfterComponentChanged = function(response) {
+                returnobj = response.responseText.evalJSON(true);
+                if (returnobj.rc != 0) {
+                    alert(returnobj.response);
+                    return false;
+                }
+                parameters['case'] = selection.selectedCasesIds;
+                constructPlanDetailsCasesZone(container, plan_id, parameters);
+                clearDialog(c);
+            };
+
+            updateCaseComponent(url, params, cbAfterComponentChanged);
+        };
+        renderComponentForm(c, params, form_observe);
+    };
+}
+
+
+/*
+ * To change selected cases' reviewer.
+ */
+function onTestCaseReviewerClick(options) {
+    var form = options.form;
+    var table = options.table;
+    var plan_id = options.planId;
+    var container = options.container;
+    var parameters = options.parameters;
+
+    return function(e) {
+        var selection = serializeCaseFromInputList2(table);
+        if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+            alert(default_messages.alert.no_case_selected);
+            return false;
+        }
+
+        var p = prompt('Please type new email or username');
+        if (!p) {
+            return false;
+        }
+
+        var postData = serializeFormData({
+            form: form,
+            zoneContainer: container,
+            casesSelection: selection,
+            hashable: true
+        });
+        postData.a = 'update';
+        postData.target_field = 'reviewer';
+        postData.new_value = p;
+
+        var cbAfterReviewerChanged = function(response) {
+            var returnobj = response.responseText.evalJSON();
+            if (returnobj.rc !== 0) {
+                alert(returnobj.response);
+                return false;
+            };
+            constructPlanDetailsCasesZone(container, plan_id, parameters);
+        };
+
+        new Ajax.Request('/ajax/update/cases-reviewer/', {
+            method: 'post',
+            parameters: postData,
+            onSuccess: cbAfterReviewerChanged,
+            onFailure: json_failure
+        });
+    };
+}
+
+/*
+ * Callback for constructPlanDetailsCasesZone.
+ */
+function constructPlanDetailsCasesZoneCallback(options) {
+    var container = options.container;
+    var plan_id = options.planId;
+    var parameters = options.parameters;
+
+    return function(response) {
         var form = container.childElements()[0];
         var table = container.childElements()[2];
-        
+
         // Presume the first form element is the form
         if (!form.tagName == 'FORM') {
             alert('form element of container is not a form');
@@ -1336,10 +1885,10 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             });
         }
 
-        if(form.adjacent('.btn_filter').length > 0) {
+        if (form.adjacent('.btn_filter').length > 0) {
             var element = form.adjacent('.btn_filter')[0];
             element.observe('click', function(t) {
-                if(filter.getStyle('display') == 'none'){
+                if (filter.getStyle('display') === 'none') {
                     filter.show();
                     this.update(default_messages.link.hide_filter);
                 } else {
@@ -1350,515 +1899,155 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         }
 
         // Bind click the tags in tags list to tags field in filter
-        if(form.adjacent('.taglist a[href="#testcases"]').length > 0) {
+        if (form.adjacent('.taglist a[href="#testcases"]').length > 0) {
             var elements = form.adjacent('.taglist a');
             elements.invoke('observe', 'click', function(e) {
-                if(filter.style.display == 'none')
+                if (filter.style.display == 'none') {
                     fireEvent(form.adjacent('.filtercase')[0], 'click');
+                }
                 /*if(form.tag__name__in.value){
                     form.tag__name__in.value = form.tag__name__in.value + ',' + this.innerHTML;
                 }else{
                     form.tag__name__in.value = this.innerHTML;
                 }*/
-                form.tag__name__in.value = form.tag__name__in.value?(form.tag__name__in.value + ',' + this.textContent):this.textContent;
+                form.tag__name__in.value = form.tag__name__in.value ? (form.tag__name__in.value + ',' + this.textContent) : this.textContent;
             });
         }
 
         // Bind the sort link
-        if(form.adjacent('.btn_sort').length > 0) {
+        if (form.adjacent('.btn_sort').length > 0) {
             var element = form.adjacent('.btn_sort')[0];
             element.observe('click', function(e) {
                 var params = serialzeCaseForm(form, table);
                 var callback = function(t) {
-                    returnobj = t.responseText.evalJSON(true);
-                    if(returnobj.rc != 0) {
+                    var returnobj = t.responseText.evalJSON(true);
+                    if (returnobj.rc != 0) {
                         alert(returnobj.reponse);
                     }
                     params.a = 'initial';
                     constructPlanDetailsCasesZone(container, plan_id, params);
-                }
+                };
                 resortCasesDragAndDrop(container, this, form, table, params, callback);
             });
         }
 
         // Bind batch change case status selector
-        if(form.adjacent('input[name="new_case_status_id"]').length > 0) {
-            var element = form.adjacent('input[name="new_case_status_id"]')[0];
-
-            element.observe('change',function(t) {
-                var selection = serializeCaseFromInputList2(table);
-                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
-                    alert(default_messages.alert.no_case_selected);
-                    return false;
-                }
-                var status_pk = this.value;
-                if (!status_pk) {
-                    return false;
-                }
-                var c = confirm(default_messages.confirm.change_case_status);
-                if (!c) {
-                    return false;
-                }
-
-                var postdata = serializeFormData({
-                    form: form,
-                    zoneContainer: container,
-                    casesSelection: selection,
-                    hashable: true
-                });
-                postdata.a = 'update';
-                postdata.target_field = 'case_status';
-                postdata.new_value = status_pk;
-
-                var callback = function(t) {
-                    returnobj = t.responseText.evalJSON(true);
-
-                    if(returnobj.rc == 0) {
-                        constructPlanDetailsCasesZone(container, plan_id, postdata);
-                        jQ('#run_case_count').text(returnobj.run_case_count);
-                        jQ('#case_count').text(returnobj.case_count);
-                        jQ('#review_case_count').text(returnobj.review_case_count);
-
-                        Nitrate.TestPlans.Details.reopenTabHelper(jQ(container));
-                    } else {
-                        alert(returnobj.response);
-                        return false;
-                    }
-                }
-
-                new Ajax.Request('/ajax/update/cases-case-status/', {
-                    method: 'post',
-                    parameters: postdata,
-                    onSuccess: callback,
-                    onFailure: json_failure
-                });
-            });
+        var element = form.adjacent('input[name="new_case_status_id"]')[0];
+        if (element !== undefined) {
+            element.observe('change', onTestCaseStatusChange({
+                form: form,
+                table: table,
+                container: container,
+                planId: plan_id
+            }));
         }
 
-        if(form.adjacent('input[name="new_priority_id"]').length > 0) {
-            var element = form.adjacent('input[name="new_priority_id"]')[0];
-            element.observe('change', function(t) {
-                var selection = serializeCaseFromInputList2(table);
-                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
-                    alert(default_messages.alert.no_case_selected);
-                    return false;
-                }
-                // FIXME: how about show a message to user to let user know what is happening?
-                if(!this.value) {
-                    return false;
-                }
-                var c = confirm(default_messages.confirm.change_case_priority);
-                if (!c) {
-                    return false;
-                }
-
-                var postdata = serializeFormData({
-                    form: form,
-                    zoneContainer: container,
-                    casesSelection: selection,
-                    hashable: true
-                });
-                postdata.a = 'update';
-                postdata.target_field = 'priority';
-                postdata.new_value = this.value;
-
-                var callback = function(t) {
-                    returnobj = t.responseText.evalJSON(true);
-                    if(returnobj.rc != 0) {
-                        alert(returnobj.response);
-                        return false
-                    };
-                    constructPlanDetailsCasesZone(container, plan_id, postdata);
-                };
-
-                new Ajax.Request('/ajax/update/cases-priority/', {
-                    method: 'post',
-                    parameters: postdata,
-                    onSuccess: callback,
-                    onFailure: json_failure
-                });
-            })
+        element = form.adjacent('input[name="new_priority_id"]')[0];
+        if (element !== undefined) {
+            element.observe('change', onTestCasePriorityChange({
+                form: form,
+                table: table,
+                container: container,
+                planId: plan_id
+            }));
         }
 
         // Observe the batch case automated status button
-        if (form.adjacent('input.btn_automated').length > 0) {
-            var element = form.adjacent('input.btn_automated')[0];
-            element.observe('click', function(e) {
-                var selection = serializeCaseFromInputList2(table);
-                var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0;
-                if(noCasesSelected) {
-                    alert(default_messages.alert.no_case_selected);
-                    return false;
-                }
-
-                var dialogContainer = getDialog();
-                var callback = function(t) {
-                    returnobj = t.responseText.evalJSON(true);
-
-                    if(returnobj.rc != 0) {
-                        alert(returnobj.response);
-                        return false
-                    };
-
-                    var params = serialzeCaseForm(form, table, true, true);
-                    /*
-                     * FIXME: this is confuse. There is no need to assign this
-                     *        value explicitly when update component and category.
-                     */
-                    params.a = 'search';
-                    params.case = selection.selectedCasesIds;
-                    constructPlanDetailsCasesZone(container, plan_id, params);
-                    clearDialog(dialogContainer);
-                };
-
-                constructCaseAutomatedForm(dialogContainer, callback, {
-                    zoneContainer: container,
-                    casesSelection: selection
-                });
-            })
+        element = form.adjacent('input.btn_automated')[0];
+        if (element !== undefined) {
+            element.observe('click', onTestCaseAutomatedClick({
+                form: form,
+                table: table,
+                container: container,
+                planId: plan_id
+            }));
         }
 
-        if(form.adjacent('input.btn_component').length > 0) {
-            var element = form.adjacent('input.btn_component')[0];
-            element.observe('click', function(e) {
-                if(this.diabled)
-                    return false;
-                var c = getDialog();
-                var params = {
-                    // FIXME: remove this line. It's unnecessary any more.
-                    'case': serializeCaseFromInputList(table),
-                    'product': Nitrate.TestPlans.Instance.fields.product_id
-                };
-                if(params['case'] && params['case'].length == 0){
-                    alert(default_messages.alert.no_case_selected);
-                    return false;
-                }
-                var form_observe = function(e) {
-                    e.stop();
-
-                    var selection = serializeCaseFromInputList2(table);
-                    var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0;
-                    if(noCasesSelected) {
-                        alert(default_messages.alert.no_case_selected);
-                        return false;
-                    }
-
-                    var params = serializeFormData({
-                        form: this,
-                        zoneContainer: container,
-                        casesSelection: selection
-                    });
-
-                    var url = getURLParam().url_cases_component;
-                    var callback = function(t) {
-                        returnobj = t.responseText.evalJSON(true);
-
-                        if (returnobj.rc != 0) {
-                            alert(returnobj.response);
-                            return false;
-                        }
-                        parameters['case'] = selection.selectedCasesIds;
-                        constructPlanDetailsCasesZone(container, plan_id, parameters);
-                        clearDialog(c);
-                    }
-
-                    updateCaseComponent(url, params, callback);
-                }
-                renderComponentForm(c, params, form_observe);
-            })
-        };
-        
-        if(form.adjacent('input.btn_category').length > 0) {
-            var element = form.adjacent('input.btn_category')[0];
-            element.observe('click', function(e) {
-                if(this.diabled)
-                    return false;
-                var c = getDialog();
-                var params = {
-                    /*
-                     * FIXME: the first time execute this code, it's unnecessary
-                     *        to pass selected cases' ids to the server.
-                     */
-                    'case': serializeCaseFromInputList(table),
-                    'product': Nitrate.TestPlans.Instance.fields.product_id
-                };
-                if(params['case'] && params['case'].length == 0){
-                    alert(default_messages.alert.no_case_selected);
-                    return false;
-                }
-                var form_observe = function(e) {
-                    e.stop();
-
-                    var selection = serializeCaseFromInputList2(table);
-                    var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0;
-                    if(noCasesSelected) {
-                        alert(default_messages.alert.no_case_selected);
-                        return false;
-                    }
-
-                    var params = serializeFormData({
-                        form: this,
-                        zoneContainer: container,
-                        casesSelection: selection
-                    });
-
-                    var url = getURLParam().url_cases_category;
-                    var callback = function(t) {
-                        returnobj = t.responseText.evalJSON(true);
-
-                        if (returnobj.rc != 0) {
-                            alert(returnobj.response);
-                            return false;
-                        }
-
-                        parameters['case'] = selection.selectedCasesIds;
-                        constructPlanDetailsCasesZone(container, plan_id, parameters);
-                        clearDialog(c);
-                    }
-
-                    updateCaseCategory(url, params, callback);
-                }
-                renderCategoryForm(c, params, form_observe);
-            })
-        };
-
-        if(form.adjacent('input.btn_default_tester').length != 0) {
-            var element = form.adjacent('input.btn_default_tester')[0];
-            element.observe('click', function(e) {
-                var selection = serializeCaseFromInputList2(table);
-                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
-                    alert(default_messages.alert.no_case_selected);
-                    return false;
-                }
-
-                var params = serializeFormData({
-                    form: form,
-                    zoneContainer: container,
-                    casesSelection: selection,
-                    hashable: true
-                });
-                params.a = 'update';
-
-                var callback = function(t) {
-                    var returnobj = t.responseText.evalJSON();
-
-                    if (returnobj.rc != 0) {
-                        alert(returnobj.response);
-                        return false
-                    };
-                    constructPlanDetailsCasesZone(container, plan_id, params);
-                };
-
-                changeCaseMember(params, callback);
-            })
+        element = form.adjacent('input.btn_component')[0];
+        if (element !== undefined) {
+            element.observe('click', onTestCaseComponentClick({
+                container: container,
+                form: form,
+                planId: plan_id,
+                table: table,
+                parameters: parameters
+            }));
         }
 
-        if (form.adjacent('input.sort_list').length != 0) {
-            var element = form.adjacent('input.sort_list')[0];
-            element.observe('click', function(e) {
-                // NOTE: new implemenation does not use testcaseplan.pk
-                var selection = serializeCaseFromInputList2(table);
-                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
-                    alert(default_messages.alert.no_case_selected);
-                    return false;
-                }
-                var postdata = serializeFormData({
-                    form: form,
-                    zoneContainer: container,
-                    casesSelection: selection,
-                    hashable: true
-                });
-
-                var callback = function(t) {
-                    postdata.case = selection.selectedCasesIds;
-                    constructPlanDetailsCasesZone(container, plan_id, postdata);
-                };
-                changeCaseOrder2(postdata, callback);
-            });
+        element = form.adjacent('input.btn_category')[0];
+        if (element !== undefined) {
+            element.observe('click', onTestCaseCategoryClick({
+                container: container,
+                form: form,
+                planId: plan_id,
+                table: table,
+                parameters: parameters
+            }));
         }
 
-        if(form.adjacent('input.btn_reviewer').length > 0) {
-            var element = form.adjacent('input.btn_reviewer')[0];
-            element.observe('click', function(e) {
-                var selection = serializeCaseFromInputList2(table);
-                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
-                    alert(default_messages.alert.no_case_selected);
-                    return false;
-                }
-
-                var p = prompt('Please type new email or username');
-                if (!p) {
-                    return false;
-                }
-
-                var postData = serializeFormData({
-                    form: form,
-                    zoneContainer: container,
-                    casesSelection: selection,
-                    hashable: true
-                });
-                postData.a = 'update';
-                postData.target_field = 'reviewer';
-                postData.new_value = p;
-
-                var callback = function(response) {
-                    var returnobj = response.responseText.evalJSON();
-                    if (returnobj.rc !== 0) {
-                        alert(returnobj.response);
-                        return false;
-                    };
-                    constructPlanDetailsCasesZone(container, plan_id, parameters);
-                };
-
-                new Ajax.Request('/ajax/update/cases-reviewer/', {
-                    method: 'post',
-                    parameters: postData,
-                    onSuccess: callback,
-                    onFailure: json_failure
-                });
-            });
+        element = form.adjacent('input.btn_default_tester')[0];
+        if (element !== undefined) {
+            element.observe('click', onTestCaseDefaultTesterClick({
+                container: container,
+                form: form,
+                planId: plan_id,
+                table: table,
+            }));
         }
 
-        // Tag call back
-        // Callback for display the cases that just added tags
-        var tag_callback = function(t) {
-            var dialog = getDialog();
-            
-            returnobj = t.responseText.evalJSON(true);
-            if (returnobj.rc && returnobj.rc == 1) {
-                alert(returnobj.response);
-                clearDialog(dialog);
-                return false;
-            };
-            
-            clearDialog(dialog);
-            dialog.show();
-            var html = '<div class="dia_title" style=" margin:10px 20px;">You have successfully operate tags in the following case:</div><div class="dialog_content">';
-            dialog.update(html);
-            
-            returnobj.each(function(i) {
-                html += '<div class="dia_content" style=" margin:10px 20px;">'+i.pk + ' &nbsp; ' + i.fields.summary+'</div>';
-            });
-            dialog.update(html);
-            
-            html +='</div><input class="dia_btn_close sprites" onclick="this.up(0).hide()" type="button" value="Close" style=" margin:10px 20px;"/>';
-            
-            dialog.update(html);
-            params = serialzeCaseForm(form, table);
-            params.a = 'initial';
-            constructPlanDetailsCasesZone(container, plan_id, params);
-        };
-        
+        element = form.adjacent('input.sort_list')[0];
+        if (element !== undefined) {
+            element.observe('click', onTestCaseSortNumberClick({
+                container: container,
+                form: form,
+                planId: plan_id,
+                table: table,
+            }));
+        }
+
+        element = form.adjacent('input.btn_reviewer')[0];
+        if(element !== undefined) {
+            element.observe('click', onTestCaseReviewerClick({
+                container: container,
+                form: form,
+                planId: plan_id,
+                table: table,
+                parameters: parameters
+            }));
+        }
+
         // Observe the batch add case button
-        if (form.adjacent('input.tag_add').length > 0) {
-            var element = form.adjacent('input.tag_add')[0];
-            element.observe('click',function(e) {
-                var selection = serializeCaseFromInputList2(table);
-                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
-                    alert(default_messages.alert.no_case_selected);
-                    return false;
-                }
-
-                constructBatchTagProcessDialog(plan_id);
-
-                // Observe the batch tag form submit
-                $('id_batch_tag_form').observe('submit', function(e){
-                    e.stop();
-
-                    var tagData = this.serialize(true);
-                    if(!tagData.tags) {
-                        return false;
-                    }
-                    var params = serializeFormData({
-                        form: form,
-                        zoneContainer: container,
-                        casesSelection: selection,
-                        hashable: true
-                    });
-                    params.tags = tagData.tags;
-
-                    /*
-                     * Two reasons to force to remove plan from parameters here.
-                     * 1. plan is added in previous cases filter. As the design
-                     *    of Show More, previous filter criteria is added for
-                     *    selecting all cases with same filter criteria.
-                     * 2. existing plan confuses tag view method due to it
-                     *    applies to both plan and case to add tag. Thus, the
-                     *    existing plan will cause it to add tag to all cases of
-                     *    that plan always.
-                     *
-                     * Placing this line of code is not a good idea. But, it
-                     * works well for the current implementation. Possible
-                     * solution to avoid this might to split the tag view method
-                     * to add tags to plans and cases, respectively. Why to make
-                     * change to tag view method? That is, according to the
-                     * cases filter implementation, plan must exist in the
-                     * filter criteria as a parameter.
-                     */
-                    delete params.plan;
-
-                    var format = 'serialized';
-                    addBatchTag(params, tag_callback, format);
-                });
-            });
+        element = form.adjacent('input.tag_add')[0];
+        if (element !== undefined) {
+            element.observe('click', onTestCaseTagAddClick({
+                container: container,
+                form: form,
+                planId: plan_id,
+                table: table,
+            }));
         }
-        
+
         // Observe the batch remove tag function
-        if(form.adjacent('input.tag_delete').length > 0) {
-            var element = form.adjacent('input.tag_delete')[0];
-            element.observe('click',function(e) {
-                var c = getDialog();
-                var selection = serializeCaseFromInputList2(table);
-                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
-                    alert(default_messages.alert.no_case_selected);
-                    return false;
-                }
-                var form_observe = function(e) {
-                    e.stop();
-
-                    var params = serializeFormData({
-                        form: this,
-                        zoneContainer: container,
-                        casesSelection: selection,
-                    });
-
-                    var url = getURLParam().url_cases_tag;
-                    var callback = function(t) {
-                        returnobj = t.responseText.evalJSON(true);
-
-                        if (returnobj.rc != 0) {
-                            alert(returnobj.response);
-                            return false;
-                        }
-                        parameters['case'] = selection.selectedCasesIds;
-                        constructPlanDetailsCasesZone(container, plan_id, parameters);
-                        clearDialog(c);
-                    }
-
-                    updateCaseTag(url, params, callback);
-                }
-                renderTagForm(c, {case: selection.selectedCasesIds}, form_observe);
-
-                // FIXME: seems this piece of code never gets called. Remove it after confirmation.
-                // Observe the batch tag form submit
-                $('id_batch_tag_form').observe('submit',function(e) {
-                    e.stop();
-                    var params = this.serialize(true);
-                    params['case'] = serializeCaseFromInputList(table);
-                    if(!params.tags)
-                        return false;
-                    
-                    // Callback for display the cases that just added tags
-                    var format = 'serialized';
-                    removeBatchTag(params, tag_callback, format)
-                 })
-            })
-            }
+        element = form.adjacent('input.tag_delete')[0];
+        if (element !== undefined) {
+            element.observe('click', onTestCaseTagDeleteClick({
+                container: container,
+                form: form,
+                planId: plan_id,
+                table: table,
+                parameters: parameters
+            }));
+        }
 
         jQ(container).find('input[value="all"]').live('click', function(e) {
             Nitrate.TestPlans.Details.toggleSelectAllInput(jQ(container));
         });
 
+        var _bindEventsOnLoadedCases = bindEventsOnLoadedCases({
+            cases_container: container,
+            plan_id: plan_id,
+            parameters: parameters
+        });
         _bindEventsOnLoadedCases(table, form);
 
         // Register event handler for loading more cases.
@@ -1867,15 +2056,36 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
 
         Nitrate.TestPlans.Details.refreshCasesSelectionCheck(jQ(container));
     };
+}
+
+
+function constructPlanDetailsCasesZone(container, plan_id, parameters) {
+    if (typeof(container) != 'object') {
+        container = $(container);
+    }
+
+    container.update('<div class="ajax_loading"></div>');
+
+    var postData = parameters;
+    if (!postData) {
+        postData = {'a': 'initial', 'from_plan': plan_id};
+    }
+
+    var complete = constructPlanDetailsCasesZoneCallback({
+        container: container,
+        planId: plan_id,
+        parameters: postData
+    });
 
     var url = getURLParam().url_search_case;
     new Ajax.Updater(container, url, {
         method: 'post',
-        parameters: parameters,
+        parameters: postData,
         onComplete: complete,
         onFailure: json_failure
-    })
+    });
 }
+
 
 function constructPlanComponentsZone(container, parameters, callback)
 {
@@ -2175,25 +2385,25 @@ function resortCasesDragAndDrop(container, button, form, table, parameters, call
         form.adjacent('.blind_icon').invoke('remove');
         form.adjacent('.show_change_status_link').invoke('remove');
         table.adjacent('.expandable').invoke('stopObserving');
-        
+
         // Use the selector content to replace the selector
         form.adjacent('.change_status_selector').each(function(t) {
             var w = t.selectedIndex;
             t.replace((new Element('span')).update(t.options[w].text));
         });
-        
+
         /*
         // Use the title to replace the blind down title link
         form.adjacent('.blind_title_link').each(function(t) {
             t.replace((new Element('span')).update(t.innerHTML));
         });
-        
+
         // Use the sortkey content to replace change sort key link
         form.adjacent('.mark').each(function(t) {
             t.update(t.down().innerHTML);
         });
         */
-        
+
         // init the tableDnD object
         new TableDnD().init(table);
         button.innerHTML = 'Done Sorting';
@@ -2201,12 +2411,12 @@ function resortCasesDragAndDrop(container, button, form, table, parameters, call
     } else {
         // $('id_sort_control').hide();
         button.replace((new Element('span')).update('...Submitting changes'));
-        
+
         table.adjacent('input[type=checkbox]').each(function(t) {
             t.checked = true;
             t.disabled = false;
         });
-        
+
         parameters.a = 'order_cases';
         parameters.case_sort_by = 'sortkey'; 
         var url = new String('cases/');
@@ -2215,7 +2425,7 @@ function resortCasesDragAndDrop(container, button, form, table, parameters, call
             parameters: parameters,
             onSuccess: callback,
             onFailure: json_failure
-        })
+        });
     }
 }
 
