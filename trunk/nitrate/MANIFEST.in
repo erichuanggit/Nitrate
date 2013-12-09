@@ -1,2 +1,10 @@
+include AUTHORS
+include ChangeLog
+include nitrate.spec
+include pylintrc
+include pylint_tcms.conf
 recursive-include tcms/templates *
 recursive-include tcms/media *
+recursive-include contrib *
+recursive-include docs *
+recursive-include requirements *
