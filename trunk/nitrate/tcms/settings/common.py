@@ -67,7 +67,7 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'media').replace('\\','/')
+MEDIA_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'media').replace('\\','/'))
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -96,7 +96,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.RemoteUserMiddleware',
     'tcms.core.middleware.CsrfDisableMiddleware',
     'django.contrib.csrf.middleware.CsrfMiddleware',
     'django.contrib.csrf.middleware.CsrfViewMiddleware',
@@ -111,7 +110,7 @@ TEMPLATE_DIRS = (
     # or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(os.path.dirname(__file__), 'templates/').replace('\\','/'),
+    os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'templates/').replace('\\','/')),
 )
 
 INSTALLED_APPS = (

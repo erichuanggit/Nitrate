@@ -31,7 +31,7 @@ import tcms, sys
 sys.path.append(os.path.join(tcms.__path__[0], 'core', 'lib'))
 
 os.environ['PYTHON_EGG_CACHE'] = '/tmp/.python-eggs/'
-os.environ['DJANGO_SETTINGS_MODULE'] = 'tcms.product_settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'tcms.settings.product'
 
 _application = django.core.handlers.wsgi.WSGIHandler()
 

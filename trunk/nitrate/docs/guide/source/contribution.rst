@@ -37,10 +37,10 @@ https://git.fedorahosted.org/cgit/nitrate.git/?h=development
 * `Django <http://www.djangoproject.com/>`_ = 1.2.3
 * `MySQL-python <http://sourceforge.net/projects/mysql-python/>`_ = 1.2.4
 * `Kobo <https://fedorahosted.org/kobo/>`_ = 0.2.1
-* `python-kerberos
-  <http://koji.fedoraproject.org/koji/buildinfo?buildID=238775>`_ = 1.1
+* `kerberos <https://pypi.python.org/pypi/kerberos/1.1.1>`_ = 1.1.1
 * `qpid-python <http://qpid.apache.org/components/messaging-api/index.html>`_  = 0.20
 * `Django debug toolbar <http://github.com/robhudson/django-debug-toolbar>`_ (Optional: Recommendations for development)
+* `Sphinx <https://pypi.python.org/pypi/Sphinx/1.2b3>`_ (Optional: Recommendations for development, used for building docs)
 
 1.1.3. Install dependence
 --------------------------------------
@@ -56,16 +56,23 @@ code::
     # mysql -uroot -p
     # mysql> create database nitrate CHARACTER SET utf8 COLLATE utf8_general_ci;
     # mysql> use nitrate; source nitrate_db_setup.sql
+    # mysql> grant all privileges on nitrate.* to nitrate@'%' identified by 'nitrate';
+    # mysql> flush privileges;
+
+.. note::
+
+   Remember to change db settings in `settings/devel.py` accordingly.
 
 1.1.5. Start the nitrate app
 ----------------------------
 code::
 
-    # cd <nitrate_project_root_path>/trunk/nitrate
-    # export DJANGO_SETTINGS_MODULE=tcms.settings
-    # django-admin runserver
+    # cd <nitrate_project_root_path>/trunk/nitrate/tcms
+    # ./manage.py runserver
 
-Done.
+.. note::
+
+   `settings/devel.py` is used as default settings.
 
 1.2. Coding style
 -----------------
