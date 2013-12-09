@@ -782,6 +782,15 @@ class TestCaseUpdateActions(object):
             # Move to next batch of cases to change.
             offset += step_length;
 
+    def _update_reviewer(self):
+        reviewers = User.objects.filter(
+            username=self.new_value).values_list('pk', flat=True)
+        if not reviewers:
+            err_msg = 'Reviewer %s is not found' % self.new_value
+            raise ObjectDoesNotExist(err_msg)
+        self.get_update_targets().update(**{str(self.target_field):
+                                            reviewers[0]})
+
 
 # NOTE: what permission is necessary
 # FIXME: find a good chance to map all TestCase property change request to this
@@ -794,6 +803,7 @@ def update_cases_default_tester(request):
 update_cases_priority = update_cases_default_tester
 update_cases_case_status = update_cases_default_tester
 update_cases_sortkey = update_cases_default_tester
+update_cases_reviewer = update_cases_default_tester
 
 
 def comment_case_runs(request):

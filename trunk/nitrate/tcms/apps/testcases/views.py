@@ -422,7 +422,8 @@ def query_testcases(request, plan, search_form):
                              'default_tester',
                              'case_status',
                              'priority',
-                             'category')
+                             'category',
+                             'reviewer')
     tcs = tcs.distinct()
     return tcs
 

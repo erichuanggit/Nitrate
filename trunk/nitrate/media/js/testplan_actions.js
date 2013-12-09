@@ -1576,7 +1576,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
 
                 var callback = function(t) {
                     var returnobj = t.responseText.evalJSON();
-                    
+
                     if (returnobj.rc != 0) {
                         alert(returnobj.response);
                         return false
@@ -1615,27 +1615,43 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         if(form.adjacent('input.btn_reviewer').length > 0) {
             var element = form.adjacent('input.btn_reviewer')[0];
             element.observe('click', function(e) {
-                var case_pks = serializeCaseFromInputList(table);
-                
-                if(case_pks.length == 0){
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                
-                var callback = function(t) {
-                    var returnobj = t.responseText.evalJSON();
-                    
-                    if (returnobj.rc != 0) {
-                        alert(returnobj.response);
-                        return false
-                    };
-                    
-                    constructPlanDetailsCasesZone(container, plan_id, parameters);
+
+                var p = prompt('Please type new email or username');
+                if (!p) {
+                    return false;
                 }
-                
-                var field = 'reviewer';
-                changeCaseMember(table, field, case_pks, callback);
-            })
+
+                var postData = serializeFormData({
+                    form: form,
+                    zoneContainer: container,
+                    casesSelection: selection,
+                    hashable: true
+                });
+                postData.a = 'update';
+                postData.target_field = 'reviewer';
+                postData.new_value = p;
+
+                var callback = function(response) {
+                    var returnobj = response.responseText.evalJSON();
+                    if (returnobj.rc !== 0) {
+                        alert(returnobj.response);
+                        return false;
+                    };
+                    constructPlanDetailsCasesZone(container, plan_id, parameters);
+                };
+
+                new Ajax.Request('/ajax/update/cases-reviewer/', {
+                    method: 'post',
+                    parameters: postData,
+                    onSuccess: callback,
+                    onFailure: json_failure
+                });
+            });
         }
 
         // Tag call back
@@ -1924,7 +1940,7 @@ function toggleMultiSelect(){
 function changeCaseMember(parameters, callback)
 {
     var p = prompt('Please type new email or username');
-    if(!p) {
+    if (!p) {
         return false;
     }
 
@@ -1936,8 +1952,9 @@ function changeCaseMember(parameters, callback)
         parameters: parameters,
         onSuccess: callback,
         onFailure: json_failure
-    })   
+    });
 }
+
 
 function constructPlanParentPreviewDialog(plan_id, parameters, callback)
 {
