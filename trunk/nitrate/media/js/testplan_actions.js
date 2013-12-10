@@ -1070,7 +1070,7 @@ function unlinkCasePlan(container, parameters)
 function unlinkCasesFromPlan(container, form, table)
 {
     var selection = serializeCaseFromInputList2(table);
-    if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+    if (selection.empty()) {
         alert('At least one case is required to delete.');
         return false;
     }
@@ -1295,7 +1295,7 @@ function onTestCaseStatusChange(options) {
 
     return function(e) {
         var selection = serializeCaseFromInputList2(table);
-        if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+        if (selection.empty()) {
             alert(default_messages.alert.no_case_selected);
             return false;
         }
@@ -1355,7 +1355,7 @@ function onTestCasePriorityChange(options) {
 
     return function(e) {
         var selection = serializeCaseFromInputList2(table);
-        if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+        if (selection.empty()) {
             alert(default_messages.alert.no_case_selected);
             return false;
         }
@@ -1409,8 +1409,7 @@ function onTestCaseAutomatedClick(options) {
 
     return function(e) {
         var selection = serializeCaseFromInputList2(table);
-        var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0;
-        if(noCasesSelected) {
+        if (selection.empty()) {
             alert(default_messages.alert.no_case_selected);
             return false;
         }
@@ -1492,7 +1491,7 @@ function onTestCaseTagAddClick(options) {
 
     return function(e) {
         var selection = serializeCaseFromInputList2(table);
-        if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+        if (selection.empty()) {
             alert(default_messages.alert.no_case_selected);
             return false;
         }
@@ -1558,7 +1557,7 @@ function onTestCaseTagDeleteClick(options) {
     return function(e) {
         var c = getDialog();
         var selection = serializeCaseFromInputList2(table);
-        if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+        if (selection.empty()) {
             alert(default_messages.alert.no_case_selected);
             return false;
         }
@@ -1605,7 +1604,7 @@ function onTestCaseSortNumberClick(options) {
     return function(e) {
         // NOTE: new implemenation does not use testcaseplan.pk
         var selection = serializeCaseFromInputList2(table);
-        if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+        if (selection.empty()) {
             alert(default_messages.alert.no_case_selected);
             return false;
         }
@@ -1661,8 +1660,7 @@ function onTestCaseCategoryClick(options) {
             e.stop();
 
             var selection = serializeCaseFromInputList2(table);
-            var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0;
-            if (noCasesSelected) {
+            if (selection.empty()) {
                 alert(default_messages.alert.no_case_selected);
                 return false;
             }
@@ -1704,7 +1702,7 @@ function onTestCaseDefaultTesterClick(options) {
 
     return function(e) {
         var selection = serializeCaseFromInputList2(table);
-        if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+        if (selection.empty()) {
             alert(default_messages.alert.no_case_selected);
             return false;
         }
@@ -1759,8 +1757,7 @@ function onTestCaseComponentClick(options) {
             e.stop();
 
             var selection = serializeCaseFromInputList2(table);
-            var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0;
-            if (noCasesSelected) {
+            if (selection.empty()) {
                 alert(default_messages.alert.no_case_selected);
                 return false;
             }
@@ -1802,7 +1799,7 @@ function onTestCaseReviewerClick(options) {
 
     return function(e) {
         var selection = serializeCaseFromInputList2(table);
-        if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+        if (selection.empty()) {
             alert(default_messages.alert.no_case_selected);
             return false;
         }
@@ -2689,7 +2686,7 @@ function requestOperationUponFilteredCases(options) {
     var casesContainer = options.table;
 
     var selection = serializeCaseFromInputList2(casesContainer);
-    if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+    if (selection.empty()) {
         alert('At least one case is required by a run.');
         return false;
     }

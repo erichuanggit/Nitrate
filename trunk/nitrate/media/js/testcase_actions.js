@@ -6,6 +6,30 @@ Nitrate.TestCases.Create = {};
 Nitrate.TestCases.Edit = {};
 Nitrate.TestCases.Clone = {};
 
+(function() {
+    'use restrict';
+
+    var TestCases = window.Nitrate.TestCases || {};
+
+    TestCases.CasesSelection = function(options) {
+        this.selectedCasesIds = options.selectedCasesIds || [];
+        this.selectAll = options.selectAll;
+
+        if (Object.prototype.toString.call(this.selectedCasesIds) !== '[object Array]') {
+            throw new TypeError('selectedCasesIds must an object of Array.');
+        }
+        if (typeof this.selectAll !== 'boolean') {
+            throw new TypeError('selectAll must be a boolean value.');
+        }
+    };
+
+    TestCases.CasesSelection.prototype.empty = function() {
+        return this.selectedCasesIds.length === 0 && !this.selectAll;
+    };
+
+    window.Nitrate.TestCases = TestCases;
+}());
+
 Nitrate.TestCases.AdvanceList.on_load = function()
 {
     bind_category_selector_to_product(true, true, $('id_product'), $('id_category'));
@@ -1024,22 +1048,25 @@ function constructCaseAutomatedForm(container, callback, options)
  * Whatever user selects all cases, above two properties appears always with
  * proper value.
  */
-function serializeCaseFromInputList2(table)
-{
-    var result = {};
-    result.selectAll = jQ(table).parent()
+function serializeCaseFromInputList2(table) {
+    var selectAll = jQ(table).parent()
                                 .find('.js-cases-select-all')
                                 .find('input[type="checkbox"]')
                                 .attr('checked');
 
-    var elements = $(table).adjacent('input[name="case"]:checked');
-    var case_ids = new Array();
-    for (i in elements) {
-        if (typeof(elements[i].value) == 'string')
-        case_ids.push(elements[i].value);
-    };
-    result.selectedCasesIds = case_ids;
-    return result;
+    var case_ids = [];
+    var checkedCases = jQ(table).find('input[name="case"]:checked');
+    checkedCases.each(function(i, checkedCase) {
+        if (typeof(checkedCase.value) === 'string') {
+            case_ids.push(checkedCase.value);
+        }
+    });
+    var selectedCasesIds = case_ids;
+
+    return new Nitrate.TestCases.CasesSelection({
+        selectedCasesIds: selectedCasesIds,
+        selectAll: selectAll
+    });
 }
 
 function serializeCaseFromInputList(table)
