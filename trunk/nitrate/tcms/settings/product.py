@@ -20,17 +20,17 @@ MEDIA_ROOT = '/usr/share/nitrate/media/'
 CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
-
+# add RemoteUserMiddleWare if kerberos authentication is enabled
 MIDDLEWARE_CLASSES += (
-    'django.contrib.auth.middleware.RemoteUserMiddleware',
+#    'django.contrib.auth.middleware.RemoteUserMiddleware',
 )
 
 # Remote kerberos authentication backends
-AUTHENTICATION_BACKENDS = (
-    'tcms.core.contrib.auth.backends.ModAuthKerbBackend',
-)
+#AUTHENTICATION_BACKENDS = (
+#    'tcms.core.contrib.auth.backends.ModAuthKerbBackend',
+#)
 # Kerberos realm
-KRB5_REALM = 'REDHAT.COM'
+#KRB5_REALM = 'EXAMPLE.COM'
 
 # Bugzilla integration setttings
 # Config following settings if your want to integrate with bugzilla
