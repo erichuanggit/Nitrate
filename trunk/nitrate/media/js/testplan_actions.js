@@ -720,11 +720,11 @@ Nitrate.TestPlans.Details = {
             clickedSelectAll(this, 'testruns_table', 'run');
         });
 
+        Nitrate.Utils.enableShiftSelectOnCheckbox('case_selector');
+        Nitrate.Utils.enableShiftSelectOnCheckbox('run_selector');
+
         Nitrate.TestPlans.Runs.initializaRunTab();
-        jQ('#show_more_runs').live('click', Nitrate.TestPlans.Runs.showMore);
-        jQ('#reload_runs').live('click', Nitrate.TestPlans.Runs.reload);
-        jQ('#tab_testruns').live('click', Nitrate.TestPlans.Runs.initializaRunTab);
-        jQ('.btn-statistics').live('click', Nitrate.TestPlans.Runs.percent);
+        Nitrate.TestPlans.Runs.bind();
     }
 };
 
@@ -935,6 +935,9 @@ function createUploadPlanSummaryZone()
     });
 }
 
+/*
+ * Deprecated function. Remove it when it's confirmed that not being referenced by others any more.
+ */
 function unlinkCasePlan(container, parameters) 
 {
     parameters.a = 'delete_cases';
@@ -969,6 +972,77 @@ function unlinkCasePlan(container, parameters)
 }
 
 /*
+ * Unlink selected cases from current TestPlan.
+ *
+ * Rewrite function unlinkCasePlan to avoid conflict. Remove it when confirm it's not used any more.
+ */
+function unlinkCasesFromPlan(container, form, table)
+{
+    var selection = serializeCaseFromInputList2(table);
+    if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+        alert('At least one case is required to delete.');
+        return false;
+    }
+
+    var parameters = serialzeCaseForm(form, table, true);
+    parameters.a = 'delete_cases';
+    if (selection.selectAll) {
+        parameters.selectAll = selection.selectAll;
+    }
+    parameters.case = selection.selectedCasesIds;
+
+    var c = confirm("Are you sure you want to delete test case(s) from this test plan?");
+    if (!c) {
+        return false;
+    }
+
+    var success = function(t) {
+        returnobj = t.responseText.evalJSON(true);
+        if(returnobj.rc == 0) {
+            parameters.a = 'initial';
+            constructPlanDetailsCasesZone(container, parameters.from_plan, parameters);
+            return true;
+        }
+        alert(returnobj.response);
+    }
+
+    var url = new String('cases/');
+    new Ajax.Request(url, {
+        method: 'post',
+        parameters: parameters,
+        onSuccess: success,
+        onFailure: json_failure
+    })
+}
+
+function refreshCasesSelectionCheck(container) {
+    var casesMostCloseContainer = jQ(container).find('.js-cases-list');
+    var notSelectAll = casesMostCloseContainer.find('input[name="case"]:not(:checked)').length > 0;
+    casesMostCloseContainer.find('input[value="all"]')[0].checked = !notSelectAll;
+
+    // Toggle select all option
+    jQ(container).find('.js-cases-select-all').find('input[type="checkbox"]')[0].checked = !notSelectAll;
+    if (notSelectAll) {
+        jQ(container).find('.js-cases-select-all').hide('fast');
+    } else {
+        jQ(container).find('.js-cases-select-all').show('fast');
+    }
+}
+
+/*
+ * When check the All box, to show or hide Select All option to user.
+ */
+function toggleSelectAllInput(container, selectAll) {
+    var selectAllDiv = jQ(container).find('.js-cases-select-all');
+    selectAllDiv.find('input[type="checkbox"]')[0].checked = selectAll;
+    if (selectAll) {
+        selectAllDiv.show('fast');
+    } else {
+        selectAllDiv.hide('fast');
+    }
+}
+
+/*
  * Bind events on loaded cases.
  *
  * This is a closure. The real function needs cases container, plan's ID, and
@@ -984,6 +1058,12 @@ function bindEventsOnLoadedCases(options) {
     var cases_container = options.cases_container;
 
     return function(container, form) {
+        jQ(cases_container).find('.js-cases-list')
+                           .find('input[name="case"]')
+                           .live('click', function(e) {
+            refreshCasesSelectionCheck(cases_container);
+        });
+
         // Observe the change sortkey
         container.adjacent('.case_sortkey.js-just-loaded').invoke('observe', 'click', function(e) {
             var c = this.next(); // Container
@@ -1079,6 +1159,66 @@ function bindEventsOnLoadedCases(options) {
     }
 }
 
+
+/*
+ * Serialize form data including the selected cases for AJAX requst.
+ *
+ * Used in function `constructPlanDetailsCasesZone'.
+ */
+function serializeFormData(options) {
+    var form = options.form;
+    var container = options.zoneContainer;
+    var selection = options.casesSelection;
+    var hashable = options.hashable || false;
+
+    var formdata = form.serialize(hashable);
+
+    // some dirty data remains in the previous criteria, remove them.
+    // FIXME: however, this is not a good way. CONSIDER to reuse filter form.
+    var prevCriterias = jQ(container).find('.js-load-more')
+                                     .attr('data-criterias')
+                                     .replace(/a=\w+/, '')
+                                     .replace(/&?selectAll=1/, '')
+                                     .replace(/&?case=\d+/g, '');
+    var unhashableData = prevCriterias;
+    if (selection.selectAll) {
+        unhashableData += '&selectAll=1';
+    }
+    var casepks = [''];
+    var loopCount = selection.selectedCasesIds.length;
+    var selectedCasesIds = selection.selectedCasesIds;
+    for (var i = 0; i < loopCount; i++) {
+        casepks.push('case=' + selectedCasesIds[i]);
+    }
+    unhashableData += casepks.join('&');
+
+    if (hashable) {
+        var arr = unhashableData.split('&');
+        for (var i = 0; i < arr.length; i++) {
+            var parts = arr[i].split('=');
+            var key = parts[0], value = parts[1];
+            // FIXME: not sure how key can be an empty string
+            if (key.length === 0) {
+                continue;
+            }
+            if (key in formdata) {
+                // Before setting value, the original value must be converted to an array object.
+                if (formdata[key].push === undefined) {
+                    formdata[key] = [formdata[key], value];
+                } else {
+                    formdata[key].push(value);
+                }
+            } else {
+                formdata[key] = value;
+            }
+        }
+    } else {
+        formdata += '&' + unhashableData;
+    }
+
+    return formdata;
+}
+
 function constructPlanDetailsCasesZone(container, plan_id, parameters)
 {
     if (typeof(container) != 'object')
@@ -1097,7 +1237,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
     
     complete = function(t) {
         var form = container.childElements()[0];
-        var table = container.childElements()[1];
+        var table = container.childElements()[2];
         
         // Presume the first form element is the form
         if (!form.tagName == 'FORM') {
@@ -1110,7 +1250,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         // Filter cases
         form.observe('submit', function(e) {
             e.stop();
-            var params = serialzeCaseForm(form, table, true, true);
+            var params = serializeCaseForm2(form, table, true, true);
             constructPlanDetailsCasesZone(container, plan_id, params);
         });
 
@@ -1124,7 +1264,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         });
 
         // Observe the check all selectbox
-        if(form.adjacent('input[value="all"]').length > 0) {
+        if (form.adjacent('input[value="all"]').length > 0) {
             var element = form.adjacent('input[value="all"]')[0];
 
             element.observe('click', function(e) {
@@ -1182,25 +1322,35 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             var element = form.adjacent('input[name="new_case_status_id"]')[0];
             
             element.observe('change',function(t) {
-                var params = serialzeCaseForm(form, table);
-                
-                if(!this.value)
-                    return false;
-
-                if(params['case'].length == 0){
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                
-                var c = confirm(default_messages.confirm.change_case_status);
-                if(!c)
+                var status_pk = this.value;
+                if (!status_pk) {
                     return false;
-                
+                }
+                var c = confirm(default_messages.confirm.change_case_status);
+                if (!c) {
+                    return false;
+                }
+
+                var postdata = serializeFormData({
+                    form: form,
+                    zoneContainer: container,
+                    casesSelection: selection,
+                    hashable: true
+                });
+                postdata.a = 'update';
+                postdata.target_field = 'case_status';
+                postdata.new_value = status_pk;
+
                 var callback = function(t) {
                     returnobj = t.responseText.evalJSON(true);
                     
                     if(returnobj.rc == 0) {
-                        constructPlanDetailsCasesZone(container, plan_id, params);
+                        constructPlanDetailsCasesZone(container, plan_id, postdata);
                         jQ('#run_case_count').text(returnobj.run_case_count);
                         jQ('#case_count').text(returnobj.case_count);
                         jQ('#review_case_count').text(returnobj.review_case_count);
@@ -1209,74 +1359,99 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                         return false;
                     }
                 }
-                
-                changeCasesStatus(plan_id, params['case'], this.value, callback);
+
+                new Ajax.Request('/ajax/update/cases-case-status/', {
+                    method: 'post',
+                    parameters: postdata,
+                    onSuccess: callback,
+                    onFailure: json_failure
+                });
             });
         }
 
         if(form.adjacent('input[name="new_priority_id"]').length > 0) {
             var element = form.adjacent('input[name="new_priority_id"]')[0];
-            
             element.observe('change', function(t) {
-                var params = serialzeCaseForm(form, table);
-                if(!this.value)
-                    return false;
-                
-
-                if(params['case'].length == 0){
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                
-                var c=confirm(default_messages.confirm.change_case_priority)
-                if(!c)
+                // FIXME: how about show a message to user to let user know what is happening?
+                if(!this.value) {
                     return false;
-                
+                }
+                var c = confirm(default_messages.confirm.change_case_priority);
+                if (!c) {
+                    return false;
+                }
+
+                var postdata = serializeFormData({
+                    form: form,
+                    zoneContainer: container,
+                    casesSelection: selection,
+                    hashable: true
+                });
+                postdata.a = 'update';
+                postdata.target_field = 'priority';
+                postdata.new_value = this.value;
+
                 var callback = function(t) {
                     returnobj = t.responseText.evalJSON(true);
-                    
                     if(returnobj.rc != 0) {
                         alert(returnobj.response);
                         return false
                     };
-                    
-                    constructPlanDetailsCasesZone(container, plan_id, params);
-                }
-                
-                changeCasePriority(params['case'], this.value, callback);
+                    constructPlanDetailsCasesZone(container, plan_id, postdata);
+                };
+
+                new Ajax.Request('/ajax/update/cases-priority/', {
+                    method: 'post',
+                    parameters: postdata,
+                    onSuccess: callback,
+                    onFailure: json_failure
+                });
             })
         }
-        
+
         // Observe the batch case automated status button
         if (form.adjacent('input.btn_automated').length > 0) {
             var element = form.adjacent('input.btn_automated')[0];
             element.observe('click', function(e) {
-                var params = serialzeCaseForm(form, table);
-               
-                if(params['case'] && params['case'].length == 0){
+                var selection = serializeCaseFromInputList2(table);
+                var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0;
+                if(noCasesSelected) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
 
-                params['a'] = 'change';
-                var c = getDialog();
+                var dialogContainer = getDialog();
                 var callback = function(t) {
                     returnobj = t.responseText.evalJSON(true);
-                    
+
                     if(returnobj.rc != 0) {
                         alert(returnobj.response);
                         return false
                     };
-                    
-                    params.a = 'initial';
+
+                    var params = serialzeCaseForm(form, table, true, true);
+                    /*
+                     * FIXME: this is confuse. There is no need to assign this
+                     *        value explicitly when update component and category.
+                     */
+                    params.a = 'search';
+                    params.case = selection.selectedCasesIds;
                     constructPlanDetailsCasesZone(container, plan_id, params);
-                    clearDialog(c);
+                    clearDialog(dialogContainer);
                 };
-                
-                constructCaseAutomatedForm(c, params, callback);
+
+                constructCaseAutomatedForm(dialogContainer, callback, {
+                    zoneContainer: container,
+                    casesSelection: selection
+                });
             })
         }
-        
+
         if(form.adjacent('input.btn_component').length > 0) {
             var element = form.adjacent('input.btn_component')[0];
             element.observe('click', function(e) {
@@ -1284,6 +1459,7 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     return false;
                 var c = getDialog();
                 var params = {
+                    // FIXME: remove this line. It's unnecessary any more.
                     'case': serializeCaseFromInputList(table),
                     'product': Nitrate.TestPlans.Instance.fields.product_id
                 };
@@ -1293,27 +1469,33 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 }
                 var form_observe = function(e) {
                     e.stop();
-                    
-                    var params = this.serialize(true);
-                    params['case'] = serializeCaseFromInputList(table);
-                    if(params['case'].length == 0){
+
+                    var selection = serializeCaseFromInputList2(table);
+                    var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0;
+                    if(noCasesSelected) {
                         alert(default_messages.alert.no_case_selected);
                         return false;
                     }
-                    
+
+                    var params = serializeFormData({
+                        form: this,
+                        zoneContainer: container,
+                        casesSelection: selection
+                    });
+
                     var url = getURLParam().url_cases_component;
                     var callback = function(t) {
                         returnobj = t.responseText.evalJSON(true);
-                        
+
                         if (returnobj.rc != 0) {
                             alert(returnobj.response);
                             return false;
                         }
-                        parameters['case'] = params['case']
+                        parameters['case'] = selection.selectedCasesIds;
                         constructPlanDetailsCasesZone(container, plan_id, parameters);
                         clearDialog(c);
                     }
-                    
+
                     updateCaseComponent(url, params, callback);
                 }
                 renderComponentForm(c, params, form_observe);
@@ -1327,6 +1509,10 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                     return false;
                 var c = getDialog();
                 var params = {
+                    /*
+                     * FIXME: the first time execute this code, it's unnecessary
+                     *        to pass selected cases' ids to the server.
+                     */
                     'case': serializeCaseFromInputList(table),
                     'product': Nitrate.TestPlans.Instance.fields.product_id
                 };
@@ -1336,27 +1522,34 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                 }
                 var form_observe = function(e) {
                     e.stop();
-                    
-                    var params = this.serialize(true);
-                    params['case'] = serializeCaseFromInputList(table);
-                    if(params['case'].length == 0){
+
+                    var selection = serializeCaseFromInputList2(table);
+                    var noCasesSelected = !selection.selectAll && selection.selectedCasesIds.length === 0;
+                    if(noCasesSelected) {
                         alert(default_messages.alert.no_case_selected);
                         return false;
                     }
-                    
+
+                    var params = serializeFormData({
+                        form: this,
+                        zoneContainer: container,
+                        casesSelection: selection
+                    });
+
                     var url = getURLParam().url_cases_category;
                     var callback = function(t) {
                         returnobj = t.responseText.evalJSON(true);
-                        
+
                         if (returnobj.rc != 0) {
                             alert(returnobj.response);
                             return false;
                         }
-                        parameters['case'] = params['case'];
+
+                        parameters['case'] = selection.selectedCasesIds;
                         constructPlanDetailsCasesZone(container, plan_id, parameters);
                         clearDialog(c);
                     }
-                    
+
                     updateCaseCategory(url, params, callback);
                 }
                 renderCategoryForm(c, params, form_observe);
@@ -1366,75 +1559,100 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         if(form.adjacent('input.btn_default_tester').length != 0) {
             var element = form.adjacent('input.btn_default_tester')[0];
             element.observe('click', function(e) {
-                var case_pks = serializeCaseFromInputList(table);
-                
-                if(case_pks.length == 0){
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                
+
+                var params = serializeFormData({
+                    form: form,
+                    zoneContainer: container,
+                    casesSelection: selection,
+                    hashable: true
+                });
+                params.a = 'update';
+
                 var callback = function(t) {
                     var returnobj = t.responseText.evalJSON();
-                    
+
                     if (returnobj.rc != 0) {
                         alert(returnobj.response);
                         return false
                     };
-                    parameters['case'] = case_pks;
-                    constructPlanDetailsCasesZone(container, plan_id, parameters);
-                }
-                
-                var field = 'default_tester';
-                changeCaseMember(table, field, case_pks, callback);
+                    constructPlanDetailsCasesZone(container, plan_id, params);
+                };
+
+                changeCaseMember(params, callback);
             })
         }
 
-        if(form.adjacent('input.sort_list').length != 0) {
+        if (form.adjacent('input.sort_list').length != 0) {
             var element = form.adjacent('input.sort_list')[0];
             element.observe('click', function(e) {
-                var case_plan_pks = serializeCasePlanIDFromInputList(table);
-                var case_pks = serializeCaseFromInputList(table);
-                if(case_plan_pks.length == 0) {
+                // NOTE: new implemenation does not use testcaseplan.pk
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                var params = {
-                    'testcaseplan': case_plan_pks
-                };
+                var postdata = serializeFormData({
+                    form: form,
+                    zoneContainer: container,
+                    casesSelection: selection,
+                    hashable: true
+                });
+
                 var callback = function(t) {
-                    parameters['case'] = case_pks;
-                    constructPlanDetailsCasesZone(container, plan_id, parameters);
+                    postdata.case = selection.selectedCasesIds;
+                    constructPlanDetailsCasesZone(container, plan_id, postdata);
                 };
-                changeCaseOrder(params, callback);
-            })
+                changeCaseOrder2(postdata, callback);
+            });
         }
 
         if(form.adjacent('input.btn_reviewer').length > 0) {
             var element = form.adjacent('input.btn_reviewer')[0];
             element.observe('click', function(e) {
-                var case_pks = serializeCaseFromInputList(table);
-                
-                if(case_pks.length == 0){
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                
-                var callback = function(t) {
-                    var returnobj = t.responseText.evalJSON();
-                    
-                    if (returnobj.rc != 0) {
-                        alert(returnobj.response);
-                        return false
-                    };
-                    
-                    constructPlanDetailsCasesZone(container, plan_id, parameters);
+
+                var p = prompt('Please type new email or username');
+                if (!p) {
+                    return false;
                 }
-                
-                var field = 'reviewer';
-                changeCaseMember(table, field, case_pks, callback);
-            })
+
+                var postData = serializeFormData({
+                    form: form,
+                    zoneContainer: container,
+                    casesSelection: selection,
+                    hashable: true
+                });
+                postData.a = 'update';
+                postData.target_field = 'reviewer';
+                postData.new_value = p;
+
+                var callback = function(response) {
+                    var returnobj = response.responseText.evalJSON();
+                    if (returnobj.rc !== 0) {
+                        alert(returnobj.response);
+                        return false;
+                    };
+                    constructPlanDetailsCasesZone(container, plan_id, parameters);
+                };
+
+                new Ajax.Request('/ajax/update/cases-reviewer/', {
+                    method: 'post',
+                    parameters: postData,
+                    onSuccess: callback,
+                    onFailure: json_failure
+                });
+            });
         }
-        
+
         // Tag call back
         // Callback for display the cases that just added tags
         var tag_callback = function(t) {
@@ -1466,28 +1684,57 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
         };
         
         // Observe the batch add case button
-        if(form.adjacent('input.tag_add').length > 0) {
+        if (form.adjacent('input.tag_add').length > 0) {
             var element = form.adjacent('input.tag_add')[0];
             element.observe('click',function(e) {
-                if(serializeCaseFromInputList(table).length == 0){
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
-                
+
                 constructBatchTagProcessDialog(plan_id);
-                
+
                 // Observe the batch tag form submit
-                $('id_batch_tag_form').observe('submit',function(e){
+                $('id_batch_tag_form').observe('submit', function(e){
                     e.stop();
-                    var params = this.serialize(true);
-                    params['case'] = serializeCaseFromInputList(table);
-                    if(!params.tags)
+
+                    var tagData = this.serialize(true);
+                    if(!tagData.tags) {
                         return false;
-                    
+                    }
+                    var params = serializeFormData({
+                        form: form,
+                        zoneContainer: container,
+                        casesSelection: selection,
+                        hashable: true
+                    });
+                    params.tags = tagData.tags;
+
+                    /*
+                     * Two reasons to force to remove plan from parameters here.
+                     * 1. plan is added in previous cases filter. As the design
+                     *    of Show More, previous filter criteria is added for
+                     *    selecting all cases with same filter criteria.
+                     * 2. existing plan confuses tag view method due to it
+                     *    applies to both plan and case to add tag. Thus, the
+                     *    existing plan will cause it to add tag to all cases of
+                     *    that plan always.
+                     *
+                     * Placing this line of code is not a good idea. But, it
+                     * works well for the current implementation. Possible
+                     * solution to avoid this might to split the tag view method
+                     * to add tags to plans and cases, respectively. Why to make
+                     * change to tag view method? That is, according to the
+                     * cases filter implementation, plan must exist in the
+                     * filter criteria as a parameter.
+                     */
+                    delete params.plan;
+
                     var format = 'serialized';
                     addBatchTag(params, tag_callback, format);
-                })
-            })
+                });
+            });
         }
         
         // Observe the batch remove tag function
@@ -1495,22 +1742,19 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             var element = form.adjacent('input.tag_delete')[0];
             element.observe('click',function(e) {
                 var c = getDialog();
-                var params = {
-                    'case': serializeCaseFromInputList(table)
-                    };
-                if(serializeCaseFromInputList(table).length == 0){
+                var selection = serializeCaseFromInputList2(table);
+                if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
                     alert(default_messages.alert.no_case_selected);
                     return false;
                 }
                 var form_observe = function(e) {
                     e.stop();
 
-                    var params = this.serialize(true);
-                    params['case'] = serializeCaseFromInputList(table);
-                    if(params['case'].length == 0){
-                        alert(default_messages.alert.no_case_selected);
-                        return false;
-                    }
+                    var params = serializeFormData({
+                        form: this,
+                        zoneContainer: container,
+                        casesSelection: selection,
+                    });
 
                     var url = getURLParam().url_cases_tag;
                     var callback = function(t) {
@@ -1520,15 +1764,16 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
                             alert(returnobj.response);
                             return false;
                         }
-                        parameters['case'] = params['case']
+                        parameters['case'] = selection.selectedCasesIds;
                         constructPlanDetailsCasesZone(container, plan_id, parameters);
                         clearDialog(c);
                     }
 
                     updateCaseTag(url, params, callback);
                 }
-                renderTagForm(c, params, form_observe);
-                
+                renderTagForm(c, {case: selection.selectedCasesIds}, form_observe);
+
+                // FIXME: seems this piece of code never gets called. Remove it after confirmation.
                 // Observe the batch tag form submit
                 $('id_batch_tag_form').observe('submit',function(e) {
                     e.stop();
@@ -1544,11 +1789,17 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters)
             })
             }
 
+        jQ(container).find('input[value="all"]').live('click', function(e) {
+            toggleSelectAllInput(container, this.checked);
+        });
+
         _bindEventsOnLoadedCases(table, form);
 
         // Register event handler for loading more cases.
         Nitrate.TestPlans.Details.observeLoadMore(container.id);
         Nitrate.TestPlans.Details.showRemainingCasesCount(container.id);
+
+        refreshCasesSelectionCheck(container);
     };
 
     var url = getURLParam().url_search_case;
@@ -1650,7 +1901,6 @@ function constructPlanComponentModificationDialog(container)
 function constructBatchTagProcessDialog(plan_id){
     $('dialog').show();
     $('dialog').update('<form id="id_batch_tag_form"><div class="dia_title" style=" margin:30px 20px;">Please type tag name:</div><div class="dia_content" style=" margin:30px 20px;"><input type="text" id="add_tag_plan" name="tags" style="width:300px; height:25px; border:solid  1px #ccc"/><div id="id_batch_add_tags_autocomplete"></div></div><div style=" margin:30px 20px;"><input type="submit" value="Submit"><input type="button" value="Cancel" onclick="this.up(2).hide();"></div></div></form>');
-
     // Bind the autocomplete for tags
     new Ajax.Autocompleter("add_tag_plan", "id_batch_add_tags_autocomplete",
         getURLParam().url_get_product_info, {
@@ -1686,25 +1936,24 @@ function toggleMultiSelect(){
     $('filter_priority_selector_multiple').toggle();
 }
 
-function changeCaseMember(container, field, case_ids, callback)
+function changeCaseMember(parameters, callback)
 {
     var p = prompt('Please type new email or username');
-    if(!p)
+    if (!p) {
         return false;
-    
-    var parameters = {
-          'info_type': 'users',
-          'username': p,
     }
-    
-    getInfoAndUpdateObject(
-        parameters,
-        'testcases.testcase',
-        case_ids,
-        field,
-        callback
-    )
+
+    parameters.target_field = 'default_tester';
+    parameters.new_value = p;
+
+    new Ajax.Request('/ajax/update/cases-default-tester/', {
+        method: 'post',
+        parameters: parameters,
+        onSuccess: callback,
+        onFailure: json_failure
+    });
 }
+
 
 function constructPlanParentPreviewDialog(plan_id, parameters, callback)
 {
@@ -1947,7 +2196,22 @@ function expandCurrentPlan(element){
 
 Nitrate.TestPlans.Runs = {
 
-    makeUrlFromPlanId: function (planId) {
+    bind: function () {
+        /**
+         * Bind everything.
+         *
+        **/
+        var that = this;
+        jQ('#show_more_runs').live('click', that.showMore);
+        jQ('#reload_runs').live('click', that.reload);
+        jQ('#tab_testruns').live('click', that.initializaRunTab);
+        jQ('.btn-statistics').live('click', that.percent);
+        jQ('#btn_selected_progress').live('click', that.showPercentageOfSelectedRuns);
+        jQ('.run_selector').live('change', that.reactsToRunSelection);
+        jQ('#id_check_all_runs').live('change', that.reactsToAllRunSelectorChange);
+    }
+
+    , makeUrlFromPlanId: function (planId) {
         return '/plan/' + planId + '/runs/';
     }
 
@@ -1957,7 +2221,12 @@ Nitrate.TestPlans.Runs = {
 
     , render: function (data, textStatus, jqXHR) {
         var tbody = jQ('#testruns_body');
-        tbody.append(data.html);
+        var html = jQ(data.html);
+        var btnCheckAll = jQ('#box_select_rest input:checkbox');
+        if (btnCheckAll.length > 0 && btnCheckAll.is(':checked')) {
+            html.find('.run_selector').attr('checked', 'checked');
+        };
+        tbody.append(html);
     }
 
     , initializaRunTab: function () {
@@ -1987,6 +2256,40 @@ Nitrate.TestPlans.Runs = {
         loader.hide();
     }
 
+    , reactsToRunSelection: function () {
+        var that = Nitrate.TestPlans.Runs;
+        var selection = jQ('.run_selector:not(:checked)')
+        var controller = jQ('#id_check_all_runs');
+        if (selection.length == 0) {
+            controller.attr('checked', true);
+        } else {
+            controller.attr('checked', false);
+        }
+        controller.trigger('change');
+    }
+
+    , reactsToAllRunSelectorChange: function (event) {
+        var that = Nitrate.TestPlans.Runs;
+        if (jQ(event.target).attr('checked')) {
+            that.toggleRemainingRunSelection('on');
+        } else {
+            that.toggleRemainingRunSelection('off');
+        }
+    }
+
+    , toggleRemainingRunSelection: function (status) {
+         var area = jQ('#box_select_rest');
+         if (area.length > 0) {
+            if (status === 'off') {
+            area.find('input:checkbox').attr('checked', false);
+            area.hide();
+             } else {
+                area.find('input:checkbox').attr('checked', true);
+                area.show();
+             }
+         };
+    }
+
     , nextPage: function (planId) {
         var that = this;
         var url = that.makeUrlFromPlanId(planId);
@@ -2001,6 +2304,9 @@ Nitrate.TestPlans.Runs = {
 
     , filter: function (data) {
         var queryString = jQ("#run_filter").serialize();
+        // store this string into the rest result select box
+        var box = jQ('#box_select_rest');
+        box.find('input:checkbox').val(queryString);
         return queryString;
     }
 
@@ -2034,7 +2340,7 @@ Nitrate.TestPlans.Runs = {
         // clean the table
         var tbody = jQ('#testruns_body');
         tbody.empty();
-        var page = jQ('[name=page_num');
+        var page = jQ('[name=page_num]');
         page.val('1');
         var showMoreLink = jQ('#show_more_runs');
         showMoreLink.html('Show More');
@@ -2071,4 +2377,72 @@ Nitrate.TestPlans.Runs = {
         });
         return false;
     }
+
+    , showPercentageOfSelectedRuns: function () {
+        var checkedBoxes = jQ('.run_selector:checked');
+        checkedBoxes.each(function (index, box) {
+            jQ(box).parent().parent().find('.btn-statistics').each(function (index, elem) {
+                var clickable = jQ(elem);
+                if (clickable.css('display') != 'none') {
+                    clickable.trigger('click');
+                }
+            });
+        });
+    }
+}
+
+/*
+ * Request specific operation upon filtered TestCases.
+ *
+ * Default HTTP method is GET.
+ *
+ * Options:
+ * - url: the URL representing the service requesting to now.
+ * - form: containing all necessary data serialized as the data included in REQUEST.
+ * - casesContainer: containing all INPUT with type checkbox, each of them holds every filtered
+ *                   TestCase' Id. Typcicall, it's a TABLE in the current implementation.
+ *
+ * FIXME: this function is similar to some other functions within tcms_actions.js, that wraps
+ *        function postToURL. All these functions have almost same behavior. Abstraction can be done
+ *        better.
+ */
+function requestOperationUponFilteredCases(options) {
+    var requestMethod = options.requestMethod || 'get';
+    var url = options.url;
+    var form = options.form;
+    var casesContainer = options.table;
+
+    var selection = serializeCaseFromInputList2(casesContainer);
+    if (!selection.selectAll && selection.selectedCasesIds.length === 0) {
+        alert('At least one case is required by a run.');
+        return false;
+    }
+    // Exclude selected cases, that will be added from the selection.
+    var params = serializeCaseForm2(form, casesContainer, true, true);
+    if (selection.selectAll) {
+        params.selectAll = selection.selectAll;
+    }
+    params.case = selection.selectedCasesIds;
+    postToURL(url, params, requestMethod);
+}
+
+/*
+ * Write new run from partial or all filtered cases.
+ */
+function writeNewRunFromFilteredCases(options) {
+    return requestOperationUponFilteredCases(options);
+}
+
+/*
+ * Add partial or all filtered cases to an existing TestRun.
+ */
+function addFilteredCasesToRun(options) {
+    return requestOperationUponFilteredCases(options);
+}
+
+/*
+ * Request clone current selected TestCases
+ */
+function requestCloneFilteredCases(options) {
+    return requestOperationUponFilteredCases(options);
 }

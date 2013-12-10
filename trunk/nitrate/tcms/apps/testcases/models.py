@@ -60,6 +60,9 @@ class TestCaseStatus(TCMSActionModel):
     id = models.AutoField(
         db_column='case_status_id', max_length=6, primary_key=True
     )
+    # FIXME: if name has unique value for each status, give unique constraint
+    #        to this field. Otherwise, all SQL queries filtering upon this
+    #        field will cost much time in the database side.
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
 

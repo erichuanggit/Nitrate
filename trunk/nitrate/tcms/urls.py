@@ -45,8 +45,14 @@ urlpatterns = patterns('',
 
     # Ajax call responder
     (r'^ajax/update/$', 'tcms.core.ajax.update'),
+    # TODO: merge this into next mapping
     (r'^ajax/update/case-status$', 'tcms.core.ajax.update_case_status'),
+    (r'^ajax/update/cases-case-status/$', 'tcms.core.ajax.update_cases_case_status'),
     (r'^ajax/update/case-run-status$', 'tcms.core.ajax.update_case_run_status'),
+    (r'^ajax/update/cases-priority/$', 'tcms.core.ajax.update_cases_priority'),
+    (r'^ajax/update/cases-default-tester/$', 'tcms.core.ajax.update_cases_default_tester'),
+    (r'^ajax/update/cases-reviewer/$', 'tcms.core.ajax.update_cases_reviewer'),
+    (r'^ajax/update/cases-sortkey/$', 'tcms.core.ajax.update_cases_sortkey'),
     (r'^ajax/form/$', 'tcms.core.ajax.form'),
     (r'^ajax/get-prod-relate-obj/$', 'tcms.core.ajax.get_prod_related_obj_json'),
     (r'^management/getinfo/$', 'tcms.core.ajax.info'),

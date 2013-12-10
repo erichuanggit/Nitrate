@@ -558,6 +558,8 @@ function blindupAllCases(element)
         element.src="/media/images/t1.gif";
     }
 }
+
+// Deprecated. Remove when it's unusable any more.
 function changeCaseOrder(parameters, callback)
 {
     if(parameters.hasOwnProperty('sortkey') == true){
@@ -591,6 +593,44 @@ function changeCaseOrder(parameters, callback)
     updateObject(ctype, object_pk, field, value, vtype, callback);
 }
 
+function changeCaseOrder2(parameters, callback) {
+    if (parameters.hasOwnProperty('sortkey') == true) {
+        nsk = prompt('Enter your new order number', parameters['sortkey']);   // New sort key
+        if(nsk == parameters['sortkey']) {
+            alert('Nothing changed');
+            return false;
+        }
+    }
+    else {
+        nsk = prompt('Enter your new order number');
+    }
+
+    if(!nsk) {
+        return false;
+    }
+
+    if(nsk != parseInt(nsk)) {
+        alert('The value must be an integer number and limit between 0 to 32300.');
+        return false;
+    }
+
+    if(nsk > 32300 || nsk < 0) {
+        alert('The value must be an integer number and limit between 0 to 32300.');
+        return false;
+    }
+
+    parameters.target_field = 'sortkey';
+    parameters.new_value = nsk;
+
+    new Ajax.Request('/ajax/update/cases-sortkey/', {
+        method: 'post',
+        parameters: parameters,
+        onSuccess: callback,
+        onFailure: json_failure
+    });
+}
+
+// Deprecated. dead code.
 function changeCasesStatus(plan_id, object_pk, value, callback)
 {
     var plan_id = plan_id;
@@ -600,6 +640,7 @@ function changeCasesStatus(plan_id, object_pk, value, callback)
     updateCaseStatus(plan_id, ctype, object_pk, field, value, vtype, callback);
 }
 
+// Deprecated. dead code.
 function changeCasePriority(object_pk, value, callback)
 {
     var ctype = 'testcases.testcase';
@@ -901,6 +942,7 @@ function renderCategoryForm(container, parameters, form_observe)
     })
 }
 
+// FIXME: abstract this function
 function updateCaseTag(url, parameters, callback)
 {
     new Ajax.Request(url, {
@@ -911,6 +953,7 @@ function updateCaseTag(url, parameters, callback)
     })
 }
 
+// FIXME: this
 function updateCaseComponent(url, parameters, callback)
 {
     new Ajax.Request(url, {
@@ -921,6 +964,7 @@ function updateCaseComponent(url, parameters, callback)
     })
 }
 
+// FIXME: this, and other code that calls Ajax.Request
 function updateCaseCategory(url, parameters, callback)
 {
     new Ajax.Request(url, {
@@ -931,12 +975,8 @@ function updateCaseCategory(url, parameters, callback)
     })
 }
 
-function constructCaseAutomatedForm(container, parameters, callback)
+function constructCaseAutomatedForm(container, callback, options)
 {
-    if (!parameters['case']) {
-        alert(default_messages.alert.no_case_selected);
-        return false;
-    };
     container.update(getAjaxLoading());
     container.show();
     var d = new Element('div', { 'class': 'automated_form' });
@@ -945,13 +985,23 @@ function constructCaseAutomatedForm(container, parameters, callback)
         var action = '/cases/automated/';
         var form_observe = function(e) {
             e.stop();
+
             if(this.getElementsBySelector('input[type="checkbox"]:checked').length == 0) {
                 alert('Nothing selected');
                 return false;
             }
 
-            var params = this.serialize(true);
-            params['case'] = parameters['case'];
+            var params = serializeFormData({
+                form: this,
+                zoneContainer: options.zoneContainer,
+                casesSelection: options.casesSelection
+            });
+            /*
+             * Have to add this. The form generated before does not contain a
+             * default value `change'. In fact, the field a onust contain the
+             * only value `change', here.
+             */
+            params = params.replace(/a=\w*/, 'a=change');
             new Ajax.Request(getURLParam().url_cases_automated, {
                 method: 'post',
                 parameters: params,
@@ -962,7 +1012,40 @@ function constructCaseAutomatedForm(container, parameters, callback)
         container.update(f);
     }
 
-    getForm(d, 'testcases.CaseAutomatedForm', parameters, c);
+    getForm(d, 'testcases.CaseAutomatedForm', {}, c);
+}
+
+/*
+ * Serialize selected cases' Ids.
+ *
+ * This function inherits the ability from original definition named
+ * serializeCaseFromInputList, except that it also collects whehter all cases
+ * are also selected even through not all of cases are displayed.
+ *
+ * Return value is an object of dictionary holding two properties. `selectAll'
+ * is a boolean value indicating whether user select all cases.
+ * `selectedCasesIds' is an array containing all selected cases' Ids the
+ * current loaded set of cases.
+ *
+ * Whatever user selects all cases, above two properties appears always with
+ * proper value.
+ */
+function serializeCaseFromInputList2(table)
+{
+    var result = {};
+    result.selectAll = jQ(table).parent()
+                                .find('.js-cases-select-all')
+                                .find('input[type="checkbox"]')
+                                .attr('checked');
+
+    var elements = $(table).adjacent('input[name="case"]:checked');
+    var case_ids = new Array();
+    for (i in elements) {
+        if (typeof(elements[i].value) == 'string')
+        case_ids.push(elements[i].value);
+    };
+    result.selectedCasesIds = case_ids;
+    return result;
 }
 
 function serializeCaseFromInputList(table)
@@ -1014,6 +1097,25 @@ function serialzeCaseForm(form, table, serialized, exclude_cases)
     }
     return data
 }
+
+/*
+ * New implementation of serialzeCaseForm to allow to choose whether the
+ * TestCases' Ids are necessary to be serialized.
+ *
+ * Be default if no value is passed to exclude_cases, not exclude them.
+ */
+function serializeCaseForm2(form, table, serialized, exclude_cases)
+{
+    if(typeof(serialized) != 'boolean')
+    var serialized = true;
+    var data = form.serialize(serialized);
+    var _exclude = exclude_cases === undefined ? false : exclude_cases;
+    if (!_exclude) {
+        data['case'] = serializeCaseFromInputList(table);
+    }
+    return data
+}
+
 
 function toggleDiv(link, divId){
     var link = jQ(link);

@@ -79,10 +79,13 @@ def new(request, template_name='run/new.html'):
         ))
 
     # Ready to write cases to test plan
-    tcs = TestCase.objects.filter(case_id__in=request.REQUEST.getlist('case'))
+    from tcms.apps.testcases.views import get_selected_testcases
+    selected_cases = get_selected_testcases(request)
+    tcs = TestCase.objects.filter(case_id__in=selected_cases)
     tp = TestPlan.objects.select_related().get(plan_id=plan_id)
     tcrs = TestCaseRun.objects.filter(case_run_id__in=request.REQUEST.getlist('case_run_id'))
 
+    # FIXME: using group by to save potential lots of SQL statements.
     num_unconfirmed_cases = 0
     for tc in tcs:
         # Hardcode here, the case_status_id is CONFIRMED
@@ -202,6 +205,7 @@ def new(request, template_name='run/new.html'):
         })
         form.populate(product_id=tp.product_id)
 
+    # FIXME: pagination cases within Create New Run page.
     return direct_to_template(request, template_name, {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
@@ -324,6 +328,24 @@ def all(request, template_name = 'run/all.html'):
         'search_form': search_form,
         'query_url': query_url,
     })
+
+def run_queryset_from_querystring(querystring):
+    """Setup a run queryset from a querystring.
+
+    A querystring is used in several places in front-end
+    to query a list of runs.
+    """
+     # 'name=alice&age=20' => {'name': 'alice', 'age': ''}
+    filter_keywords = dict(k.split('=') for k  in querystring.split('&'))
+    # get rid of empty values and several other noisy names
+    filter_keywords.pop('page_num')
+    filter_keywords.pop('page_size')
+
+    filter_keywords = dict((str(k), v) for (k, v) in filter_keywords.iteritems() if v.strip())
+
+    trs = TestRun.objects.filter(**filter_keywords)
+    return trs
+
 
 def load_runs_of_one_plan(request, plan_id, template_name='plan/plan_runs_part.html'):
     """A dedicated view to return a set of runs of a plan.
@@ -799,7 +821,12 @@ def clone(request, template_name='run/clone.html'):
     SUB_MODULE_NAME = "runs"
 
     trs = TestRun.objects.select_related()
-    trs = trs.filter(pk__in=request.REQUEST.getlist('run'))
+
+    filter_str = request.REQUEST.get('filter_str')
+    if filter_str:
+        trs = run_queryset_from_querystring(filter_str)
+    else:
+        trs = trs.filter(pk__in=request.REQUEST.getlist('run'))
 
     if not trs:
         return HttpResponse(Prompt.render(
@@ -810,7 +837,7 @@ def clone(request, template_name='run/clone.html'):
         ))
 
     # Generate the clone run page for one run
-    if len(trs) == 1 and not request.REQUEST.get('submit'):
+    if trs.count() == 1 and not request.REQUEST.get('submit'):
         tr = trs[0]
         tcrs = tr.case_run.all()
         form = RunCloneForm(initial={

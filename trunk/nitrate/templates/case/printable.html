@@ -33,8 +33,10 @@
 			<h3>Contents</h3>
 			<div>
 				<ol>
-					{% for case in cases %}
+					{% for test_case in test_cases %}
+					{% ifin test_case.pk test_plan.case_list %}
 					<li>[{{ test_case.pk }}] {{ test_case.summary }}</li>
+					{% endifin %}
 					{% endfor %}
 				</ol>
 			</div>

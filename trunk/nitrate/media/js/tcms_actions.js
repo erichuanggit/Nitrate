@@ -1,5 +1,7 @@
 // Create a dictionary to avoid polluting the global namespace:
-var Nitrate = {};
+var Nitrate = window.Nitrate || {}; // Ironically, this global name is not respected. So u r on ur own.
+window.Nitrate = Nitrate;
+
 Nitrate.Utils = {};
 var short_string_length = 100;
 var nil;
@@ -9,9 +11,13 @@ var nil;
     Set up a function callback for after the page has loaded
  */
 Nitrate.Utils.after_page_load = function(callback) {
+    var that = this;
     Event.observe(window, 'load', callback);
 };
 
+Nitrate.Utils.enableShiftSelectOnCheckbox = function (className){
+    jQ('.'+className).shiftcheckbox();
+}
 
 Nitrate.Utils.convert = function(argument, data) {
     switch(argument) {
@@ -903,7 +909,6 @@ function addBatchTag(parameters, callback, format)
     parameters.t = 'json';
     parameters.f = format;
     batchProcessTag(parameters, callback, format);
-    
 }
 
 function removeBatchTag(parameters, callback, format)
@@ -922,8 +927,9 @@ function batchProcessTag(parameters, callback, format)
             returnobj = t.responseText.evalJSON(true);
             
             if (returnobj.response == 'ok') {
-                if(callback)
+                if(callback) {
                     callback.call();
+                }
             } else {
                 alert(returnobj.response);
                 return false;
@@ -931,14 +937,14 @@ function batchProcessTag(parameters, callback, format)
         } else {
             callback(t);
         }
-    }
-    
-    var url = new String('/management/tags/')
+    };
+
+    var url = new String('/management/tags/');
     new Ajax.Request(url, {
         method: 'get',
         parameters: parameters,
         onSuccess: success,
-    })
+    });
 }
 
 function bindCommentDeleteLink(container, parameters)
@@ -1431,11 +1437,21 @@ function popupAddAnotherWindow(triggeringLink, parameters)
     return false;
 }
 
-function exportCase(url, case_ids){
-    if(case_ids.case.length==0){
-        alert('At least one case is required.');
+function exportCase(url, form, table) {
+    var selection = serializeCaseFromInputList2(table);
+    var emptySelection = !selection.selectAll & selection.selectedCasesIds.length === 0;
+    if (emptySelection) {
+        alert(default_messages.alert.no_case_selected);
         return false;
     }
-    postToURL(url, case_ids);
+
+    var params = serialzeCaseForm(form, table, true);
+    if (selection.selectAll) {
+        params.selectAll = selection.selectAll;
+    }
+    // replace with selected cases' IDs
+    params.case = selection.selectedCasesIds;
+    postToURL(url, params);
 }
 
+var printableCases = exportCase;

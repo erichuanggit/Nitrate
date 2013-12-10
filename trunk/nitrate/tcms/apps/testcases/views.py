@@ -38,6 +38,8 @@ from tcms.core.logs.models import TCMSLogModel
 from tcms.search.order import order_case_queryset
 from tcms.search import remove_from_request_path
 
+from tcms.apps.testcases.actions import CategoryActions
+from tcms.apps.testcases.actions import ComponentActions
 from tcms.apps.testcases.models import TestCase, TestCaseStatus, \
         TestCaseAttachment, TestCasePlan, TestCaseCategory
 from tcms.apps.testcases.models import TestCaseBug
@@ -55,18 +57,39 @@ from fields import CC_LIST_DEFAULT_DELIMITER
 
 MODULE_NAME = "testcases"
 
+TESTCASE_OPERATION_ACTIONS = ('search', 'sort', 'update',
+                              'remove', # including remove tag from cases
+                              'add', # including add tag to cases
+                              'change',
+                              'delete_cases', # unlink cases from a TestPlan
+                              )
+
 
 #_____________________________________________________________________________
 # helper functions
 
 
-def plan_from_request_or_none(request):
+def plan_from_request_or_none(request, pk_enough=False):
+    '''Get TestPlan from REQUEST
+
+    This method relies on the existence of from_plan within REQUEST.
+
+    Arguments:
+    - pk_enough: a choice for invoker to determine whether the ID is enough.
+    '''
     tp_id = request.REQUEST.get("from_plan")
     if tp_id:
-        tp = get_object_or_404(TestPlan, plan_id=tp_id)
+        if pk_enough:
+            try:
+                tp = int(tp_id)
+            except ValueError:
+                tp = None
+        else:
+            tp = get_object_or_404(TestPlan, plan_id=tp_id)
     else:
         tp = None
     return tp
+
 
 def update_case_email_settings(tc, n_form):
     """Update testcase's email settings."""
@@ -139,12 +162,14 @@ def automated(request):
 
     form = CaseAutomatedForm(request.REQUEST)
     if form.is_valid():
-        tcs = TestCase.objects.filter(pk__in=request.REQUEST.getlist('case'))
-        if not tcs:
-            raise Http404
+        tcs = get_selected_testcases(request)
 
         if form.cleaned_data['a'] == 'change':
             if isinstance(form.cleaned_data['is_automated'], int):
+                # FIXME: inconsistent operation updating automated property
+                #        upon TestCases. Other place to update property upon
+                #        TestCase via Model.save, that will trigger model
+                #        singal handlers.
                 tcs.update(is_automated=form.cleaned_data['is_automated'])
             if isinstance(form.cleaned_data['is_automated_proposed'], bool):
                 tcs.update(
@@ -155,6 +180,7 @@ def automated(request):
         ajax_response['response'] = forms.errors_to_list(form)
 
     return HttpResponse(simplejson.dumps(ajax_response))
+
 
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcase'))
 def new(request, template_name='case/new.html'):
@@ -336,7 +362,8 @@ def build_cases_search_form(request, populate=None, plan=None):
         SearchForm = SearchCaseForm
 
     # Initial the form and template
-    if request.REQUEST.get('a') in ('search', 'sort'):
+    action = request.REQUEST.get('a')
+    if action in TESTCASE_OPERATION_ACTIONS:
         search_form = SearchForm(request.REQUEST)
     else:
         d_status = get_case_status(request.REQUEST.get('template_type'))
@@ -364,11 +391,13 @@ def paginate_testcases(request, testcases):
     Return value: return the queryset for chain call
     '''
     DEFAULT_PAGE_INDEX = 1
-    DEFAULT_PAGE_SIZE = settings.DEFAULT_PAGE_SIZE
+    # FIXME: it's better handle this default value in search form instead of
+    # here.
+    DEFAULT_PAGE_SIZE = 20
 
     POST = request.POST
     page_index = int(POST.get('page_index', DEFAULT_PAGE_INDEX))
-    page_size = int(POST.get('page_size', DEFAULT_PAGE_SIZE))
+    page_size = int(POST.get('items_per_page', DEFAULT_PAGE_SIZE))
     offset = (page_index - 1) * page_size
     return testcases[offset:offset + page_size]
 
@@ -376,9 +405,10 @@ def paginate_testcases(request, testcases):
 def query_testcases(request, plan, search_form):
     '''Query TestCases according to the criterias along with REQUEST'''
     # FIXME: search_form is not defined before being used.
-    if request.REQUEST.get('a') in ('search', 'sort') and search_form.is_valid():
+    action = request.REQUEST.get('a')
+    if action in TESTCASE_OPERATION_ACTIONS and search_form.is_valid():
         tcs = TestCase.list(search_form.cleaned_data, plan)
-    elif request.REQUEST.get('a') == 'initial':
+    elif action == 'initial':
         d_status = get_case_status(request.REQUEST.get('template_type'))
         tcs = TestCase.objects.filter(case_status__in=d_status)
     else:
@@ -392,12 +422,22 @@ def query_testcases(request, plan, search_form):
                              'default_tester',
                              'case_status',
                              'priority',
-                             'category')
+                             'category',
+                             'reviewer')
     tcs = tcs.distinct()
-    # sorting
+    return tcs
+
+
+def sort_queried_testcases(request, testcases):
+    '''Sort querid TestCases according to sort key
+
+    Arguments:
+    - request: REQUEST object
+    - testcases: object of QuerySet containing queried TestCases
+    '''
     order_by = request.REQUEST.get('order_by', 'create_date')
     asc = bool(request.REQUEST.get('asc', None))
-    tcs = order_case_queryset(tcs, order_by, asc)
+    tcs = order_case_queryset(testcases, order_by, asc)
     # default sorted by sortkey
     tcs = tcs.order_by('testcaseplan__sortkey')
     # Resort the order
@@ -410,8 +450,43 @@ def query_testcases(request, plan, search_form):
             tcs = tcs.order_by('testcaseplan__sortkey')
         else:
             tcs = tcs.order_by('-testcaseplan__sortkey')
-
     return tcs
+
+
+def query_testcases_from_request(request, plan=None):
+    '''Query TestCases according to criterias coming within REQUEST
+
+    Arguments:
+    - request: the REQUEST object.
+    - plan: instance of TestPlan to restrict only those TestCases belongs to
+      the TestPlan. Can be None. As you know, query from all TestCases.
+    '''
+    search_form = build_cases_search_form(request)
+    return query_testcases(request, plan, search_form)
+
+
+def get_selected_testcases(request):
+    '''Get selected TestCases from client side
+
+    TestCases are selected in two cases. One is user selects part of displayed
+    TestCases, where there should be at least one variable named case, whose
+    value is the TestCase Id. Another one is user selects all TestCases based
+    on previous filter criterias even through there are non-displayed ones. In
+    this case, another variable selectAll appears in the REQUEST. Whatever its
+    value is.
+
+    If neither variables mentioned exists, empty query result is returned.
+
+    Arguments:
+    - request: REQUEST object.
+    '''
+    REQ = request.REQUEST
+    if REQ.get('selectAll', None):
+        plan = plan_from_request_or_none(request)
+        return query_testcases_from_request(request, plan)
+    else:
+        pks = [int(pk) for pk in REQ.getlist('case')]
+        return TestCase.objects.filter(pk__in=pks)
 
 
 def load_more_cases(request, template_name='plan/cases_rows.html'):
@@ -420,8 +495,8 @@ def load_more_cases(request, template_name='plan/cases_rows.html'):
     cases = []
     selected_case_ids = []
     if plan is not None:
-        search_form = build_cases_search_form(request)
-        cases = query_testcases(request, plan, search_form)
+        cases = query_testcases_from_request(request, plan)
+        cases = sort_queried_testcases(request, cases)
         cases = paginate_testcases(request, cases)
         cases = calculate_for_testcases(plan, cases)
         selected_case_ids = [tc.pk for tc in cases]
@@ -470,6 +545,7 @@ def all(request, template_name="case/all.html"):
     tp = plan_from_request_or_none(request)
     search_form = build_cases_search_form(request, populate=True, plan=tp)
     tcs = query_testcases(request, tp, search_form)
+    tcs = sort_queried_testcases(request, tcs)
     total_cases_count = tcs.count()
 
     # Initial the case ids
@@ -770,37 +846,58 @@ def get(request, case_id, template_name='case/get.html'):
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
     })
 
+
+# TODO: better to split this method for TestPlan and TestCase respectively.
+# NOTE: if you want to print cases according to case_status, you have to pass
+#       printable_case_status in the REQUEST. Why to do this rather than using
+#       case_status is that, Select All causes previous filter criteria is
+#       passed via REQUEST, whereas case_status must exist. So, we have to find
+#       a way to distinguish them for different purpose, respectively.
 def printable(request, template_name='case/printable.html'):
     """Create the printable copy for plan/case"""
-    if (not request.REQUEST.get('plan') and
-            not request.REQUEST.get('case') and
-            not request.REQUEST.get('case_status')):
+    req_get = request.REQUEST.get
+    req_getlist = request.REQUEST.getlist
+
+    plan_pks = req_getlist('plan')
+    case_pks = req_getlist('case')
+    select_all = req_get('selectAll')
+    case_status_pks = req_getlist('printable_case_status')
+
+    # After supporting Select All, querying TestCase requires the existance of
+    # either case or selectAll.
+    req_fails = not plan_pks and not case_pks and \
+                (select_all is not None) and \
+                not case_status_pks
+    if req_fails:
         return HttpResponse(Prompt.render(
                 request=request,
                 info_type=Prompt.Info,
                 info='At least one target is required.',))
 
-    if request.REQUEST.get('plan'):
-        tps = TestPlan.objects.filter(pk__in=request.REQUEST.getlist('plan'))
+    # Preparing for TestPlans
+    if plan_pks:
+        tps = TestPlan.objects.filter(pk__in=plan_pks)
     else:
         tps = TestPlan.objects.none()
 
-    if tps:
-        for tp in tps:
-            tp.case_list = tp.case.values_list('pk', flat=True)
+    for tp in tps:
+        tp.case_list = tp.case.values_list('pk', flat=True)
 
-    internal_query_maps = (
-        # [Web request string, database queryset]
-            ('plan', 'plan__pk__in'),
-            ('case', 'pk__in'),
-            ('case_status', 'case_status__pk__in'))
-
+    # Preparing for TestCases
     query = {}
-    for iqm in internal_query_maps:
-        if request.REQUEST.get(iqm[0]):
-            query[iqm[1]] = request.REQUEST.getlist(iqm[0])
+
+    if plan_pks:
+        query['plan__pk__in'] = plan_pks
+
+    if case_status_pks:
+        query['case_status__pk__in'] = case_status_pks
+
+    if case_pks or select_all is not None:
+        query['pk__in'] = get_selected_testcases(request)
 
     # Disabled cases ignored in default
+    # FIXME: case_status__pk__in must exist when code execution flows here. Why
+    #        check the existance again?
     if not query.get('case_status__pk__in'):
         query['case_status__pk__in'] = TestCaseStatus.objects.exclude(
             name='DISABLED'
@@ -811,10 +908,14 @@ def printable(request, template_name='case/printable.html'):
             'test_plans': tps,
             'test_cases': tcs,})
 
+
 def export(request, template_name='case/export.xml'):
     """Export the plan"""
-    if not request.REQUEST.get('plan') and not request.REQUEST.get('case')\
-    and not request.REQUEST.get('case_status'):
+    REQ = request.REQUEST
+    # FIXME: is it necessary to confirm this repeatedly? No.
+    miss_criteria = not REQ.get('plan') and not REQ.get('case_status') and \
+        not REQ.get('selectAll') and not REQ.get('case')
+    if miss_criteria:
         return HttpResponse(Prompt.render(
                 request=request,
                 info_type=Prompt.Info,
@@ -825,6 +926,7 @@ def export(request, template_name='case/export.xml'):
     response = printable(request, template_name)
     response['Content-Disposition'] = 'attachment; filename=tcms-testcases-%s.xml' % timestamp_str
     return response
+
 
 def update_testcase(request, tc, tc_form):
     '''Updating information of specific TestCase
@@ -1031,12 +1133,13 @@ def text_history(request, case_id, template_name='case/history.html'):
         'select_case_text_version': int(request.REQUEST.get('case_text_version', 0)),
     })
 
+
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcase'))
 def clone(request, template_name='case/clone.html'):
     """Clone one case or multiple case into other plan or plans"""
     SUB_MODULE_NAME = 'cases'
 
-    if not request.REQUEST.get('case'):
+    if 'selectAll' not in request.REQUEST and 'case' not in request.REQUEST:
         return HttpResponse(Prompt.render(
             request=request,
             info_type=Prompt.Info,
@@ -1191,16 +1294,17 @@ def clone(request, template_name='case/clone.html'):
                 next=reverse('tcms.apps.testplans.views.all')
             ))
     else:
+        selected_cases = get_selected_testcases(request)
         # Initial the clone case form
         clone_form = CloneCaseForm(initial={
-            'case': request.REQUEST.getlist('case'),
+            'case': selected_cases,
             'copy_case': False,
             'maintain_case_orignal_author': True,
             'maintain_case_orignal_default_tester': True,
             'copy_component': True,
             'copy_attachment': True,
         })
-        clone_form.populate(case_ids=request.REQUEST.getlist('case'))
+        clone_form.populate(case_ids=selected_cases)
 
     # Generate search plan form
     if request.REQUEST.get('from_plan'):
@@ -1217,19 +1321,22 @@ def clone(request, template_name='case/clone.html'):
         'clone_form': clone_form,
         'submit_action': submit_action,
     })
+
+
 def tag(request):
     """
     Management test case tags
     """
     ajax_response = {'rc': 0, 'response': 'ok', 'errors_list':[]}
-    tcs = TestCase.objects.filter(pk__in=request.REQUEST.getlist('case'))
+    # FIXME: It's unnecessary to check existance of each case Id. Because, in
+    # the following iteration through queried testcases, this problem is solved
+    # naturally.
+    tcs = get_selected_testcases(request)
     if not tcs:
         raise Http404
 
     if request.REQUEST.get('a'):
-        case_ids = request.POST.getlist('case')
         tag_ids = request.POST.getlist('o_tag')
-        tcs = TestCase.objects.filter(pk__in=case_ids)
         tags = TestTag.objects.filter(pk__in=tag_ids)
         for tc in tcs:
             for tag in tags:
@@ -1242,9 +1349,11 @@ def tag(request):
                     })
                     return HttpResponse(simplejson.dumps(ajax_response))
         return HttpResponse(simplejson.dumps(ajax_response))
+
     form = CaseTagForm(initial={'tag': request.REQUEST.get('o_tag')})
     form.populate(case_ids=tcs)
     return HttpResponse(form.as_p())
+
 
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasecomponent'))
 def component(request):
@@ -1253,109 +1362,11 @@ def component(request):
     """
     # FIXME: It will update product/category/component at one time so far.
     # We may disconnect the component from case product in future.
-
-    class ComponentActions(object):
-        """Component actions"""
-        def __init__(self, request, tcs):
-            self.ajax_response = {'rc': 0, 'response': 'ok', 'errors_list': []}
-            self.request = request
-            self.tcs = tcs
-            self.product_id = request.REQUEST.get('product')
-
-        def __get_form(self):
-            self.form = CaseComponentForm(request.REQUEST)
-            self.form.populate(product_id = self.product_id)
-            return self.form
-
-        def __check_form_validation(self):
-            form = self.__get_form()
-            if not form.is_valid():
-                return 0, self.render_ajax(forms.errors_to_list(form))
-
-            return 1, form
-
-        def __check_perms(self, perm):
-            if not self.request.user.has_perm('testcases.' + perm + '_testcasecomponent'):
-                self.ajax_response['rc'] = 1
-                self.ajax_response['response'] = 'Permission denied - ' + perm
-
-                return 0, self.render_ajax(self.ajax_response)
-
-            return 1, True
-
-        def add(self):
-            is_valid, perm = self.__check_perms('add')
-            if not is_valid:
-                return perm
-
-            is_valid, form = self.__check_form_validation()
-            if not is_valid:
-                return form
-
-            for tc in self.tcs:
-                for c in form.cleaned_data['o_component']:
-                    try:
-                        tc.add_component(component = c)
-                    except:
-                        self.ajax_response['errors_list'].append({'case': tc.pk, 'component': c.pk})
-
-            return self.render_ajax(self.ajax_response)
-
-        def remove(self):
-            is_valid, perm = self.__check_perms('delete')
-            if not is_valid:
-                return perm
-
-            is_valid, form = self.__check_form_validation()
-            if not is_valid:
-                return form
-
-            for tc in self.tcs:
-                for c in form.cleaned_data['o_component']:
-                    try:
-                        tc.remove_component(component = c)
-                    except:
-                        self.ajax_response['errors_list'].append({'case': tc.pk, 'component': c.pk})
-
-            return self.render_ajax(self.ajax_response)
-
-        def update(self):
-            is_valid, perm = self.__check_perms('change')
-            if not is_valid:
-                return perm
-
-            is_valid, form = self.__check_form_validation()
-            if not is_valid:
-                return form
-
-            #self.tcs.update(category = self.form.cleaned_data['category'])
-            for tc in self.tcs:
-                tc.clear_components()
-                for c in form.cleaned_data['o_component']:
-                    tc.add_component(component=c)
-
-            return self.render_ajax(self.ajax_response)
-
-        def render_ajax(self, response):
-            return HttpResponse(simplejson.dumps(self.ajax_response))
-
-        def render_form(self):
-            form = CaseComponentForm(initial={
-                'product': self.product_id,
-                #'category': self.request.REQUEST.get('category'),
-                'component': self.request.REQUEST.getlist('o_component'),
-            })
-            form.populate(product_id = self.product_id)
-
-            return HttpResponse(form.as_p())
-
-    tcs = TestCase.objects.filter(pk__in = request.REQUEST.getlist('case'))
-    if not tcs:
-        raise Http404
-
-    cas = ComponentActions(request = request, tcs = tcs)
-    func = getattr(cas, request.REQUEST.get('a', 'render_form').lower())
+    cas = ComponentActions(request)
+    action = request.REQUEST.get('a', 'render_form')
+    func = getattr(cas, action.lower())
     return func()
+
 
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasecomponent'))
 def category(request):
@@ -1364,62 +1375,7 @@ def category(request):
     """
     # FIXME: It will update product/category/component at one time so far.
     # We may disconnect the component from case product in future.
-
-    class CategoryActions(object):
-        """Category actions"""
-        def __init__(self, request, tcs):
-            self.ajax_response = {'rc': 0, 'response': 'ok', 'errors_list': []}
-            self.request = request
-            self.tcs = tcs
-            self.product_id = request.REQUEST.get('product')
-
-        def __get_form(self):
-            self.form = CaseCategoryForm(request.REQUEST)
-            self.form.populate(product_id = self.product_id)
-            return self.form
-
-        def __check_form_validation(self):
-            form = self.__get_form()
-            if not form.is_valid():
-                return 0, self.render_ajax(forms.errors_to_list(form))
-
-            return 1, form
-
-        def __check_perms(self, perm):
-            return 1, True
-
-        def update(self):
-            is_valid, perm = self.__check_perms('change')
-            if not is_valid:
-                return perm
-
-            is_valid, form = self.__check_form_validation()
-            if not is_valid:
-                return form
-
-            categorys = TestCaseCategory.objects.get(pk = request.REQUEST.get('o_category'))
-            for tc in self.tcs:
-                tc.category = categorys
-                tc.save()
-            return self.render_ajax(self.ajax_response)
-
-        def render_ajax(self, response):
-            return HttpResponse(simplejson.dumps(self.ajax_response))
-
-        def render_form(self):
-            form = CaseCategoryForm(initial={
-                'product': self.product_id,
-                'category': self.request.REQUEST.get('o_category'),
-            })
-            form.populate(product_id = self.product_id)
-
-            return HttpResponse(form.as_p())
-
-    tcs = TestCase.objects.filter(pk__in = request.REQUEST.getlist('case'))
-    if not tcs:
-        raise Http404
-
-    cas = CategoryActions(request = request, tcs = tcs)
+    cas = CategoryActions(request)
     func = getattr(cas, request.REQUEST.get('a', 'render_form').lower())
     return func()
 
