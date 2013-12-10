@@ -1,9 +1,14 @@
-*Tue Sep 17 2013 Jian Chen <jianchen@redhat.com> - 3.8.4
+3.8.4 (Sep 17 2013)
+-------------------
 - Fixed bug # 1005797 - [RFE] Add a column with number of comments into Case Runs table
 - Fixed bug # 921930 - Date format of attached log links is incorrect
-*T Jul 25 2013 Chaobin Tang <ctang@redhat.com> - 3.8.2
+
+3.8.2 (Jul 25 2013)
+-------------------
 - Fixed bug # 988332 - Added one permission protected XMLRPC API to add group for a user.
-*Fri Jul 11 2011 Chaobin Tang <ctang@redhat.com> - 3.5
+
+3.5 (Jul 11 2011)
+-----------------
 - Fixed bug # 545082 - Test case sort order is shared across plans for cloned cases
 - Fixed bug # 589633 - Not able to change author of plan
 - Fixed bug # 646325 - [FEAT]cases link doesn't link to the special cases
@@ -61,7 +66,8 @@
 - Fixed bug # 717870 - problem to clone plan no. 3486
 - Fixed bug # 719253 - [UI]UI problem of the input box for adding comment
 
-*Fri Jun 10 2011 Chaobin Tang <ctang@redhat.com> - 3.4.1
+3.4.1 (Jun 10 2011)
+-------------------
 - Fixed bug # 590817 - Build reports include incorrect values
 - Fixed bug # 642246 - Custom build report is incomplete
 - Fixed bug # 653919 - [FEAT] filtering case-runs according to test-plan
@@ -71,7 +77,8 @@
 - Fixed bug # 706839 - [Advanced search]When click link "Return to homepage", come out warning "Bad Request" 
 - Fixed bug # 707243 - bug links don't work 
 
-*Fri May 24 2011 Chaobin Tang <ctang@redhat.com> - 3.4
+3.4 (May 24 2011)
+-----------------
 - Fixed bug #690423 - [xmlrpc] - xmlrpc loses connection to the server after a short timeout 
 - Fixed bug #593760 - xmlrpc doc doesn't match actual behavior: TestRun.update 
 - Fixed bug #593805 - xmlrpc Testcase.update fails when using certain arguments 
@@ -116,12 +123,14 @@
 - Fixed bug #542968 - [FEAT]Nitrate doesn't allow group operations on test case runs 
 - Fixed bug #564316 - [FEAT] tag searching - bugzilla-like categories or negative searching & regexps 
 
-*Fri Mar 3 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-4
+3.3-4 (Mar 3 2011)
+------------------
 - Fixed bug 681156 - [Test Plan]Can not expand all the test case in test plan.
 - Fixed Bug 679677 - [Test Run]The button should be "cancel" in Property page.
 - Fixed Bug 672495 - Old test run shows updated case information but its text version is unchanged.
 
-*Fri Feb 25 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-3
+3.3-3 (Feb 25 2011)
+-------------------
 - Fixed bug 680315 - [Reporting]Open a product will lead to the error page.
 - Fixed bug 680321 - [Test Run]Click "View My Assigned Runs" will list all runs
 - Fixed bug 627236 - s/2009/2010/ orequivalent of date in page footer
@@ -133,7 +142,8 @@
 - Fixed bug 674754 - [xmlrpc] TestRun.create() fails when list of tags provided
 - Fixed bug 676590 - In run execute page, 'expand all' generates tons of http requests
 
-*Tue Feb 15 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-2
+3.3-2 (Feb 15 2011)
+-------------------
 - Fixed bug 664025 - TCMS main check box to control test cases doesn't work
 - Fixed bug 658372 - Cannot select "Product Version" when clone multiple test plans
 - Fixed bug 667304 - Click "Build" label, it won't be sorted by build
@@ -148,7 +158,8 @@
 - Fixed bug 658475 - The bug can not be deleted inside the run
 - Fixed bug 672622 - product version gets set to "unused" when editing a plan
 
-*Mon Jan 24 2011 Yuguang Wang <yuwang@redhat.com> - 3.3-1
+3.3-1 (Jan 24 2011)
+-------------------
 - Fixed bug 661951 - Messed-up warning message pop up when clicking Add without entering Bug ID
 - Fixed bug 665945 - run export button dosn't work
 - Fixed bug 667293 - The first product is the default product.
@@ -168,12 +179,14 @@
 - Fixed case run percent counter
 - Improve the style of filtering test case runs
 
-* Thu Dec 1 2010 Xuqing Kuang <xkuang@redhat.com> - 3.2-4
+3.2-4 (Dec 1 2010)
+------------------
 - Fixed #658160 - Changing case status does not work reliably
 - Fixed UI Bug #658495 - Some case run comments not displayed
 - Re-enabled assignee update notification.
 
-* Tue Nov 30 2010 Xuqing Kuang <xkuang@redhat.com> - 3.2-3
+3.2-3 (Nov 30 2010)
+-------------------
 - Fixed UI Bug #654944 - [TCMS][RFE]Email content:Assign cases to …
 - Fixed UI Bug #656215 - Select all checkbox in search run page broken.
 - Fixed #646912 - editing TC, leaving all automated/manual/autoproposed …
@@ -183,7 +196,8 @@
 - Fixed #658385 - TCMS is spamming with "Assignee of run X has ben …
 - Fixed #658181 - TCMS xmlrpc: 403 FORBIDDEN
 
-* Tue Nov 23 2010 Xuqing Kuang <xkuang@redhat.com> - 3.2-2
+3.2-2 (Nov 23 2010)
+-------------------
 - Fixed own username/email in user profile display without register support
 - Completed UI FEAT - Add case default tester in search plan
 - Fixed username regex like Django restrictive
@@ -204,7 +218,8 @@
 - Fixed UI Bug #627074 - Planning: Default components "update" removes …
 - Fixed #656174 - Can't record Case or Case-Run Log
 
-* Tue Nov 9 2010 Xuqing Kuang <xkuang@redhat.com> - 3.2-1
+3.2-1 (Nov 9 2010)
+------------------
 - Fixed UI Bug #635329 - [TCMS]a small spelling mistake
 - Fixed #635369 - Add a test case with tags will fail via tcms xmlrpc
 - Fixed #635931 - [TCMS]The blank row in Status' drop-down box of Search test Runs
@@ -274,10 +289,12 @@
 - Fixed #648325 - When clone multiple, check 'update manager', it has an error
 - Linked the user linke to profile
 
-* Fri Sep 17 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.1-3
+3.1.1-3 (Sep 17 2010)
+---------------------
 - Fixed global plan search issue.
 
-* Wed Sep 15 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.1-2
+3.1.1-2 (Sep 15 2010)
+---------------------
 - Optimized the performance for pagination
 - Fixed #630604 - disabled test cases included in /plan/<XYZ>/printable/
 - Fixed #564258 - [REF] Ability to export/print specified cases
@@ -286,7 +303,8 @@
 - Fixed #633681 - JS error info in "search plan" and "search case" page …
 - Fixed #634045 - Tag auto-completion failed to work.
 
-* Wed Sep 8 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.1-1
+3.1.1-1 (Sep 8 2010)
+--------------------
 - improve the run report
 - Fixed UI Bug #626720 - see all link does not work
 - Fixed UI Bug #625646 - Text changes for reporting UI
@@ -312,10 +330,12 @@
 - Fixed #629617 - remove white spaces from beginnig and at the end of …
 - Added parent modify feature to XML-RPC
 
-* Thu Aug 12 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.0-2
+3.1.0-2 (Aug 12 2010)
+---------------------
 - Enhanced the reporting feature.
 
-* Thu Aug 12 2010 Xuqing Kuang <xkuang@redhat.com> - 3.1.0-1
+3.1.0-1 (Aug 12 2010)
+---------------------
 - Fixed #612803 - add an export feature for test case runs, can export …
 - Fixed #609777 - Tag autocomplete for "remove tag" shows all possible …
 - Completed Feature #578887 - Clone all test runs for a particular build of …
@@ -329,14 +349,17 @@
 - Fixed #598409 - "RFE: add plan creation date search criteria", add a …
 - Completed new report with customization
 
-* Fri Aug 2 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.4-3
+3.0.4-3 (Aug 2 2010)
+--------------------
 - Fixed #612797 - The Property in Environment can not be deleted
 - Fixed #616463 - Remove property doesn't work in TCMS
 
-* Fri Jul 30 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.4-2
+3.0.4-2 (Jul 30 2010)
+---------------------
 - Fixed #619247 - Cannot update test case status
 
-* Wed Jul 21 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.4-1
+3.0.4-1 (Jul 21 2010)
+---------------------
 - First open sourced version.
 - Added all of docs lacked for installation/upgrading/usage.
 - Fixed #604206 - TestCase.link_plan() does not report errors
@@ -356,7 +379,8 @@
 - Move the compoent of the case to be a tab
 - Use the updateObject() function to reimplemented multiple operations.
 
-* Mon Jun 28 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.3-2.svn2859
+3.0.3-2.svn2859 (Jun 28 2010)
+-----------------------------
 - Fixed bug #604860. Modify ComponentAdmin?'s search_fields from (('name',)) …
 - Update the plan list & case list & run list
 - Update the case run list
@@ -373,7 +397,8 @@
 - Fixed #603622 - TestCase?.add_component: adding already attached component …
 - Optimized front page display
 
-* Sat Jun 12 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.3-1.svn2841
+3.0.3-1.svn2841 (Jun 12 2010)
+-----------------------------
 - Fixed UI Bug #600198 - TCMS][3.0.2-1] - Buttons not Visible in Add New Test …
 - Completed feature #588974 - Make edit work flow more efficient
 - Fixed remove case function in plan
@@ -389,7 +414,8 @@
 - Fixed UI Bug #591783 - The assigned run should be in my run page
 - Fixed edit env property/value name to exist name caused 500 error
 
-* Tue Jun 8 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.2-2.svn2819
+3.0.2-2.svn2819 (Jun 8 2010)
+----------------------------
 - Fixed #598935 - strip whitespace when adding bug numbers
 - Fixed #598909 - Bugs filed from tcms contains HTML
 - Fixed UI Bug #599465 - Filtering test plans based on the author broken
@@ -398,7 +424,8 @@
 - Optimized batch automated operation form
 - Fixed some UI issues.
 
-* Thu Jun 3 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.2-1.svn2805
+3.0.2-1.svn2805 (Jun 3 2010)
+----------------------------
 - Use livepiple to replace scriptaculous and clean up the js codes.
 - Added initial data for syncdb.
 - Added unit test script.
@@ -421,7 +448,8 @@
 - Fixed Bug #595680 - TCMS: cannot disable a test plan
 - Fixed Bug #594566 - Get test case category by product is broken
 
-* Wed May 19 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.1-3.svn2748
+3.0.1-3.svn2748 (May 19 2010)
+-----------------------------
 - Fixed #592212 - Search for test cases covering multiple bugs
 - Fixed #543985 - sort testplans on "clone test case" page alphabetically
 - Fixed #561234 - [feature request]should filter out “the space” key in all …
@@ -431,13 +459,15 @@
 - Fixed #592973 - Add cases from other plans fails with a service error
 - Fixed get_components XML-RPC typo mistake and added docs to new filter …
 
-* Thu May 13 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.1-2.svn2736
+3.0.1-2.svn2736 (May 13 2010)
+-----------------------------
 - Completed signal handler for mailing by a standalone threading
 - Fixed test plan link for #591819
 - Fixed 519029
 - Optimized the menu style
 
-* Tue May 11 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0.1-1.svn2728
+3.0.1-1.svn2728 (May 11 2010)
+-----------------------------
 - Refined whole UI.
 - Optimized query count for performance.
 - Add examples to XML-RPC docs.
@@ -453,7 +483,8 @@
 - #577820, #583917, #562110, #580494, #570351, #589124, #577130, #561406, #586085,
 - #588595, #560791, #584459.
 
-* Fri Apr 16 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0-1b2.svn2665
+3.0-1b2.svn2665 (Apr 16 2010)
+-----------------------------
 - Fixed #582517 - remove tag doesn't work
 - Fixed #582910 - Automatic Display of Next Test Case Not working properly.
 - Fixed #574663
@@ -462,7 +493,8 @@
 - Completed get form ajax responder
 - Optimized get info responder
 
-* Wed Apr 14 2010 Xuqing Kuang <xkuang@redhat.com> - 3.0-1b1.svn2650
+3.0-1b1.svn2650 (Apr 14 2010)
+-----------------------------
 - Initial completed most new features, extend database schema
 - Initial completed bookmark(watch list) feature(Models added)
 - Initial completed modify run environment value feature(Backend code)
@@ -474,48 +506,58 @@
 - Fixed Build.create() bug
 - Fixed TestRun.get_test_case_runs() bug
 
-* Thu Apr 1 2010 Xuqing Kuang <xkuang@redhat.com> - 2.3-5.svn2599
+2.3-5.svn2599 (Apr 1 2010)
+--------------------------
 - Fixed add tag to run cause to crash issue.
 
-* Mon Mar 29 2010 Xuqing Kuang <xkuang@redhat.com> - 2.3-4.svn2594
+2.3-4.svn2594 (Mar 29 2010)
+---------------------------
 - Completed create/update functions for XML-RPC.
 - Fixed web browser compatible issues.
 - Improve review case progress.
 
-* Tue Mar 23 2010 Xuqing Kuang <xkuang@redhat.com> - 2.3-3.svn2577
+2.3-3.svn2577 (Mar 23 2010)
+---------------------------
 - Fixed Webkit based browser compatible issues
 - Fixed TinyMCE in Webkit based browser compatible issues
 - Fixed UI Bug: #570351
 - Fixed UI Bug: #553308
 
-* Mon Mar 22 2010 Xuqing Kuang <xkuang@redhat.com> - 2.3-2.svn2568
+2.3-2.svn2568 (Mar 22 2010)
+---------------------------
 - Fixed search case without product issue(r2567)
 - Fixed create run foot UI issue(r2566)
 - Fixed update component in search case issue(r2565)
 
-* Thu Mar 18 2010 Xuqing Kuang <xkuang@redhat.com> - 2.3-1.svn2564
+2.3-1.svn2564 (Mar 18 2010)
+---------------------------
 - Complete most of XML-RPC functions.
 - Complete batch operation for case including setting priority, add/remove tag.
 - Fixed most of bugs.
 
-* Wed Mar 17 2010 Xuqing Kuang <xkuang@redhat.com> -2.2-4.svn2504
+2.2-4.svn2504 (Mar 17 2010)
+----------------------------
 - Fixed version in web ui incorrect.
 
-* Fri Mar 12 2010 Xuqing Kuang <xkuang@redhat.com> - 2.2-3.svn2504
+2.2-3.svn2504 (Mar 12 2010)
+---------------------------
 - HOT BUG FIXING - #572487
 
-* Thu Mar 4 2010 Xuqing Kuang <xkuang@redhat.com> - 2.2-2.svn2504
+2.2-2.svn2504 (Mar 4 2010)
+--------------------------
 - Fixed UI bug: Execute link exceed the width issue
 - Fixed UI bug: CC for run page display issue
 
-* Mon Mar 1 2010 Xuqing Kuang <xkuang@redhat.com> - 2.2-1.svn2500
+2.2-1.svn2500 (Mar 1 2010)
+--------------------------
 - Add a new serializer for XMLRPC serialization
 - Fixed KerbTransport authorization issue
 - Change deployment method to WSGI
 - A lot of bugs fixing for application.
 - Fixed a lot of UI bugs
 
-* Thu Feb 11 2010 Xuqing Kuang <xkuang@redhat.com> - 2.1-4.svn2461
+2.1-4.svn2461 (Feb 11 2010)
+---------------------------
 - Fixed application bug #561620
 - Fixed web UI bug #529807
 - Fixed web UI bug #561610
@@ -526,37 +568,44 @@
 - Fixed web UI bug #560091
 - Fixed web UI bug #560055
 
-* Tue Feb 2 2010 Xuqing Kuang <xkuang@redhat.com> - 2.1-3.svn2449
+2.1-3.svn2449 (Feb 2 2010)
+--------------------------
 - Remove product version from case search page.
 - Optimize search case form.
 
-* Tue Feb 2 2010 Xuqing Kuang <xkuang@redhat.com> - 2.1-2.svn2446
+2.1-2.svn2446 (Feb 2 2010)
+--------------------------
 - Fixed the case display with the bug added directly in case page in run issue.
 - Fixed edit case component selector issue.
 - Case product link to category now, disconnect from plan.
 
-* Mon Feb 1 2010 Xuqing Kuang <xkuang@redhat.com> - 2.1-1.svn2443
+2.1-1.svn2443 (Feb 1 2010)
+--------------------------
 - Rewrite get case details to ajax code, for optimize performance
 - Add tag support for test run
 - Add bug to case directly now supported.
 
-* Mon Jan 18 2010 Xuqing Kuang <xkuang@redhat.com> - 2.0-3.svn2403
+2.0-3.svn2403 (Jan 18 2010)
+---------------------------
 - Fixed hot issue #556382
 
-* Mon Jan 18 2010 Xuqing Kuang <xkuang@redhat.com> - 2.0-2.svn2402
+2.0-2.svn2402 (Jan 18 2010)
+---------------------------
 - Fixed auto blind down issue
 - Fixed #555702
 - Fixed #555703
 - Fixed #555707 and #554676
 - Completed add tag to case/plan when create backend function
 
-* Fri Jan 15 2010 Xuqing Kuang <xkuang@redhat.com> - 2.0-1.svn2394
+2.0-1.svn2394 (Jan 15 2010)
+---------------------------
 - Fixed most of bugs
 - The component will add to new product specific in clone function
 - Use Cache backend to handle session
 - More optimization
 
-* Mon Jan 11 2010 Xuqing Kuang <xkuang@redhat.com> - 2.0-1RC.svn2368
+2.0-1RC.svn2368 (Jan 11 2010)
+-----------------------------
 - Fixed a lot of bugs
 - Optimize new comment system
 - Completed new log system
@@ -564,7 +613,8 @@
 - Improve new review workflow
 - Update setup.py
 
-* Tue Dec 29 2009 Xuqing Kuang <xkuang@redhat.com> - 2.0-1beta.svn2318
+2.0-1beta.svn2318 (Dec 29 2009)
+-------------------------------
 - First public beta release of 2.0
 - Rewrite most components
 - Add estimated time into run
@@ -573,10 +623,12 @@
 - Use a lot Ajax to instead of render whole page
 - Redesign the interface
 
-* Fri Dec 18 2009 Xuqing Kuang <xkuang@redhat.com> - 1.3-3.svn2261
+1.3-3.svn2261 (Dec 18 2009)
+---------------------------
 - Add case run changelog show in run details page feature
 
-* Tue Dec 8 2009 Xuqing Kuang <xkuang@redhat.com> - 1.3-2.svn2229
+1.3-2.svn2229 (Dec 8 2009)
+--------------------------
 - Fixed #544951
 - Fixed #544229
 - Fixed #543985
@@ -584,17 +636,20 @@
 - Fixed reporing when plan count is null issue
 - Update overview report of product statistics SQL
 
-* Fri Dec 4 2009 Xuqing Kuang <xkuang@redhat.com> - 1.3-1.svn2213
+1.3-1.svn2213 (Dec 4 2009)
+--------------------------
 - Fixed #541823
 - Fixed #541829
 - Optimize delete case/run ACL policy.
 - Initial completed Reporting feature.
 - Initial XML-RPC interface
 
-* Wed Nov 25 2009 Xuqing Kuang <xkuang@redhat.com> - 1.2-3.svn2167
+1.2-3.svn2167 (Nov 25 2009)
+---------------------------
 - Made a mistake in checkout the source, so rebuild it.
 
-* Wed Nov 25 2009 Xuqing Kuang <xkuang@redhat.com> - 1.2-2.svn2167
+1.2-2.svn2167 (Nov 25 2009)
+---------------------------
 - [2152] Fixed bug #530478 - Case run case_text_version is 0 cause to file bug crash
 - [2154] Fixed bug #538747
 - [2156] Use QuerySet update function to batch modify the database
@@ -603,7 +658,8 @@
 - [2163] Fixed bug #538849 - Test case execute comment garbled
 - [2165] Fixed bug #540371 - Where are Cloned Tests
 
-* Fri Nov 20 2009 Xuqing Kuang <xkuang@redhat.com> - 1.2-1.svn2143
+1.2-1.svn2143 (Nov 20 2009)
+---------------------------
 - Fixed UI bug #530010 - clean float dialog
 - Fixed UI bug #531942 - Correct strings in system
 - Fixed UI bug #536996
@@ -619,35 +675,43 @@
 - Fixed bug #533869 - "Save and add another" case button results in a traceback
 - Completed case attachment feature
 
-* Mon Nov 9 2009 Xuqing Kuang <xkuang@redhat.com> - 1.1-1.svn2097
+1.1-1.svn2097 (Nov 9 2009)
+--------------------------
 - Release 1.1 version TCMS
 - Completed clone case/run feature
 - Refined the UI structure
 - Add XML-RPC interface for ATP
 
-* Mon Nov 9 2009 Xuqing Kuang <xkuang@redhat.com> - 1.0-9.svn2046
+1.0-9.svn2046 (Nov 9 2009)
+--------------------------
 - Add mod_auth_kerb.patch for authorize with apache kerberos module.
 
-* Thu Oct 22 2009 Xuqing Kuang <xkuang@redhat.com> - 1.0-7.svn2046.RC
+1.0-7.svn2046.RC (Oct 22 2009)
+------------------------------
 - Improve templates
 
-* Thu Oct 22 2009 Xuqing Kuang <xkuang@redhat.com> - 1.0-6.svn2046.RC
+1.0-6.svn2046.RC (Oct 22 2009)
+------------------------------
 - Imporove test plan clone feature
 - Fixed failed case run count in run details page
 - Add RELEASENOTES
 
-* Wed Oct 21 2009 Xuqing Kuang <xkuang@redhat.com> - 1.0-5.svn2042.RC
+1.0-5.svn2042.RC (Oct 21 2009)
+------------------------------
 - Realign the version to 1.0
 - Fixed most of bugs
 
-* Wed Oct 16 2009 Xuqing Kuang <xkuang@redhat.com> - 2.0-4.svn2006.RC
+2.0-4.svn2006.RC (Oct 16 2009)
+------------------------------
 - Fixed other unimportant bugs, release RC.
 
-* Wed Oct 14 2009 Xuqing Kuang <xkuang@redhat.com> - 2.0-3.svn1971
+2.0-3.svn1971 (Oct 14 2009)
+---------------------------
 - Fixed most of bugs and get ready to GA.
 - KNOWN ISSUE: Search case to add to plan just complete the page design, is waiting for logic function.
 
-* Wed Sep 30 2009 Xuqing Kuang <xkuang@redhat.com> - 2.0-2.svn1938
+2.0-2.svn1938 (Sep 30 2009)
+---------------------------
 - Rewrite assign case page
 - Rewrite attachment implementation
 - Search with environment is available
@@ -666,7 +730,8 @@
 - Fixed #525830 - The same buttons aligned in different tabs should keep consistent
 - Fixed #525606 - "Is active" should be kept on the same line with its check-box 
 
-* Tue Sep 23 2009 Xuqing Kuang <xkuang@redhat.com> - 2.0-2.svn1898
+2.0-2.svn1898 (Sep 23 2009)
+---------------------------
 - Feature:
 - Completed environment element modfiy/delete feature in admin
 - Fixed #525039 - [FEAT]It should let users add notes and set status of test cases even when the status of the test run is "Finished"
@@ -680,53 +745,65 @@
 - Fixed #525044 - The buttons are not aligned and missing some checkboxes when searching cases
 - Fixed #524778 - [Admin]The add icons should be after the fields
 
-* Tue Sep 15 2009 Xuqing Kuang <xkuang@redhat.com> - 2.0-1.svn1863
+2.0-1.svn1863 (Sep 15 2009)
+---------------------------
 - Remove case from plan
 - Sort case in plan
 - Fixed edit case issue
 
-* Tue Sep 1 2009 Xuqing Kuang <xkuang@redhat.com> - 2.0-1.svn1833
+2.0-1.svn1833 (Sep 1 2009)
+--------------------------
 - Fixed a lot of bug.
 - Redesign the interface.
 
-* Wed Jul 22 2009 Xuqing Kuang <xkuang@redhat.com> - 2.0-1.svn1799
+2.0-1.svn1799 (Jul 22 2009)
+---------------------------
 - Rewrite most of components
 - Add tables from Django
 - dump version to 2.0 (trunk development version)
 
-* Thu Mar 19 2009 David Malcolm <dmalcolm@redhat.com> - 0.16-6.svn1547
+0.16-6.svn1547 (Mar 19 2009)
+----------------------------
 - require kerberos authentication
 - svn r1547
 
-* Tue Mar 17 2009 David Malcolm <dmalcolm@redhat.com> - 0.16-5.svn1525
+0.16-5.svn1525 (Mar 17 2009)
+----------------------------
 - mark tcms/product_settings.py as being a config file
 - add dependency on mod_ssl
 
-* Tue Mar 17 2009 David Malcolm <dmalcolm@redhat.com> - 0.16-4.svn1525
-- substitute RPM metadata into the page footer so that it always shows the
-exact revision of the code
+0.16-4.svn1525 (Mar 17 2009)
+----------------------------
+- substitute RPM metadata into the page footer so that it always shows the exact revision of the code
 - bump to svn revision 1525
 
-* Thu Mar 12 2009 David Malcolm <dmalcolm@redhat.com> - 0.16-3.svn1487
+0.16-3.svn1487 (Mar 12 2009)
+----------------------------
 - drop the dist tag
 
-* Thu Mar 12 2009 David Malcolm <dmalcolm@redhat.com> - 0.16-2.svn1487
+0.16-2.svn1487 (Mar 12 2009)
+----------------------------
 - add build-requires on Django to try to get pylint to work (otherwise: tcms/urls.py:11: [E0602] Undefined variable 'patterns')
 
-* Thu Mar 12 2009 David Malcolm <dmalcolm@redhat.com> - 0.16-1.svn1487
+0.16-1.svn1487 (Mar 12 2009)
+----------------------------
 - 0.16
 - add build-requires on python-setuptools
 
-* Tue Feb 24 2009 David Malcolm <dmalcolm@redhat.com> - 0.13-4
+0.13-4 (Feb 24 2009)
+--------------------
 - fix regexp for pylint errors
 
-* Tue Feb 24 2009 David Malcolm <dmalcolm@redhat.com> - 0.13-3
+0.13-3 (Feb 24 2009)
+--------------------
 - add code to invoke pylint.  Stop building the rpm if pylint finds a problem.
 
-* Wed Feb 18 2009 David Malcolm <dmalcolm@redhat.com> - 0.13-2.svn1309
+0.13-2.svn1309 (Feb 18 2009)
+----------------------------
 - add mod_python and python-memcached dependencies
 - move static content to below datadir
 - add apache config to correct location
 
-* Thu Feb 12 2009 David Malcolm <dmalcolm@redhat.com> - 0.13-1.svn1294
+0.13-1.svn1294 (Feb 12 2009)
+----------------------------
 - initial packaging
