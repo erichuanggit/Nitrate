@@ -3,7 +3,7 @@
 
 Name:           nitrate
 Version:        3.8.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -118,6 +118,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+
+* Tue Dec 10 2013 Chenxiong Qi <cqi@redhat.com> - 3.8.5-5
+- 1036538 [advance search]printable copy, test cases is null even if select cases/plan from advance search list
+- 1036678 [Print plan]No cases information in print view page
 
 * Tue Dec 4 2013 Chenxiong Qi <cqi@redhat.com> - 3.8.5-4
 - 1036028 [Test plan] Unable to calculate all run progress even if I select "Also select the rest XX page(s)"
