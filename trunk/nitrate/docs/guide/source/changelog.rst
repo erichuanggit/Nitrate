@@ -3,4 +3,4 @@
 Changelog
 =========
 
-.. include:: ../../../ChangeLog
+.. literalinclude:: ../../../ChangeLog

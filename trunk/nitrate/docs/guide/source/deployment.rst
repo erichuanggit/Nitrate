@@ -3,11 +3,11 @@
 Deployment
 ==========
 
-1.1. Deployment
----------------
+Deployment
+----------
 
-1.1.1. Download the sources
----------------------------
+Download the sources
+~~~~~~~~~~~~~~~~~~~~
 
 The Nitrate source code is available at:
 https://git.fedorahosted.org/cgit/nitrate.git/?h=development
@@ -20,16 +20,16 @@ You can get the latest changes with git easily::
 Or you also can download the tarballs from:
 https://git.fedorahosted.org/cgit/nitrate.git/?h=development
 
-1.1.2. Install from source code
--------------------------------
+Install from source code
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 After download the source code, you can go to the source code directory and install this project with python setup.py::
 
   cd [nitrate_download_path]/nitrate/trunk/nitrate
   python setup.py install
 
-1.1.3. Initialize database schema
----------------------------------
+Initialize database schema
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Database is required by Nitrate(and all of Django apps). The Django ORM supports many database backends, we recommend you to use MySQL.
 
@@ -58,8 +58,8 @@ b. added an example site with SITE_ID = 1::
 
       tcms.example.com
 
-1.1.4. Settings
----------------
+Settings
+~~~~~~~~
 
 First please go to nitrate root path, it's different based on your current OS.
 
@@ -73,8 +73,8 @@ After backed up the product.py, please modify following settings based on your c
 .. literalinclude:: ../../../tcms/settings/product.py
    :language: python
 
-1.1.5. Start the django app
----------------------------
+Start the django app
+~~~~~~~~~~~~~~~~~~~~
 
 After upon steps is completed, now you can try to start the web server which is built-in Django to test if the app can run successfully.
 In nitrate root path, run following command::
@@ -83,8 +83,8 @@ In nitrate root path, run following command::
 
 Then try to use web browser to open http://localhost:8000/ to verify the working status of this web service.
 
-1.1.6. Deployment with Apache
------------------------------
+Deployment with Apache
+~~~~~~~~~~~~~~~~~~~~~~
 
 Deploying Django projects with Apache and mod_wsgi is the recommended way to get them into production.
 
@@ -94,8 +94,8 @@ You can have a try with following apache confs:
    :language: bash
 
 
-1.1.7. Deployment with Nginx
-----------------------------
+Deployment with Nginx
+~~~~~~~~~~~~~~~~~~~~~
 
 With benchmark, we found Nginx + FCGI is faster than Apache + Mod_python.
 So deploying with Nginx will also be a good idea for production environment.
@@ -105,6 +105,7 @@ Here are deployment confs about Nginx:
    :language: bash
 
 
-1.2. Upgrading
---------------
-...
+Upgrading
+---------
+
+.. TODO

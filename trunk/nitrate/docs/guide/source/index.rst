@@ -12,7 +12,8 @@ Contents
 --------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
+   :numbered:
 
    about.rst
    deployment.rst

@@ -1,22 +1,22 @@
 .. _contribution:
 
-1. Contribution
-===============
+Contribution
+============
 
 This guide is a comprehensive resource for contributing to Nitrate - for both
 new and experienced contributors. It is maintained by the Nitrate community.
 We welcome your contributions to Nitrate!
 
-1.1. Getting involved
----------------------
+Getting involved
+----------------
 
 These instructions cover how to setup development environment and recommended
 coding conventions for nitrate project.  It also gives an overview of the
 directory structure of the Nitrate source code.
 
 
-1.1.1. Getting the Source Code
-------------------------------
+Getting the Source Code
+~~~~~~~~~~~~~~~~~~~~~~~
 
 The Nitrate source code is available at:
 https://git.fedorahosted.org/cgit/nitrate.git/?h=development
@@ -30,8 +30,8 @@ code::
 Or you also can download the tarballs from:
 https://git.fedorahosted.org/cgit/nitrate.git/?h=development
 
-1.1.2. Requirement modules
----------------------------
+Requirement modules
+~~~~~~~~~~~~~~~~~~~
 
 * `Python <http://www.python.org/>`_ >= 2.4
 * `Django <http://www.djangoproject.com/>`_ = 1.2.3
@@ -42,15 +42,17 @@ https://git.fedorahosted.org/cgit/nitrate.git/?h=development
 * `Django debug toolbar <http://github.com/robhudson/django-debug-toolbar>`_ (Optional: Recommendations for development)
 * `Sphinx <https://pypi.python.org/pypi/Sphinx/1.2b3>`_ (Optional: Recommendations for development, used for building docs)
 
-1.1.3. Install dependence
---------------------------------------
+Install dependence
+~~~~~~~~~~~~~~~~~~
+
 code::
 
     # cd nitrate/trunk/nitrate
     # pip install -r requirements/devel.txt
 
 1.1.4. Setup database
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 code::
 
     # mysql -uroot -p
@@ -63,8 +65,8 @@ code::
 
    Remember to change db settings in `settings/devel.py` accordingly.
 
-1.1.5. Start the nitrate app
-----------------------------
+Start the nitrate app
+~~~~~~~~~~~~~~~~~~~~~
 code::
 
     # cd <nitrate_project_root_path>/trunk/nitrate/tcms
@@ -74,13 +76,13 @@ code::
 
    `settings/devel.py` is used as default settings.
 
-1.2. Coding style
------------------
+Coding style
+------------
 
 Please follow these coding standards when writing code for inclusion in Nitrate.
 
-1.2.1. Python style
--------------------
+Python style
+~~~~~~~~~~~~
 
 * Unless otherwise specified, follow `PEP 8 <http://www.python.org/dev/peps/pep-0008>`_.
 * Use underscores, not camelCase, for variable, function and method names (i.e. poll.get_unique_voters(), not poll.getUniqueVoters).
