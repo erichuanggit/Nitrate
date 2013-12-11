@@ -26,6 +26,8 @@ Requires:       mod_ssl
 Requires:       python-memcached
 Requires:       python-kerberos
 Requires:       python-hashlib
+Requires:       python-qpid
+Requires:       python-lxml
 Requires:       kobo-django >= 0.2.0-3
 Requires:       mod_auth_kerb
 Requires:       mod_wsgi
