@@ -50,7 +50,7 @@ code::
     # cd nitrate/trunk/nitrate
     # pip install -r requirements/devel.txt
 
-1.1.4. Setup database
+Setup database
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 code::
