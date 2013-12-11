@@ -1,7 +1,12 @@
 SPECFILE=nitrate.spec
+# FIXME: this varialbe is for install and install-data. If remove them, also
+# remove this one.
 PREFIX=/usr
-# FIXME: eventually figure this out, using something like this:
-#$(shell (svn info | awk "/Revision:/ { print $$2 }"))
+
+# Support build branch. That is make supports to build package from current git
+# branch. If you want to distribute TCMS upon a specific branch, checkout to it
+# first, and then issue make.
+BUILD_BRANCH=$(shell git branch | grep "^\*" | sed -e "s/\* //")
 
 NAME=$(shell rpm -q --qf "%{NAME}\n" --specfile $(SPECFILE)|head -n1)
 VERSION=$(shell rpm -q --qf "%{VERSION}\n" --specfile $(SPECFILE)|head -n1)
@@ -14,13 +19,7 @@ RPMBUILD_OPTIONS=--nodeps --define "_sourcedir $(PWD)" --define "_srcrpmdir $(PW
 
 WORK_DIR=/tmp/nitrate-$(VERSION)
 SOURCE_DIR = $(WORK_DIR)/nitrate/trunk/
-
-# By default, development is the default branch for making tarball. Meanwhile,
-# developer has the oppotunity to force make to make tarball from other branch
-# by specifying a branch name via TCMS_BRANCH explicitly.
-ifeq ($(strip $(TCMS_BRANCH)),)
-	TCMS_BRANCH=development
-endif
+CODE_REPO=git://git.fedorahosted.org/nitrate.git
 
 # Target: build a local RPM
 local-rpm: $(SRPM)
@@ -34,14 +33,15 @@ $(SRPM): $(TARBALL) $(SPECFILE)
 
 # Target for constructing a source tarball
 # We do not build from the local copy.
-# Instead, we always checkout a clean source tree from SVN.
+# Instead, we always checkout a clean source tree from remote repository.
 # This means that we know exactly which version of each file we have in any RPM.
 $(TARBALL): Makefile
+	@echo "Start to build distribution package upon branch $(BUILD_BRANCH)"
 	@rm -rf $(WORK_DIR)
 	@rm -f $(TARBALL)
 	@mkdir $(WORK_DIR)
 	@echo "Getting latest codes from git"
-	@cd $(WORK_DIR); git clone -b $(TCMS_BRANCH) git://git.fedorahosted.org/nitrate.git
+	@cd $(WORK_DIR); git clone -b $(BUILD_BRANCH) $(CODE_REPO)
 	# Fixup the version field in the page footer so that it shows the precise
 	# RPM version-release:
 	@cd $(SOURCE_DIR); sed --in-place -r 's|NITRATE_VERSION|$(VERSION)|' $(SOURCE_DIR)/nitrate/templates/tcms_base.html
@@ -74,6 +74,7 @@ pylint:
 test:
 	python manage.py test
 
+# FIXME: remove install and install-data?
 install: $(install-data)
 	python setup.py install -O1 --skip-build --root ${PREFIX}
 
