@@ -25,6 +25,7 @@ import os.path
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+# Administrators error report email settings
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
@@ -255,7 +256,7 @@ EMAIL_PORT = 25
 EMAIL_FROM = 'noreply@foo.com'
 EMAIL_SUBJECT_PREFIX = '[TCMS] '
 
-EMAILS_FOR_DEBUG = ['ctang@redhat.com',]
+EMAILS_FOR_DEBUG = []
 
 # TCMS email behavior settings
 PLAN_EMAIL_TEMPLATE = 'mail/change_plan.txt'
@@ -334,10 +335,11 @@ KRB5_REALM = ''
 
 # Integration with Errata system, used to linkify the Errata ID
 # A valid Errata URL:
-# https://errata.devel.redhat.com/errata/stateview/{Errata ID}
-ERRATA_URL_PREFIX = 'https://errata.devel.redhat.com/errata/stateview'
+# https://errata.devel.example.com/errata/stateview/{Errata ID}
+ERRATA_URL_PREFIX = ''
+
 # user guide url:
-USER_GUIDE_URL = 'https://riddler.bne.redhat.com/TCMS-User_Guide/index.html'
+USER_GUIDE_URL = ''
 
 # Default page size for showing each possible query result. This provides a
 # consistent user experiece to users.

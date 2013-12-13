@@ -3,7 +3,7 @@
 from common import *
 
 # Debug settings
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 # Database settings
@@ -21,8 +21,9 @@ DATABASES = {
 
 STATIC_ROOT = '/usr/share/nitrate/static/'
 
-CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
-SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+# Memcached settings
+#CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
+#SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
 # add RemoteUserMiddleWare if kerberos authentication is enabled
 MIDDLEWARE_CLASSES += (
@@ -33,6 +34,7 @@ MIDDLEWARE_CLASSES += (
 #AUTHENTICATION_BACKENDS = (
 #    'tcms.core.contrib.auth.backends.ModAuthKerbBackend',
 #)
+
 # Kerberos realm
 #KRB5_REALM = 'EXAMPLE.COM'
 
@@ -44,8 +46,8 @@ BUGZILLA_USER = ''
 BUGZILLA_PASSWORD = ''
 
 # Set the default send mail address
-EMAIL_HOST = 'smtp.corp.redhat.com'
-EMAIL_FROM = 'noreply@redhat.com'
+EMAIL_HOST = 'smtp.example.com'
+EMAIL_FROM = 'noreply@example.com'
 
 # Site-specific messages
 
@@ -62,14 +64,9 @@ FIRST_RUN = False
 MOTD_LOGIN = """<p>This is the development server of the TCMS (for testing).</p>
 <p>Please use your kerberos user name and password.</p>
 """
-
+# You can add a help link on the footer of home page as following format:
+# ('http://foo.com', 'foo')
 FOOTER_LINKS = (
- ('mailto:tcms-dev-list@redhat.com', 'Contact developers'),
- ('mailto:eng-ops@redhat.com', 'Request permissions'),
- ('https://bugzilla.redhat.com/enter_bug.cgi?product=TCMS&version=3.0', 'Report bug'),
- ('https://riddler.bne.redhat.com/TCMS-User_Guide/index.html', 'User guide'),
- ('http://survey.englab.nay.redhat.com/index.php?sid=14851&lang=en', 'Satisfaction Survey'),
- ('https://fedorahosted.org/nitrate/wiki', 'Release schedule'),
  ('/xmlrpc/', 'XML-RPC service'),
 )
 

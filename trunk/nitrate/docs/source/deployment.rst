@@ -3,8 +3,8 @@
 Deployment
 ==========
 
-Deployment
-----------
+Installation
+------------
 
 Download the sources
 ~~~~~~~~~~~~~~~~~~~~
@@ -58,8 +58,8 @@ b. added an example site with SITE_ID = 1::
 
       tcms.example.com
 
-Settings
-~~~~~~~~
+Config Settings
+~~~~~~~~~~~~~~~
 
 First please go to nitrate root path, it's different based on your current OS.
 
@@ -73,6 +73,29 @@ After backed up the product.py, please modify following settings based on your c
 .. literalinclude:: ../../tcms/settings/product.py
    :language: python
 
+Use Memcached
+~~~~~~~~~~~~~~
+Please install package of memcached and python-memcached if using memcached as Nitrate's cache::
+
+    yum install memcached python-memcached
+
+then run the memcached service::
+
+    service memcached start
+
+You can also change default memcached settings in file of /etc/sysconfig/memcached::
+
+    PORT="11211"
+    USER="memcached"
+    MAXCONN="1024"
+    CACHESIZE="64"
+    OPTIONS=""
+
+At last set related settings in tcms/settings/product.py::
+
+   CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
+   SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+
 Start the django app
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -83,27 +106,39 @@ In nitrate root path, run following command::
 
 Then try to use web browser to open http://localhost:8000/ to verify the working status of this web service.
 
-Deployment with Apache
-~~~~~~~~~~~~~~~~~~~~~~
+Deployment
+----------
+
+Deploy with Apache
+~~~~~~~~~~~~~~~~~~
 
 Deploying Django projects with Apache and mod_wsgi is the recommended way to get them into production.
 
-You can have a try with following apache confs:
+To build a production server with Apache, just copy apache conf to /etc/httpd/conf.d/.
+
+I presume that the conf file is named nitrate-httpd.conf.
 
 .. literalinclude:: ../../contrib/conf/nitrate-httpd.conf
    :language: bash
 
+In /etc/httpd/conf/httpd.conf, set the following settings simply::
 
-Deployment with Nginx
-~~~~~~~~~~~~~~~~~~~~~
+    ServerName example.com:80
+    Listen ip_address:80
 
-With benchmark, we found Nginx + FCGI is faster than Apache + Mod_python.
-So deploying with Nginx will also be a good idea for production environment.
-Here are deployment confs about Nginx:
+After configuration, run::
 
-.. literalinclude:: ../../contrib/conf/nitrate-nginx.conf
-   :language: bash
+    service httpd start
 
+Please go to browser to have a verify if this service runs successfully.
+
+If any problem, please refer to log file::
+
+    /var/log/httpd/error_log
+
+Or any access info, refer to::
+
+    /var/log/httpd/access_log
 
 Upgrading
 ---------
