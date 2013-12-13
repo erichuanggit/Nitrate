@@ -70,7 +70,7 @@ Like on RHEL6.3, the root path is located in::
 As we plan to deploy a example server for nitrate, we can use product.py as the default settings.
 After backed up the product.py, please modify following settings based on your custom configurations in settings/product.py:
 
-.. literalinclude:: ../../../tcms/settings/product.py
+.. literalinclude:: ../../tcms/settings/product.py
    :language: python
 
 Start the django app
@@ -90,7 +90,7 @@ Deploying Django projects with Apache and mod_wsgi is the recommended way to get
 
 You can have a try with following apache confs:
 
-.. literalinclude:: ../../../contrib/conf/nitrate-httpd.conf
+.. literalinclude:: ../../contrib/conf/nitrate-httpd.conf
    :language: bash
 
 
@@ -101,7 +101,7 @@ With benchmark, we found Nginx + FCGI is faster than Apache + Mod_python.
 So deploying with Nginx will also be a good idea for production environment.
 Here are deployment confs about Nginx:
 
-.. literalinclude:: ../../../contrib/conf/nitrate-nginx.conf
+.. literalinclude:: ../../contrib/conf/nitrate-nginx.conf
    :language: bash
 
 
