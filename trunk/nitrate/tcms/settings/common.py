@@ -290,7 +290,7 @@ FOOTER_LINKS = ()
 # Attachement file download path
 # it could be spcified to a different out of MEDIA_URL
 # FILE_UPLOAD_DIR = path.join(MEDIA_DIR, 'uploads').replace('\\','/'),
-FILE_UPLOAD_DIR = '/var/tmp/uploads'
+FILE_UPLOAD_DIR = '/var/nitrate'
 
 #
 # Installation settings
