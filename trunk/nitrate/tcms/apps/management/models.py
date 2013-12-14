@@ -183,7 +183,6 @@ class Component(TCMSActionModel):
     class Meta:
         db_table = u'components'
         unique_together = ('product', 'name')
-        ordering = ['name', ]
     
     def __unicode__(self):
         return self.name

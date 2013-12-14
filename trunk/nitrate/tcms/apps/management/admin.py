@@ -45,6 +45,10 @@ class ComponentAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'product', 'initial_owner', 'description')
     list_filter = ('product', )
 
+    def queryset(self, request):
+        qs = super(ComponentAdmin, self).queryset(request)
+        return qs.select_related('product', 'initial_owner')
+
 class VersionAdmin(admin.ModelAdmin):
     search_fields = (('value','pk',))
     list_display = ('id', 'product', 'value')
