@@ -15,6 +15,7 @@
 # 
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
+#   Chenxiong Qi <cqi@redhat.com>
 
 from mailto import *
 
@@ -90,3 +91,59 @@ def clean_request(request, keys = None):
                 v = string_to_list(v)
             rt[k] = v
     return rt
+
+
+class QuerySetIterationProxy(object):
+    '''Iterate a series of object and its associated objects at once
+
+    This iteration proxy applies to this kind of structure especially.
+
+    Group       Properties          Logs
+    -------------------------------------------------
+    group 1     property 1          log at Mon.
+                property 2          log at Tue.
+                property 3          log at Wed.
+    -------------------------------------------------
+    group 2     property 4          log at Mon.
+                property 5          log at Tue.
+                property 6          log at Wed.
+    -------------------------------------------------
+    group 3     property 7          log at Mon.
+                property 8          log at Tue.
+                property 9          log at Wed.
+
+    where, in each row of the table, one or more than one properties and logs
+    to be shown along with the group.
+    '''
+
+    def __init__(self, iterable, associate_name=None, **associated_data):
+        '''Initialize proxy
+
+        Arguments:
+        - iterable: an iterable object representing the main set of objects.
+        - associate_name: the attribute name of each object within iterable,
+          from which value is retrieve to get associated data from
+          associate_data. Default is 'pk'.
+        - associate_data: the associated data, that contains all data for each
+          item in the set referenced by iterable. You can pass mulitple
+          associated data as the way of Python **kwargs. The associated data
+          must be grouped by the value of associate_name.
+        '''
+        self._iterable = iter(iterable)
+        self._associate_name = associate_name
+        if self._associate_name is None:
+            self._associate_name = 'pk'
+        self._associated_data = associated_data
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        next_one = self._iterable.next()
+        for name, lookup_table in self._associated_data.iteritems():
+            setattr(next_one,
+                    name,
+                    lookup_table.get(
+                        getattr(next_one, self._associate_name, None),
+                        ()))
+        return next_one

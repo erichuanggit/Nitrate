@@ -339,6 +339,7 @@ class TestEnvironmentElement(models.Model):
     def __unicode__(self):
         return self.name
 
+
 class TestEnvironmentProperty(models.Model):
     property_id = models.IntegerField(primary_key=True)
     element = models.ForeignKey(TestEnvironmentElement)
@@ -349,6 +350,7 @@ class TestEnvironmentProperty(models.Model):
     
     def __unicode__(self):
         return self.name
+
 
 class TestEnvironmentMap(models.Model):
     environment = models.ForeignKey(TestEnvironment, primary_key=True)
@@ -361,7 +363,10 @@ class TestEnvironmentMap(models.Model):
     def __unicode__(self):
         return self.value_selected
 
+
 # Test tag zone
+
+
 class TestTag(TCMSActionModel):
     id = models.AutoField(db_column='tag_id', max_length=10, primary_key=True)
     name = models.CharField(db_column='tag_name', max_length=255)
@@ -386,7 +391,9 @@ class TestTag(TCMSActionModel):
             tags.append(new_tag)
         return tags
 
+
 # Test attachements file zone
+
 
 class TestAttachment(models.Model):
     attachment_id = models.AutoField(max_length=10, primary_key=True)
@@ -407,6 +414,7 @@ class TestAttachment(models.Model):
     class Meta:
         db_table = u'test_attachments'
 
+
 class TestAttachmentData(models.Model):
     attachment = models.ForeignKey(TestAttachment, primary_key=True)
     contents = BlobField(blank=True)
@@ -416,6 +424,7 @@ class TestAttachmentData(models.Model):
 # ============================
 # New TCMS Environments models
 # ============================
+
 
 class TCMSEnvGroup(TCMSActionModel):
     name = models.CharField(unique=True, max_length=255)
@@ -432,17 +441,18 @@ class TCMSEnvGroup(TCMSActionModel):
         through='management.TCMSEnvGroupPropertyMap',
         related_name='group'
     )
-    
+
     class Meta:
         db_table = u'tcms_env_groups'
         ordering = ['name']
-    
+
     def __unicode__(self):
         return unicode(self.name)
-    
+
     @classmethod
     def get_active(cls):
         return cls.objects.filter(is_active=True)
+
 
 class TCMSEnvPlanMap(models.Model):
     plan = models.ForeignKey('testplans.TestPlan')
@@ -451,6 +461,7 @@ class TCMSEnvPlanMap(models.Model):
     class Meta:
         db_table = u'tcms_env_plan_map'
 
+
 class TCMSEnvProperty(TCMSActionModel):
     name = models.CharField(unique=True, max_length=255)
     is_active = models.BooleanField(default=True)
@@ -458,13 +469,14 @@ class TCMSEnvProperty(TCMSActionModel):
     class Meta:
         db_table = u'tcms_env_properties'
         ordering = ['name']
-    
+
     def __unicode__(self):
         return unicode(self.name)
-    
+
     @classmethod
     def get_active(cls):
         return cls.objects.filter(is_active=True)
+
 
 class TCMSEnvGroupPropertyMap(models.Model):
     group = models.ForeignKey(TCMSEnvGroup)
@@ -472,6 +484,7 @@ class TCMSEnvGroupPropertyMap(models.Model):
     
     class Meta:
         db_table = u'tcms_env_group_property_map'
+
 
 class TCMSEnvValue(TCMSActionModel):
     value = models.CharField(max_length=255)
@@ -488,6 +501,7 @@ class TCMSEnvValue(TCMSActionModel):
     @classmethod
     def get_active(cls):
         return cls.objects.filter(is_active=True)
+
 
 if register_model:
     register_model(Classification)

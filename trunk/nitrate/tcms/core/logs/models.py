@@ -28,12 +28,12 @@ class TCMSLogModel(TCMSContentTypeBaseModel):
     who = models.ForeignKey('auth.User', related_name='log_who')
     date = models.DateTimeField(auto_now_add=True)
     action = models.TextField()
-    
+
     objects = TCMSLogManager()
-    
+
     class Meta:
         abstract = False
         db_table = u'tcms_logs'
-    
+
     def __unicode__(self):
         return self.action

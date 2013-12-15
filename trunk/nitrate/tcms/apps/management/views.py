@@ -16,6 +16,8 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
+from itertools import groupby
+
 try:
     from django.db import IntegrityError
 except:
@@ -24,6 +26,7 @@ except:
 from django.utils.simplejson import dumps as json_dumps
 
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.utils import simplejson
 from django.core.urlresolvers import reverse
@@ -32,10 +35,13 @@ from django.template import RequestContext
 
 from tcms.apps.management.models import TCMSEnvGroup, TCMSEnvProperty, \
         TCMSEnvGroupPropertyMap, TCMSEnvValue
+from tcms.core.logs.models import TCMSLogModel
+from tcms.core.utils import QuerySetIterationProxy
 
 MODULE_NAME = "management"
 
 # Create your views here.
+
 
 def environment_groups(request, template_name = 'environment/groups.html'):
     """
@@ -141,11 +147,35 @@ def environment_groups(request, template_name = 'environment/groups.html'):
     else:
         env_groups = env_groups.all().order_by('is_active')
 
+    # Get properties for each group
+    qs = TCMSEnvGroupPropertyMap.objects.filter(group__in=env_groups)
+    qs = qs.values('group__pk', 'property__name')
+    qs = qs.order_by('group__pk', 'property__name').iterator()
+    properties = dict([(key, list(value)) for key, value in
+                       groupby(qs, lambda item: item['group__pk'])])
+
+    # Get logs for each group
+    env_group_ct = ContentType.objects.get_for_model(TCMSEnvGroup)
+    qs = TCMSLogModel.objects.filter(content_type=env_group_ct,
+                                     object_pk__in=env_groups)
+    qs = qs.values('object_pk', 'who__username', 'date', 'action')
+    qs = qs.order_by('object_pk').iterator()
+    # we have to convert object_pk to an integer due to it's a string stored in
+    # database.
+    logs = dict([(int(key), list(value)) for key, value in
+                 groupby(qs, lambda log: log['object_pk'])])
+
+    env_groups = env_groups.select_related('modified_by', 'manager').iterator()
+
+    env_groups = QuerySetIterationProxy(env_groups,
+                                        properties=properties,
+                                        another_logs=logs)
     context_data = {
         'environments': env_groups
     }
     return render_to_response(template_name, context_data,
                               context_instance=RequestContext(request))
+
 
 @user_passes_test(lambda u: u.has_perm('management.change_tcmsenvgroup'))
 def environment_group_edit(request, template_name = 'environment/group_edit.html'):
