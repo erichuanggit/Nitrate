@@ -17,8 +17,9 @@
 #   Xuqing Kuang <xkuang@redhat.com>
 
 from django.views.decorators.csrf import csrf_protect
-from django.views.generic.simple import direct_to_template
+from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
+from django.template import RequestContext
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.conf import settings
@@ -91,10 +92,12 @@ def bookmark(request, username, template_name = 'profile/bookmarks.html'):
             else:
                 bks = Bookmark.objects.filter(user = request.user)
 
-            return direct_to_template(request, template_name, {
+            context_data = {
                 'user_profile': up,
                 'bookmarks': bks,
-            })
+            }
+            return render_to_response(template_name, context_data,
+                                      context_instance=RequestContext(request))
 
         def render_form(self):
             query = request.GET.copy()
@@ -130,11 +133,13 @@ def profile(request, username, template_name = 'profile/info.html'):
         if form.is_valid():
             form.save()
             message = 'Information successfully updated.'
-    return direct_to_template(request, template_name, {
+    context_data = {
         'user_profile': up,
         'form': form,
         'message': message,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 @login_required
 def recent(request, username, template_name='profile/recent.html'):
@@ -163,7 +168,7 @@ def recent(request, username, template_name='profile/recent.html'):
     trs = TestRun.list(runs_query)
     test_plans_disable_count = tps.count() - tps_active.count()
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'user_profile': up,
         'test_plans_count': tps.count(),
@@ -171,7 +176,9 @@ def recent(request, username, template_name='profile/recent.html'):
         'test_runs_count': trs.count(),
         'last_15_test_plans': tps_active[:15],
         'last_15_test_runs': trs[:15],
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 @login_required
 def redirect_to_profile(request):

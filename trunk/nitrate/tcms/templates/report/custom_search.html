@@ -19,10 +19,10 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomSearch.on_load);
 
 {% block contents %}
 <div id="content">
-	<div class="sprites crumble"><a href="{% url tcms.core.views.index %}">Home</a> >> Custom Reporting</div>
+	<div class="sprites crumble"><a href="{% url "tcms.core.views.index" %}">Home</a> >> Custom Reporting</div>
 	<div class="itemSearch">
 		<h2>Report Options</h2>
-		<form id="id_form_search" action="{% url tcms.report.views.custom_search %}">
+		<form id="id_form_search" action="{% url "tcms.report.views.custom_search" %}">
 			{% include "report/form/search.html" %}
 			<div class="bottom">
 				<input type="submit" name="a" value="Search" title="Create report" />
@@ -51,12 +51,12 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomSearch.on_load);
 			<tr class="{% cycle 'even' 'odd' %}">
 				<td>
 					<input type="hidden" name="build_id" value="{{ build.pk }}" />
-					{% if build.plans_count %}<a class="build_link"  href="{% url tcms.report.views.custom_details %}" >{% endif %}{{ build }}</a>
+					{% if build.plans_count %}<a class="build_link"  href="{% url "tcms.report.views.custom_details" %}" >{% endif %}{{ build }}</a>
 				</td>
 				<td valign="top">{{ build.plans_count|default_if_none:0 }}</td>
 				<td valign="top">
                 {% if build.runs_count %}
-                <a href="{% url tcms.apps.testruns.views.all %}?product={{ build.product.pk }}&build={{ build.pk }}&product_version={{ REQUEST_CONTENTS.build_run__product_version }}">{{ build.runs_count }}</a>
+                <a href="{% url "tcms.apps.testruns.views.all" %}?product={{ build.product.pk }}&build={{ build.pk }}&product_version={{ REQUEST_CONTENTS.build_run__product_version }}">{{ build.runs_count }}</a>
                 {% else %}
                 {{ build.runs_count|default_if_none:0 }}
                 {% endif %}

@@ -18,9 +18,9 @@
 
 from django.conf import settings
 from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render_to_response
 from django.core.urlresolvers import reverse
-from django.views.generic.simple import direct_to_template
+from django.template import RequestContext
 
 from tcms.core.views import Prompt
 
@@ -87,9 +87,11 @@ def register(request, template_name='registration/registration_form.html'):
     else:
         form = RegistrationForm()
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'form': form,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 def confirm(request, activation_key):
     """

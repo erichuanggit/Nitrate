@@ -17,9 +17,10 @@
 #   Xuqing Kuang <xkuang@redhat.com>
 
 from django.db import connection, transaction
-from django.views.generic.simple import direct_to_template
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 
 from tcms.apps.testruns.models import TestRun, TestCaseRun
 from tcms.apps.management.models import Classification, Product, Component
@@ -47,11 +48,13 @@ def overall(request, template_name='report/list.html'):
         'cases_count': RawSQL.index_product_cases_count,
     })
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'products': products
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 def overview(request, product_id, template_name='report/overview.html'):
     """Product for a product"""
@@ -90,13 +93,15 @@ def overview(request, product_id, template_name='report/overview.html'):
             setattr(case_run_counter, row[0], row[1])
             setattr(case_run_counter, row[0] + '_percent', float(row[1]) / total * 100)
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'product': product,
         'runs_count': runs_count,
         'case_run_count': case_run_counter,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 def version(request, product_id, template_name='report/version.html'):
     """Version report for a product"""
@@ -142,14 +147,16 @@ def version(request, product_id, template_name='report/version.html'):
                 setattr(case_run_counter, row[0], row[1])
                 setattr(case_run_counter, row[0] + '_percent', float(row[1]) / total * 100)
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'product': product,
         'versions': versions,
         'version': current_version,
         'case_run_count': case_run_counter,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 def build(request, product_id, template_name='report/build.html'):
     """Build report for a product"""
@@ -190,14 +197,16 @@ def build(request, product_id, template_name='report/build.html'):
                 setattr(case_run_counter, row[0], row[1])
                 setattr(case_run_counter, row[0] + '_percent', float(row[1]) / total * 100)
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'product': product,
         'builds': builds,
         'build': current_build,
         'case_run_count': case_run_counter
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 def component(request, product_id, template_name='report/component.html'):
     """Component report for a product"""
@@ -240,14 +249,16 @@ def component(request, product_id, template_name='report/component.html'):
                 setattr(case_run_counter, row[0], row[1])
                 setattr(case_run_counter, row[0] + '_percent', float(row[1]) / total * 100)
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'product': product,
         'components': components,
         'component': current_component,
         'case_run_count': case_run_counter
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 def custom_search(request, template_name='report/custom_search.html'):
     """Custom report with search function"""
@@ -281,7 +292,7 @@ def custom_search(request, template_name='report/custom_search.html'):
         form = CustomSearchForm()
         tbs = TestBuild.objects.none()
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'form': form,
@@ -292,7 +303,9 @@ def custom_search(request, template_name='report/custom_search.html'):
         'auto_count': auto_count,
         'both_count': both_count,
         'total_count': manual_count + auto_count + both_count,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 def custom_details(request, template_name='report/custom_details.html'):
     """Custom report with search function"""
@@ -344,7 +357,7 @@ def custom_details(request, template_name='report/custom_details.html'):
             for s, n in cursor.fetchall():
                 setattr(tr, s, n)
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'form': form,
@@ -357,7 +370,9 @@ def custom_details(request, template_name='report/custom_details.html'):
         'manual_count': manual_count,
         'auto_count': auto_count,
         'both_count': both_count,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 def view_test_run_report(request):
     templates = {
@@ -390,4 +405,5 @@ def view_test_run_report(request):
     if request_path:
         path_without_build = remove_from_request_path(request_path, 'r_build')
     data.update(locals())
-    return direct_to_template(request, tmpl, data)
+    return render_to_response(tmpl, data,
+                              context_instance=RequestContext(request))

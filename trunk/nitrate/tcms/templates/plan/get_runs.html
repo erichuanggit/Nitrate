@@ -54,7 +54,7 @@
 	</form>
 </div>
 
-<form id='id_form_run' action="{% url tcms.apps.testruns.views.clone %}" method="get">
+<form id='id_form_run' action="{% url "tcms.apps.testruns.views.clone" %}" method="get">
 	<input type="hidden" name="from_plan" value="{{ test_plan.pk }}" />
 	<input type="hidden" name="product" value="{{ test_plan.product.pk }}" />
 	<input type="hidden" name="product_version" value="{{ test_plan.get_version_id }}" />

@@ -18,7 +18,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.List.on_load);
 {% block contents %}
 <div id="content">
 	<div class="sprites crumble">
-		<a href="{% url tcms.core.views.index %}">Home</a>
+		<a href="{% url "tcms.core.views.index" %}">Home</a>
 		>>Report
 	</div>
 	{% include 'report/nav.html' %}

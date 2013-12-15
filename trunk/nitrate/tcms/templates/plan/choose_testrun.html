@@ -22,8 +22,8 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.ChooseRuns.on_load);
 {% block contents %}
 <div id="content">
 	<div class="sprites crumble">
-		<a href="{% url tcms.core.views.index %}">Home</a>
-		>> <a href="{% url tcms.apps.testplans.views.all %}">...</a>
+		<a href="{% url "tcms.core.views.index" %}">Home</a>
+		>> <a href="{% url "tcms.apps.testplans.views.all" %}">...</a>
 		>> <a href="{{ plan.get_absolute_url }}">[{{plan.plan_id}}]{{plan.name}}</a>
 		>> Add test case to runs
 	</div>
@@ -49,7 +49,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.ChooseRuns.on_load);
 							<input type="checkbox" name="run"  value="{{ test_run.run_id }}"/>
 						</td>
 						<td>
-							<a href="{% url tcms.apps.testruns.views.get test_run.run_id %}">{{ test_run.run_id }}</a>
+							<a href="{% url "tcms.apps.testruns.views.get" test_run.run_id %}">{{ test_run.run_id }}</a>
 						</td>
 						<td >
 							{{ test_run.summary }}
@@ -108,7 +108,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.ChooseRuns.on_load);
 							</a>
 						</td>
 						<td>
-							<a href="{% url tcms.apps.testcases.views.get test_case.case_id %}">{{ test_case.case_id }}</a>
+							<a href="{% url "tcms.apps.testcases.views.get" test_case.case_id %}">{{ test_case.case_id }}</a>
 							<input type="hidden" name="case" value="{{ test_case.case_id }}">
 						</td>
 						<td onclick="toggleTestCaseContents('{{ forloop.counter }}')">

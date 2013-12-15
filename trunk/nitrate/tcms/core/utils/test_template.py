@@ -20,5 +20,6 @@ def test_template(request, template_name):
     """
     Test the template appearence
     """
-    from django.views.generic.simple import direct_to_template
-    return direct_to_template(request, template_name)
+    from django.shortcuts import render_to_response
+    from django.template import RequestContext
+    return render_to_response(template_name, RequestContext(request))

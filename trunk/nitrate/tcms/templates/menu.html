@@ -1,73 +1,73 @@
 <div class="sprites menu">
 	<ul id="nav">
-		<li class="nav_li {% ifequal module 'index' %} current {% endifequal %}" onclick="window.location='{% url tcms.core.views.index %}'">
-			<a href="{% url tcms.core.views.index %}">HOME</a>
+		<li class="nav_li {% ifequal module 'index' %} current {% endifequal %}" onclick="window.location='{% url "tcms.core.views.index" %}'">
+			<a href="{% url "tcms.core.views.index" %}">HOME</a>
 		</li>
 		<li class="sprites menuline"></li>
-		<li class="nav_li{% ifequal module 'testplans' %} current{% endifequal %}" onclick="window.location='{% url tcms.apps.testplans.views.all %}'">
-			<a	href="{% url tcms.apps.testplans.views.all %}">PLANNING</a>
+		<li class="nav_li{% ifequal module 'testplans' %} current{% endifequal %}" onclick="window.location='{% url "tcms.apps.testplans.views.all" %}'">
+			<a	href="{% url "tcms.apps.testplans.views.all" %}">PLANNING</a>
 			<ul class="nav_sub sub_plan" style="display: none;">
-				<li {% ifequal sub_module 'plans' %} class="subcurrent"{% endifequal %} onclick="window.location='{% url tcms.apps.testplans.views.all %}'">
-					<a href="{% url tcms.apps.testplans.views.all %}">Search Plans</a>
+				<li {% ifequal sub_module 'plans' %} class="subcurrent"{% endifequal %} onclick="window.location='{% url "tcms.apps.testplans.views.all" %}'">
+					<a href="{% url "tcms.apps.testplans.views.all" %}">Search Plans</a>
 				</li>
 				{% if user.is_authenticated %}
-				<li {% ifequal sub_module 'my_plans' %} class="subcurrent"{% endifequal %} onclick="window.location='{% url tcms.apps.testplans.views.all %}?author__email__startswith={{ user.email }}'">
-					<a href="{% url tcms.apps.testplans.views.all %}?author__email__startswith={{ user.email }}">My Plans</a>
+				<li {% ifequal sub_module 'my_plans' %} class="subcurrent"{% endifequal %} onclick="window.location='{% url "tcms.apps.testplans.views.all" %}?author__email__startswith={{ user.email }}'">
+					<a href="{% url "tcms.apps.testplans.views.all" %}?author__email__startswith={{ user.email }}">My Plans</a>
 				</li>
 				{% endif %}
 				{% if perms.testplans.add_testplan %}
-				<li {% ifequal sub_module 'new_plan' %} class="subcurrent"{% endifequal %} onclick="window.location='{% url tcms.apps.testplans.views.new %}'">
-					<a href="{% url tcms.apps.testplans.views.new %}">New Plan</a>
+				<li {% ifequal sub_module 'new_plan' %} class="subcurrent"{% endifequal %} onclick="window.location='{% url "tcms.apps.testplans.views.new" %}'">
+					<a href="{% url "tcms.apps.testplans.views.new" %}">New Plan</a>
 				</li>
 				{% endif %}
 			</ul>
 		</li>
 		<li class="sprites menuline"></li>
-		<li class="nav_li{% ifequal module 'testruns' %} current{% endifequal %}" onclick="window.location='{% url tcms.apps.testruns.views.all %}'">
-			<a href="{% url tcms.apps.testruns.views.all %}">TESTING</a>
+		<li class="nav_li{% ifequal module 'testruns' %} current{% endifequal %}" onclick="window.location='{% url "tcms.apps.testruns.views.all" %}'">
+			<a href="{% url "tcms.apps.testruns.views.all" %}">TESTING</a>
 			<ul id="submenu_test" class="nav_sub" style="display:none;">
-				<li {% ifequal sub_module 'runs' %} class="subcurrent"{% endifequal %} onclick="window.location='{% url tcms.apps.testruns.views.all %}'">
-					<a href="{% url tcms.apps.testruns.views.all %}">Search Runs</a>
+				<li {% ifequal sub_module 'runs' %} class="subcurrent"{% endifequal %} onclick="window.location='{% url "tcms.apps.testruns.views.all" %}'">
+					<a href="{% url "tcms.apps.testruns.views.all" %}">Search Runs</a>
 				</li>
-				<li {% ifequal sub_module 'cases' %} class="subcurrent"{% endifequal %} onclick="window.location='{% url tcms.apps.testcases.views.search %}'">
-					<a href="{% url tcms.apps.testcases.views.search %}">Search Cases</a>
+				<li {% ifequal sub_module 'cases' %} class="subcurrent"{% endifequal %} onclick="window.location='{% url "tcms.apps.testcases.views.search" %}'">
+					<a href="{% url "tcms.apps.testcases.views.search" %}">Search Cases</a>
 				</li>
 				{% if user.is_authenticated %}
-				<li {% ifequal sub_module 'my_runs' %} class="subcurrent"{% endifequal %} onclick="window.location='{% url tcms.apps.testruns.views.all %}?people={{ user.email }}'">
-					<a href="{% url tcms.apps.testruns.views.all %}?people={{ user.email }}">My Runs</a>
+				<li {% ifequal sub_module 'my_runs' %} class="subcurrent"{% endifequal %} onclick="window.location='{% url "tcms.apps.testruns.views.all" %}?people={{ user.email }}'">
+					<a href="{% url "tcms.apps.testruns.views.all" %}?people={{ user.email }}">My Runs</a>
 				</li>
 				{% endif %}
 				{% if perms.testcases.add_testcase %}
 				<li>
-					<a href="{% url tcms.apps.testcases.views.new %}">New Case</a>
+					<a href="{% url "tcms.apps.testcases.views.new" %}">New Case</a>
 				</li>
 				{% endif %}
 			</ul>
 		</li>
 		<li class="sprites menuline"></li>
-		<li class="nav_li{% ifequal module 'env' %} current{% endifequal %} " onclick="window.location='{% url tcms.apps.management.views.environment_groups %}'">
-			<a href="{% url tcms.apps.management.views.environment_groups %}">ENVIRONMENT</a>
+		<li class="nav_li{% ifequal module 'env' %} current{% endifequal %} " onclick="window.location='{% url "tcms.apps.management.views.environment_groups" %}'">
+			<a href="{% url "tcms.apps.management.views.environment_groups" %}">ENVIRONMENT</a>
 			<ul	 id="submenu_environment" class="nav_sub"  style="display:none;">
-				<li onclick="window.location='{% url tcms.apps.management.views.environment_groups %}'">
-					<a href="{% url tcms.apps.management.views.environment_groups %}">Groups</a>
+				<li onclick="window.location='{% url "tcms.apps.management.views.environment_groups" %}'">
+					<a href="{% url "tcms.apps.management.views.environment_groups" %}">Groups</a>
 				</li>
-				<li onclick="window.location='{% url tcms.apps.management.views.environment_properties %}'">
-					<a href="{% url tcms.apps.management.views.environment_properties %}">Properties</a>
+				<li onclick="window.location='{% url "tcms.apps.management.views.environment_properties" %}'">
+					<a href="{% url "tcms.apps.management.views.environment_properties" %}">Properties</a>
 				</li>
 			</ul>
 		</li>
 		<li class="sprites menuline"></li>
-		<li class="nav_li {% ifequal module 'report' %} current{% endifequal %}" onclick="window.location='{% url tcms.report.views.overall %}'">
-		<a href="{% url tcms.report.views.overall %}">REPORTING</a>
+		<li class="nav_li {% ifequal module 'report' %} current{% endifequal %}" onclick="window.location='{% url "tcms.report.views.overall" %}'">
+		<a href="{% url "tcms.report.views.overall" %}">REPORTING</a>
 			<ul	 id="submenu_report" class="nav_sub"  style="display:none;">
-				<li onclick="window.location='{% url tcms.report.views.overall %}'">
-					<a href="{% url tcms.report.views.overall %}">Overall</a>
+				<li onclick="window.location='{% url "tcms.report.views.overall" %}'">
+					<a href="{% url "tcms.report.views.overall" %}">Overall</a>
 				</li>
-				<li onclick="window.location='{% url tcms.report.views.custom_search %}'">
-					<a href="{% url tcms.report.views.custom_search %}">Custom</a>
+				<li onclick="window.location='{% url "tcms.report.views.custom_search" %}'">
+					<a href="{% url "tcms.report.views.custom_search" %}">Custom</a>
 				</li>
-				<li onclick="window.location='{% url testrun_report %}'">
-					<a href="{% url testrun_report %}">Testing Report</a>
+				<li onclick="window.location='{% url "testrun_report" %}'">
+					<a href="{% url "testrun_report" %}">Testing Report</a>
 				</li>
 			</ul>
 		
@@ -103,7 +103,7 @@
 		{% endif %}
 	</ul>
 	<div class="right-action">
-		<form action="{% url tcms.core.views.search %}" method="get">
+		<form action="{% url "tcms.core.views.search" %}" method="get">
 			<span>
 				<select id="search_type" name="search_type">
 					<option value="plans"{% ifequal module 'testplans' %} selected{% endifequal %}>Test Plan</option>

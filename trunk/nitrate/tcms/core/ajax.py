@@ -34,7 +34,8 @@ from django.dispatch import Signal
 from django.http import Http404
 from django.http import HttpResponse
 from django.utils import simplejson
-from django.views.generic.simple import direct_to_template
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 
 from tcms.apps.management.models import Component, TestBuild, Version
 from tcms.apps.management.models import Priority
@@ -294,10 +295,12 @@ def tag(request, template_name="management/get_tag.html"):
             'num_runs': 'SELECT COUNT(*) FROM test_run_tags WHERE test_tags.tag_id = test_run_tags.tag_id',
         })
 
-        return direct_to_template(request, template_name, {
+        context_data = {
             'tags': tags,
             'object': obj[0],
-        })
+        }
+        return render_to_response(template_name, context_data,
+                                  context_instance=RequestContext(request))
     return HttpResponse('')
 
 

@@ -18,8 +18,9 @@
 
 from datetime import datetime
 from django.contrib.auth.decorators import user_passes_test
-from django.views.generic.simple import direct_to_template
 from django.core.urlresolvers import reverse
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 
 from tcms.apps.testplans.models import TestPlan
@@ -71,12 +72,14 @@ def new(request, plan_id, template_name='review/new.html'):
 
     num_confirmed_cases = tcs.filter(case_status__name = 'CONFIRMED').count()
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'testplan': tp,
         'testcases': tcs,
         'form': form,
         'num_confirmed_cases': num_confirmed_cases,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 def get(request, review_id, template_name='review/get.html'):
     """Display the review and change the case status"""
@@ -95,11 +98,13 @@ def get(request, review_id, template_name='review/get.html'):
         'reviewer', 'case__case_status', 'case__priority'
     )
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'test_review': trv,
         'test_review_cases': trcs,
         'test_case_status': TestCaseStatus.objects.all()
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
 def change_case_status(request, review_id, template_name='review/get_case.html'):
@@ -122,11 +127,13 @@ def change_case_status(request, review_id, template_name='review/get_case.html')
         raise Http404(error)
 
     if trvc.case.case_status_id == request.REQUEST.get('case_status_id'):
-        return direct_to_template(request, template_name, {
+        context_data = {
             'forloop': forloop,
             'test_review_case': trvc,
             'message': 'No changes for the case.'
-        })
+        }
+        return render_to_response(template_name, context_data,
+                                  context_instance=RequestContext(request))
     try:
         tc_status = TestCaseStatus.objects.get(
             id = request.REQUEST['case_status_id']
@@ -163,8 +170,10 @@ def change_case_status(request, review_id, template_name='review/get_case.html')
     )
     trvc = trvc.get(id = request.REQUEST.get('review_case_id'))
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'forloop': forloop,
         'test_review_case': trvc,
         'test_case_status': TestCaseStatus.objects.all()
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))

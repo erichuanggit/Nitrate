@@ -42,7 +42,7 @@ def get_package_data():
     # annoyingly, it appears that package_data has to list filenames; it can't
     # cope with directories, so we have to figure this out for it:
     result = {
-        '': [] + list(get_files_below('../templates')) + list(get_files_below('../media')) + list(get_files_below('../docs')),
+        '': [] + list(get_files_below('../templates')) + list(get_files_below('../static')) + list(get_files_below('../docs')),
     }
     return result
 

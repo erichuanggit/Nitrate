@@ -19,7 +19,8 @@
 from django.db import models
 from django.http import HttpResponse
 from django.utils import simplejson
-from django.views.generic.simple import direct_to_template
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 
 from django.contrib import comments
 from django.contrib.comments.views.utils import next_redirect, confirmation_view
@@ -48,9 +49,11 @@ def all(request, template_name='comments/comments.html'):
     except:
         raise
     
-    return direct_to_template(request, template_name, {
+    context_data = {
         'object': target,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 def post(request, template_name='comments/comments.html'):
     """
@@ -80,10 +83,12 @@ def post(request, template_name='comments/comments.html'):
     # Construct the comment form
     form = comments.get_form()(target, data=data)
     if not form.is_valid():
-        return direct_to_template(request, template_name, {
+        context_data = {
             'object': target,
             'form': form,
-        })
+        }
+        return render_to_response(template_name, context_data,
+                                  context_instance=RequestContext(request))
     
     # Otherwise create the comment
     comment = form.get_comment_object()
@@ -107,10 +112,12 @@ def post(request, template_name='comments/comments.html'):
         request = request
     )
     
-    return direct_to_template(request, template_name, {
+    context_data = {
         'object': target,
         'form': form,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 #@permission_required("comments.delete_comment")
 def delete(request, next=None):

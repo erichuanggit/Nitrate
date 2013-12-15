@@ -24,10 +24,11 @@ except:
 from django.utils.simplejson import dumps as json_dumps
 
 from django.contrib.auth.decorators import user_passes_test
-from django.views.generic.simple import direct_to_template
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.utils import simplejson
 from django.core.urlresolvers import reverse
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 
 from tcms.apps.management.models import TCMSEnvGroup, TCMSEnvProperty, \
         TCMSEnvGroupPropertyMap, TCMSEnvValue
@@ -140,9 +141,11 @@ def environment_groups(request, template_name = 'environment/groups.html'):
     else:
         env_groups = env_groups.all().order_by('is_active')
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'environments': env_groups
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 @user_passes_test(lambda u: u.has_perm('management.change_tcmsenvgroup'))
 def environment_group_edit(request, template_name = 'environment/group_edit.html'):
@@ -162,12 +165,14 @@ def environment_group_edit(request, template_name = 'environment/group_edit.html
         de = TCMSEnvGroup.objects.get(name = request.REQUEST.get('name'))
         if environment != de:
             response = 'Duplicated name already exists, please change to another name.'
-            return direct_to_template(request, template_name, {
+            context_data = {
                 'environment': environment,
                 'properties': TCMSEnvProperty.get_active(),
                 'selected_properties': environment.property.all(),
                 'message': response,
-            })
+            }
+            return render_to_response(template_name, context_data,
+                                      context_instance=RequestContext(request))
     except TCMSEnvGroup.DoesNotExist, error:
         pass
 
@@ -210,12 +215,14 @@ def environment_group_edit(request, template_name = 'environment/group_edit.html
 
         response = 'Environment group saved successfully.'
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'environment': environment,
         'properties': TCMSEnvProperty.get_active(),
         'selected_properties': environment.property.all(),
         'message': response,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 def environment_properties(request, template_name = 'environment/property.html'):
     """
@@ -346,10 +353,12 @@ def environment_properties(request, template_name = 'environment/property.html')
     if request.is_ajax():
         return HttpResponse('Unknown action')
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'message': message,
         'properties': TCMSEnvProperty.objects.all().order_by('-is_active')
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 def environment_property_values(request, template_name = 'environment/ajax/property_values.html'):
     """
@@ -419,8 +428,10 @@ def environment_property_values(request, template_name = 'environment/ajax/prope
         )
 
     values = property.value.all()
-    return direct_to_template(request, template_name, {
+    context_data = {
         'property': property,
         'values': values,
         'message': message,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))

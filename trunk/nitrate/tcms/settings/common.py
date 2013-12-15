@@ -16,43 +16,41 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-# Django default settings for tcms project.
+# Django settings for tcms project.
 
+import django.conf.global_settings as DEFAULT_SETTINGS
 import os.path
 
-# Debug settings
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-DEBUG_PROPAGATE_EXCEPTIONS = False
-
-# Administrators error report email settings
 
 ADMINS = (
-    # ('Your Name', 'your_email@domain.com'),
+    # ('Your Name', 'your_email@example.com'),
 )
 
 MANAGERS = ADMINS
 
-# Database settings
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': '',                      # Or path to database file if using sqlite3.
+        # The following settings are not used with sqlite3:
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'PORT': '',                      # Set to empty string for default.
+    }
+}
 
-DATABASE_ENGINE = 'mysql'     # 'postgresql_psycopg2', 'postgresql',
-                                # 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'testopia'        # Or path to database file if using sqlite3.
-DATABASE_USER = 'root'              # Not used with sqlite3.
-DATABASE_PASSWORD = ''          # Not used with sqlite3.
-DATABASE_HOST = ''              # Set to empty string for localhost.
-                                # Not used with sqlite3.
-DATABASE_PORT = '3306'              # Set to empty string for default.
-                                # Not used with sqlite3.
-
-DATABASE_OPTIONS = {}
+# Hosts/domain names that are valid for this site; required if DEBUG is False
+# See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
+ALLOWED_HOSTS = []
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
-# If running in a Windows environment this must be set to the same as your
-# system time zone.
+# In a Windows environment this must be set to your system time zone.
 TIME_ZONE = 'Asia/Shanghai'
 
 # Language code for this installation. All choices can be found here:
@@ -65,14 +63,21 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
-# Absolute path to the directory that holds media.
-# Example: "/home/media/media.lawrence.com/"
+# If you set this to False, Django will not format dates, numbers and
+# calendars according to the current locale.
+USE_L10N = True
+
+# If you set this to False, Django will not use timezone-aware datetimes.
+USE_TZ = False
+
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+# Example: "/var/www/example.com/media/"
 MEDIA_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'media').replace('\\','/'))
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
-# trailing slash if there is a path component (optional in other cases).
-# Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = '/media'
+# trailing slash.
+# Examples: "http://example.com/media/", "http://media.example.com/"
+MEDIA_URL = '/media/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -83,31 +88,31 @@ ADMIN_MEDIA_PREFIX = '/admin_media/'
 ADMIN_PREFIX = '/admin'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 't&xaxmguqrfksbmrn3ltt8xcb61k71dzsr6a58k8-^$$!92k_x'
+SECRET_KEY = '^8y!)$0t7yq2+65%&_#@i^_o)eb3^q--y_$e7a_=t$%$1i)zuv'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
-#     'django.template.loaders.eggs.load_template_source',
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'tcms.core.middleware.CsrfDisableMiddleware',
-    'django.contrib.csrf.middleware.CsrfMiddleware',
-    'django.contrib.csrf.middleware.CsrfViewMiddleware',
-    'django.contrib.csrf.middleware.CsrfResponseMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'tcms.core.lib.django-pagination.pagination.middleware.PaginationMiddleware',
 )
 
 ROOT_URLCONF = 'tcms.urls'
 
+# Python dotted path to the WSGI application used by Django's runserver.
+WSGI_APPLICATION = 'tcms.wsgi.application'
+
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates"
-    # or "C:/www/django/templates".
+    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'templates/').replace('\\','/')),
@@ -118,6 +123,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'django.contrib.messages',
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.comments',
@@ -141,15 +147,11 @@ INSTALLED_APPS = (
     'tcms.integration.apps.bugzilla',
 )
 
-# RequestContext settings
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.auth',
+TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_SETTINGS.TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
-    'django.core.context_processors.media',
-    'django.core.context_processors.debug',
     'tcms.core.context_processors.admin_prefix_processor',
-    'tcms.core.context_processors.admin_media_prefix_processor',
     'tcms.core.context_processors.auth_backend_processor',
     'tcms.core.context_processors.request_contents_processor',
     'tcms.core.context_processors.settings_processor',
@@ -159,7 +161,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 # Default apps settings
 #
 
-# Defene the custom comment app
+# Define the custom comment app
 # http://docs.djangoproject.com/en/dev/ref/contrib/comments/custom/
 
 COMMENTS_APP = 'tcms.core.contrib.comments'
@@ -215,14 +217,6 @@ DEBUG_LEVEL = 0
 # Needed by django.core.context_processors.debug:
 # See http://docs.djangoproject.com/en/dev/ref/templates/api/#django-core-context-processors-debug
 INTERNAL_IPS = ('127.0.0.1', )
-
-#
-# Plugins
-#
-SIGNAL_PLUGINS = (
-    # 'tcms.plugins.example',
-    # 'tcms.plugins.qpid',
-)
 
 # Authentication backends
 # For the login/register/logout reaon, we only support the internal auth backends.
@@ -327,3 +321,32 @@ USER_GUIDE_URL = 'https://riddler.bne.redhat.com/TCMS-User_Guide/index.html'
 # Default page size for showing each possible query result. This provides a
 # consistent user experiece to users.
 DEFAULT_PAGE_SIZE = 20
+
+# A sample logging configuration. The only tangible logging
+# performed by this configuration is to send an email to
+# the site admins on every HTTP 500 error when DEBUG=False.
+# See http://docs.djangoproject.com/en/dev/topics/logging for
+# more details on how to customize your logging configuration.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        }
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    }
+}

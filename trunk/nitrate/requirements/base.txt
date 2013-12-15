@@ -1,4 +1,4 @@
-Django==1.2.3
+Django==1.5.5
 MySQL-python==1.2.4
 kerberos==1.1.1
 lxml==3.2.4

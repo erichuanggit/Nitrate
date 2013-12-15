@@ -18,6 +18,7 @@
 
 from django.conf import settings
 from django.conf.urls.defaults import *
+from django.views.generic.base import RedirectView
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -165,7 +166,7 @@ urlpatterns = patterns('',
     # Management ajax zone
 
     # Report zone
-    (r'^report/$', 'django.views.generic.simple.redirect_to', {'url': 'overall/'}),
+    (r'^report/$', RedirectView.as_view(url='overall/')),
     (r'^report/overall/$', 'tcms.report.views.overall'),
     (r'^report/product/(?P<product_id>\d+)/overview/$', 'tcms.report.views.overview'),
     (r'^report/product/(?P<product_id>\d+)/version/$', 'tcms.report.views.version'),

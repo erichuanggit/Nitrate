@@ -23,8 +23,8 @@ import urllib
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Q
 from django.contrib.auth.models import User
-from django.views.generic.simple import direct_to_template
 from django.core.urlresolvers import reverse
+from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -206,7 +206,7 @@ def new(request, template_name='run/new.html'):
         form.populate(product_id=tp.product_id)
 
     # FIXME: pagination cases within Create New Run page.
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'from_plan': plan_id,
@@ -214,7 +214,9 @@ def new(request, template_name='run/new.html'):
         'test_cases': tcs,
         'form': form,
         'num_unconfirmed_cases': num_unconfirmed_cases,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 
 @user_passes_test(lambda u: u.has_perm('testruns.delete_testrun'))
@@ -320,14 +322,16 @@ def all(request, template_name = 'run/all.html'):
     else:
         query_url = '%s&asc=True' % query_url
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_runs': trs,
         'query_result': query_result,
         'search_form': search_form,
         'query_url': query_url,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 def run_queryset_from_querystring(querystring):
     """Setup a run queryset from a querystring.
@@ -379,10 +383,13 @@ def load_runs_of_one_plan(request, plan_id, template_name='plan/plan_runs_part.h
     except EmptyPage:
         runs = queryset.none()
 
-    response = direct_to_template(request, template_name, {
+    context_data = {
             'test_runs': runs,
             'test_plan': tp
-        })
+    }
+    response = render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
+
     return HttpResponse(simplejson.dumps({
             'html': response.content,
             'numPages': paginator.num_pages,
@@ -567,7 +574,7 @@ def get(request, run_id, template_name='run/get.html'):
     tcr_bugs = set(tcr_bugs)
     # Get tag list of testcases
     ttags = TestTag.objects.filter(testcase__in=tcs).order_by('name').distinct()
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_run': tr,
@@ -579,7 +586,9 @@ def get(request, run_id, template_name='run/get.html'):
         'priorities': Priority.objects.all(),
         'case_own_tags': ttags,
         'errata_url_prefix': settings.ERRATA_URL_PREFIX,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 
 @user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
@@ -653,12 +662,14 @@ def edit(request, run_id, template_name='run/edit.html'):
         })
         form.populate(product_id=tr.build.product_id)
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_run': tr,
         'form': form,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 
 @user_passes_test(lambda u: u.has_perm('testruns.change_testcaserun'))
@@ -807,13 +818,15 @@ def new_run_with_caseruns(request,run_id,template_name='run/clone.html'):
 
         form.populate(product_id=tr.plan.product_id)
 
-        return direct_to_template(request,template_name,{
+        context_data = {
             'module':MODULE_NAME,
             'sub_module':SUB_MODULE_NAME,
             'clone_form':form,
             'test_run':tr,
             'cases_run':tcrs,
-        })
+        }
+        return render_to_response(template_name, context_data,
+                                  context_instance=RequestContext(request))
 
 
 def clone(request, template_name='run/clone.html'):
@@ -853,13 +866,15 @@ def clone(request, template_name='run/clone.html'):
         })
         form.populate(product_id=tr.plan.product_id)
 
-        return direct_to_template(request, template_name, {
+        context_data = {
             'module': MODULE_NAME,
             'sub_module': SUB_MODULE_NAME,
             'clone_form': form,
             'test_run': tr,
             'cases_run': tcrs,
-        })
+        }
+        return render_to_response(template_name, context_data,
+                                  context_instance=RequestContext(request))
 
     # Process multiple runs clone page
     template_name = 'run/clone_multiple.html'
@@ -937,11 +952,13 @@ def clone(request, template_name='run/clone.html'):
                 'clone_tag': True,})
         form.populate(trs=trs)
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'clone_form': form,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 
 def order_case(request, run_id):
@@ -1057,14 +1074,16 @@ def assign_case(request, run_id, template_name="run/assign_case.html"):
 
         return HttpResponseRedirect(reverse('tcms.apps.testruns.views.get', args=[tr.run_id, ]))
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_run': tr,
         'confirmed_cases': ctcs,
         'test_case_run': tcrs,
         'exist_case_run_ids': etcrs_id,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 
 def cc(request, run_id):
@@ -1077,10 +1096,12 @@ def cc(request, run_id):
 
     if request.REQUEST.get('do'):
         if not request.REQUEST.get('user'):
-            return direct_to_template(request, 'run/get_cc.html', {
+            context_data = {
                 'test_run': tr,
                 'message': 'User name or email is required by this operation'
-            })
+            }
+            return render_to_response('run/get_cc.html', context_data,
+                                      context_instance=RequestContext(request))
 
         try:
             user = User.objects.get(
@@ -1088,19 +1109,22 @@ def cc(request, run_id):
                 | Q(email=request.REQUEST['user'])
             )
         except ObjectDoesNotExist, error:
-            return direct_to_template(request, 'run/get_cc.html', {
+            context_data = {
                 'test_run': tr,
                 'message': 'The user you typed does not exist in database'
-            })
+            }
+            return render_to_response('run/get_cc.html', context_data,
+                                      context_instance=RequestContext(request))
+
         if request.REQUEST['do'] == 'add':
             tr.add_cc(user=user)
 
         if request.REQUEST['do'] == 'remove':
             tr.remove_cc(user=user)
 
-    return direct_to_template(request,
-                              'run/get_cc.html',
-                              {'test_run': tr,})
+    context_data = {'test_run': tr,}
+    return render_to_response('run/get_cc.html', context_data,
+                              context_instance=RequestContext(request))
 
 
 def update_case_run_text(request, run_id):
@@ -1295,8 +1319,8 @@ def caseruns(request, templ='report/caseruns.html'):
         caseruns = get_caseruns_of_runs(runs, queries)
         context['test_case_runs'] = caseruns
         context['runs'] = runs
-    response = direct_to_template(request, templ, context)
-    return response
+    return render_to_response(templ, context,
+                              context_instance=RequestContext(request))
 
 def get_caseruns_of_runs(runs, kwargs=None):
     '''

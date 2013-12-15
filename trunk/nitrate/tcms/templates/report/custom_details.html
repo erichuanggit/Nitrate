@@ -21,9 +21,9 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 
 {% block contents %}
 <div id="content">
-	<div class="sprites crumble"><a href="{% url tcms.core.views.index %}">Home</a> >> <a href="{% url tcms.report.views.custom_search %}">Custom</a> >> {% for build in builds %}{{ build }}{% endfor %}</div>
+	<div class="sprites crumble"><a href="{% url "tcms.core.views.index" %}">Home</a> >> <a href="{% url "tcms.report.views.custom_search" %}">Custom</a> >> {% for build in builds %}{{ build }}{% endfor %}</div>
 	<div class="report_title_bg">
-		<form action="{% url tcms.report.views.custom_details %}">
+		<form action="{% url "tcms.report.views.custom_details" %}">
 			{{ form.product.label }}: {{ form.product }}<br />
 			{{ form.pk__in.label }}: {{ form.pk__in }}<br />
 			<input type="submit" value="Submit" />
@@ -83,63 +83,63 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 				<td valign="top"><a href="{{ test_run.get_url_path }}">[{{ test_run.pk }}] {{ test_run.summary }}</a></td>
 				<td valign="top">
                 {% if test_run.IDLE %}
-                {#}<a href="{% url tcms.apps.testruns.views.get test_run.pk %}?case_run_status=idel">{{ test_run.IDLE }}</a>{#}
+                {#}<a href="{% url "tcms.apps.testruns.views.get" test_run.pk %}?case_run_status=idel">{{ test_run.IDLE }}</a>{#}
 				{{ test_run.IDLE }}
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.RUNNING %}
-                {#}<a href="{% url tcms.apps.testruns.views.get test_run.pk %}?case_run_status=running">{{ test_run.RUNNING }}</a>{#}
+                {#}<a href="{% url "tcms.apps.testruns.views.get" test_run.pk %}?case_run_status=running">{{ test_run.RUNNING }}</a>{#}
 				{{ test_run.RUNNING }}
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.PAUSED %}
-                {#}<a href="{% url tcms.apps.testruns.views.get test_run.pk %}?case_run_status=paused">{{ test_run.PAUSED }}</a>{#}
+                {#}<a href="{% url "tcms.apps.testruns.views.get" test_run.pk %}?case_run_status=paused">{{ test_run.PAUSED }}</a>{#}
 				{{ test_run.PAUSED }}
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.PASSED %}
-                {#}<a href="{% url tcms.apps.testruns.views.get test_run.pk %}?case_run_status=passed">{{ test_run.PASSED }}</a>{#}
+                {#}<a href="{% url "tcms.apps.testruns.views.get" test_run.pk %}?case_run_status=passed">{{ test_run.PASSED }}</a>{#}
 				{{ test_run.PASSED }}
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.FAILED %}
-                {#}<a href="{% url tcms.apps.testruns.views.get test_run.pk %}?case_run_status=failed">{{ test_run.FAILED }}</a>{#}
+                {#}<a href="{% url "tcms.apps.testruns.views.get" test_run.pk %}?case_run_status=failed">{{ test_run.FAILED }}</a>{#}
 				{{ test_run.FAILED }}
                 {% else %}
                 {% endif%}
                 </td>
 				<td valign="top">
                 {% if test_run.BLOCKED %}
-                {#}<a href="{% url tcms.apps.testruns.views.get test_run.pk %}?case_run_status=blocked">{{ test_run.BLOCKED }}</a>{#}
+                {#}<a href="{% url "tcms.apps.testruns.views.get" test_run.pk %}?case_run_status=blocked">{{ test_run.BLOCKED }}</a>{#}
 				{{ test_run.BLOCKED }}
                 {% else %}
                 {% endif%}
                 </td>
 				<td valign="top">
                 {% if test_run.ERROR %}
-                {#}<a href="{% url tcms.apps.testruns.views.get test_run.pk %}?case_run_status=error">{{ test_run.ERROR }}</a>{#}
+                {#}<a href="{% url "tcms.apps.testruns.views.get" test_run.pk %}?case_run_status=error">{{ test_run.ERROR }}</a>{#}
 				{{ test_run.ERROR }}
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.WAIVED %}
-                {#}<a href="{% url tcms.apps.testruns.views.get test_run.pk %}?case_run_status=waived">{{ test_run.WAIVED }}</a>{#}
+                {#}<a href="{% url "tcms.apps.testruns.views.get" test_run.pk %}?case_run_status=waived">{{ test_run.WAIVED }}</a>{#}
 				{{ test_run.WAIVED }}
                 {% else %}
                 {% endif %}
                 </td>
 				<td valign="top">
                 {% if test_run.case_run.count %}
-                {#}<a href="{% url tcms.apps.testruns.views.get test_run.pk %}">{{ test_run.case_run.count }}</a>{#}
+                {#}<a href="{% url "tcms.apps.testruns.views.get" test_run.pk %}">{{ test_run.case_run.count }}</a>{#}
 				{{ test_run.case_run.count }}
                 {% else %}
                 {% endif %}
@@ -180,7 +180,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 		{% ifequal test_case_run.case_run_status.name 'FAILED' %}
 		<tr>
 			<td valign="top" ><a href="{{ test_case_run.case.get_url_path }}">{{ test_case_run.case.pk }}</a></td>
-            <td valign="top"><a href="{% url tcms.apps.testruns.views.get test_case_run.run_id %}#caserun_{{ test_case_run.pk }}">{{ test_case_run.pk }}</a></td>
+            <td valign="top"><a href="{% url "tcms.apps.testruns.views.get" test_case_run.run_id %}#caserun_{{ test_case_run.pk }}">{{ test_case_run.pk }}</a></td>
 			<td valign="top" >{{ test_case_run.case.summary }}</td>
 			<td valign="top" >{{ test_case_run.case.category }}</td>
 			<td valign="top" >{{ test_case_run.tested_by }}</td>
@@ -239,7 +239,7 @@ Nitrate.Utils.after_page_load(Nitrate.Report.CustomDetails.on_load);
 		{% ifequal test_case_run.case_run_status.name 'BLOCKED' %}
 		<tr>
 			<td valign="top"><a href="{{ test_case_run.case.get_url_path }}">{{ test_case_run.case.pk }}</a></td>
-			<td valign="top"><a href="{% url tcms.apps.testruns.views.get test_case_run.run_id %}#caserun_{{ test_case_run.pk }}">{{ test_case_run.pk }}</td>
+			<td valign="top"><a href="{% url "tcms.apps.testruns.views.get" test_case_run.run_id %}#caserun_{{ test_case_run.pk }}">{{ test_case_run.pk }}</td>
 			<td valign="top">{{ test_case_run.case.summary }}</td>
 			<td valign="top">{{ test_case_run.case.category }}</td>
 			<td valign="top">{{ test_case_run.tested_by }}</td>

@@ -22,13 +22,13 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.AssignCase.on_load);
 {% block contents %}
 <div id="content">
 	<div class="sprites crumble">
-		<a href="{% url tcms.core.views.index %}">Home</a>
-		>> <a href="{% url tcms.apps.testplans.views.all %}">...</a>
+		<a href="{% url "tcms.core.views.index" %}">Home</a>
+		>> <a href="{% url "tcms.apps.testplans.views.all" %}">...</a>
 		>> <a href="{{ test_run.plan.get_absolute_url }}">...</a>
-		>> <a href="{% url tcms.apps.testruns.views.get test_run.run_id %}">{{ test_run.run_id }}: {{ test_run.summary }}</a>
+		>> <a href="{% url "tcms.apps.testruns.views.get" test_run.run_id %}">{{ test_run.run_id }}: {{ test_run.summary }}</a>
 		>> Add test case
 	</div>
-	<h2 id="display_title"><a href="{% url tcms.apps.testruns.views.get test_run.run_id %}">{{ test_run.summary }}</a></h2>
+	<h2 id="display_title"><a href="{% url "tcms.apps.testruns.views.get" test_run.run_id %}">{{ test_run.summary }}</a></h2>
 	<table class="runsDetail" border="0" width="66%" cellspacing="0" cellpadding="0">
 		<tr class="cell">
 			<td class="lab">Build</td>
@@ -51,7 +51,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.AssignCase.on_load);
 			<td>{{ test_case_run|length }}</td>
 		</tr>
 	</table>
-	<form action="{% url tcms.apps.testruns.views.assign_case test_run.run_id %}" method="post">
+	<form action="{% url "tcms.apps.testruns.views.assign_case" test_run.run_id %}" method="post">
 		<div class="Detailform border-1" id="testcases_selected">
 			<div class="mixbar">
 				<span class="tit"><b>Cases in this Run: {{ test_case_run|length }}</b></span>
@@ -100,7 +100,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.AssignCase.on_load);
 							</a>
 						</td>
 						<td>
-							<a href="{% url tcms.apps.testcases.views.get test_case.case_id %}">{{ test_case.case_id }}</a>
+							<a href="{% url "tcms.apps.testcases.views.get" test_case.case_id %}">{{ test_case.case_id }}</a>
 						</td>
 						<td onclick="toggleTestCaseContents('{{ forloop.counter }}')">
 							<a id="link_{{ forloop.counter }}" class="blind_title_link" href="javascript:void(0);">

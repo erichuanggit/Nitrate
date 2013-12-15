@@ -29,12 +29,11 @@ from django.core.urlresolvers import reverse
 from django.db.models import Count
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponsePermanentRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render_to_response
 from django.template.defaultfilters import slugify
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.simplejson import dumps as json_dumps
-from django.views.generic.simple import direct_to_template
 
 from tcms.core.views import Prompt
 from tcms.core.utils.raw_sql import RawSQL
@@ -95,11 +94,13 @@ def new(request, template_name='plan/new.html'):
                 form.data['text'] = form.cleaned_data['text']
 
                 # Generate the form
-                return direct_to_template(request, template_name, {
-                        'module': MODULE_NAME,
-                        'sub_module': SUB_MODULE_NAME,
-                        'form' : form,
-                })
+                context_data = {
+                    'module': MODULE_NAME,
+                    'sub_module': SUB_MODULE_NAME,
+                    'form' : form,
+                }
+                return render_to_response(template_name, context_data,
+                                          context_instance=RequestContext(request))
 
         # Process the test plan submit to the form
         if form.is_valid():
@@ -140,11 +141,13 @@ def new(request, template_name='plan/new.html'):
     else:
         form = NewPlanForm() # An unbound form
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'form' : form,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 
 @user_passes_test(lambda u: u.has_perm('testplans.delete_testplan'))
@@ -268,7 +271,7 @@ def all(request, template_name='plan/all.html'):
     query_url_page_type = remove_from_request_path(request, 'page_type')
     if query_url_page_type:
         query_url_page_type = remove_from_request_path(query_url_page_type, 'page')
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_plans' : tps,
@@ -277,7 +280,9 @@ def all(request, template_name='plan/all.html'):
         'query_url': query_url,
         'query_url_page_type': query_url_page_type,
         'page_type': page_type
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 def get_number_of_plans_cases(plan_ids):
     '''Get the number of cases related to each plan
@@ -488,14 +493,16 @@ def get(request, plan_id, slug=None, template_name = 'plan/get.html'):
     tp.run_case = tp.case.filter(case_status__name=confirm_status_name)
     tp.review_case = tp.case.exclude(case_status__name=confirm_status_name)
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_plan': tp,
         # TODO'test_runs': tp_trs,
         'test_reviews': tp_rvs,
         'xml_form': ImportCasesViaXMLForm(initial = {'a': 'import_cases'}),
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 
 @user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
@@ -535,14 +542,16 @@ def choose_run(request, plan_id, template_name='plan/choose_testrun.html'):
         tcs = get_selected_testcases(request)
         tcs = TestCase.objects.filter(case_id__in=tcs)
 
-        return direct_to_template(request, template_name, {
+        context_data = {
             'module': MODULE_NAME,
             'sub_module': SUB_MODULE_NAME,
             'plan_id': plan_id,
             'plan': tp,
             'test_run_list': testruns,
             'test_cases': tcs,
-        })
+        }
+        return render_to_response(template_name, context_data,
+                                  context_instance=RequestContext(request))
 
     #Add cases to runs
     if request.method == 'POST':
@@ -603,12 +612,14 @@ def edit(request, plan_id, template_name='plan/edit.html'):
                 form.data['text'] = form.cleaned_data['text']
 
                 # Generate the form
-                return direct_to_template(request, template_name, {
+                context_data = {
                     'module': MODULE_NAME,
                     'sub_module': SUB_MODULE_NAME,
                     'form' : form,
                     'test_plan': tp,
-                })
+                }
+                return render_to_response(template_name, context_data,
+                                          context_instance=RequestContext(request))
 
             if request.user.has_perm('testplans.change_testplan'):
                 tp.name = form.cleaned_data['name']
@@ -679,12 +690,14 @@ def edit(request, plan_id, template_name='plan/edit.html'):
         })
         form.populate(product_id=tp.product_id)
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_plan': tp,
         'form': form,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 
 @user_passes_test(lambda u: u.has_perm('testplans.add_testplan'))
@@ -878,12 +891,14 @@ def clone(request, template_name='plan/clone.html'):
                 'keep_case_default_tester': True,
             })
 
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'testplans': tps,
         'clone_form': clone_form,
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 
 def attachment(request, plan_id, template_name='plan/attachment.html'):
@@ -894,13 +909,15 @@ def attachment(request, plan_id, template_name='plan/attachment.html'):
     limit_readable = int(file_size_limit)/2**20 #Mb
 
     tp = get_object_or_404(TestPlan, plan_id=plan_id)
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_plan': tp,
         'limit': file_size_limit,
         'limit_readable': str(limit_readable) + "Mb",
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 
 def text_history(request, plan_id, template_name = 'plan/history.html'):
@@ -909,7 +926,7 @@ def text_history(request, plan_id, template_name = 'plan/history.html'):
 
     tp = get_object_or_404(TestPlan, plan_id=plan_id)
     tptxts = tp.text.all()
-    return direct_to_template(request, template_name, {
+    context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'testplan': tp,
@@ -917,7 +934,9 @@ def text_history(request, plan_id, template_name = 'plan/history.html'):
         'select_plan_text_version': int(
             request.REQUEST.get('plan_text_version', 0)
         ),
-    })
+    }
+    return render_to_response(template_name, context_data,
+                              context_instance=RequestContext(request))
 
 
 def cases(request, plan_id):
@@ -973,13 +992,15 @@ def cases(request, plan_id):
                     'case_status_id': TestCaseStatus.get_CONFIRMED()
                 })
 
-            return direct_to_template(request, template_name, {
+            context_data = {
                 'module': MODULE_NAME,
                 'sub_module': SUB_MODULE_NAME,
                 'test_plan': tp,
                 'test_cases': tcs,
                 'search_form': form,
-            })
+            }
+            return render_to_response(template_name, context_data,
+                                      context_instance=RequestContext(request))
 
         def delete_cases(self):
 
@@ -1222,9 +1243,11 @@ def component(request, template_name='plan/get_component.html'):
                     serializers.serialize(request.REQUEST['type'], obj)
                 )
 
-            return direct_to_template(request, template_name, {
+            context_data = {
                 'test_plan': self.tps[0],
-            })
+            }
+            return render_to_response(template_name, context_data,
+                                      context_instance=RequestContext(request))
 
     if not request.REQUEST.get('plan'):
         raise Http404

@@ -18,13 +18,13 @@
 {% block contents %}
 <div id="content">
 	<div class="sprites crumble">
-		<a href="{% url tcms.core.views.index %}">Home</a>
-		>> <a href="{% url tcms.apps.testplans.views.all %}">Plans</a>
+		<a href="{% url "tcms.core.views.index" %}">Home</a>
+		>> <a href="{% url "tcms.apps.testplans.views.all" %}">Plans</a>
 		>> <a href="{{ testplan.get_absolute_url }}">{{ testplan.plan_id}}:{{ testplan }}</a>
 		>> New Test Review
 	</div>
 	<h2>Create New Test Review</h2>
-	<form action="{% url tcms.apps.testreviews.views.new testplan.plan_id %}" method="post">
+	<form action="{% url "tcms.apps.testreviews.views.new" testplan.plan_id %}" method="post">
 		<div class="Detailform border-1">
 			<table class="editor" cellspan="0" cellspacing="0">
 				<tr>
@@ -170,7 +170,7 @@
 						<ul class="ul-no-format">
 							{% for attachment_file in testcase.attachment.all %}
 							<li>
-								<a href="{% url tcms.core.files.check_file attachment_file.attachment_id %}">
+								<a href="{% url "tcms.core.files.check_file" attachment_file.attachment_id %}">
 									{{ attachment_file.file_name }}
 								</a>
 							</li>

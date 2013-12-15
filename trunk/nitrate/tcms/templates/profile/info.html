@@ -17,10 +17,10 @@
 <div id="content">
 	<div class="sprites crumble profile_tab">
 		<ul>
-			<li class="profile_tab_active"><a href="{% url tcms.apps.profiles.views.profile user.username %}">Basic Information</a></li>
+			<li class="profile_tab_active"><a href="{% url "tcms.apps.profiles.views.profile" user.username %}">Basic Information</a></li>
 			{% ifequal user_profile.user user %}
-			<li><a href="{% url tcms.apps.profiles.views.bookmark user.username %}">Bookmarks</a></li>
-			<li><a href="{% url tcms.apps.profiles.views.recent user.username %}">Recent</a></li>
+			<li><a href="{% url "tcms.apps.profiles.views.bookmark" user.username %}">Bookmarks</a></li>
+			<li><a href="{% url "tcms.apps.profiles.views.recent" user.username %}">Recent</a></li>
 			{% endifequal %}
 		</ul>
 	</div>
@@ -39,7 +39,7 @@
 						<input type="hidden" name="user" value="{{ user.pk }}" />
 						{% if AUTH_BACKEND.can_register %}
 						{{ form.username }}
-						<a href="{% url django.contrib.auth.views.password_change %}">Change password</a>
+						<a href="{% url "django.contrib.auth.views.password_change" %}">Change password</a>
 						{% else %}
 						{{ user_profile.user.username }}
 						<input type="hidden" name="username" value="{{ user_profile.user.username }}" />

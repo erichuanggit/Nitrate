@@ -24,7 +24,7 @@ Advance search implementations
 from django.http import HttpRequest, HttpResponse, Http404
 from django import template
 from django.shortcuts import render_to_response
-from django.views.generic.simple import direct_to_template
+from django.template import RequestContext
 from django.conf import settings
 from django.core.cache import cache
 from django.db.models.query import QuerySet
@@ -66,7 +66,8 @@ def advance_search(request, tmpl='search/advanced_search.html'):
         ]
         PLAN_TYPE_CHOICES = cached_entities('testplantype')
         errors = fmt_errors(errors)
-        return direct_to_template(request, tmpl, locals())
+        return render_to_response(tmpl, locals(),
+                                  context_instance=RequestContext(request))
 
     start = time.time()
     results = query(request, plan_form.cleaned_data,
@@ -156,14 +157,14 @@ def render_results(request, results, time_cost, queries, tmpl='search/results.ht
         query_url = remove_from_request_path(query_url, 'asc')
     else:
         query_url = '%s&asc=True' % query_url
-    return direct_to_template(request, tmpl,
-        {
+    context_data = {
             klasses[request.GET['target']]['result_key']: results,
             'time_cost': time_cost,
             'queries': queries,
             'query_url': query_url,
-        }
-    )
+    }
+    return render_to_response(tmpl, context_data,
+                              context_instance=RequestContext(request))
 
 def remove_from_request_path(request, name):
     '''

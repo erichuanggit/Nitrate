@@ -12,12 +12,12 @@
 		{% for test_review in test_reviews %}
 		<tr class="{% cycle 'odd' 'even' %}">	
 			<td valign="top">
-				<a href="{% url tcms.apps.testreviews.views.get test_review.id %}">{{ test_review.id }}</a>
+				<a href="{% url "tcms.apps.testreviews.views.get" test_review.id %}">{{ test_review.id }}</a>
 			</td>
 			<td valign="top" class="subject">
-				<a href="{% url tcms.apps.testreviews.views.get test_review.id %}">{{ test_review.summary }} review summary</a>
+				<a href="{% url "tcms.apps.testreviews.views.get" test_review.id %}">{{ test_review.summary }} review summary</a>
 			</td>
-			<td valign="top"><a href="{% url tcms.apps.profiles.views.profile test_review.author.username %}">{{ test_review.author }}</a></td>
+			<td valign="top"><a href="{% url "tcms.apps.profiles.views.profile" test_review.author.username %}">{{ test_review.author }}</a></td>
 			<td valign="top">{{ test_review.start_date }}</td>
 			<td valign="top" align="center">{{ test_review.total_num_review_cases }}</td>
 		</tr>

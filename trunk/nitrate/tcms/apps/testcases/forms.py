@@ -173,7 +173,6 @@ class BaseCaseForm(forms.Form):
     extra_link = forms.URLField(
         label = 'Extra link',
         max_length = 1024,
-        verify_exists = False,
         required = False
     )
     # sortkey = forms.IntegerField(label = 'Sortkey', required = False)

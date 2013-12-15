@@ -17,9 +17,10 @@
 #   Xuqing Kuang <xkuang@redhat.com>
 
 from django.conf import settings
-from django.views.generic.simple import direct_to_template
 from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
+from django.template import RequestContext
 from django.db import models, connection, transaction
 from django.contrib.auth.models import Permission as DjangoPermission
 from django.contrib.auth.models import User as DjangoUser
@@ -69,7 +70,7 @@ def upgrade(request):
 
 def create_groups(request, port_user = False, template_name='install/create_groups.html'):
     """
-    Create the nercessery groups such as Tester and Administrator
+    Create the necessery groups such as Tester and Administrator
     """
     if not settings.FIRST_RUN:
         if request:
@@ -82,7 +83,7 @@ def create_groups(request, port_user = False, template_name='install/create_grou
     
     permissions = DjangoPermission.objects.all()
     
-    # Create the Administrator group
+    # Create the tester group
     tester_group, create = DjangoGroup.objects.get_or_create(name='Tester')
     for permission in permissions:
         if permission.id > 30 and not permission.codename.startswith('delete_') \
@@ -106,10 +107,12 @@ def create_groups(request, port_user = False, template_name='install/create_grou
     # Render the web page for installation output
     if request:
         if port_user:
-            return direct_to_template(request, template_name, {
+            context_data = {
                 'tester_group': tester_group,
                 'admin_group': admin_group,
-            })
+            }
+            return render_to_response(template_name, context_data,
+                                      context_instance=RequestContext(request))
         else:
             return HttpResponse(upgrade_completed_msg)
     
@@ -165,10 +168,12 @@ def port_users(request, template_name='install/port_users.html'):
         admin_group = None
     
     if not tester_group and not admin_group:
-        return direct_to_template(request, template_name, {
+        context_data = {
             'create_user_errors': create_error_users,
             'message': 'Port user completed, no group added.'
-        })
+        }
+        return render_to_response(template_name, context_data,
+                                  context_instance=RequestContext(request))
     
     # Add correct admin permission and group to users.
     for user in DjangoUser.objects.all():
@@ -191,9 +196,11 @@ def port_users(request, template_name='install/port_users.html'):
     
     # Render the web page for installation output
     if request:
-        return direct_to_template(request, template_name, {
+        context_data = {
             'create_user_errors': create_error_users,
-        })
+        }
+        return render_to_response(template_name, context_data,
+                                  context_instance=RequestContext(request))
     
     message = ''
     # Print out the output to console
