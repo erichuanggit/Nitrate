@@ -3,7 +3,7 @@
 	<input type="hidden" name="case_id" value="{{ test_review_case.case.case_id }}" />
 	<span class="lab-20">{{ forloop.counter }}</span>
 	<a id="blind_link_{{ forloop.counter }}" class="lab-80" >
-		<img id="blind_icon_{{ forloop.counter }}" class="blind_link" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="" />
+		<img id="blind_icon_{{ forloop.counter }}" class="blind_link" src="{{ STATIC_URL }}images/t1.gif" border="0" alt="" />
 	</a>
 	<a id="id_{{ forloop.counter }}" class="blind_title_link lab-80" href="{% url "tcms.apps.testcases.views.get" test_review_case.case.case_id %}" >{{ test_review_case.case.case_id }}</a>
 	<a id="link_{{ forloop.counter }}" class="blind_title_link lab-300">{{ test_review_case.case.summary }}</a>

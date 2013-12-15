@@ -137,7 +137,7 @@ hr.dotted{ border:dotted #ccc 0px;border-top-width:1px;}
 .right-action{float:right;margin-right:10px;}
 .right-action img{ margin-top:5px;}
 .right-action input[name="search_type"] { border: none;}
-.right-action input[name="search_content"] { background: #FFF url(/media/images/icon-search.gif) no-repeat scroll 0 1px;padding: 1px 1px 1px 20px; -webkit-border-radius: 5em; -moz-border-radius: 5em;}
+.right-action input[name="search_content"] { background: #FFF url(/static/images/icon-search.gif) no-repeat scroll 0 1px;padding: 1px 1px 1px 20px; -webkit-border-radius: 5em; -moz-border-radius: 5em;}
 .right-action value[name="Go"] { border: none; }
 
 .whitelink a{color:#fff;}
@@ -159,7 +159,7 @@ table.noborder,table.noborder td{border:none;background:transparent;}
 /**************************buttons************************/
 .toolbar{ margin:0 0 5px 10px;}
 .toolbar a{color:#fff;}
-.toolbar ul li{color:#000; list-style:none; padding:8px 10px 4px 10px;; vertical-align:middle; height:18px; position:relative; background:#f7f7f7 url(/media/images/toolbar_bg.png) repeat-x left top; display:inline-block; -moz-border-radius:5px; -khtml-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px; border:solid 1px #f1f0f0; cursor:pointer;z-index:0px;}
+.toolbar ul li{color:#000; list-style:none; padding:8px 10px 4px 10px;; vertical-align:middle; height:18px; position:relative; background:#f7f7f7 url(/static/images/toolbar_bg.png) repeat-x left top; display:inline-block; -moz-border-radius:5px; -khtml-border-radius: 5px;-webkit-border-radius: 5px;border-radius: 5px; border:solid 1px #f1f0f0; cursor:pointer;z-index:0px;}
 .toolbar ul ul{display:none;}
 .toolbar li:hover ul{display:block;position:absolute;top:27px;left:-2px; padding:5px;min-width:100px;background:#f3f3f3;border:solid 1px #235d9f;border-top:none;-moz-border-radius-bottomright:5px;-moz-border-radius-bottomleft:5px;-webkit-border-bottom-right-radius:5px;-webkit-border-bottom-left-radius:5px;z-index:1000;}
 .toolbar li ul li{display:block; background:none; border:none; margin:0px; padding:6px 5px 0 5px; height:19px;line-height:25px;}
@@ -226,7 +226,7 @@ fieldset .form-row{ padding-top:10px; width:100%; background:#f1f1f1; clear:both
 fieldset h2{ margin:0px; background:#235D9F; color:#fff; border-bottom:1px solid #ccc; border-top:1px solid #fff; border-left:1px solid #fff; border-right:1px solid #fff; padding-bottom:3px; padding-top:3px; font-size:1.1em; padding-left:10px; }
 .form-row label	{ width:150px; float:left; padding-left:10px; font-weight:600; color:#666;  }
 fieldset .required{ clear:left;width:150px; float:left; padding-left:10px; font-weight:600; color:#666; }
-.errornote{ background:#FCE595; color:red; background : url("admin_media/img/admin/icon_error.gif") left 3px  no-repeat; padding-left:20px; }
+.errornote{ background:#FCE595; color:red; background : url("static/admin/img/admin/icon_error.gif") left 3px  no-repeat; padding-left:20px; }
 .errorlist{ width:99%; margin:10px auto;background:#AF2B2B;font-size:12px;-moz-border-radius:5px 5px 5px 5px;-moz-box-shadow:0 1px 4px #666666; border:1px solid #6F1B1B;color:#FFF;display:block;text-shadow:0 0px 0 #000000; padding:10px 0; font-weight:bold;}
 .errorlist li{ list-style:none; margin-left:10px;}
 .errorlist li ul{padding:0px; border:0px; -moz-box-shadow:0px 0px 0px; -moz-border-radius:0px; margin:0px; font-weight:normal;}

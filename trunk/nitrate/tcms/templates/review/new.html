@@ -8,11 +8,11 @@
 {% endblock %}
 
 {% block custom_javascript %}
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/fastinit.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/tablekit.js"></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/tablednd.js'></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/testreview_actions.js'></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/tablekit/fastinit.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/tablekit/tablekit.js"></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/lib/tablednd.js'></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/testcase_actions.js'></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/testreview_actions.js'></script>
 {% endblock %}
 
 {% block contents %}
@@ -102,7 +102,7 @@
 			<span class="tit"><b>Selected cases:</b></span>
 			<span class="notice">
 				{% if num_confirmed_cases %}
-				<img src="{{ MEDIA_URL }}/images/warning.png" style="float:none"/>
+				<img src="{{ STATIC_URL }}images/warning.png" style="float:none"/>
 				{{ num_confirmed_cases }} confirmed cases removed
 				{% endif %}
 			</span>
@@ -127,7 +127,7 @@
 					<td>
 						<input type="hidden" name="case_id" value="{{ testcase.case_id }}">
 						<a id="blind_link_{{ forloop.counter }}" class="blind_link">
-							<img id="blind_icon_{{ forloop.counter }}" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
+							<img id="blind_icon_{{ forloop.counter }}" src="{{ STATIC_URL }}images/t1.gif" border="0" alt="">
 						</a>
 					</td>
 					<td>
@@ -142,7 +142,7 @@
 					</td>
 					{% else %}
 					<td style='text-decoration: line-through'>
-						<img src="{{ MEDIA_URL }}/images/warning.png"/>
+						<img src="{{ STATIC_URL }}images/warning.png"/>
 						<a id="link_{{ forloop.counter }}" class="blind_title_link">
 							{{ testcase.summary }}
 						</a>

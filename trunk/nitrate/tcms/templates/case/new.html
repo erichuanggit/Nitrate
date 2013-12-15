@@ -6,13 +6,13 @@
 {% endblock %}
 
 {% block custom_javascript %}
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/tinymce/jscripts/tiny_mce/tiny_mce.js'></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/testplan_actions.js'></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/lib/tinymce/jscripts/tiny_mce/tiny_mce.js'></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/testplan_actions.js'></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/testcase_actions.js'></script>
 <script type="text/javascript" src="/admin/jsi18n/"></script>
-<script type="text/javascript" src="/admin_media/js/core.js"></script>
-<script type="text/javascript" src="/admin_media/js/SelectFilter2.js"></script>
-<script type="text/javascript" src="/admin_media/js/SelectBox.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}admin/js/core.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}admin/js/SelectFilter2.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}admin/js/SelectBox.js"></script>
 <script type="text/javascript">
 Nitrate.Utils.after_page_load(Nitrate.TestCases.Create.on_load);
 </script>
@@ -38,7 +38,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestCases.Create.on_load);
 		{% endif %}
 		<div id="newcase" class="Detailform border-1">
 			<div id="id_create_case_process" class="submit" style="display: none">
-				<img src="{{ MEDIA_URL }}/images/loading/ajax-button.gif" />
+				<img src="{{ STATIC_URL }}images/loading/ajax-button.gif" />
 			</div>
 			<fieldset class="no-border background-light-grey">
 				<div class="editor-side">

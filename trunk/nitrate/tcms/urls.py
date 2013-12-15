@@ -183,10 +183,6 @@ urlpatterns = patterns('',
 # Debug zone
 
 if settings.DEBUG:
-    urlpatterns += patterns('',
-        (r'(^|/)media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-    )
-
     urlpatterns += patterns('tcms.core.utils.test_template',
         (r'^tt/(?P<template_name>.*)', 'test_template'),
     )

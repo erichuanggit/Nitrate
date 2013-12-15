@@ -8,12 +8,12 @@
 {% endblock %}
 
 {% block custom_javascript %}
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/inplacericheditor/lib/tiny_mce/tiny_mce.js'></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/fastinit.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/tablesort.js"></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/testrun_actions.js'></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/testplan_actions.js"></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/lib/inplacericheditor/lib/tiny_mce/tiny_mce.js'></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/tablesort/fastinit.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/tablesort/tablesort.js"></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/testrun_actions.js'></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/testcase_actions.js'></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/testplan_actions.js"></script>
 <script type="text/javascript">
 Nitrate.Utils.after_page_load(Nitrate.TestRuns.AssignCase.on_load);
 </script>
@@ -96,7 +96,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.AssignCase.on_load);
 						</td>
 						<td>
 							<a id="blind_link_{{ forloop.counter }}" class="blind_link" href="javascript:toggleTestCaseContents('{{ forloop.counter }}')">
-								<img id="blind_icon_{{ forloop.counter }}" src="{{ MEDIA_URL }}/images/t1.gif" border="0" alt="">
+								<img id="blind_icon_{{ forloop.counter }}" src="{{ STATIC_URL }}images/t1.gif" border="0" alt="">
 							</a>
 						</td>
 						<td>

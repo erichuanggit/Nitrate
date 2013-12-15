@@ -8,11 +8,11 @@
 {% endblock %}
 
 {% block custom_javascript %}
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/inplacericheditor/lib/tiny_mce/tiny_mce.js'></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/fastinit.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablesort/tablesort.js"></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/testreview_actions.js'></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/lib/inplacericheditor/lib/tiny_mce/tiny_mce.js'></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/tablesort/fastinit.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/tablesort/tablesort.js"></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/testcase_actions.js'></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/testreview_actions.js'></script>
 {% endblock %}
 
 {% block contents %}

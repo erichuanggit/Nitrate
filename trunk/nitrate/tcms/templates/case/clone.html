@@ -3,7 +3,7 @@
 {% block custom_stylesheet %}
 {% endblock %}
 {% block custom_javascript %}
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/testcase_actions.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/testcase_actions.js"></script>
 <script type="text/javascript">
 Nitrate.Utils.after_page_load(Nitrate.TestCases.Clone.on_load);
 </script>

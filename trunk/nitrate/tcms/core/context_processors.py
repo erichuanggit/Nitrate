@@ -24,12 +24,6 @@ def admin_prefix_processor(request):
     """
     return { 'ADMIN_PREFIX': settings.ADMIN_PREFIX }
 
-def admin_media_prefix_processor(request):
-    """
-    Django Admin Media URL Prefix RequestContext Handler
-    """
-    return { 'ADMIN_MEDIA_PREFIX': settings.ADMIN_MEDIA_PREFIX }
-
 def auth_backend_processor(request):
     """Determine the be able to login/logout/register request """
     from tcms.core.contrib.auth import get_using_backend

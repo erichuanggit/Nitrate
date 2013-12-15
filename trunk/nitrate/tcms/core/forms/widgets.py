@@ -125,7 +125,7 @@ TinyMCEWidget = TinyMCE(mce_attrs = {
     'height': '300',
     'width': '100%',
     'urlconverter_callback' : 'myCustomURLConverter',
-    #'content_css' : '/media/style/base.css',
+    #'content_css' : '/static/style/base.css',
     'plugins': "table,safari,advimage,advlink,fullscreen,visualchars,paste,media,template,searchreplace,emotions,linkautodetect",
     'table_styles' : "Header 1=header1;Header 2=header2;Header 3=header3",
     'table_cell_styles' : "Header 1=header1;Header 2=header2;Header 3=header3;Table Cell=tableCel1",

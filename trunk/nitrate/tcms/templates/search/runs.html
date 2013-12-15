@@ -1,9 +1,9 @@
 {% load pagination_tags %}
 
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/fastinit.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/tablekit.js"></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/testrun_actions.js'></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/management_actions.js'></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/tablekit/fastinit.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/tablekit/tablekit.js"></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/testrun_actions.js'></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/management_actions.js'></script>
 <script type="text/javascript">
 Nitrate.Utils.after_page_load(Nitrate.TestRuns.List.on_load);
 </script>

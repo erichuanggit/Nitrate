@@ -8,13 +8,13 @@
 {% endblock %}
 
 {% block custom_javascript %}
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/fastinit.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/tablekit.js"></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/createrun.js'></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/testrun_actions.js'></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/testplan_actions.js"></script>
-<script type="text/javascript" src="/admin_media/js/admin/RelatedObjectLookups.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/tablekit/fastinit.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/tablekit/tablekit.js"></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/createrun.js'></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/testrun_actions.js'></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/testcase_actions.js'></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/testplan_actions.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}admin/js/admin/RelatedObjectLookups.js"></script>
 
 <script type="text/javascript">
 Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
@@ -139,7 +139,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 			<span class="title"><b>Selected cases:</b></span>
 				<span class="notice">
 					{% if  num_unconfirmed_cases %}
-					<img src="{{ MEDIA_URL }}/images/warning.png" style="float:none"/>
+					<img src="{{ STATIC_URL }}images/warning.png" style="float:none"/>
 					{{ num_unconfirmed_cases }} unconfirmed cases removed
 					{% endif %}
 				</span>
@@ -166,7 +166,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 							{% endif %}
 						</td>
 						<td{% if not test_case.case_status.is_confirmed %} style='text-decoration: line-through'{% endif %}>
-							{% if not test_case.case_status.is_confirmed %} <img src="{{ MEDIA_URL }}/images/warning.png"/>{% endif %}
+							{% if not test_case.case_status.is_confirmed %} <img src="{{ STATIC_URL }}images/warning.png"/>{% endif %}
 							<a id="link_{{ forloop.counter }}" class="blind_title_link" href="javascript:toggleTestCaseContents('{{ forloop.counter }}')">
 								{{ test_case.summary }}
 							</a>

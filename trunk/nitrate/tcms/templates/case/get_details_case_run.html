@@ -92,7 +92,7 @@
 								        <span class="grey">From Run</span>
 								        <a href="{% url "tcms.apps.testruns.views.get" bug.case_run.run_id %}">{{ bug.case_run.run_id }}</a>
 								        {% ifequal bug.case_run_id test_case_run.pk %}
-								        <a href="javascript:void(0);" title="Remove This Bug" onclick="removeCaseRunBug({{ test_case_run.run.pk }}, this.up(10).previous(), this.up(10), {{ bug.bug_id }}, {{ test_case_run.case_id }}, {{ test_case_run.pk }})"><img width="9" height="9" title="remove this bug" src="/media/images/remove_small.png"></a>
+								        <a href="javascript:void(0);" title="Remove This Bug" onclick="removeCaseRunBug({{ test_case_run.run.pk }}, this.up(10).previous(), this.up(10), {{ bug.bug_id }}, {{ test_case_run.case_id }}, {{ test_case_run.pk }})"><img width="9" height="9" title="remove this bug" src="{{ STATIC_URL }}images/remove_small.png"></a>
 								        {% endifequal %}
 								    {% else %}
 								        <span class="grey">From Case</span>
@@ -215,7 +215,7 @@
                             <div class="content">
                                 <ul class="ul-format">
                                     {% for link in test_case_run.links.all %}
-                                      <li><a href="{{ link.url }}" target="_blank" title="{{ link.url }}">{{ link.name|escape }}</a>&nbsp;<span class="grey">{{ link.created_on|date:"N d, Y" }}</span>&nbsp;<a href="javascript:void(0);" onclick="removeLink(this, {{ link.pk }});"><img title="Remove this log" src="/media/images/remove_small.png"></a></li>
+                                      <li><a href="{{ link.url }}" target="_blank" title="{{ link.url }}">{{ link.name|escape }}</a>&nbsp;<span class="grey">{{ link.created_on|date:"N d, Y" }}</span>&nbsp;<a href="javascript:void(0);" onclick="removeLink(this, {{ link.pk }});"><img title="Remove this log" src="{{ STATIC_URL }}images/remove_small.png"></a></li>
                                     {% endfor %}
                                 </ul>
                              </div>

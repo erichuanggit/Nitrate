@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block custom_javascript %}
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/management_actions.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/management_actions.js"></script>
 <script type="text/javascript">
 function getEnvURLParams()
 {
@@ -33,7 +33,7 @@ Nitrate.Utils.after_page_load(Nitrate.Management.Environment.on_load);
 	<div class="mixbar">
 		<form method="get" action="{% url "tcms.apps.management.views.environment_groups" %}" id="changelist-search">
 			<input type="hidden" name="action" value="search">
-			<label for="searchbar"><img alt="Search" height="20px" src="/media/images/search.png"/></label>
+            <label for="searchbar"><img alt="Search" height="20px" src="{{ STATIC_URL }}images/search.png"/></label>
 			<input type="text" id="searchbar" value="{{ REQUEST_CONTENTS.name }}" name="name" size="40"/>
 			<input type="submit" value="Search environment group"/>
 		</form>

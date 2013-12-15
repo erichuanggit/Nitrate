@@ -61,7 +61,7 @@
 			   {% for bug in test_case_run.case.get_bugs %}
 				<li class="listyledisc"><a href="{{ bug.get_absolute_url }}">{{ bug }}</a>
 				<a href="javascript:void(0)" onclick="removeCaseRunBug({{ test_case_run.run.pk }}, this.up(4).previous(), {{ test_case_run.pk }}, {{ bug.pk }})">
-				<img src="{{ MEDIA_URL }}/images/icon_cross.png" width="12" height="12" title="remove this bug" />
+				<img src="{{ STATIC_URL }}images/icon_cross.png" width="12" height="12" title="remove this bug" />
 				</a>
 				</li>
 				{% empty %}

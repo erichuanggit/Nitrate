@@ -160,7 +160,7 @@ Nitrate.TestCases.List.on_load = function()
         if ( oTable.fnIsOpen(tr) ) {
             $(blind_icon).removeClassName('collapse');
             $(blind_icon).addClassName('expand');
-            $(blind_icon).src = "/media/images/t1.gif";
+            $(blind_icon).src = "/static/images/t1.gif";
             oTable.fnClose( tr );
         } else {
           oTable.fnOpen( tr, detail_td, "info_row" );
@@ -323,7 +323,7 @@ Nitrate.TestCases.Create.on_load = function()
     // bind_component_selector_to_product(false, false, $('id_product'), $('id_component'));
     // bind_category_selector_to_product(false, false, $('id_product'), $('id_category'));
     
-    SelectFilter.init("id_component", "component", 0, "/admin_media/");
+    SelectFilter.init("id_component", "component", 0, "/static/admin/");
     //init category and components
     getCategorisByProductId(false, $('id_product'), $('id_category'));
     var from = 'id_component_from';
@@ -361,7 +361,7 @@ Nitrate.TestCases.Edit.on_load = function()
 {
     bind_category_selector_to_product(false, false, $('id_product'), $('id_category'));
     // bind_component_selector_to_product(false, false, $('id_product'), $('id_component'));
-    //SelectFilter.init("id_component", "component", 0, "/admin_media/");
+    //SelectFilter.init("id_component", "component", 0, "/static/admin/");
 
     resize_tinymce_editors();
 }
@@ -429,11 +429,11 @@ function getTestCaseContents(template_type, container, content_container, object
     if (content_container.getStyle('display') == 'none') {
         $(blind_icon).removeClassName('collapse');
         $(blind_icon).addClassName('expand');
-        $(blind_icon).src = "/media/images/t1.gif";
+        $(blind_icon).src = "/static/images/t1.gif";
     } else {
         $(blind_icon).removeClassName('expand');
         $(blind_icon).addClassName('collapse');
-        $(blind_icon).src = "/media/images/t2.gif";
+        $(blind_icon).src = "/static/images/t2.gif";
     }
 }
 
@@ -467,11 +467,11 @@ function toggleTestCaseContents(template_type, container, content_container, obj
     if (content_container.getStyle('display') == 'none') {
         $(blind_icon).removeClassName('collapse');
         $(blind_icon).addClassName('expand');
-        $(blind_icon).src = "/media/images/t1.gif";
+        $(blind_icon).src = "/static/images/t1.gif";
     } else {
         $(blind_icon).removeClassName('expand');
         $(blind_icon).addClassName('collapse');
-        $(blind_icon).src = "/media/images/t2.gif";
+        $(blind_icon).src = "/static/images/t2.gif";
     }
 }
 
@@ -559,7 +559,7 @@ function blinddownAllCases(element)
         element.removeClassName('collapse-all');
         element.addClassName('expand-all');
 //        element.href="javascript:blindupAllCases()";
-        element.src="/media/images/t2.gif";
+        element.src="/static/images/t2.gif";
     }
 }
 
@@ -573,7 +573,7 @@ function blindupAllCases(element)
         element.removeClassName('expand-all');
         element.addClassName('collapse-all');
 //        element.href="javascript:blinddownAllCases()";
-        element.src="/media/images/t1.gif";
+        element.src="/static/images/t1.gif";
     }
 }
 
@@ -1190,10 +1190,10 @@ function toggleCaseRunsByPlan(params, callback)
     if (content_container.getStyle('display') == 'none') {
         $(blind_icon).removeClassName('collapse');
         $(blind_icon).addClassName('expand');
-        $(blind_icon).src = "/media/images/t1.gif";
+        $(blind_icon).src = "/static/images/t1.gif";
     } else {
         $(blind_icon).removeClassName('expand');
         $(blind_icon).addClassName('collapse');
-        $(blind_icon).src = "/media/images/t2.gif";
+        $(blind_icon).src = "/static/images/t2.gif";
     }
 }

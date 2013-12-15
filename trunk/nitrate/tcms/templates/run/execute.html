@@ -3,9 +3,9 @@
 {% block subtitle %}Execute test run - {{ test_run.summary }}{% endblock %}
 
 {% block custom_javascript %}
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/validations.js'></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/testrun_actions.js'></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/lib/validations.js'></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/testcase_actions.js'></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/testrun_actions.js'></script>
 <script type="text/javascript">
 {#　Define the case_run_status array for all of case run status　#}
 Nitrate.TestRuns.CaseRunStatus = new Array();
@@ -92,7 +92,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Execute.on_load);
 				</div>
 				<span class="lab-20">{{ forloop.counter }}</span>
 				<div class="collapse-control">
-					<a><img class="collapse blind_icon" src="{{ MEDIA_URL }}/images/t1.gif" /></a>
+					<a><img class="collapse blind_icon" src="{{ STATIC_URL }}images/t1.gif" /></a>
 				</div>
 				<span class="lab-50">{{ test_case_run.case.priority.value }}</span>
 				<span class="lab-100" title="Case_Run ID">{{ test_case_run.case_run_id }}</span>

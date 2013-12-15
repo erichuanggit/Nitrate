@@ -32,7 +32,7 @@ installation, which is covered in INSTALL.txt in this same directory.)
         ("django.core.context_processors.auth",
         "django.core.context_processors.debug",
         "django.core.context_processors.i18n",
-        "django.core.context_processors.media",
+        "django.core.context_processors.static",
         "django.core.context_processors.request")
 
 4. Add this line at the top of your template to load the pagination tags:

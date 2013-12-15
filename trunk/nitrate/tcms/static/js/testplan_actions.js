@@ -150,8 +150,8 @@ Nitrate.TestPlans.TreeView = {
         var li_container = e_container.up(1);
         var e_pk = e_container.next('a').innerHTML;
         var container_clns = e_container.classNames().toArray();
-        var expand_icon_url = '/media/images/t2.gif';
-        var collapse_icon_url = '/media/images/t1.gif';
+        var expand_icon_url = '/static/images/t2.gif';
+        var collapse_icon_url = '/static/images/t1.gif';
         var obj = tree.traverse(tree.data, e_pk);
         
         for (i in container_clns) {
@@ -192,8 +192,8 @@ Nitrate.TestPlans.TreeView = {
     },
     render: function(data) {
         var ul = new Element('ul');
-        var icon_expand = '<img src="/media/images/t2.gif" class="expand_icon">';
-        var icon_collapse = '<img src="/media/images/t1.gif" class="collapse_icon">';
+        var icon_expand = '<img src="/static/images/t2.gif" class="expand_icon">';
+        var icon_collapse = '<img src="/static/images/t1.gif" class="collapse_icon">';
         
         // Add the 'Up' button
         if (!data && this.data) {
@@ -2162,7 +2162,7 @@ function constructPlanComponentModificationDialog(container)
         
         // FIXME: Split the select to two columns, javascript buggy here.
         /*
-        SelectFilter.init("id_component", "component", 0, "/admin_media/");
+        SelectFilter.init("id_component", "component", 0, "/static/admin/");
         refreshSelectFilter('component');
         */
     }
@@ -2443,7 +2443,7 @@ function expandCurrentPlan(element){
         var e_container = element.getElementsByClassName('collapse_icon')[0];
         var li_container = e_container.up(1);
         var e_pk = e_container.next('a').innerHTML;
-        var expand_icon_url = '/media/images/t2.gif';
+        var expand_icon_url = '/static/images/t2.gif';
         var obj = tree.traverse(tree.data, e_pk);
         if (typeof(obj.children) != 'object' || obj.children == []) {
             var c = function(t) {

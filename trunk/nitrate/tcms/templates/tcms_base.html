@@ -4,11 +4,13 @@
 	<title>{% block subtitle %}{% endblock %}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<meta http-equiv="Content-Language" content="utf-8" />
-	<link rel="Shortcut Icon" href="{{ MEDIA_URL }}/images/favicon.png" />
-	<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/base.css" media="screen" />
-	<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/print.css" media="print" />
+	<link rel="Shortcut Icon" href="{{ STATIC_URL }}images/favicon.png" />
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}style/base.css" media="screen" />
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}style/print.css" media="print" />
 	{% block custom_stylesheet %}{% endblock %}
-	<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/jquery-1.5.1.min.js'></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}admin/js/jquery.min.js"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}admin/js/jquery.init.js"></script>
+	<script type="text/javascript" src='{{ STATIC_URL }}js/lib/jquery-1.5.1.min.js'></script>
 	<script type="text/javascript" language="javascript" charset="utf-8">
 		jQuery.noConflict();
 		var jQ = jQuery;
@@ -16,14 +18,14 @@
 		// Top level namespace
 		window.Nitrate = {};
 	</script>
-	<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/livepipe/lib/prototype.js'></script>
-	<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/livepipe/lib/scriptaculous.js'></script>
-	<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/livepipe/src/livepipe.js'></script>
-	<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/jquery.shiftcheckbox.js'></script>
-	<script type="text/javascript" src='{{ MEDIA_URL }}/js/tcms_actions.js'></script>
+	<script type="text/javascript" src='{{ STATIC_URL }}js/lib/livepipe/lib/prototype.js'></script>
+	<script type="text/javascript" src='{{ STATIC_URL }}js/lib/livepipe/lib/scriptaculous.js'></script>
+	<script type="text/javascript" src='{{ STATIC_URL }}js/lib/livepipe/src/livepipe.js'></script>
+	<script type="text/javascript" src='{{ STATIC_URL }}js/lib/jquery.shiftcheckbox.js'></script>
+	<script type="text/javascript" src='{{ STATIC_URL }}js/tcms_actions.js'></script>
 	{% block custom_javascript %}{% endblock %}
 	<script type="text/javascript">
-	window.__admin_media_prefix__ = "{{ SETTINGS.ADMIN_MEDIA_PREFIX }}";
+	window.__admin_media_prefix__ = "{{ STATIC_URL }}admin/";
 	{% if request.user.is_authenticated %}
 	Nitrate.User = {
 		pk: {{ request.user.pk }},
@@ -42,7 +44,7 @@
 <body id="body">
 	<div id="header">
 			<div class="logo">
-				<a href="{% url "tcms.core.views.index" %}"><img src="{{ MEDIA_URL }}/images/logo_shipshape_1.png" alt="logo" /></a>
+				<a href="{% url "tcms.core.views.index" %}"><img src="{{ STATIC_URL }}images/logo_shipshape_1.png" alt="logo" /></a>
 			</div>
 			<div class="absoluteright">
 				<label>

@@ -6,10 +6,10 @@
 {% endblock %}
 
 {% block custom_javascript %}
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/fastinit.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/js/lib/tablekit/tablekit.js"></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/testplan_actions.js'></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/tablekit/fastinit.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/tablekit/tablekit.js"></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/testplan_actions.js'></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/testcase_actions.js'></script>
 <script type="text/javascript">
 Nitrate.Utils.after_page_load(Nitrate.TestPlans.SearchCase.on_load);
 </script>

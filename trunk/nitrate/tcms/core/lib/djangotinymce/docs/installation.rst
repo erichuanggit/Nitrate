@@ -71,10 +71,10 @@ Configuration
 The application can be configured by editing the project's ``settings.py``
 file.
 
-``TINYMCE_JS_URL`` (default: ``settings.MEDIA_URL + 'js/tiny_mce/tiny_mce.js'``)
+``TINYMCE_JS_URL`` (default: ``settings.STATIC_URL + 'js/tiny_mce/tiny_mce.js'``)
   The URL of the TinyMCE javascript file.
 
-``TINYMCE_JS_ROOT`` (default: ``settings.MEDIA_ROOT + 'js/tiny_mce'``)
+``TINYMCE_JS_ROOT`` (default: ``settings.STATIC_ROOT + 'js/tiny_mce'``)
   The filesystem location of the TinyMCE files.
 
 ``TINYMCE_DEFAULT_CONFIG`` (default: ``{'theme': "simple", 'relative_urls': False}``)

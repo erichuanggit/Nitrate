@@ -17,10 +17,10 @@
 							</span>
 							<span class="action_property">
 								{% if perms.testruns.change_tcmsenvrunvaluemap %}
-								<a href="javascript:void(0)" onclick="editValue(this.up(1),'id_env_value_{{ run_env_value.pk }}','id_select_value_{{ run_env_value.pk }}','id_submit_value_{{ run_env_value.pk }}')"><img src="{{ MEDIA_URL }}/images/icon_changelink.gif" title="Edit this value" /></a>
+								<a href="javascript:void(0)" onclick="editValue(this.up(1),'id_env_value_{{ run_env_value.pk }}','id_select_value_{{ run_env_value.pk }}','id_submit_value_{{ run_env_value.pk }}')"><img src="{{ STATIC_URL }}images/icon_changelink.gif" title="Edit this value" /></a>
 								{% endif %}
 								{% if perms.testruns.delete_tcmsenvrunvaluemap %}
-								<a href="javascript:void(0)"><img src="{{ MEDIA_URL }}/images/remove_small.png" title="Remove this property" onclick="removeProperty('{{ test_run.run_id }}','{{ run_env_value.pk }}')"/></a>
+								<a href="javascript:void(0)"><img src="{{ STATIC_URL }}images/remove_small.png" title="Remove this property" onclick="removeProperty('{{ test_run.run_id }}','{{ run_env_value.pk }}')"/></a>
 								{% endif %}
 							</span>
 						</form>

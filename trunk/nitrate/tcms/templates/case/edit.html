@@ -15,12 +15,12 @@
 {% endblock %}
 
 {% block custom_javascript %}
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/lib/tinymce/jscripts/tiny_mce/tiny_mce.js'></script>
-<script type="text/javascript" src='{{ MEDIA_URL }}/js/testcase_actions.js'></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/lib/tinymce/jscripts/tiny_mce/tiny_mce.js'></script>
+<script type="text/javascript" src='{{ STATIC_URL }}js/testcase_actions.js'></script>
 <script type="text/javascript" src="/admin/jsi18n/"></script>
-<script type="text/javascript" src="/admin_media/js/core.js"></script>
-<script type="text/javascript" src="/admin_media/js/SelectFilter2.js"></script>
-<script type="text/javascript" src="/admin_media/js/SelectBox.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}admin/js/core.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}admin/js/SelectFilter2.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}admin/js/SelectBox.js"></script>
 <script type="text/javascript">
 Nitrate.Utils.after_page_load(Nitrate.TestCases.Edit.on_load);
 </script>

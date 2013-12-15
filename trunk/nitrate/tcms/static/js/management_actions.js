@@ -4,7 +4,7 @@ Nitrate.Management.Environment.Edit = {};
 
 Nitrate.Management.Environment.Edit.on_load = function()
 {
-	SelectFilter.init("id_properties", "properties", 0, "/admin_media/");
+	SelectFilter.init("id_properties", "properties", 0, "/static/admin/");
 }
 Nitrate.Management.Environment.on_load=function(){
 	
