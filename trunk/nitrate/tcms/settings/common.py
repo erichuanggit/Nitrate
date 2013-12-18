@@ -225,17 +225,6 @@ SERIALIZATION_MODULES = {
     'json': 'tcms.core.lib.wadofstuff.django.serializers.json',
 }
 
-#
-# Debug settings
-#
-# Debug log file, default is output to console
-DEBUG_LOG_FILE = '/var/log/shipshape.log'
-# Debug level is following:
-# - 0 is None
-# - 1 is Info
-# - 5 is Error
-DEBUG_LEVEL = 0
-
 # Needed by django.core.context_processors.debug:
 # See http://docs.djangoproject.com/en/dev/ref/templates/api/#django-core-context-processors-debug
 INTERNAL_IPS = ('127.0.0.1', )
