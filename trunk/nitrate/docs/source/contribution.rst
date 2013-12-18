@@ -65,6 +65,8 @@ code::
 
    Remember to change db settings in `settings/devel.py` accordingly.
 
+   **Tip**: change settings in `settings/local.py` (create by yourself) instead of `settings/devel.py` since `settings/devel.py` will load settings in `settings/local.py` automatically and `settings/local.py` is ignored by git.
+
 Start the nitrate app
 ~~~~~~~~~~~~~~~~~~~~~
 code::

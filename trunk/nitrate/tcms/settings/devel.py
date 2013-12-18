@@ -29,3 +29,10 @@ INSTALLED_APPS += (
 DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False
 }
+
+# local.py can be used to override settings like database for development env.
+# local.py is ignored by git.
+try:
+    from local import *
+except ImportError:
+    pass
