@@ -35,7 +35,7 @@ Database is required by Nitrate(and all of Django apps). The Django ORM supports
 
 You can get a db dump from nitrate source code directory::
 
-  cd [nitrate_download_path]/nitrate/trunk/nitrate/docs
+  cd [nitrate_download_path]/nitrate/trunk/nitrate/contrib/sql
 
 In this directory, there is a sql file of 'nitrate_db_setup.sql'.
 
