@@ -33,8 +33,8 @@ https://git.fedorahosted.org/cgit/nitrate.git/?h=development
 Requirement modules
 ~~~~~~~~~~~~~~~~~~~
 
-* `Python <http://www.python.org/>`_ >= 2.4
-* `Django <http://www.djangoproject.com/>`_ = 1.2.3
+* `Python <http://www.python.org/>`_ >= 2.6.5
+* `Django <http://www.djangoproject.com/>`_ = 1.5.5
 * `MySQL-python <http://sourceforge.net/projects/mysql-python/>`_ = 1.2.4
 * `Kobo <https://fedorahosted.org/kobo/>`_ = 0.2.1
 * `kerberos <https://pypi.python.org/pypi/kerberos/1.1.1>`_ = 1.1.1
