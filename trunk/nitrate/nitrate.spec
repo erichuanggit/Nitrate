@@ -1,5 +1,4 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
-%define use_pylint 0
 
 Name:           nitrate
 Version:        3.8.5
@@ -15,10 +14,6 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires:  python-setuptools
 BuildRequires:  python-devel
-%if %{use_pylint}
-BuildRequires:  pylint
-BuildRequires:  Django
-%endif
 
 Requires:       Django = 1.2.3
 # Requires:     mod_python
@@ -49,40 +44,6 @@ sed --in-place \
 
 %build
 %{__python} setup.py build
-
-%if %{use_pylint}
-# Run pylint.  Halt the build if there are errors
-# There doesn't seem to be a good way to get the result of pylint as an
-# exit code.  (upstream bug: http://www.logilab.org/ticket/4691 )
-
-# Capture the output:
-pylint --rcfile=tcms/pylintrc tcms > pylint.log
-
-# Ensure the pylint log makes it to the rpm build log:
-cat pylint.log
-
-# Analyse the "Messages by category" part of the report, looking for
-# non-zero results:
-# The table should look like this:
-#   +-----------+-------+---------+-----------+
-#   |type       |number |previous |difference |
-#   +===========+=======+=========+===========+
-#   |convention |0      |0        |=          |
-#   +-----------+-------+---------+-----------+
-#   |refactor   |0      |0        |=          |
-#   +-----------+-------+---------+-----------+
-#   |warning    |0      |0        |=          |
-#   +-----------+-------+---------+-----------+
-#   |error      |0      |0        |=          |
-#   +-----------+-------+---------+-----------+
-#   
-# Halt the build if any are non-zero:
-grep -E "^\|convention[ ]*\|0[ ]*\|" pylint.log || exit 1
-grep -E "^\|refactor[ ]*\|0[ ]*\|" pylint.log || exit 1
-grep -E "^\|warning[ ]*\|0[ ]*\|" pylint.log || exit 1
-grep -E "^\|error[ ]*\|0[ ]*\|" pylint.log || exit 1
-%endif
-
 
 %install
 rm -rf $RPM_BUILD_ROOT
