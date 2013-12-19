@@ -30,7 +30,7 @@
 						<li><input type="button" class="export icon_plan" title="Export selected cases into XML file" value="Export" onclick="exportCase('{% url "tcms.apps.testcases.views.export" %}', this.up(6), this.up(6).next().next());" /></li>
 						<li><input type="button" class="print_view icon_plan" value="Print"  title="print view of selected cases" onclick="printableCases('{% url "tcms.apps.testcases.views.printable" %}', this.up(6), this.up(6).next().next());" /></li>
 						{% if perms.testcases.add_testcase %}
-						<li><input type="button" class="clone icon_plan" value="Clone" title="Clone selected cases to another test plan" onclick="requestCloneFilteredCases({url: '{% url tcms.apps.testcases.views.clone %}', form: this.up(6), table: this.up(6).next().next(), requestMethod: 'get'});" /></li>
+						<li><input type="button" class="clone icon_plan" value="Clone" title="Clone selected cases to another test plan" onclick="requestCloneFilteredCases({url: '{% url "tcms.apps.testcases.views.clone" %}', form: this.up(6), table: this.up(6).next().next(), requestMethod: 'get'});" /></li>
 						{% else %}
 						<li><input type="button" class="clone icon_plan" value="Clone" title="Clone selected cases to another test plan" disabled="true"/></li>
 						{% endif %}
