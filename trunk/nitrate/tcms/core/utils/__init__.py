@@ -17,7 +17,6 @@
 #   Xuqing Kuang <xkuang@redhat.com>
 #   Chenxiong Qi <cqi@redhat.com>
 
-from mailto import *
 
 def string_to_list(strs, spliter = ','):
     """Convert the string to list"""

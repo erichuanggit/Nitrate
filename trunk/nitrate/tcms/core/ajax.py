@@ -51,7 +51,6 @@ from tcms.apps.testruns import signals as run_watchers
 from tcms.apps.testruns.models import TestRun, TestCaseRun, TestRunTag, TestCaseRunStatus
 from tcms.core.helpers.comments import add_comment
 from tcms.core.utils import get_string_combinations
-from tcms.core.utils.mailto import mailto
 
 post_update = Signal(providing_args=["instances", "kwargs"])
 post_update.connect(run_watchers.post_update_handler)
@@ -400,11 +399,11 @@ def update(request):
     objects_update(targets, **{field:value})
 
     if hasattr(model, 'mail_scene'):
-        from tcms.core.utils.mailto import mailto
         mail_context = model.mail_scene(
             objects = targets, field = field, value = value, ctype = ctype, object_pk = object_pk,
         )
         if mail_context:
+            from tcms.core.utils.mailto import mailto
             mail_context['request'] = request
             try:
                 mailto(**mail_context)
@@ -699,6 +698,7 @@ class TestCaseUpdateActions(object):
                                            field=self.target_field,
                                            value=self.new_value)
         if mail_context:
+            from tcms.core.utils.mailto import mailto
             mail_context['request'] = self.request
             try:
                 mailto(**mail_context)
