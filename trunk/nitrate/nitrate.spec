@@ -15,12 +15,10 @@ BuildArch:      noarch
 BuildRequires:  python-setuptools
 BuildRequires:  python-devel
 
-Requires:       Django = 1.2.3
-# Requires:     mod_python
+Requires:       Django = 1.5.5
 Requires:       mod_ssl
 Requires:       python-memcached
 Requires:       python-kerberos
-Requires:       python-hashlib
 Requires:       python-qpid
 Requires:       python-lxml
 Requires:       kobo-django >= 0.2.0-3
@@ -61,10 +59,8 @@ done
 # Install apache config for the app:
 install -m 0644 -D -p contrib/conf/nitrate-httpd.conf  ${RPM_BUILD_ROOT}%{_sysconfdir}/httpd/conf.d/%{name}.conf
 
- 
 %clean
 rm -rf $RPM_BUILD_ROOT
-
 
 %files
 %defattr(-,root,root,-)
@@ -73,8 +69,6 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}/Nitrate-%{version}-py*.egg-info/
 %{_datadir}/%{name}
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
-
-
 
 %changelog
 
