@@ -50,8 +50,10 @@ rm -rf $RPM_BUILD_ROOT
 # Copy static content from 32/64bit-specific python dir to shared data dir:
 mkdir -p ${RPM_BUILD_ROOT}%{_datadir}/%{name}
 mkdir -p ${RPM_BUILD_ROOT}%{_docdir}/%{name}
+mkdir -p ${RPM_BUILD_ROOT}%{_var}/%{name}/static
+mkdir -p ${RPM_BUILD_ROOT}%{_var}/%{name}/uploads
 
-for d in contrib tcms/media; do
+for d in contrib; do
     cp -r ${d} ${RPM_BUILD_ROOT}%{_datadir}/%{name};
     # chown -R root:root ${RPM_BUILD_ROOT}%{_datadir}/%{name}/${d};
 done
@@ -64,11 +66,13 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc docs/INSTALL docs/AUTHORS docs/ChangeLog docs/README docs/RELEASENOTES docs/UPGRADING docs/XMLRPC docs/testopia-dump-blank.sql docs/mysql_initial.sql docs/db-updates.sql
+%attr(0755, apache, apache) %{_var}/%{name}
+%doc AUTHORS ChangeLog docs/README
 %{python_sitelib}/tcms/
-%{python_sitelib}/Nitrate-%{version}-py*.egg-info/
+%{python_sitelib}/nitrate-%{version}-py*.egg-info/
 %{_datadir}/%{name}
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
+%config(noreplace) %{python_sitelib}/tcms/settings/product.py
 
 %changelog
 
