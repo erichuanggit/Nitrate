@@ -713,15 +713,27 @@ def bug(request, case_run_id, template_name='run/execute_case_run.html'):
 
             form = CaseBugForm(request.REQUEST)
             if not form.is_valid():
-                response = {'rc': 1, 'response': form.errors}
-                return self.ajax_response(response = response)
+                # When form has a unique constraint error according to the
+                # definition within TestCaseBug's Meta class, __all__ appears.
+                # For more details, refer to method django.forms.BaseForm.clean.
+                error_msg = form.errors.get('__all__')
+                if error_msg is None:
+                    # FIXME: this case seems unnecessary.
+                    response = {'rc': 1, 'response': form.errors}
+                else:
+                    response = {'rc': 1, 'response': error_msg[0]}
+                return self.ajax_response(response=response)
 
-            tcr.add_bug(
-                bug_id = form.cleaned_data['bug_id'],
-                bug_system = form.cleaned_data['bug_system'],
-                summary = form.cleaned_data['summary'],
-                description = form.cleaned_data['description'],
-            )
+            bug_id = form.cleaned_data['bug_id']
+            try:
+                tcr.add_bug(bug_id=bug_id,
+                            bug_system=form.cleaned_data['bug_system'],
+                            summary=form.cleaned_data['summary'],
+                            description=form.cleaned_data['description'])
+            except:
+                return self.ajax_response(
+                    response='Failed to add bug %d' % bug_id)
+
             # tcr.set_current()
             self.default_ajax_response['run_bug_count'] = self.get_run_bug_count()
             return self.ajax_response()
@@ -730,7 +742,8 @@ def bug(request, case_run_id, template_name='run/execute_case_run.html'):
             if not response:
                 response = self.default_ajax_response
 
-            return HttpResponse(simplejson.dumps(response))
+            return HttpResponse(simplejson.dumps(response),
+                                mimetype='application/json')
 
         def file(self):
             rh_bz = Bugzilla(settings.BUGZILLA_URL)

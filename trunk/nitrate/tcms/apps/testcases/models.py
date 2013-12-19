@@ -610,27 +610,32 @@ class TestCaseBugSystem(TCMSActionModel):
     def __unicode__(self):
         return self.name
 
+
 class TestCaseBug(TCMSActionModel):
     bug_id = models.IntegerField()
-    case_run = models.ForeignKey(
-        'testruns.TestCaseRun',
-        related_name='case_run_bug',
-        default=None, blank=True, null=True
-    )
-    case = models.ForeignKey(
-        TestCase,
-        related_name='case_bug',
-    )
+    case_run = models.ForeignKey('testruns.TestCaseRun',
+                                 related_name='case_run_bug',
+                                 default=None, blank=True, null=True)
+    case = models.ForeignKey(TestCase, related_name='case_bug')
     bug_system = models.ForeignKey(TestCaseBugSystem, default=1)
     summary = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 
     class Meta:
         db_table = u'test_case_bugs'
-        unique_together = (
-            ('bug_id', 'case_run', 'case'),
-            ('bug_id', 'case_run')
-        )
+        unique_together = (('bug_id', 'case_run', 'case'),
+                           ('bug_id', 'case_run'))
+
+    def unique_error_message(self, model_class, unique_check):
+        '''Specific to invalid bug id'''
+        bug_id_uniques = (('bug_id', 'case_run', 'case'),
+                          ('bug_id', 'case_run'))
+        if unique_check in bug_id_uniques:
+            return 'Bug %d exists in run %d already.' % (self.bug_id,
+                                                         self.case_run.pk)
+        else:
+            return super(TestCaseBug, self).unique_error_message(model_class,
+                                                                 unique_check)
 
     def __unicode__(self):
         return str(self.bug_id)
@@ -647,6 +652,7 @@ class TestCaseBug(TCMSActionModel):
 
     def get_url(self):
         return self.bug_system.url_reg_exp % self.bug_id
+
 
 class Contact(TCMSContentTypeBaseModel):
     ''' A Contact that can be added into Email settings' CC list '''

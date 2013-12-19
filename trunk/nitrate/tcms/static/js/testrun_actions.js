@@ -606,7 +606,7 @@ function addCaseRunBug(run_id, title_container, container, case_id, case_run_id,
         alert('Number too long, length must be less than 7.');
         return false;
     }
-    
+
     var url = getURLParam(case_run_id).url_case_run_bug;
     var parameters = {
         a: 'add',
@@ -615,15 +615,16 @@ function addCaseRunBug(run_id, title_container, container, case_id, case_run_id,
         bug_id: bug_id,
     }
     parameters['case'] = case_id;
-    
+
     var success = function(t) {
         var returnobj = t.responseText.evalJSON();
-        
+
         if(returnobj.rc == 0) {
-            if (callback)
+            if (callback) {
                 return callback();
+            }
             //update bug count
-            if(jQ('span#'+case_run_id+'_case_bug_count').text()=='0'){
+            if (jQ('span#'+case_run_id+'_case_bug_count').text()=='0') {
                 jQ('span#'+case_run_id+'_case_bug_count').addClass('have_bug');
             }
             jQ('span#'+case_run_id+'_case_bug_count').text(parseInt(jQ('span#'+case_run_id+'_case_bug_count').text())+1);
@@ -631,23 +632,22 @@ function addCaseRunBug(run_id, title_container, container, case_id, case_run_id,
                 jQ('span#total_run_bug_count').html(
                     "<a title='Show All Bugs' href='/run/"+run_id+"/report/#buglist'>Bugs ["+returnobj.run_bug_count+"]</a>"
                 );
-            }
-            else{
+            } else {
                 jQ('span#total_run_bug_count a').html("Bugs ["+returnobj.run_bug_count+"]");
             }
             return constructCaseRunZone(container, title_container, case_id);
         } else {
-            alert(returnobj.response);
+            alert(returnobj.response[0]);
             return false;
         }
-    }
-    
+    };
+
     new Ajax.Request(url, {
         method: 'get',
         parameters: parameters,
         onSuccess: success,
         onFailure: json_failure,
-    })
+    });
 }
 function removeCaseRunBug(run_id, title_container, container, bug_id, case_id, case_run_id, callback)
 {   
