@@ -598,7 +598,7 @@ def all(request, template_name="case/all.html"):
 
         # Load more is a POST request, so POST parameters are required only.
         # Remember this for loading more cases with the same as criterias.
-        'search_criterias': request.raw_post_data,
+        'search_criterias': request.body,
         'total_cases_count': total_cases_count,
     }
     return render_to_response(template_name, context_data,

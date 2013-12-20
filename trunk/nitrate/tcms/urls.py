@@ -17,7 +17,7 @@
 #   Xuqing Kuang <xkuang@redhat.com>
 
 from django.conf import settings
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 from django.views.generic.base import RedirectView
 
 # Uncomment the next two lines to enable the admin:
