@@ -30,18 +30,6 @@ code::
 Or you also can download the tarballs from:
 https://git.fedorahosted.org/cgit/nitrate.git/?h=development
 
-Requirement modules
-~~~~~~~~~~~~~~~~~~~
-
-* `Python <http://www.python.org/>`_ >= 2.6.5
-* `Django <http://www.djangoproject.com/>`_ = 1.5.5
-* `MySQL-python <http://sourceforge.net/projects/mysql-python/>`_ = 1.2.4
-* `Kobo <https://fedorahosted.org/kobo/>`_ = 0.2.1
-* `kerberos <https://pypi.python.org/pypi/kerberos/1.1.1>`_ = 1.1.1
-* `qpid-python <http://qpid.apache.org/components/messaging-api/index.html>`_  = 0.20
-* `Django debug toolbar <http://github.com/robhudson/django-debug-toolbar>`_ (Optional: Recommendations for development)
-* `Sphinx <https://pypi.python.org/pypi/Sphinx/1.2b3>`_ (Optional: Recommendations for development, used for building docs)
-
 Install dependence
 ~~~~~~~~~~~~~~~~~~
 
