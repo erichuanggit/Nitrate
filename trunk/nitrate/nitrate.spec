@@ -1,8 +1,8 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:           nitrate
-Version:        3.8.5
-Release:        5%{?dist}
+Version:        3.8.6
+Release:        1%{?dist}
 Summary:        Test Case Management System
 
 Group:          Development/Languages
