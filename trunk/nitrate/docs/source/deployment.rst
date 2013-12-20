@@ -28,6 +28,12 @@ After download the source code, you can go to the source code directory and inst
   cd [nitrate_download_path]/nitrate/trunk/nitrate
   python setup.py install
 
+.. Note::
+
+   Additional devel packages should be installed first:
+
+   `$ sudo yum install python-devel mysql-devel krb5-devel libxml2-devel libxslt-devel`
+
 Initialize database schema
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

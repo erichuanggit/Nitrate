@@ -38,6 +38,12 @@ code::
     # cd nitrate/trunk/nitrate
     # pip install -r requirements/devel.txt
 
+.. Note::
+
+   Additional devel packages should be installed first:
+
+   `$ sudo yum install python-devel mysql-devel krb5-devel libxml2-devel libxslt-devel`
+
 Setup database
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
