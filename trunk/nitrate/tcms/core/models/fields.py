@@ -61,7 +61,7 @@ class TimedeltaField(models.Field):
     def get_db_prep_lookup(self, lookup_type, value):
         raise NotImplementedError()  # SQL WHERE
     
-    def get_db_prep_save(self, value):
+    def get_db_prep_save(self, value, connection):
         if (value is None) or value == '':
             return '00:00:00'
         
@@ -123,7 +123,7 @@ class BlobField(models.Field):
         else:
             return value
     
-    def get_db_prep_save(self, value):
+    def get_db_prep_save(self, value, connection):
         if value is None:
             return None
         if settings.DATABASE_ENGINE =='postgresql_psycopg2':
