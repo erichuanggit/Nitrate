@@ -349,6 +349,7 @@ def say_no(error_msg):
 def say_yes():
     return HttpResponse(simplejson.dumps({'rc': 0, 'response': 'ok'}))
 
+# Deprecated. Not flexible.
 def update(request):
     '''
     Generic approach to update a model,\n

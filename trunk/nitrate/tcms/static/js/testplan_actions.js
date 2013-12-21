@@ -18,6 +18,7 @@ Nitrate.TestPlans.CasesContainer = {
     ReviewingCases: 'reviewcases'
 };
 
+
 Nitrate.TestPlans.TreeView = {
     pk: new Number(),
     data: new Object(),
@@ -26,7 +27,7 @@ Nitrate.TestPlans.TreeView = {
     default_parameters: {
         t: 'ajax',
     }, // FIXME: Doesn't make effect here.
-    
+
     filter: function(parameters, callback) {
         var url = getURLParam().url_plans;
         new Ajax.Request(url, {
@@ -35,39 +36,41 @@ Nitrate.TestPlans.TreeView = {
             asynchronous: false,
             onSuccess: callback,
             onFailure: json_failure,
-        })
+        });
     },
+
     init: function(plan_id) {
         this.pk = plan_id;
-        
+
         // Current, Parent, Brothers, Children, Temporary current
         var c_plan, p_plan, b_plans, ch_plans, tc_plan;
-        
+
         // Get the current plan
-        var p1 = { pk: plan_id, t: 'ajax'};
+        var p1 = {pk: plan_id, t: 'ajax'};
         var c1 = function(t) {
             var returnobj = t.responseText.evalJSON(true);
-            if (returnobj.length > 0)
+            if (returnobj.length > 0) {
                 c_plan = returnobj[0];
+            }
         };
         this.filter(p1, c1);
-        if(!c_plan) {
+        if (!c_plan) {
             alert('Plan ' + plan_id + ' can not found in database');
             return false;
         }
-        
+
         // Get the parent plan
-        if(c_plan.fields.parent) {
+        if (c_plan.fields.parent) {
             var p2 = { pk: c_plan.fields.parent, t: 'ajax'};
             var c2 = function(t) {
                 var returnobj = t.responseText.evalJSON(true);
                 p_plan = returnobj[0];
-            }
+            };
             this.filter(p2, c2);
         }
-        
+
         // Get the brother plans
-        if(c_plan.fields.parent) {
+        if (c_plan.fields.parent) {
             var p3 = { parent__pk: c_plan.fields.parent, t: 'ajax'};
             var c3 = function(t) {
                 var returnobj = t.responseText.evalJSON(true);
@@ -75,7 +78,7 @@ Nitrate.TestPlans.TreeView = {
             }
             this.filter(p3, c3);
         }
-        
+
         // Get the child plans
         var p4 = { 'parent__pk': c_plan.pk, 't': 'ajax'};
         var c4 = function(t) {
@@ -83,27 +86,31 @@ Nitrate.TestPlans.TreeView = {
             ch_plans = returnobj;
         };
         this.filter(p4, c4);
-        
+
         // Combine all of plans
         // Presume the plan have parent and brother at first
-        if(p_plan && b_plans) {
+        if (p_plan && b_plans) {
             p_plan.children = b_plans;
             tc_plan = this.traverse(p_plan.children, c_plan.pk);
             tc_plan.is_current = true;
-            if (ch_plans)
+            if (ch_plans) {
                 tc_plan.children = ch_plans;
-            
-            if(p_plan.pk)
-                p_plan = Nitrate.Utils.convert('obj_to_list', p_plan)
-            
+            }
+
+            if(p_plan.pk) {
+                p_plan = Nitrate.Utils.convert('obj_to_list', p_plan);
+            }
+
             this.data = p_plan;
         } else {
             c_plan.is_current = true;
-            if (ch_plans)
+            if (ch_plans) {
                 c_plan.children = ch_plans;
+            }
             this.data = Nitrate.Utils.convert('obj_to_list', c_plan);
-        };
+        }
     },
+
     up: function(e) {
         var tree = Nitrate.TestPlans.TreeView;
         var parent_obj, brother_obj; 
@@ -112,7 +119,7 @@ Nitrate.TestPlans.TreeView = {
             pk: tree.data[0].fields.parent,
             t: 'ajax'
         };
-        
+
         var parent_callback = function(t) {
             var returnobj = t.responseText.evalJSON(true);
             parent_obj = {0: returnobj[0], length: 1};
@@ -144,6 +151,7 @@ Nitrate.TestPlans.TreeView = {
             tree.render_page();
         }
     },
+
     blind: function(e) {
         var tree = Nitrate.TestPlans.TreeView;
         var e_container = this;
@@ -153,48 +161,48 @@ Nitrate.TestPlans.TreeView = {
         var expand_icon_url = '/static/images/t2.gif';
         var collapse_icon_url = '/static/images/t1.gif';
         var obj = tree.traverse(tree.data, e_pk);
-        
-        for (i in container_clns) {
-            if(typeof(container_clns[i]) != 'string')
-                continue
-            
-            switch (container_clns[i]) {
-                case 'expand_icon':
-                    li_container.down('ul').hide();
-                    e_container.src = collapse_icon_url;
-                    e_container.removeClassName('expand_icon');
-                    e_container.addClassName('collapse_icon');
-                    break;
-                case 'collapse_icon':
-                    if (typeof(obj.children) != 'object' || obj.children == []) {
-                        var c = function(t) {
-                            var returnobj = t.responseText.evalJSON(true);
-                            returnobj = Nitrate.Utils.convert('obj_to_list', returnobj);
-                            tree.insert(obj, returnobj);
-                            var ul = tree.render(returnobj);
-                            li_container.appendChild(ul);
-                        };
-                        
-                        var p = {
-                            parent__pk: e_pk,
-                            t: 'ajax',
-                        };
-                        tree.filter(p, c);
-                    };
-                    
-                    li_container.down('ul').show();
-                    e_container.src = expand_icon_url;
-                    e_container.removeClassName('collapse_icon');
-                    e_container.addClassName('expand_icon');
-                    break;
+
+        container_clns.forEach(function(className, index) {
+            if (typeof(className) === 'string') {
+                switch (className) {
+                    case 'expand_icon':
+                        li_container.down('ul').hide();
+                        e_container.src = collapse_icon_url;
+                        e_container.removeClassName('expand_icon');
+                        e_container.addClassName('collapse_icon');
+                        break;
+
+                    case 'collapse_icon':
+                        if (typeof(obj.children) != 'object' || obj.children == []) {
+                            var cbGetChildPlans = function(t) {
+                                var returnobj = t.responseText.evalJSON(true);
+                                returnobj = Nitrate.Utils.convert('obj_to_list', returnobj);
+                                tree.insert(obj, returnobj);
+                                var ul = tree.render(returnobj);
+                                li_container.appendChild(ul);
+                            };
+                            var p = {
+                                parent__pk: e_pk,
+                                t: 'ajax',
+                            };
+                            tree.filter(p, cbGetChildPlans);
+                        }
+
+                        li_container.down('ul').show();
+                        e_container.src = expand_icon_url;
+                        e_container.removeClassName('collapse_icon');
+                        e_container.addClassName('expand_icon');
+                        break;
+                }
             }
-        };
+        });
     },
+
     render: function(data) {
         var ul = new Element('ul');
         var icon_expand = '<img src="/static/images/t2.gif" class="expand_icon">';
         var icon_collapse = '<img src="/static/images/t1.gif" class="collapse_icon">';
-        
+
         // Add the 'Up' button
         if (!data && this.data) {
             var data = this.data;
@@ -207,51 +215,56 @@ Nitrate.TestPlans.TreeView = {
                 ul.appendChild(li);
             };
         }
-        
+
         // Add the child plans to parent
-        for (i in data) {
-            if(!data[i].pk)
+        for (var i in data) {
+            if(!data[i].pk) {
                 continue;
-            
+            }
+
             var li = new Element('li');
             var title = '[<a href="' + data[i].extras.get_url_path + '">' + data[i].pk + '</a>] ';
 
-            if (data[i].extras.num_children && data[i].children){
+            if (data[i].extras.num_children && data[i].children) {
                 title = icon_expand + title;
                 li.addClassName('no-list-style');
             }
-            
-            if (data[i].extras.num_children && !data[i].children){
+
+            if (data[i].extras.num_children && !data[i].children) {
                 title = icon_collapse + title;
                 li.addClassName('no-list-style');
             }
-            
-            if (data[i].is_current)
+
+            if (data[i].is_current) {
                 li.addClassName('current');
-            
-            if (data[i].fields.is_active)
+            }
+
+            if (data[i].fields.is_active) {
                 title = '<div>' + title;
-            else
+            } else {
                 title = '<div class="line-through">' + title;
+            }
 
             // Construct the items
             title += '<a class="plan_name" href="' + data[i].extras.get_url_path + '">' + data[i].fields.name + '</a>';
             title += ' (';
-            if (data[i].extras.num_cases && data[i].is_current)
+            if (data[i].extras.num_cases && data[i].is_current) {
                 title += '<a href="#testcases" onclick="FocusTabOnPlanPage(this)">' + data[i].extras.num_cases + ' cases</a>, ';
-            else if (data[i].extras.num_cases && !(data[i].is_current))
+            } else if (data[i].extras.num_cases && !(data[i].is_current)) {
                 title += '<a href="' + data[i].extras.get_url_path + '#testcases">' + data[i].extras.num_cases + ' cases</a>, ';
-            else
+            } else {
                 title += '0 case, ';
-            
-            if (data[i].extras.num_runs && data[i].is_current)
-                title += '<a href="#testruns" onclick="FocusTabOnPlanPage(this)">' + data[i].extras.num_runs + ' runs</a>, ';
-            else if (data[i].extras.num_runs && !data[i].is_current)
-                title += '<a href="' + data[i].extras.get_url_path + '#testruns">' + data[i].extras.num_runs + ' runs</a>, ';
-            else
-                title += '0 runs, ';
+            }
 
-            if (data[i].is_current){
+            if (data[i].extras.num_runs && data[i].is_current) {
+                title += '<a href="#testruns" onclick="FocusTabOnPlanPage(this)">' + data[i].extras.num_runs + ' runs</a>, ';
+            } else if (data[i].extras.num_runs && !data[i].is_current) {
+                title += '<a href="' + data[i].extras.get_url_path + '#testruns">' + data[i].extras.num_runs + ' runs</a>, ';
+            } else {
+                title += '0 runs, ';
+            }
+
+            if (data[i].is_current) {
                 switch (data[i].extras.num_children) {
                     case 0:
                         title += '0 child';
@@ -263,7 +276,7 @@ Nitrate.TestPlans.TreeView = {
                         title += '<a href="#treeview" onclick="expandCurrentPlan(this.up(0))">' + data[i].extras.num_children + ' children</a>';
                         break;
                 }
-            }else{
+            } else {
                 switch (data[i].extras.num_children) {
                     case 0:
                         title += '0 child';
@@ -277,36 +290,37 @@ Nitrate.TestPlans.TreeView = {
                 }
 
             }
-            
+
             title += ')</div>';
-            
+
             li.update(title);
             ul.appendChild(li);
-            
+
             // Observe the blind link click event
             li.adjacent('img').invoke('observe', 'click', this.blind);
-            if(data[i].children)
+            if (data[i].children) {
                 li.appendChild(this.render(data[i].children));
+            }
         };
-        
+
         return ul;
     },
+
     render_page: function(container) {
-        if (!container)
-            container = this.default_container
-        
-        $(container).update(getAjaxLoading());
-        $(container).update(this.render());
+        var _container = container || this.default_container;
+        $(_container).update(getAjaxLoading());
+        $(_container).update(this.render());
     },
+
     traverse: function(data, pk) {
         // http://stackoverflow.com/questions/3645678/javascript-get-a-reference-from-json-object-with-traverse
         for (i in data) {
             if (data[i] == [] || typeof(data[i]) != 'object')
                 continue
-            
+
             if(typeof(data[i].pk) == 'number' && data[i].pk == pk)
                 return data[i];
-            
+
             if (typeof(data[i].children) == 'object') {
                 var retVal = this.traverse(data[i].children, pk);
                 if (typeof(retVal) != 'undefined')
@@ -314,13 +328,164 @@ Nitrate.TestPlans.TreeView = {
             };
         };
     },
+
     insert: function(node, data) {
         if(node.children)
             return node;
-        
+
         node.children = data;
         return node;
     },
+
+    toggleRemoveChildPlanButton: function() {
+        var treeContainer = jQ('#' + Nitrate.TestPlans.TreeView.default_container);
+        var tvTabContainer = Nitrate.TestPlans.Details.getTabContentContainer({
+            containerId: Nitrate.TestPlans.Details.tabContentContainerIds.treeview
+        });
+        var toEnableRemoveButton = treeContainer.find('.current').find('ul li').length > 0;
+        if (toEnableRemoveButton) {
+            tvTabContainer.find('.remove_node')[0].disabled = false;
+        } else {
+            tvTabContainer.find('.remove_node')[0].disabled = true;
+        }
+    },
+
+    addChildPlan: function(container, plan_id) {
+        var self = this;
+        var tree = Nitrate.TestPlans.TreeView;
+        var p = prompt('Enter a comma separated list of plan IDs');
+        if (!p) {
+            return false;
+        }
+
+        var childPlanId = parseInt(p);
+        if (isNaN(childPlanId)) {
+            alert('Plan Id should be a numeric. $plan_id is not valid.'.replace('$plan_id', p));
+            return false;
+        }
+
+        if (childPlanId === tree.data[0].pk || childPlanId === plan_id) {
+            alert('Cannot add parent or self.');
+            return false;
+        }
+
+        var parameters = {
+            pk__in: childPlanId,
+        };
+
+        var callback = function(e) {
+            e.stop();
+            var cbUpdateTreeView = function(t) {
+                clearDialog();
+                var planDetails = Nitrate.TestPlans.Details;
+                var container = planDetails.getTabContentContainer({
+                    containerId: planDetails.tabContentContainerIds.treeview
+                });
+                planDetails.loadPlansTreeView(plan_id);
+                self.toggleRemoveChildPlanButton();
+            };
+
+            updateObject('testplans.testplan', this.serialize(true)['plan_id'],
+                         'parent', plan_id, 'int',
+                         cbUpdateTreeView);
+        };
+
+        constructPlanParentPreviewDialog(childPlanId, parameters, callback);
+    },
+
+    removeChildPlan: function(container, plan_id) {
+        var self = this;
+        var tree = Nitrate.TestPlans.TreeView;
+        var plan_obj = tree.traverse(tree.data, plan_id);
+        var children_pks = [];
+        for (var i = 0; i < plan_obj.children.length; i++) {
+            children_pks.push(plan_obj.children[i].pk);
+        }
+
+        var p = prompt('Enter a comma separated list of plan IDs to be removed');
+        if (!p) {
+            return false;
+        }
+        var prompt_pks = p.split(',');
+        for (var j = 0 ; j < prompt_pks.length; j++) {
+            if (prompt_pks[j].include(plan_id)) {
+                alert('can not remove current plan');
+                return false;
+            } else if (!children_pks.include(prompt_pks[j])) {
+                alert('plan ' + prompt_pks[j] + ' is not the child node of current plan');
+                return false;
+            }
+        }
+        var parameters = {pk__in: p};
+
+        var callback = function(e) {
+            e.stop();
+            var tree = Nitrate.TestPlans.TreeView;
+            var cbUpdateTreeView = function(t) {
+                clearDialog();
+                var planDetails = Nitrate.TestPlans.Details;
+                var container = planDetails.getTabContentContainer({
+                    containerId: planDetails.tabContentContainerIds.treeview
+                });
+                planDetails.loadPlansTreeView(plan_id);
+                self.toggleRemoveChildPlanButton();
+            };
+            updateObject('testplans.testplan', this.serialize(true)['plan_id'],
+                         'parent', 0, 'None', cbUpdateTreeView);
+        };
+
+        constructPlanParentPreviewDialog(p, parameters, callback);
+    },
+
+
+    changeParentPlan: function(container, plan_id) {
+        var tree = Nitrate.TestPlans.TreeView;
+        var p = prompt('Enter new parent plan ID');
+        if (!p) {
+            return false;
+        }
+        var planId = parseInt(p);
+        if (isNaN(planId)) {
+            alert('Plan Id should be a numeric. ' + p + ' is invalid.');
+            return false;
+        }
+        if (planId === plan_id) {
+            alert('Parent plan should not be the current plan itself.');
+            return false;
+        }
+
+        var parameters = {plan_id: p};
+        var callback = function(e) {
+            e.stop();
+            var tree = Nitrate.TestPlans.TreeView;
+            var cbAfterUpdatingPlan = function(t) {
+                var plan;
+                var param = { plan_id: p, t: 'ajax' };
+                var c = function(t) {
+                    plan = Nitrate.Utils.convert('obj_to_list', t.responseText.evalJSON(true));
+
+                    if (tree.data[0].pk == plan_id) {
+                        plan[0].children = Object.clone(tree.data);
+                        tree.data = plan;
+                        tree.render_page();
+                    } else {
+                        plan[0].children = Object.clone(tree.data[0].children);
+                        tree.data = plan;
+                        tree.render_page();
+                    };
+
+                    clearDialog();
+                };
+
+                tree.filter(param, c);
+            };
+            updateObject('testplans.testplan', plan_id, 'parent',
+                         this.serialize(true)['plan_id'],
+                         'int', cbAfterUpdatingPlan);
+        };
+
+        constructPlanParentPreviewDialog(p, parameters, callback);
+    }
 };
 
 Nitrate.TestPlans.Create.on_load = function()
@@ -395,7 +560,7 @@ Nitrate.TestPlans.List.on_load = function()
             clickedSelectAll(this, $('plans_form'), 'plan');
         });
     };
-//     
+
     // if($('testplans_table')) {
         // TableKit.Sortable.init('testplans_table',
         // {
@@ -458,6 +623,29 @@ Nitrate.TestPlans.List.on_load = function()
 }
 
 Nitrate.TestPlans.Details = {
+
+    tabContentContainerIds: {
+        document: 'document',
+        confirmedCases: 'testcases',
+        reviewingCases: 'reviewcases',
+        attachment: 'attachment',
+        testruns: 'testruns',
+        components: 'components',
+        log: 'log',
+        treeview: 'treeview',
+        tag: 'tag'
+    },
+
+    getTabContentContainer: function(options) {
+        var containerId = options.containerId;
+        var constants = Nitrate.TestPlans.Details.tabContentContainerIds;
+        var id = constants[containerId];
+        if (id === undefined) {
+            return undefined;
+        } else {
+            return jQ('#' + id);
+        }
+    },
 
     /*
      * Lazy-loading TestPlans TreeView
@@ -2204,7 +2392,7 @@ function sortCase(container, plan_id, order) {
     constructPlanDetailsCasesZone(container, plan_id, parameters)
 }
 
-function toggleMultiSelect(){
+function toggleMultiSelect() {
     $('filter_priority_selector').toggle();
     $('filter_priority_selector_multiple').toggle();
 }
@@ -2245,132 +2433,6 @@ function constructPlanParentPreviewDialog(plan_id, parameters, callback)
     */
     
     previewPlan(parameters, action, callback, notice);
-}
-
-function changePlanParent(container, plan_id)
-{
-    // container is not in using so far
-    
-    var tree = Nitrate.TestPlans.TreeView;
-    var p = prompt('Enter new parent plan ID');
-    if(!p)
-        return false;
-    
-    if (p == plan_id) {
-        alert('Nothing changed');
-        return false;
-    }
-    
-    var parameters = {
-        plan_id: p,
-    };
-    
-    var callback = function(e) {
-        e.stop();
-        var tree = Nitrate.TestPlans.TreeView;
-        var c = function(t) {
-            var plan;
-            var param = { plan_id: p, t: 'ajax' };
-            var c = function(t) {
-                plan = Nitrate.Utils.convert('obj_to_list', t.responseText.evalJSON(true));
-                
-                if (tree.data[0].pk == plan_id) {
-                    plan[0].children = Object.clone(tree.data);
-                    tree.data = plan;
-                    tree.render_page();
-                } else {
-                    plan[0].children = Object.clone(tree.data[0].children);
-                    tree.data = plan;
-                    tree.render_page();
-                };
-                
-                clearDialog();
-            };
-            
-            tree.filter(param, c)
-        };
-        updateObject('testplans.testplan', plan_id, 'parent', this.serialize(true)['plan_id'], 'int', c);
-    };
-    
-    constructPlanParentPreviewDialog(p, parameters, callback);
-}
-
-function addPlanChildren(container, plan_id)
-{
-    // container is not in using so far
-    
-    var tree = Nitrate.TestPlans.TreeView;
-    var p = prompt('Enter a comma separated list of plan IDs');
-    if(!p)
-        return false;
-    
-    if (p == tree.data[0].pk || p == plan_id) {
-        alert('Nothing changed');
-        return false;
-    }
-    
-    var parameters = {
-        pk__in: p,
-    };
-    
-    var callback = function(e) {
-        e.stop();
-        var tree = Nitrate.TestPlans.TreeView;
-        var c = function(t) {
-            tree.init(plan_id);
-            tree.render_page();
-            clearDialog();
-            alert(default_messages.alert.tree_reloaded);
-        };
-        
-        updateObject('testplans.testplan', this.serialize(true)['plan_id'], 'parent', plan_id, 'int', c);
-    };
-    
-    constructPlanParentPreviewDialog(p, parameters, callback);
-}
-
-function removePlanChildren(container, plan_id)
-{
-    // container is not in using so far
-    
-    var tree = Nitrate.TestPlans.TreeView;
-    var plan_obj = tree.traverse(tree.data, plan_id);
-    var children_pks = new Array();
-    for (var i = 0; i < plan_obj.children.length; i++)
-        children_pks.push(plan_obj.children[i].pk);
-    var p = prompt('Enter a comma separated list of plan IDs to be removed');
-    if(!p)
-        return false;
-    var prompt_pks = p.split(',');
-    for(var j = 0 ; j < prompt_pks.length; j++){
-        if (prompt_pks[j].include(plan_id)){
-            alert('can not remove current plan');
-            return false;
-        }
-        else if (!children_pks.include(prompt_pks[j])){
-            alert('plan ' + prompt_pks[j] + ' is not the child node of current plan');
-            return false;
-        }
-        else
-            continue;
-    }
-    var parameters = {
-        pk__in: p,
-    };
-    
-    var callback = function(e) {
-        e.stop();
-        var tree = Nitrate.TestPlans.TreeView;
-        var c = function(t) {
-            tree.init(plan_id);
-            tree.render_page();
-            clearDialog();
-            alert(default_messages.alert.tree_reloaded);
-        };
-        updateObject('testplans.testplan', this.serialize(true)['plan_id'], 'parent', 0, 'None', c);
-    };
-    
-    constructPlanParentPreviewDialog(p, parameters, callback);
 }
 
 function resortCasesDragAndDrop(container, button, form, table, parameters, callback)

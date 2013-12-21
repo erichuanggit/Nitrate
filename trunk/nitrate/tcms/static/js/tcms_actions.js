@@ -1022,20 +1022,21 @@ function submitComment(container, parameters, callback)
 
 function previewPlan(parameters, action, callback, notice, s, c) {
     var dialog = getDialog();
-    
+
     clearDialog();
     dialog.show();
-    
+
     parameters.t = 'html';
     parameters.f = 'preview';
-    
+
     // constuct_list is not in using yet.
     var construct_list = function(data) {
         var ul = new Element('ul');
         for (i in data) {
-            if(typeof(data[i]) != 'object')
-                continue
-            
+            if (typeof(data[i]) != 'object') {
+                continue;
+            }
+
             var li = new Element('li');
             var ck = new Element('input', {type: 'checkbox', name: 'plan_id', value: data[i].pk});
             var title = new Element('label');
@@ -1044,10 +1045,10 @@ function previewPlan(parameters, action, callback, notice, s, c) {
             li.appendChild(title);
             ul.appendChild(li);
         }
-        
+
         return ul;
-    }
-    
+    };
+
     var url = new String('/plans/');
     var success = function(t) {
         /*
@@ -1055,17 +1056,17 @@ function previewPlan(parameters, action, callback, notice, s, c) {
         var html = construct_list(returnobj);
         var form = constructForm(html, action, callback);
         */
-        
+
         var form = constructForm(t.responseText, action, callback, notice, s, c);
         dialog.update(form);
     };
-    
+
     new Ajax.Request(url, {
         method: 'get',
         parameters: parameters,
         onSuccess: success,
         onFaiulre: html_failure,
-    })
+    });
 }
 
 function getInfo(parameters, callback, container, allow_blank, format)

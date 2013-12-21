@@ -118,61 +118,46 @@ class TestCaseCategory(TCMSActionModel):
 
 class TestCase(TCMSActionModel):
     case_id = models.AutoField(max_length=10, primary_key=True)
-    create_date = models.DateTimeField(
-        db_column='creation_date', auto_now_add=True
-    )
-    is_automated = models.IntegerField(
-        db_column='isautomated', default = 0, max_length=4,
-    )
+    create_date = models.DateTimeField(db_column='creation_date',
+                                       auto_now_add=True)
+    is_automated = models.IntegerField(db_column='isautomated',
+                                       default=0,
+                                       max_length=4)
     is_automated_proposed = models.BooleanField(default = False)
     script = models.TextField(blank=True)
     arguments = models.TextField(blank=True)
-    extra_link = models.CharField(
-        max_length=1024,
-        default=None,
-        blank=True,
-        null=True
-    )
+    extra_link = models.CharField(max_length=1024,
+                                  default=None,
+                                  blank=True,
+                                  null=True)
     summary = models.CharField(max_length=255, blank=True)
     requirement = models.CharField(max_length=255, blank=True)
     alias = models.CharField(max_length=255, blank=True)
     estimated_time = TimedeltaField(null=True, blank=True)
     notes = models.TextField(blank=True)
     case_status = models.ForeignKey(TestCaseStatus)
-    category = models.ForeignKey(
-        TestCaseCategory, related_name='category_case'
-    )
-    priority = models.ForeignKey(
-        'management.Priority', related_name='priority_case'
-    )
-    author = models.ForeignKey(
-        'auth.User', related_name='cases_as_author'
-    )
-    default_tester = models.ForeignKey(
-        'auth.User', related_name='cases_as_default_tester', blank = True, null=True
-    )
-    reviewer = models.ForeignKey(
-        'auth.User', related_name='cases_as_reviewer', null=True
-    )
-    attachment = models.ManyToManyField(
-        'management.TestAttachment',
-        through='testcases.TestCaseAttachment',
-    )
+    category = models.ForeignKey(TestCaseCategory, related_name='category_case')
+    priority = models.ForeignKey('management.Priority',
+                                 related_name='priority_case')
+    author = models.ForeignKey('auth.User', related_name='cases_as_author')
+    default_tester = models.ForeignKey('auth.User',
+                                       related_name='cases_as_default_tester',
+                                       blank=True,
+                                       null=True)
+    reviewer = models.ForeignKey('auth.User',
+                                 related_name='cases_as_reviewer',
+                                 null=True)
+    attachment = models.ManyToManyField('management.TestAttachment',
+                                        through='testcases.TestCaseAttachment')
 
-    plan = models.ManyToManyField(
-        'testplans.TestPlan',
-        through='testcases.TestCasePlan',
-    )
+    plan = models.ManyToManyField('testplans.TestPlan',
+                                  through='testcases.TestCasePlan')
 
-    component = models.ManyToManyField(
-        'management.Component',
-        through='testcases.TestCaseComponent',
-    )
+    component = models.ManyToManyField('management.Component',
+                                       through='testcases.TestCaseComponent')
 
-    tag = models.ManyToManyField(
-        'management.TestTag',
-        through='testcases.TestCaseTag',
-    )
+    tag = models.ManyToManyField('management.TestTag',
+                                 through='testcases.TestCaseTag')
 
     # Auto-generated attributes from back-references:
     #   'texts' : list of TestCaseTexts (from TestCaseTexts.case)
