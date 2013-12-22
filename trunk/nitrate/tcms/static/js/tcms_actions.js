@@ -32,20 +32,20 @@ Nitrate.Utils.convert = function(argument, data) {
 Event.observe(window, 'load', function(e) {
     // Initial the drop menu
     var dropDownMenu = Class.create();
-    
+
     dropDownMenu.prototype = {
         initialize: function(cls){
             this.cls = cls;
             this.init();
         },  
-        
+
         init: function(){
             $$(this.cls).each(function(o){
                 o.observe("mouseover", function(i) {
                     if(o.down(1))
                         o.down(1).show();
                 });
-                
+
                 o.observe("mouseout", function(i) {
                     if(o.down(1))
                         o.down(1).hide();
@@ -53,7 +53,7 @@ Event.observe(window, 'load', function(e) {
             });
         }
     };
-    
+
     var newnewMenu = new dropDownMenu(".nav_li");
 
     // Observe the bookmark form
@@ -65,33 +65,33 @@ Event.observe(window, 'load', function(e) {
             var username = Nitrate.User.username;
             var parameters = this.serialize(true);
             parameters.url = window.location.href;
-            
+
             if(!parameters.name)
                 parameters.name = document.title;
-            
+
             var complete = function(t) {
                 var c = function(t) {
                     var returnobj = t.responseText.evalJSON();
-                    
+
                     if (returnobj.rc != 0) {
                         alert(returnobj.response);
                         return returnobj
                     }
-                    
+
                     clearDialog();
                     alert(default_messages.alert.bookmark_added);
                     return returnobj;
                 }
-                
+
                 var form_observe = function(e) {
                     e.stop();
                     addBookmark(this.action, this.method, this.serialize(true), c)
                 }
-                
+
                 var form = constructForm(t.responseText, url, form_observe);
                 dialog.update(form);
             };
-            
+
             new Ajax.Updater(dialog, url, {
                 method: this.method,
                 parameters: parameters,
@@ -138,60 +138,77 @@ var default_messages = {
         'hide_filter': 'Hide Case Information Option',
         'show_filter': 'Show Case Information Option',
     }
-}
+};
 
-function getURLParam()
-{
-    args = $A(arguments);
-    id = args[0];
-    
-    var param = new Object();
-    
-    param.url_login = '/accounts/login/';
-    param.url_logout = '/accounts/logout/';
-    
-    param.url_get_product_info = '/management/getinfo/';
-    param.url_get_form = '/ajax/form/';
-    param.url_upload_file = '/management/uploadfile/';
 
-    param.url_search_users = '/management/accounts/search/';
-    param.url_change_user_group = '/management/account/' + id + '/changegroup/';
-    param.url_change_user_status = '/management/account/' + id + '/changestatus/';
+/*
+ * http namespace and modules
+ */
+(function() {
+    var http = Nitrate.http || {};
 
-    param.url_plans = '/plans/';
-    param.url_plan_components  = '/plans/component/';
-    param.url_modify_plan  = '/plan/' + id + '/modify/';
-    param.url_plan_assign_case = '/plan/' + id + '/assigncase/apply/';
-    param.url_plan_tree_view = '/plan/' + id + '/treeview/';
+    http.URLConf = {
+        _mapping: {
+            login: '/accounts/login/',
+            logout: '/accounts/logout/',
 
-    param.url_change_case_run_status = '/run/' + id + '/execute/changestatus/';
-    param.url_change_case_run_order = '/run/' + id + '/changecaserunorder/';
-    
-    param.url_search_case = '/cases/';
-    param.url_create_case = '/case/create/';
-    param.url_cases_automated = '/cases/automated/';
-    param.url_cases_tag = '/cases/tag/';
-    param.url_cases_component = '/cases/component/';
-    param.url_cases_category = '/cases/category/';
-    param.url_case_details = '/case/' + id + '/';
-    param.url_case_plan = '/case/' + id + '/plan/';
-    param.url_modify_case = '/case/' + id + '/modify/';
-    param.url_case_change_status = '/cases/changestatus/';
-    param.url_change_case_order = '/case/' + id + '/changecaseorder/';
-    
-    param.url_case_run_bug = '/caserun/' + id + '/bug/';
-    param.url_case_run_set_current = '/caserun/' + id + '/current/';
-    
-    param.url_runs_env_value = '/runs/env_value/';
+            change_user_group: '/management/account/$id/changegroup/',
+            change_user_status: '/management/account/$id/changestatus/',
+            search_users: '/management/accounts/search/',
 
-    param.url_comments_remove = '/comments/delete/';
+            comments_remove: '/comments/delete/',
+            get_form: '/ajax/form/',
+            get_product_info: '/management/getinfo/',
+            upload_file: '/management/uploadfile/',
 
-    param.url_manage_env_categories = '/management/environments/categories/';
-    param.url_manage_env_properties = '/management/environments/properties/';
-    param.url_manage_env_property_values = '/management/environments/propertyvalues/';
+            modify_plan : '/plan/$id/modify/',
+            plan_assign_case: '/plan/$id/assigncase/apply/',
+            plan_components : '/plans/component/',
+            plan_tree_view: '/plan/$id/treeview/',
+            plans: '/plans/',
 
-    return param;
-}
+            case_change_status: '/cases/changestatus/',
+            case_details: '/case/$id/',
+            case_plan: '/case/$id/plan/',
+            case_run_bug: '/caserun/$id/bug/',
+            case_run_set_current: '/caserun/$id/current/',
+            cases_automated: '/cases/automated/',
+            cases_category: '/cases/category/',
+            cases_component: '/cases/component/',
+            cases_tag: '/cases/tag/',
+            change_case_order: '/case/$id/changecaseorder/',
+            change_case_run_order: '/run/$id/changecaserunorder/',
+            change_case_run_status: '/run/$id/execute/changestatus/',
+            create_case: '/case/create/',
+            modify_case: '/case/$id/modify/',
+            search_case: '/cases/',
+
+            manage_env_categories: '/management/environments/categories/',
+            manage_env_properties: '/management/environments/properties/',
+            manage_env_property_values: '/management/environments/propertyvalues/',
+            runs_env_value: '/runs/env_value/'
+        },
+
+        reverse: function(options) {
+            var name = options.name;
+            if (name === undefined) {
+                return undefined;
+            }
+            var arguments = options.arguments || {};
+            var urlpattern = this._mapping[name];
+            if (urlpattern === undefined) {
+                return undefined;
+            }
+            var url = urlpattern;
+            for (var key in arguments) {
+                url = url.replace('$' + key, arguments[key].toString());
+            }
+            return url;
+        }
+    };
+
+    Nitrate.http = http;
+}());
 
 
 // Exceptions for Ajax
@@ -214,7 +231,7 @@ var html_failure = function()
 var json_success_refresh_page = function(t)
 {
     returnobj = t.responseText.evalJSON(true);
-    
+
     if (returnobj.rc == 0) {
         window.location.reload();
     } else {
@@ -226,7 +243,7 @@ var json_success_refresh_page = function(t)
 function addBookmark(url, method, parameters, callback)
 {
     parameters['a'] = 'add';
-    
+
     new Ajax.Request(url, {
         method: method,
         parameters: parameters,
@@ -272,10 +289,10 @@ function removeItem(item)
 function splitString(str, num)
 {
     cut_for_dot = num - 3;
-    
+
     if(str.length > num)
         return str.substring(0, cut_for_dot) + "...";
-        
+
     return str;
 }
 
@@ -291,7 +308,7 @@ function set_up_choices(element, values, allow_blank)
 {
     var innerHTML = "";
     var selected_ids = new Array();
-    
+
     if(!element.multiple) {
         // Process the single select box
         selected_ids.push(element.value);
@@ -302,38 +319,38 @@ function set_up_choices(element, values, allow_blank)
                selected_ids.push(node.value)
         }
     }
-    
+
     // Set up blank option, if there is one:
     if (allow_blank) {
         innerHTML += '<option value="">---------</option>';
     }
-    
+
     // Add an <option> for each value:
     values.each( function(item) {
         var item_id = item[0];
         var item_name = item[1];
         var optionHTML = '<option value="' + item_id + '"';
-        
+
         var display_item_name = item_name
         var cut_for_short = false;
         if(item_name.length > short_string_length) {
             display_item_name = splitString(item_name, short_string_length);
             var cut_for_short = true;
         }
-        
+
         selected_ids.each(function(i) {
             if(i == item_id)
                 optionHTML += ' selected="selected"';
         })
-        
+
         if(cut_for_short) {
             optionHTML += ' title="' + item_name + '"';
         }
-        
+
         optionHTML += '>' + display_item_name + '</option>';
         innerHTML += optionHTML;
     });
-    
+
     // Copy it up to the element in the DOM:
     element.innerHTML = innerHTML;
 }
@@ -342,7 +359,7 @@ function getBuildsByProductId(allow_blank, product_field, build_field, is_active
 {
     if(!product_field)
         var product_field = new String('id_product')
-    
+
     if(!build_field) {
         if($('id_build')) {
             var build_field = new String('id_build');
@@ -351,47 +368,49 @@ function getBuildsByProductId(allow_blank, product_field, build_field, is_active
             return false;
         }
     }
-    
+
     var product_id = $F(product_field);
     var is_active = '';
     if($('value_sub_module')) {
         if($F('value_sub_module') == "new_run")
             is_active = true;
     }
-    
+
     if(is_active) {
         is_active = true;
     }
-    
+
     if(product_id == "")
     {
         $(build_field).innerHTML = '<option value="">---------</option>';
         return false;
     }
-    
+
     var success = function(t) {
         returnobj = t.responseText.evalJSON(true);
-        
+
         debug_output('Get builds succeed get ready to replace the select widget inner html');
-        
+
         set_up_choices($(build_field), 
                        returnobj.collect(function(o) {
                            return [o.pk, o.fields.name];
                        }),
                        allow_blank);
-        
+
         debug_output('Update builds completed');
-        
+
         if($F('value_sub_module') == "new_run")
             if($(build_field).innerHTML == '')
                 alert('You should create new build first before create new run');
     }
-    
+
     var failure = function(t) {
         alert("Update builds and envs failed");
     }
-    
-    var url = getURLParam().url_get_product_info;
+
+    var url = Nitrate.http.URLConf.reverse({
+        name: 'get_product_info'
+    });
     new Ajax.Request(url, {
         method: 'get',
         parameters: {
@@ -409,25 +428,25 @@ function getEnvsByProductId(allow_blank, product_field)
 {
     if(!product_field)
         var product_field = new String('id_product')
-    
+
     product_id = $F(product_field);
     var args = false;
     if($('value_sub_module')) {
         if($F('value_sub_module') == "new_run")
             args = 'is_active'
     }
-    
+
     if(product_id == "")
     {
         $('id_env_id').innerHTML = '<option value="">---------</option>';
         return true;
     }
-    
+
     var success = function(t) {
         returnobj = t.responseText.evalJSON(true);
-        
+
         debug_output('Get environments succeed get ready to replace the select widget inner html');
-        
+
         set_up_choices($('id_env_id'), 
                        returnobj.collect(function(o) {
                            return [o.pk, o.fields.name];
@@ -443,8 +462,9 @@ function getEnvsByProductId(allow_blank, product_field)
         alert("Update builds and envs failed");
     }
 
-    
-    var url = getURLParam().url_get_product_info;
+    var url = Nitrate.http.URLConf.reverse({
+        name: 'get_product_info'
+    });
     new Ajax.Request(url, {
         method:'get',
         parameters:{
@@ -462,7 +482,7 @@ function getVersionsByProductId(allow_blank, product_field, version_field)
 {
     if(!product_field)
         var product_field = new String('id_product')
-    
+
     if(!version_field) {
         if($('id_product_version')) {
             var version_field = new String('id_product_version');
@@ -473,18 +493,18 @@ function getVersionsByProductId(allow_blank, product_field, version_field)
             return false;
         }
     }
-    
+
     product_id = $F(product_field);
-    
+
     if(product_id == "" && allow_blank)
     {
         $(version_field).innerHTML = '<option value="">---------</option>';
         return true;
     }
-    
+
     var success = function(t) {
         returnobj = t.responseText.evalJSON(true);
-        
+
         debug_output('Get versions succeed get ready to replace the select widget inner html');
 
         set_up_choices($(version_field), 
@@ -498,8 +518,9 @@ function getVersionsByProductId(allow_blank, product_field, version_field)
         alert("Update versions failed");
     }
 
-    
-    var url = getURLParam().url_get_product_info;
+    var url = Nitrate.http.URLConf.reverse({
+        name: 'get_product_info'
+    });
     new Ajax.Request(url,
                      {method:'get',
                       parameters:{info_type:'versions',
@@ -509,10 +530,13 @@ function getVersionsByProductId(allow_blank, product_field, version_field)
                       onFailure:failure});
 }
 
+
 function getPropertiesByProductId(allow_blank, container)
 {
     product_id = $F('id_product_id');
-    var url = getURLParam().url_get_product_info;
+    var url = Nitrate.http.URLConf.reverse({
+        name: 'get_product_info'
+    });
     new Ajax.Updater(container, url, { parameters: {
             info_type: 'properties',
             product_id: product_id,
@@ -526,9 +550,9 @@ function getComponentsByProductId(allow_blank, product_field, component_field, c
 {
     if(!parameters)
         var parameters = {};
-    
+
     parameters.info_type = 'components';
-    
+
     // Initial the product get from
     if (!parameters || !parameters.product_id) {
         if(!product_field)
@@ -536,7 +560,7 @@ function getComponentsByProductId(allow_blank, product_field, component_field, c
         product_id = $F(product_field);
         parameters.product_id = product_id
     }
-    
+
     if(!component_field) {
         if($('id_component')) {
             var component_field = new String('id_component');
@@ -545,33 +569,35 @@ function getComponentsByProductId(allow_blank, product_field, component_field, c
             return false;
         }
     }
-    
+
     if(parameters.product_id == "")
     {
         $(component_field).innerHTML = '<option value="">---------</option>';
         return true;
     }
-    
+
     var success = function(t) {
         returnobj = t.responseText.evalJSON(true);
-        
+
         set_up_choices($(component_field), 
                        returnobj.collect(function(o) {
                            return [o.pk, o.fields.name];
                        }),
                        allow_blank);
-        
+
         if (callback) {
             callback.call();
         }
     }
-    
+
     var failure = function(t) {
         alert("Update components failed");
     }
-    
-    var url = getURLParam().url_get_product_info;
-    
+
+    var url = Nitrate.http.URLConf.reverse({
+        name: 'get_product_info'
+    });
+
     new Ajax.Request(url,{
         method:'get',
         parameters: parameters,
@@ -585,9 +611,9 @@ function getCategorisByProductId(allow_blank, product_field, category_field)
 {   
     if(!product_field)
         var product_field = new String('id_product')
-    
+
     product_id = $F(product_field);
-    
+
     if(!category_field) {
         if($('id_category')) {
             var category_field = new String('id_category');
@@ -596,24 +622,24 @@ function getCategorisByProductId(allow_blank, product_field, category_field)
             return false;
         }
     }
-    
+
     debug_output('Get categories from product ' + product_id);
-        
+
     if(product_id == "")
     {
         $(category_field).innerHTML = '<option value="">---------</option>';
         return true;
     }
-    
+
     var success = function(t) {
         returnobj = t.responseText.evalJSON(true);
-        
+
         set_up_choices(
             $(category_field), returnobj.collect(function(o) {
                 return [o.pk, o.fields.name];
             }), allow_blank
         );
-        
+
         debug_output('Get categories succeed get ready to replace the select widget inner html');
     }
 
@@ -621,8 +647,9 @@ function getCategorisByProductId(allow_blank, product_field, category_field)
         alert("Update category failed");
     }
 
-    
-    var url = getURLParam().url_get_product_info;
+    var url = Nitrate.http.URLConf.reverse({
+        name: 'get_product_info'
+    });
     new Ajax.Request(url, {method:'get',
                            parameters:{info_type:'categories',
                                        product_id:product_id},
@@ -635,7 +662,7 @@ function checkProductField(product_field)
 {
     if(product_field)
         return product_field
-    
+
     if($('id_product'))
         return $('id_product')
     /*if(console){
@@ -647,12 +674,12 @@ function checkProductField(product_field)
 function bind_build_selector_to_product(allow_blank, product_field, build_field, active)
 {
     var product_field = checkProductField(product_field)
-    
+
     if(product_field) {
         product_field.observe('change', getBuildsByProductId.curry(
             allow_blank, product_field, build_field, active
         ));
-        
+
         getBuildsByProductId(allow_blank, product_field, build_field, active);
     }
 }
@@ -667,7 +694,7 @@ function bind_env_selector_to_product(allow_blank)
 function bind_version_selector_to_product(allow_blank, load, product_field, version_field)
 {
     var product_field = checkProductField(product_field)
-    
+
     if(product_field) {
         product_field.observe('change', getVersionsByProductId.curry(
             allow_blank, product_field, version_field
@@ -680,7 +707,7 @@ function bind_version_selector_to_product(allow_blank, load, product_field, vers
 function bind_category_selector_to_product(allow_blank, load, product_field, category_field)
 {
     var product_field = checkProductField(product_field)
-    
+
     if(product_field) {
         product_field.observe('change', getCategorisByProductId.curry(
             allow_blank, product_field, category_field
@@ -693,12 +720,12 @@ function bind_category_selector_to_product(allow_blank, load, product_field, cat
 function bind_component_selector_to_product(allow_blank, load, product_field, component_field)
 {
     var product_field = checkProductField(product_field)
-    
+
     if(product_field) {
         $(product_field).observe('change', getComponentsByProductId.curry(
             allow_blank, product_field, component_field
         ));
-        
+
         if (load)
             getComponentsByProductId(allow_blank);
     }
@@ -707,7 +734,7 @@ function bind_component_selector_to_product(allow_blank, load, product_field, co
 function bind_properties_selector_to_product(allow_blank, container)
 {
     var product_field = checkProductField(product_field)
-    
+
     if(product_field) {
         product_field.observe('change', function(t) { 
             $(container).innerHTML = "";
@@ -800,19 +827,19 @@ function fireEvent(obj,evt){
 // Stolen from http://stackoverflow.com/questions/133925/javascript-post-request-like-a-form-submit
 function postToURL(path, params, method) {
     method = method || "post"; // Set method to post by default, if not specified.
-    
+
     // The rest of this code assumes you are not using a library.
     // It can be made less wordy if you use one.
     var form = document.createElement("form");
     form.setAttribute("method", method);
     form.setAttribute("action", path);
-    
+
     for(var key in params) {
         if (typeof(params[key]) == 'object') {
             for (var i in params[key]) {
                 if (typeof(params[key][i]) != 'string')
                     continue
-                
+
                 var hiddenField = document.createElement("input");
                 hiddenField.setAttribute("type", "hidden");
                 hiddenField.setAttribute("name", key);
@@ -827,7 +854,7 @@ function postToURL(path, params, method) {
             form.appendChild(hiddenField);
         }
     }
-    
+
     document.body.appendChild(form);    // Not entirely sure if this is necessary
     form.submit();
 }
@@ -835,8 +862,11 @@ function postToURL(path, params, method) {
 function constructTagZone(container, parameters)
 {
     $(container).update('<div class="ajax_loading"></div>');
+    var url = Nitrate.http.URLConf.reverse({
+        name: 'get_product_info'
+    });
     var complete = function(t) {
-        new Ajax.Autocompleter("id_tags", "id_tags_autocomplete", getURLParam().url_get_product_info, {
+        new Ajax.Autocompleter("id_tags", "id_tags_autocomplete", url, {
             minChars: 2,
             tokens: ',',
             paramName: 'name__startswith',
@@ -848,18 +878,18 @@ function constructTagZone(container, parameters)
                 field: 'name'
             }
         });
-        
+
         $('id_tag_form').observe('submit', function(i){
             i.stop();
-            
+
             constructTagZone(container, this.serialize(true));
-            
+
             // this.adjacent('input[name="tags"]').invoke('focus');
         })
         var count = jQ('tbody#tag').attr('count');
         jQ('#tag_count').text(count);
     }
-    
+
     var url = new String('/management/tags/');
     new Ajax.Updater(container, url, {
         method: 'get',
@@ -876,10 +906,10 @@ function addTag(container)
 function removeTag(container, tag)
 {
     $('id_tag_form').adjacent('input[name="a"]')[0].value = 'remove';
-    
+
     parameters = $('id_tag_form').serialize(true);
     parameters.tags = tag;
-    
+
     constructTagZone(container, parameters);
 }
 function editTag(container, tag)
@@ -887,7 +917,7 @@ function editTag(container, tag)
     var nt = prompt(default_messages.prompt.edit_tag, tag);
     if(!nt)
         return false;
-    
+
     parameters = $('id_tag_form').serialize(true);
     parameters.tags = nt;
     var complete = function(t) {
@@ -899,7 +929,7 @@ function editTag(container, tag)
         parameters: parameters,
         onComplete: complete,
     })
-    
+
 }
 
 
@@ -925,7 +955,7 @@ function batchProcessTag(parameters, callback, format)
     var success = function(t) {
         if(!format) {
             returnobj = t.responseText.evalJSON(true);
-            
+
             if (returnobj.response == 'ok') {
                 if(callback) {
                     callback.call();
@@ -953,15 +983,15 @@ function bindCommentDeleteLink(container, parameters)
     var d_success = function(t) {
         constructCommentZone(container, parameters);
     }
-    
+
     var d_objects = container.adjacent('.commentdelete');
-    
+
     d_objects.invoke('stopObserving');
     d_objects.invoke('observe', 'click', function(i) {
         if(!confirm('Are you sure to delete the comment?'))
             return false;
         var d_form = this.up();
-        
+
         new Ajax.Request(d_form.action, {
             method: d_form.method,
             parameters: d_form.serialize(),
@@ -975,7 +1005,7 @@ function removeComment(form, callback)
     var url = form.action;
     var method = form.method;
     var parameters = form.serialize(true);
-    
+
     new Ajax.Request(url, {
         method: method,
         parameters: parameters,
@@ -989,11 +1019,11 @@ function constructCommentZone(container, parameters)
     var complete = function(t) {
         bindCommentDeleteLink(container, parameters);
     }
-    
+
     $(container).update('<div class="ajax_loading"></div>');
-    
+
     var url = new String('/comments/list/');
-    
+
     new Ajax.Updater(container, url, {
         method: 'get',
         parameters: parameters,
@@ -1008,11 +1038,11 @@ function submitComment(container, parameters, callback)
         if(callback)
             callback();
     }
-    
+
     $(container).update('<div class="ajax_loading"></div>');
-    
+
     var url = new String('/comments/post/')
-    
+
     new Ajax.Updater(container, url, {
         method: 'post',
         parameters: parameters,
@@ -1072,26 +1102,28 @@ function previewPlan(parameters, action, callback, notice, s, c) {
 function getInfo(parameters, callback, container, allow_blank, format)
 {
     debug_output('Get info ' + parameters);
-    
+
     var success = function(t) {
         if (callback) {
             debug_output("Starting GetInfo callback");
             callback(t, allow_blank, container);
             debug_output("GetInfo callback completed");
         }
-        
+
         debug_output("GetInfo " + type + " successful");
     }
-    
+
     var failure = function(t) {
         alert("Get info " + type + " failed");
         return false;
     }
-    
+
     if(format)
         parameters.format = format;
-    
-    var url = getURLParam().url_get_product_info;
+
+    var url = Nitrate.http.URLConf.reverse({
+        name: 'get_product_info'
+    });
     new Ajax.Request(url, {
         method:'get',
         parameters: parameters,
@@ -1106,14 +1138,16 @@ function getForm(container, app_form, parameters, callback, format)
         alert('Getting form get errors');
         return false;
     }
-    
+
     if(!parameters)
         var parameters = {}
-    
+
     parameters.app_form = app_form;
     parameters.format = format;
-    
-    url = getURLParam().url_get_form;
+
+    var url = Nitrate.http.URLConf.reverse({
+        name: 'get_form'
+    });
     new Ajax.Updater(container, url, {
         method:'get',
         parameters: parameters,
@@ -1196,11 +1230,11 @@ function updateObject(content_type, object_pk, field, value, value_type, callbac
 {
     if (!value_type)
         var value_type = 'str';
-    
+
     var url = new String('/ajax/update/');
     var success = function(t) {
         var returnobj = t.responseText.evalJSON();
-        
+
         if (returnobj == 0) {
             return callback(t, returnobj);
         } else {
@@ -1220,7 +1254,7 @@ function updateObject(content_type, object_pk, field, value, value_type, callbac
         value: value,
         value_type: value_type,
     }
-    
+
     new Ajax.Request(url, {
         method: 'post',
         parameters: parameters,
@@ -1238,7 +1272,7 @@ function getInfoAndUpdateObject(parameters, content_type, object_pks, field, cal
     object_pk: Int/Array - use for updateObject method
     field: String - use for updateObject method
     callback: Function - use for updateObject method
-    
+
     */
     var refresh_window = function(t) {
         var returnobj = t.responseText.evalJSON(true);
@@ -1246,31 +1280,31 @@ function getInfoAndUpdateObject(parameters, content_type, object_pks, field, cal
             alert(returnobj.response);
             return false;
         }
-        
+
         window.location.reload();
     }
-    
+
     var get_info_callback = function(t) {
         var returnobj = t.responseText.evalJSON(true);
-        
+
         // FIXME: Display multiple items and let user to select one
         if (returnobj.length == 0) {
             alert('Nothing found in database');
             return false;
         }
-        
+
         if (returnobj.length > 1) {
             alert('Mutiple instances reached, please define the condition more clear.');
             return false;
         }
-        
+
         var value = returnobj[0].pk;
-        
+
         if (!callback)
             callback = refresh_window
         updateObject(content_type, object_pks, field, value, 'str', callback);
     }
-    
+
     getInfo(parameters, get_info_callback);
 }
 
@@ -1291,7 +1325,7 @@ function getDialog(element)
 {
     if(!element)
         var element = $('dialog');
-    
+
     return element
 }
 
@@ -1304,7 +1338,7 @@ var showDialog = function(element)
 var clearDialog = function(element)
 {
     var dialog = getDialog(element);
-    
+
     dialog.update(getAjaxLoading());
     return dialog.hide();
 }
@@ -1314,7 +1348,7 @@ function getAjaxLoading(id)
     var e = Element('div', {className: 'ajax_loading'});
     if (id)
         e.id = id
-        
+
     return e;
 }
 
@@ -1325,16 +1359,16 @@ function refreshSelectFilter(element, clean)
 {
     var from = 'id_' + element + '_from';
     var to = 'id_' + element + '_to';
-    
+
     var from_field = $(from);
     var to_field = $(to);
-    
+
     SelectBox.cache[from] = new Array();
     SelectBox.cache[to] = new Array();
-    
+
     if (clean) {
         to_field.update('');
-        
+
         for (var i = 0; (node = from_field.options[i]); i++) {
             SelectBox.cache[from].push({value: node.value, text: node.text, displayed: 1});
         }
@@ -1343,7 +1377,7 @@ function refreshSelectFilter(element, clean)
             if (!node.selected)
                 SelectBox.cache[from].push({value: node.value, text: node.text, displayed: 1});
         }
-        
+
         for (var i = 0; (node = from_field.options[i]); i++) {
             if (node.selected)
                 SelectBox.cache[to].push({value: node.value, text: node.text, displayed: 1});
@@ -1375,31 +1409,31 @@ function bindSelectAllCheckbox(element, form, name)
 function constructForm(content, action, form_observe, info, s, c)
 {
     var f = new Element('form', {'action': action});
-    
+
     var i = new Element('div', {className: 'alert'});
     if(info)
         i.update(info);
-    
+
     if (!s) {
         var s = new Element('input', {'type': 'submit', 'value': 'Submit'}); // Submit button
     }
-    
+
     if (!c) {
         var c = new Element('input', {'type': 'button', 'value': 'Cancel'}); // Cancel button
         c.observe('click', function(e) {
             clearDialog();
         });
     }
-    
+
     if(form_observe) {
         f.observe('submit', form_observe);
     }
-    
+
     f.update(content);
     f.appendChild(i);
     f.appendChild(s);
     f.appendChild(c);
-    
+
     return f
 }
 
@@ -1412,7 +1446,7 @@ var reloadWindow = function(t)
             return false;
         }
     }
-    
+
     window.location.reload(true);
 }
 
@@ -1427,12 +1461,12 @@ function popupAddAnotherWindow(triggeringLink, parameters)
     } else {
         href  += '&_popup=1';
     }
-    
+
     // IMPOROMENT: Add parameters.
     // FIXME: Add multiple parameters here
     if (parameters)
         href += '&' + parameters + '=' + $F('id_' + parameters);
-    
+
     var win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
     win.focus();
     return false;

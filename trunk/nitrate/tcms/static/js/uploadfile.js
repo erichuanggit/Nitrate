@@ -29,7 +29,7 @@ function getUploadParam()
 function createUploadZone()
 {
     var p = getUploadParam(valueUploadNum);
-    
+
     /*
     var new_upload_zone = new Element('div', { 'id': p.upload_zone });
     var new_upload_iframe = new Element('iframe',
@@ -39,14 +39,14 @@ function createUploadZone()
                                       'width': '300'
                                     });
     var new_upload_form = new Element('form', { 'id': p.upload_form, 'enctype': 'multipart/form-data' });
-    
+
     var new_upload_field = new Element('input', 
                                     { 'id': p.upload_field,
                                         'type': 'file',
                                         'name': 'upload_file',
                                         'size': '15'
                                     });
-                                    
+
     var new_upload_link = new Element('a', 
                                     { 'id': p.upload_link,
                                         'href': 'javascript:uploadFile(' + p.id + ')',
@@ -75,14 +75,14 @@ function createUploadZone()
                                         'name': 'upload_file',
                                         'value': 'Upload...',
     });
-    
-    
+
+
     // new_upload_zone.insert(new_upload_field);
     new_upload_zone.insert(new_upload_link);
 
     $('id_upload_files').insert(new_upload_zone);
-    
-    
+
+
     new Ajax_upload(new_upload_link, {
         // Location of the server-side upload script
         action: '/management/uploadfile/',
@@ -102,7 +102,7 @@ function createUploadZone()
                     return false;
             }
             */
-            
+
             new_upload_link.disable();
             // new_upload_field.value = file + " is uploading...";
             valueUploadNum = valueUploadNum + 1;
@@ -159,7 +159,7 @@ function createFileDisplayZone(id, file_id, file_name)
                                             { 'id': p.remove_link,
                                               'href': 'javascript:removeUploadedFile(' + id + ');'
     }).update('Remove');
-    
+
     $(p.upload_zone).insert(new_upload_display_file);
     $(p.upload_zone).insert(new_upload_hidden_file);
     $(p.upload_zone).insert(new_remove_uploaded_link);
@@ -168,17 +168,17 @@ function createFileDisplayZone(id, file_id, file_name)
 function uploadFile(id)
 {   
     var p = getUploadParam(id);
-    
+
     if($F(p.upload_field) == "") {
         alert("You should select a file before upload");
         return false;
     }
-    
+
     valueUploadNum = valueUploadNum + 1;
     // createUploadZone();
     // $(p.upload_form).hide();
     // createUploadProgressBar(id);
-    
+
     /*
     var success = function(t) {
         returnobj = t.responseText.evalJSON(true);
@@ -192,12 +192,12 @@ function uploadFile(id)
             alert("Upload file failed");
         }
     }
-    
+
     var failure = function(t) {
         alert("Upload file failed, something wrong when connect to server, please contact to admin.");
         $(p.upload_form).show();
     }
-    
+
     var url  = getURLParam().url_upload_file;
     var params = $(p.upload_form).serialize(true);
     console.log(params);

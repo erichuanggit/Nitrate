@@ -29,7 +29,9 @@ Nitrate.TestPlans.TreeView = {
     }, // FIXME: Doesn't make effect here.
 
     filter: function(parameters, callback) {
-        var url = getURLParam().url_plans;
+        var url = Nitrate.http.URLConf.reverse({
+            name: 'plans'
+        });
         new Ajax.Request(url, {
             method: 'get',
             parameters: parameters,
@@ -498,7 +500,7 @@ Nitrate.TestPlans.Create.on_load = function()
     $('env_group_help_close').observe('click', function(t) {
         $('env_group_help').hide();
     })
-    
+
 }
 Nitrate.TestPlans.Edit.on_load = function()
 {
@@ -516,13 +518,13 @@ Nitrate.TestPlans.Advance_Search_List.on_load = function()
     if($('id_product')) {
         bind_version_selector_to_product(true);
     };
-    
+
     if($('id_check_all_plans')) {
         $('id_check_all_plans').observe('click', function(e) {
             clickedSelectAll(this, $('plans_form'), 'plan');
         });
     };
-    
+
     if($('column_add')) {
         $('column_add').observe('change', function(t) {
             switch(this.value) {
@@ -539,7 +541,7 @@ Nitrate.TestPlans.Advance_Search_List.on_load = function()
             }
         });
     };
-    
+
     $$('input[name="plan_id"]').invoke('observe', 'click', function(t) {
         if(this.checked) {
             this.up(1).addClassName('selection_row');
@@ -554,7 +556,7 @@ Nitrate.TestPlans.List.on_load = function()
     if($('id_product')) {
         bind_version_selector_to_product(true);
     };
-    
+
     if($('id_check_all_plans')) {
         $('id_check_all_plans').observe('click', function(e) {
             clickedSelectAll(this, $('plans_form'), 'plan');
@@ -569,7 +571,7 @@ Nitrate.TestPlans.List.on_load = function()
             // nosortClass : 'nosort'
         // });
     // };
-    
+
     if($('column_add')) {
         $('column_add').observe('change', function(t) {
             switch(this.value) {
@@ -586,7 +588,7 @@ Nitrate.TestPlans.List.on_load = function()
             }
         });
     };
-    
+
     $$('input[name="plan_id"]').invoke('observe', 'click', function(t) {
         if(this.checked) {
             this.up(1).addClassName('selection_row');
@@ -1018,18 +1020,18 @@ Nitrate.TestPlans.SearchCase.on_load = function()
             // bind_version_selector_to_product(true);
         }
     }
-    
+
     if($('id_table_cases')) {
         TableKit.Sortable.init('id_table_cases');
     }
-    
+
     bindSelectAllCheckbox($('id_checkbox_all_cases'), $('id_form_cases'), 'case');
 }
 
 Nitrate.TestPlans.Clone.on_load = function()
 {
     bind_version_selector_to_product(false);
-    
+
     $('id_link_testcases').observe('change', function(e) {
         if(this.checked) {
             this.parentNode.parentNode.className = 'choose';
@@ -1039,7 +1041,7 @@ Nitrate.TestPlans.Clone.on_load = function()
             $('id_clone_case_zone').style.display = 'none';
         }
     })
-    
+
     $('id_copy_testcases').observe('change', function(e){
         if(this.checked) {
             $('id_maintain_case_orignal_author').disabled = false;
@@ -1086,7 +1088,7 @@ function switchToEditPlanMode()
 {
     args = $A(arguments);
     plan_id = args[0];
-    
+
     objs = getTestPlanParam();
     $A(objs).each(function(name) {
         $('display_' + name).hide();
@@ -1095,7 +1097,7 @@ function switchToEditPlanMode()
     // Version editing is a special case:
     $('display_product_version').hide();
     $('form_version_id').show();
-    
+
     $('control_box').appear();
     $('btn_edit').href = "javascript:switchToPlanNormalDisplayMode(" + plan_id + ")";
     // $('btn_edit').innerHTML = "Save";
@@ -1113,7 +1115,7 @@ function switchToPlanNormalDisplayMode()
 {
     args = $A(arguments);
     plan_id = args[0];
-    
+
     objs = getTestPlanParam();
     $A(objs).each(function(name) {
         $('form_' + name).hide();
@@ -1122,16 +1124,16 @@ function switchToPlanNormalDisplayMode()
     // Version editing is a special case:
     $('form_version_id').hide();
     $('display_product_version').show();
-    
+
     // saveModifiedTestPlan(plan_id);
-    
+
     $('control_box').hide();
     $('btn_edit').href = "javascript:switchToEditPlanMode(" + plan_id + ")";
     // $('btn_edit').innerHTML = "Edit";
     $('id_buttons').show();
     $('title_id').hide();
     $('form_upload_plan_summary').hide()
-    
+
     showMoreSummary();
 }
 
@@ -1167,7 +1169,7 @@ function showShortSummary()
         $('id_link_show_short').hide();
         $('display_summary_short').show();
     }
-    
+
     window.scrollTo(0, 0);
 }
 
@@ -1181,14 +1183,14 @@ function createUploadPlanSummaryZone()
 
         onSubmit: function(file, extension) {
             debug_output('Upload plan document success submit');
-            
+
             if (! (extension && /^(txt|html|htm)$/.test(extension))) {
                         // extension is not allowed
                         alert('Error: invalid file extension, only allow .txt, .htm, or .html file upload.');
                         // cancel upload
                         return false;
             }
-            
+
             $('id_btn_upload_plan_summary').disable();
             $('id_btn_upload_plan_summary').value = "Uploading, please wait..."
         },
@@ -1202,7 +1204,7 @@ function createUploadPlanSummaryZone()
                     tinyMCE.get('id_summary').setContent(summary);
                 else
                     $('id_summary').value = summary;
-                    
+
                 $('id_btn_upload_plan_summary').enable();
                 $('id_btn_upload_plan_summary').value = "Upload plan document..."
             } else {
@@ -1220,16 +1222,16 @@ function createUploadPlanSummaryZone()
 function unlinkCasePlan(container, parameters) 
 {
     parameters.a = 'delete_cases';
-    
+
     if(!parameters['case']) {
         alert('At least one case is required to delete.');
         return false;
     }
-    
+
     var c = confirm("Are you sure you want to delete test case(s) from this test plan?");
     if (!c)
         return false;
-    
+
     var success = function(t) {
         returnobj = t.responseText.evalJSON(true);
         if(returnobj.rc == 0) {
@@ -1237,10 +1239,10 @@ function unlinkCasePlan(container, parameters)
             constructPlanDetailsCasesZone(container, parameters.from_plan, parameters);
             return true;
         }
-        
+
         alert(returnobj.response);
     }
-    
+
     var url = new String('cases/');
     new Ajax.Request(url, {
         method: 'post',
@@ -1760,7 +1762,9 @@ function onTestCaseTagDeleteClick(options) {
                 casesSelection: selection,
             });
 
-            var url = getURLParam().url_cases_tag;
+            var url = Nitrate.http.URLConf.reverse({
+                name: 'cases_tag'
+            });
             var afterTagDeletedCallback = function(response) {
                 var returnobj = response.responseText.evalJSON(true);
                 if (returnobj.rc != 0) {
@@ -1859,7 +1863,9 @@ function onTestCaseCategoryClick(options) {
                 casesSelection: selection
             });
 
-            var url = getURLParam().url_cases_category;
+            var url = Nitrate.http.URLConf.reverse({
+                name: 'cases_category'
+            });
             var callback = function(response) {
                 var returnobj = response.responseText.evalJSON(true);
                 if (returnobj.rc != 0) {
@@ -1956,7 +1962,9 @@ function onTestCaseComponentClick(options) {
                 casesSelection: selection
             });
 
-            var url = getURLParam().url_cases_component;
+            var url = Nitrate.http.URLConf.reverse({
+                name: 'cases_component'
+            });
             var cbAfterComponentChanged = function(response) {
                 returnobj = response.responseText.evalJSON(true);
                 if (returnobj.rc != 0) {
@@ -2262,7 +2270,9 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters) {
         parameters: postData
     });
 
-    var url = getURLParam().url_search_case;
+    var url = Nitrate.http.URLConf.reverse({
+        name: 'search_case'
+    });
     new Ajax.Updater(container, url, {
         method: 'post',
         parameters: postData,
@@ -2274,24 +2284,27 @@ function constructPlanDetailsCasesZone(container, plan_id, parameters) {
 
 function constructPlanComponentsZone(container, parameters, callback)
 {
-    if(!parameters)
+    if (!parameters) {
         var parameters = {
             plan: Nitrate.TestPlans.Instance.pk,
         }
-    
-    var url = getURLParam().url_plan_components;
-    
+    }
+
+    var url = Nitrate.http.URLConf.reverse({
+        name: 'plan_components'
+    });
+
     var complete = function(t) {
         if(callback) {
             callback();
         }
-        
+
         $('id_form_plan_components').observe('submit', function(e) {
             e.stop();
             var p = this.serialize(true);
             constructPlanComponentsZone(container, p, callback);
         });
-        
+
         $$('.link_remove_plan_component').invoke('observe', 'click', function(e) {
             var c = confirm(default_messages.confirm.remove_case_component);
             if(!c)
@@ -2299,13 +2312,13 @@ function constructPlanComponentsZone(container, parameters, callback)
             var links = $$('.link_remove_plan_component');
             var index = links.indexOf(this);
             var component = $$('input[type="checkbox"][name="component"]')[index];
-            
+
             var p = $('id_form_plan_components').serialize(true);
             p['component'] = component.value;
             p['a'] = 'remove';
             constructPlanComponentsZone(container, p, callback);
         })
-        
+
         $('id_checkbox_all_component').observe('click', function(e) {
             clickedSelectAll(this, this.up(4), 'component');
         });
@@ -2313,7 +2326,7 @@ function constructPlanComponentsZone(container, parameters, callback)
         var c_count = jQ('tbody#component').attr('count');
         jQ('#component_count').text(c_count);
     }
-    
+
     new Ajax.Updater(container, url, {
         method: 'get',
         parameters: parameters,
@@ -2322,21 +2335,24 @@ function constructPlanComponentsZone(container, parameters, callback)
     })
 }
 
+// No invocation.
 function constructPlanComponentModificationDialog(container)
 {
     if(!container)
         var container = getDialog();
     container.show();
-    
+
     var d = new Element('div');
-    
+
     var parameters = {
         a: 'get_form',
         plan: Nitrate.TestPlans.Instance.pk,
     };
-    
+
     var callback = function(t) {
-        var action = getURLParam().url_plan_components;
+        var action = Nitrate.http.URLConf.reverse({
+            name: 'plan_components'
+        });
         var form_observe = function(e) {
             e.stop();
             constructPlanComponentsZone('components', this.serialize());
@@ -2344,17 +2360,17 @@ function constructPlanComponentModificationDialog(container)
         };
         var notice = 'Press "Ctrl" to select multiple default component';
         var s = new Element('input', {'type': 'submit', 'name': 'a', 'value': 'Update'}); // Submit button
-        
+
         var f = constructForm(d.innerHTML, action, form_observe, notice, s);
         container.update(f);
-        
+
         // FIXME: Split the select to two columns, javascript buggy here.
         /*
         SelectFilter.init("id_component", "component", 0, "/static/admin/");
         refreshSelectFilter('component');
         */
     }
-    
+
     // Get the form and insert into the dialog.
     constructPlanComponentsZone(d, parameters, callback);
 }
@@ -2363,8 +2379,11 @@ function constructBatchTagProcessDialog(plan_id){
     $('dialog').show();
     $('dialog').update('<form id="id_batch_tag_form"><div class="dia_title" style=" margin:30px 20px;">Please type tag name:</div><div class="dia_content" style=" margin:30px 20px;"><input type="text" id="add_tag_plan" name="tags" style="width:300px; height:25px; border:solid  1px #ccc"/><div id="id_batch_add_tags_autocomplete"></div></div><div style=" margin:30px 20px;"><input type="submit" value="Submit"><input type="button" value="Cancel" onclick="this.up(2).hide();"></div></div></form>');
     // Bind the autocomplete for tags
+    var url = Nitrate.http.URLConf.reverse({
+        name: 'get_product_info'
+    });
     new Ajax.Autocompleter("add_tag_plan", "id_batch_add_tags_autocomplete",
-        getURLParam().url_get_product_info, {
+        url, {
             minChars: 2,
             tokens: ',',
             paramName: 'name__startswith',
@@ -2384,7 +2403,7 @@ function sortCase(container, plan_id, order) {
     var form = container.childElements()[0];
     var parameters = form.serialize(true);
     parameters.a = 'sort';
-    
+
     if(parameters.case_sort_by == order)
         parameters.case_sort_by = '-' + order;
     else
@@ -2431,7 +2450,7 @@ function constructPlanParentPreviewDialog(plan_id, parameters, callback)
     s.appendChild(s2);
     s.appendChild(s3);
     */
-    
+
     previewPlan(parameters, action, callback, notice);
 }
 
@@ -2515,7 +2534,7 @@ function expandCurrentPlan(element){
                 var ul = tree.render(returnobj);
                 li_container.appendChild(ul);
             };
-            
+
             var p = {
                 parent__pk: e_pk,
                 t: 'ajax',

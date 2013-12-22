@@ -95,7 +95,7 @@ Nitrate.TestCases.List.on_load = function()
             clickedSelectAll(this, this.up(4), 'case')
         });
     };
-    
+
     $('id_blind_all_link').observe('click', function(e) {
         //FIXME
         //Adding a lock here to avoid generating too much requests.
@@ -123,7 +123,7 @@ Nitrate.TestCases.List.on_load = function()
             };
         }
     })
-    
+
     if(window.location.hash == '#expandall'){
         blinddownAllCases();
     }
@@ -180,32 +180,34 @@ Nitrate.TestCases.Details.on_load = function()
         this.parentNode.addClassName('tab_focus');
         $(this.title).show();
     });
-    
+
     if(window.location.hash) {
         fireEvent($$('a[href=\"' + window.location.hash + '\"]')[0], 'click');
     };
-    
+
     $('id_update_component').observe('click', function(e) {
         if(this.diabled)
         return false;
-        
+
         var params = {
             'case': Nitrate.TestCases.Instance.pk,
             'product': Nitrate.TestCases.Instance.product_id,
             'category': Nitrate.TestCases.Instance.category_id,
             // 'component': 
         };
-        
+
         var form_observe = function(e) {
             e.stop();
-            
+
             var params = this.serialize(true);
             params['case'] = Nitrate.TestCases.Instance.pk
-            
-            var url = getURLParam().url_cases_component;
+
+            var url = Nitrate.http.URLConf.reverse({
+                name: 'cases_component'
+            });
             var success = function(t) {
                 returnobj = t.responseText.evalJSON(true);
-                
+
                 if (returnobj.rc == 0) {
                     window.location.reload();
                 } else {
@@ -213,7 +215,7 @@ Nitrate.TestCases.Details.on_load = function()
                     return false;
                 }
             }
-            
+
             new Ajax.Request(url, {
                 method: this.method,
                 parameters: params,
@@ -221,11 +223,11 @@ Nitrate.TestCases.Details.on_load = function()
                 onFailure: json_failure,
             })
         };
-        
+
         renderComponentForm(getDialog(), params, form_observe);
         renderCategoryForm(getDialog(), garams, form_observe);
     });
-    
+
     $('id_form_case_component').observe('submit', function(e) {
         e.stop();
         var parameters = {
@@ -233,22 +235,22 @@ Nitrate.TestCases.Details.on_load = function()
             'case': Nitrate.TestCases.Instance.pk,
             'o_component': this.serialize(true)['component'],
         };
-        
+
         if(!parameters['o_component'])
             return false
-        
+
         var c = confirm(default_messages.confirm.remove_case_component);
         if(!c)
             return false
-        
+
         updateCaseComponent(this.action, parameters, json_success_refresh_page);
     })
-    
+
     $$('.link_remove_component').invoke('observe', 'click', function(e) {
         var c = confirm(default_messages.confirm.remove_case_component);
         if(!c)
             return false
-        
+
         var form = $('id_form_case_component');
         var parameters = {
             'a': form.serialize(true)['a'],
@@ -257,7 +259,7 @@ Nitrate.TestCases.Details.on_load = function()
         };
         updateCaseComponent(form.action, parameters, json_success_refresh_page);
     });
-    
+
     bindSelectAllCheckbox($('id_checkbox_all_components'), $('id_form_case_component'), 'component');
 
     var toggle_case_run = function(e) {
@@ -269,7 +271,7 @@ Nitrate.TestCases.Details.on_load = function()
         var type = 'case_case_run';
         toggleTestCaseContents(type, c, c_container, case_id, case_text_version, case_run_id);
     }
-    
+
     var toggle_case_runs_by_plan = function(e) {
         var c = this.up();
         var case_id = c.getElementsByTagName('input')[0].value;
@@ -322,7 +324,7 @@ Nitrate.TestCases.Create.on_load = function()
 {
     // bind_component_selector_to_product(false, false, $('id_product'), $('id_component'));
     // bind_category_selector_to_product(false, false, $('id_product'), $('id_category'));
-    
+
     SelectFilter.init("id_component", "component", 0, "/static/admin/");
     //init category and components
     getCategorisByProductId(false, $('id_product'), $('id_category'));
@@ -369,27 +371,27 @@ Nitrate.TestCases.Edit.on_load = function()
 Nitrate.TestCases.Clone.on_load = function()
 {
     bind_version_selector_to_product(true);
-    
+
     $('id_form_search_plan').observe('submit', function(e) {
         e.stop();
-        
+
         var url = '/plans/';
         var container = $('id_plan_container')
-        
+
         container.show()
         new Ajax.Updater(container, url, {
             method: 'get',
             parameters: this.serialize()
         })
     })
-    
+
     $('id_use_filterplan').observe('click', function(e) {
         $('id_form_search_plan').enable();
         $('id_plan_id').value = '';
         $('id_plan_id').name = '';
         $('id_copy_case').checked = true;
     });
-    
+
     if($('id_use_sameplan')){
     $('id_use_sameplan').observe('click', function(e) {
         $('id_form_search_plan').disable();
@@ -401,6 +403,7 @@ Nitrate.TestCases.Clone.on_load = function()
     })
     };
 }
+
 function getTestCaseContents(template_type, container, content_container, object_pk, case_text_version, case_run_id, callback)
 {
     if (typeof(container) != 'object')
@@ -410,7 +413,10 @@ function getTestCaseContents(template_type, container, content_container, object
     var content_container = $(content_container)
 
     if ($('id_loading_' + object_pk)) {
-        var url = getURLParam(object_pk).url_case_details;
+        var url = Nitrate.http.URLConf.reverse({
+            name: 'case_details',
+            arguments: {id: object_pk}
+        });
         var parameters = {
             template_type: template_type,
             case_text_version: case_text_version,
@@ -441,20 +447,23 @@ function toggleTestCaseContents(template_type, container, content_container, obj
 {
     if (typeof(container) != 'object')
     var container = $(container)
-    
+
     if(typeof(content_container) != 'object')
     var content_container = $(content_container)
-    
+
     content_container.toggle();
-    
+
     if ($('id_loading_' + object_pk)) {
-        var url = getURLParam(object_pk).url_case_details;
+        var url = Nitrate.http.URLConf.reverse({
+            name: 'case_details',
+            arguments: {id: object_pk}
+        });
         var parameters = {
             template_type: template_type,
             case_text_version: case_text_version,
             case_run_id: case_run_id,
         };
-        
+
         new Ajax.Updater(content_container, url, {
             method: 'get',
             parameters: parameters,
@@ -462,7 +471,7 @@ function toggleTestCaseContents(template_type, container, content_container, obj
             onFailure: html_failure
         });
     };
-    
+
     var blind_icon = container.getElementsByTagName('img')[0];
     if (content_container.getStyle('display') == 'none') {
         $(blind_icon).removeClassName('collapse');
@@ -546,7 +555,7 @@ function toggleAllCases(element){
             element.title = "Expand all cases"
             blindupAllCases(element);
         };
-        
+
     }
 }
 
@@ -568,7 +577,7 @@ function blindupAllCases(element)
     $$('.collapse').each(function(e) {
         fireEvent(e, 'click');
     })
-    
+
     if(element) {
         element.removeClassName('expand-all');
         element.addClassName('collapse-all');
@@ -592,12 +601,12 @@ function changeCaseOrder(parameters, callback)
 
     if(!nsk)
         return false
-    
+
     if(nsk != parseInt(nsk)) {
         alert('The value must be an integer number and limit between 0 to 32300.');
         return false;
     }
-    
+
     if(nsk > 32300 || nsk < 0) {
         alert('The value must be an integer number and limit between 0 to 32300.');
         return false;
@@ -607,7 +616,7 @@ function changeCaseOrder(parameters, callback)
     var field = 'sortkey';
     var value = nsk;
     var vtype = 'int';
-    
+
     updateObject(ctype, object_pk, field, value, vtype, callback);
 }
 
@@ -680,19 +689,19 @@ function getPlansByVersionId(allow_blank)
     if(!$F('id_version_id')) {
         return false;
     }
-    
+
     var success = function(t) {
         returnobj = t.responseText.evalJSON(true);
-        
+
         set_up_choices($('id_plan_id'), returnobj.collect(function(e) {
             return [e.pk, e.fields.name];
         }), allow_blank);
     }
-        
+
     var failure = function(t) {
         alert("Update plan failed");
     }
-    
+
     var url = '/plans/';
     new Ajax.Request(url, {
         method:'get',
@@ -798,9 +807,13 @@ function constructPlanCaseZone(container, case_id, parameters)
                 return false;
             };
 
-            previewPlan(p, getURLParam(case_id).url_case_plan, callback);
-        })
-        if(jQ('#testplans_table td a').length > 0){
+            var url = Nitrate.http.URLConf.reverse({
+                name: 'case_plan',
+                arguments: {id: case_id}
+            });
+            previewPlan(p, url, callback);
+        });
+        if (jQ('#testplans_table td a').length > 0) {
             jQ('#testplans_table').dataTable({
                 "bFilter": false,
                 "bLengthChange": false,
@@ -820,12 +833,17 @@ function constructPlanCaseZone(container, case_id, parameters)
             });
         }
     }
-    var url = getURLParam(case_id).url_case_plan;
+
+    var url = Nitrate.http.URLConf.reverse({
+        name: 'case_plan',
+        arguments: {id: case_id}
+    });
+
     new Ajax.Updater(container, url, {
         method: 'get',
         parameters: parameters,
         onComplete: complete,
-    })
+    });
 }
 
 function removePlanFromCase(container, plan_id, case_id)
@@ -860,7 +878,9 @@ function renderTagForm(container, parameters, form_observe)
     container.show();
 
     var callback = function(t) {
-        var action = getURLParam().url_cases_tag;
+        var action = Nitrate.http.URLConf.reverse({
+            name: 'cases_tag'
+        });
         var notice = 'Press "Ctrl" to select multiple default component';
 
         var h = new Element('input', {'type': 'hidden', 'name': 'a', 'value': 'remove'});
@@ -872,14 +892,16 @@ function renderTagForm(container, parameters, form_observe)
         var f = constructForm(d.innerHTML, action, form_observe, notice, c);
         container.update(f);
         bind_component_selector_to_product(false, false, $('id_product'), $('id_o_component'));
-    }
-    var url = getURLParam().url_cases_tag;
+    };
+    var url = Nitrate.http.URLConf.reverse({
+        name: 'cases_tag'
+    });
     new Ajax.Updater(d, url, {
         method: 'post',
         parameters: parameters,
         onComplete: callback,
         onFailure: html_failure,
-    })
+    });
 }
 
 
@@ -891,7 +913,9 @@ function renderComponentForm(container, parameters, form_observe)
     container.show();
 
     var callback = function(t) {
-        var action = getURLParam().url_cases_component;
+        var action = Nitrate.http.URLConf.reverse({
+            name: 'cases_component'
+        });
         var notice = 'Press "Ctrl" to select multiple default component';
 
         var h = new Element('input', {'type': 'hidden', 'name': 'a', 'value': 'add'});
@@ -911,14 +935,16 @@ function renderComponentForm(container, parameters, form_observe)
         bind_component_selector_to_product(false, false, $('id_product'), $('id_o_component'));
     }
 
-    var url = getURLParam().url_cases_component;
+    var url = Nitrate.http.URLConf.reverse({
+        name: 'cases_component'
+    });
 
     new Ajax.Updater(d, url, {
         method: 'post',
         parameters: parameters,
         onComplete: callback,
         onFailure: html_failure,
-    })
+    });
 }
 
 
@@ -930,7 +956,9 @@ function renderCategoryForm(container, parameters, form_observe)
     container.show();
 
     var callback = function(t) {
-        var action = getURLParam().url_cases_category;
+        var action = Nitrate.http.URLConf.reverse({
+            name: 'cases_category'
+        });
         var notice = 'Select Category';
 
         var h = new Element('input', {'type': 'hidden', 'name': 'a', 'value': 'add'});
@@ -950,14 +978,16 @@ function renderCategoryForm(container, parameters, form_observe)
         bind_category_selector_to_product(false, false, $('id_product'), $('id_o_category'));
     }
 
-    var url = getURLParam().url_cases_category;
+    var url = Nitrate.http.URLConf.reverse({
+        name: 'cases_category'
+    });
 
     new Ajax.Updater(d, url, {
         method: 'post',
         parameters: parameters,
         onComplete: callback,
         onFailure: html_failure,
-    })
+    });
 }
 
 // FIXME: abstract this function
@@ -1020,7 +1050,10 @@ function constructCaseAutomatedForm(container, callback, options)
              * only value `change', here.
              */
             params = params.replace(/a=\w*/, 'a=change');
-            new Ajax.Request(getURLParam().url_cases_automated, {
+            var url = Nitrate.http.URLConf.reverse({
+                name: 'cases_automated'
+            });
+            new Ajax.Request(url, {
                 method: 'post',
                 parameters: params,
                 onSuccess: callback,
@@ -1165,19 +1198,22 @@ function toggleCaseRunsByPlan(params, callback)
     var case_id = params.case_id;
     if (typeof(container) != 'object')
         container = $(container);
-    
+
     if(typeof(content_container) != 'object')
         content_container = $(content_container);
-    
+
     content_container.toggle();
-    
+
     if ($('id_loading_' + case_run_plan_id)) {
-        var url = getURLParam(case_id).url_case_details;
+        var url = Nitrate.http.URLConf.reverse({
+            name: 'case_details',
+            arguments: {id: case_id}
+        });
         var parameters = {
             template_type: params.type,
             case_run_plan_id: case_run_plan_id,
         };
-        
+
         new Ajax.Updater(content_container, url, {
             method: 'get',
             parameters: parameters,
@@ -1185,7 +1221,7 @@ function toggleCaseRunsByPlan(params, callback)
             onFailure: html_failure
         });
     };
-    
+
     var blind_icon = container.getElementsByTagName('img')[0];
     if (content_container.getStyle('display') == 'none') {
         $(blind_icon).removeClassName('collapse');
