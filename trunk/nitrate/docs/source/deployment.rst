@@ -73,7 +73,7 @@ After backed up the product.py, please modify following settings based on your c
 .. literalinclude:: ../../tcms/settings/product.py
    :language: python
 
-Use Memcached
+Use Memcached (Optional)
 ~~~~~~~~~~~~~~
 Please install package of memcached and python-memcached if using memcached as Nitrate's cache::
 
@@ -91,7 +91,7 @@ You can also change default memcached settings in file of /etc/sysconfig/memcach
     CACHESIZE="64"
     OPTIONS=""
 
-At last set related settings in tcms/settings/product.py::
+At last set related production settings in tcms/settings/product.py::
 
    CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
    SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
