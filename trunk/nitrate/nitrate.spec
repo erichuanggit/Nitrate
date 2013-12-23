@@ -16,6 +16,7 @@ BuildRequires:  python-setuptools
 BuildRequires:  python-devel
 
 Requires:       Django = 1.5.5
+Requires:       MySQL-python >= 1.2.3
 Requires:       mod_ssl
 Requires:       python-memcached
 Requires:       python-kerberos
