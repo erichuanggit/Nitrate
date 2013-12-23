@@ -80,7 +80,8 @@ After backed up the product.py, please modify following settings based on your c
    :language: python
 
 Use Memcached (Optional)
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+
 Please install package of memcached and python-memcached if using memcached as Nitrate's cache::
 
     yum install memcached python-memcached
