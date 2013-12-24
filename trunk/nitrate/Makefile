@@ -1,7 +1,4 @@
 SPECFILE=nitrate.spec
-# FIXME: this varialbe is for install and install-data. If remove them, also
-# remove this one.
-PREFIX=/usr
 
 # Support build branch. That is make supports to build package from current git
 # branch. If you want to distribute TCMS upon a specific branch, checkout to it
@@ -15,16 +12,17 @@ RELEASE=$(shell rpm -q --qf "%{RELEASE}\n" --specfile $(SPECFILE)|head -n1)
 SRPM=$(NAME)-$(VERSION)-$(RELEASE).src.rpm
 TARBALL=nitrate-$(VERSION).tar.bz2
 PWD=$(shell pwd)
-RPMBUILD_OPTIONS=--nodeps --define "_sourcedir $(PWD)" --define "_srcrpmdir $(PWD)"
+RPMBUILD_OPTIONS=--nodeps --define "_sourcedir $(PWD)" --define "_srcrpmdir $(PWD)" --define "_rpmdir $(PWD)"
 
 WORK_DIR=/tmp/nitrate-$(VERSION)
-SOURCE_DIR = $(WORK_DIR)/nitrate/trunk/
+SOURCE_DIR = $(WORK_DIR)/nitrate/trunk/nitrate
 CODE_REPO=git://git.fedorahosted.org/nitrate.git
 
+default: help
 # Target: build a local RPM
 local-rpm: $(SRPM)
 	echo "$(SRPM)"
-	rpmbuild --rebuild $(SRPM) || exit 1
+	rpmbuild --rebuild $(RPMBUILD_OPTIONS) $(SRPM) || exit 1
 
 # Target for constructing a source RPM:
 $(SRPM): $(TARBALL) $(SPECFILE)
@@ -44,16 +42,11 @@ $(TARBALL): Makefile
 	@cd $(WORK_DIR); git clone -b $(BUILD_BRANCH) $(CODE_REPO)
 	# Fixup the version field in the page footer so that it shows the precise
 	# RPM version-release:
-	@cd $(SOURCE_DIR); sed --in-place -r 's|NITRATE_VERSION|$(VERSION)|' $(SOURCE_DIR)/nitrate/templates/tcms_base.html
-	@cd $(SOURCE_DIR); mv nitrate nitrate-${VERSION}
-	@cd $(SOURCE_DIR); tar --bzip2 --exclude .git -cSpf $(TARBALL) nitrate-${VERSION}
-	@cp $(SOURCE_DIR)/$(TARBALL) .
+	@cd $(SOURCE_DIR); sed --in-place -r 's|NITRATE_VERSION|$(VERSION)|' $(SOURCE_DIR)/tcms/templates/tcms_base.html
+	@cd $(SOURCE_DIR); python setup.py sdist --formats=bztar
+	@cp $(SOURCE_DIR)/dist/$(TARBALL) .
 
 src-rpm: $(SRPM)
-
-# Shortcut target for building in brew:
-brew: $(SRPM)
-	brew build --nowait dist-5E-eso $(SRPM)
 
 # Various targets for debugging the creation of an RPM or SRPM:
 # Debug target: stop after the %prep stage
@@ -68,22 +61,34 @@ debug-build: $(TARBALL) $(SPECFILE)
 debug-install: $(TARBALL) $(SPECFILE)
 	rpmbuild -bi $(RPMBUILD_OPTIONS) $(SPECFILE) || exit 1
 
-pylint:
-	PYTHONPATH=.. pylint tcms
+pep8:
+	pep8 tcms
+
+pyflakes:
+	pyflakes tcms
 
 test:
 	python manage.py test
 
-# FIXME: remove install and install-data?
-install: $(install-data)
-	python setup.py install -O1 --skip-build --root ${PREFIX}
+build:
+	python setup.py build
 
-install-data:
-	@mkdir -pv ${PREFIX}/share/${NAME}
-	for d in contrib templates media; do \
-		cp -rv $$d ${PREFIX}/share/${NAME}; \
-	done
+install:
+	python setup.py install
 
-# FIXME:
-# Things to add:
-#   - unit tests
+help:
+	@echo 'Usage make [command]'
+	@echo ''
+	@echo 'Available commands:'
+	@echo ''
+	@echo '  local-rpm        - Create the binary RPM'
+	@echo '  src-rpm          - Create a source RPM'
+	@echo '  debug-prep       - Debug nitrate.spec prep'
+	@echo '  debug-build      - Debug nitrate.spec build'
+	@echo '  debug-install    - Debug nitrate.spec install'
+	@echo '  pep8             - Check Python style as pep8'
+	@echo '  pyflakes         - Check Python programs as pyflakes'
+	@echo '  test             - Run command: python manage.py test'
+	@echo '  build            - Run command: python setup.py build'
+	@echo '  install          - Run command: python setup.py install'
+	@echo '  help             - Show this help message and exit'
