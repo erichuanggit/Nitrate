@@ -61,11 +61,12 @@ debug-build: $(TARBALL) $(SPECFILE)
 debug-install: $(TARBALL) $(SPECFILE)
 	rpmbuild -bi $(RPMBUILD_OPTIONS) $(SPECFILE) || exit 1
 
-pep8:
-	pep8 tcms
+# Check code convention based on flake8
+CHECK_DIRS=manage.py setup.py tcms/wsgi.py tcms/urls.py tcms/settings tcms/apps tcms/integration tcms/report tcms/search tcms/scripts tcms/core
+EXCLUDE_DIRS=tcms/core/lib
 
-pyflakes:
-	pyflakes tcms
+flake8:
+	flake8 $(CHECK_DIRS) --exclude $(EXCLUDE_DIRS)
 
 test:
 	python manage.py test
@@ -86,8 +87,7 @@ help:
 	@echo '  debug-prep       - Debug nitrate.spec prep'
 	@echo '  debug-build      - Debug nitrate.spec build'
 	@echo '  debug-install    - Debug nitrate.spec install'
-	@echo '  pep8             - Check Python style as pep8'
-	@echo '  pyflakes         - Check Python programs as pyflakes'
+	@echo '  flake8           - Check Python style based on flake8'
 	@echo '  test             - Run command: python manage.py test'
 	@echo '  build            - Run command: python setup.py build'
 	@echo '  install          - Run command: python setup.py install'

@@ -1,5 +1,4 @@
 -r base.txt
 django-debug-toolbar==0.11.0
 Sphinx==1.2b3
-pep8==1.4.6
-pyflakes==0.7.3
+flake8==2.1.0
