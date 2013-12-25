@@ -71,7 +71,7 @@ First please go to nitrate root path, it's different based on your current OS.
 
 Like on RHEL6.3, the root path is located in::
 
-  /usr/lib/python2.6/site-packages/Nitrate-3.8.5-py2.6.egg/tcms
+  /usr/lib/python2.6/site-packages/nitrate-3.8.6-py2.6.egg/tcms
 
 As we plan to deploy a example server for nitrate, we can use product.py as the default settings.
 After backed up the product.py, please modify following settings based on your custom configurations in settings/product.py:
@@ -79,42 +79,43 @@ After backed up the product.py, please modify following settings based on your c
 .. literalinclude:: ../../tcms/settings/product.py
    :language: python
 
-Use Memcached (Optional)
-~~~~~~~~~~~~~~~~~~~~~~~~
+Use cache (Optional)
+~~~~~~~~~~~~~~~~~~~~
 
-Please install package of memcached and python-memcached if using memcached as Nitrate's cache::
+You can use django's cache framework to get better performance.
 
-    yum install memcached python-memcached
+Read following docs for detail:
 
-then run the memcached service::
+https://docs.djangoproject.com/en/1.5/topics/cache/
 
-    service memcached start
-
-You can also change default memcached settings in file of /etc/sysconfig/memcached::
-
-    PORT="11211"
-    USER="memcached"
-    MAXCONN="1024"
-    CACHESIZE="64"
-    OPTIONS=""
-
-At last set related production settings in tcms/settings/product.py::
-
-   CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
-   SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+https://docs.djangoproject.com/en/1.5/ref/settings/#caches
 
 Start the django app
 ~~~~~~~~~~~~~~~~~~~~
 
 After upon steps is completed, now you can try to start the web server which is built-in Django to test if the app can run successfully.
-In nitrate root path, run following command::
+Run following command::
 
-  ./manage.py runserver --settings=settings.product
+  django-admin.py runserver --settings=tcms.settings.product
 
 Then try to use web browser to open http://localhost:8000/ to verify the working status of this web service.
 
 Deployment
 ----------
+
+Collect static files
+~~~~~~~~~~~~~~~~~~~~
+
+The default directory to store static files is `/var/nitrate/static`, you can modify it by changing `STATIC_ROOT` setting in `/path/to/installed/nitrate/tcms/settings/product.py`.
+
+Run following command to collect static files::
+
+  django-admin.py collectstatic --settings=tcms.settings.product
+
+Reference:
+
+https://docs.djangoproject.com/en/1.5/howto/static-files/deployment/
+
 
 Deploy with Apache
 ~~~~~~~~~~~~~~~~~~
