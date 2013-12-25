@@ -24,8 +24,8 @@ https://git.fedorahosted.org/cgit/nitrate.git/?h=development
 You can easy to get the latest changes with git:
 code::
 
-    # git clone git://git.fedorahosted.org/nitrate.git
-    # git checkout --track origin/development
+     git clone git://git.fedorahosted.org/nitrate.git
+     git checkout --track origin/development
 
 Or you also can download the tarballs from:
 https://git.fedorahosted.org/cgit/nitrate.git/?h=development
@@ -35,8 +35,8 @@ Install dependence
 
 code::
 
-    # cd nitrate/trunk/nitrate
-    # pip install -r requirements/devel.txt
+     cd nitrate/trunk/nitrate
+     pip install -r requirements/devel.txt
 
 .. Note::
 
@@ -49,11 +49,11 @@ Setup database
 
 code::
 
-    # mysql -uroot -p
-    # mysql> create database nitrate CHARACTER SET utf8 COLLATE utf8_general_ci;
-    # mysql> use nitrate; source nitrate_db_setup.sql
-    # mysql> grant all privileges on nitrate.* to nitrate@'%' identified by 'nitrate';
-    # mysql> flush privileges;
+     mysql -uroot -p
+     mysql> create database nitrate CHARACTER SET utf8 COLLATE utf8_general_ci;
+     mysql> use nitrate; source nitrate_db_setup.sql
+     mysql> grant all privileges on nitrate.* to nitrate@'%' identified by 'nitrate';
+     mysql> flush privileges;
 
 .. note::
 
@@ -65,8 +65,8 @@ Start the nitrate app
 ~~~~~~~~~~~~~~~~~~~~~
 code::
 
-    # cd <nitrate_project_root_path>/trunk/nitrate/tcms
-    # ./manage.py runserver
+     cd <nitrate_project_root_path>/trunk/nitrate
+     ./manage.py runserver
 
 .. note::
 
@@ -80,29 +80,28 @@ Please follow these coding standards when writing code for inclusion in Nitrate.
 Python style
 ~~~~~~~~~~~~
 
-* Unless otherwise specified, follow `PEP 8 <http://www.python.org/dev/peps/pep-0008>`_.
-* Use underscores, not camelCase, for variable, function and method names (i.e. poll.get_unique_voters(), not poll.getUniqueVoters).
-* In docstrings, use “action words” such as:
+* Nitrate follows code convention based on flake8. Flake8 is a wrapper around these tools:
+    * PyFlakes
+    * pep8
+    * Ned Batchelder’s McCabe script
 
-    code::
+  So make sure all python files are following convention of pep8, pyflakes and more.
 
-        def foo():
-            """
-            Calculates something and returns the result.
-            """
-            pass
+* Run following command to check the code style of whole project before every commit::
 
-    Here’s an example of what not to do:
+    make flake8
 
-    code::
+  Or you can check specific python file using command::
 
-        def foo():
-            """
-            Calculate something and return the result.
-            """
-            pass
+    flake8 file_name
 
-    More details please follow `Django's development version <https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/coding-style/>`_.
+* Please refer following links for detailed description of every code convention:
+
+  * `PEP 8 <http://www.python.org/dev/peps/pep-0008>`_
+  * `Pyflakes <https://pypi.python.org/pypi/pyflakes>`_
+  * `Flake8 <https://pypi.python.org/pypi/flake8>`_
+
+* For more details about django projects, please follow `Django's development version <https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/coding-style/>`_.
 
 How To Contribute
 -----------------
