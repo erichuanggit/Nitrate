@@ -178,6 +178,11 @@ urlpatterns = patterns('',
     url(r'^report/testing/$', 'tcms.report.views.view_test_run_report', name='testrun_report'),
 
     url(r'^advance-search/$', 'tcms.search.advance_search', name='advance_search'),
+
+    #Using admin js without admin permission
+    #refer: https://docs.djangoproject.com/en/1.6/topics/i18n/translation/#module-django.views.i18n
+    (r'^jsi18n/$', 'django.views.i18n.javascript_catalog',
+     {'packages': ('django.conf', 'django.contrib.admin')}),
 )
 
 # Debug zone
