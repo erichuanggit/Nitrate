@@ -2,6 +2,7 @@
 
 import xmlrpclib
 import threading
+import warnings
 from datetime import datetime
 from django.conf import settings
 
@@ -14,14 +15,18 @@ class BZ_Externer_Track_Thread(threading.Thread):
 
     def run(self):
         if self.is_add:
-            proxy = xmlrpclib.ServerProxy(settings.BUGZILLA3_RPC_SERVER)
-            proxy.ExternalBugs.add_external_bug({
-                'Bugzilla_login': settings.BUGZILLA_USER,
-                'Bugzilla_password': settings.BUGZILLA_PASSWORD,
-                'bug_ids': [self.bug.bug_id,],
-                'external_bugs': [{'ext_bz_bug_id': str(self.bug.case.case_id),
-                            'ext_type_description': 'TCMS Test Case'},]
-            })
+            try:
+                proxy = xmlrpclib.ServerProxy(settings.BUGZILLA3_RPC_SERVER)
+                proxy.ExternalBugs.add_external_bug({
+                    'Bugzilla_login': settings.BUGZILLA_USER,
+                    'Bugzilla_password': settings.BUGZILLA_PASSWORD,
+                    'bug_ids': [self.bug.bug_id,],
+                    'external_bugs': [{'ext_bz_bug_id': str(self.bug.case.case_id),
+                                'ext_type_description': 'TCMS Test Case'},]
+                })
+            except Exception, err:
+                message = '%s: %s' % (err.__class__.__name__, err.message)
+                warnings.warn(message)
         else:
             pass
 
