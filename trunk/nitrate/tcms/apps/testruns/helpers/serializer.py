@@ -101,7 +101,7 @@ class TCR2File(object):
                 log_sub_elem.append(log_elem)
             sub_elem.append(log_sub_elem)
             bug_sub_elem = etree.Element('bugs')
-            for bug in tcr.case.case_bug.all():
+            for bug in tcr.case_run_bug.all():
                 bug_elem = etree.Element('bug')
                 bug_elem.set('bug', str(bug.bug_id))
                 bug_sub_elem.append(bug_elem)
