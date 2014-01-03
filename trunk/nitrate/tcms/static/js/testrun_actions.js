@@ -637,7 +637,7 @@ function addCaseRunBug(run_id, title_container, container, case_id, case_run_id,
             }
             return constructCaseRunZone(container, title_container, case_id);
         } else {
-            alert(returnobj.response[0]);
+            alert(returnobj.response);
             return false;
         }
     };
