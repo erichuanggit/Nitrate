@@ -26,7 +26,7 @@ from django.utils.safestring import mark_safe, SafeData
 from django.db.models.signals import post_save, post_delete
 from django.conf import settings
 from django.db import models
-from django.template.defaultfilters import slugify
+from uuslug import slugify
 
 from tcms.core.models import TCMSActionModel
 

@@ -30,7 +30,7 @@ from django.db.models import Count
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, render_to_response
-from django.template.defaultfilters import slugify
+from uuslug import slugify
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.simplejson import dumps as json_dumps

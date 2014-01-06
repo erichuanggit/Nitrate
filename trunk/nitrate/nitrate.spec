@@ -22,6 +22,7 @@ Requires:       python-kerberos
 Requires:       python-qpid
 Requires:       python-lxml
 Requires:       kobo-django >= 0.2.0-3
+Requires:       django-uuslug
 Requires:       mod_auth_kerb
 Requires:       mod_wsgi
 Requires:       w3m
