@@ -1240,10 +1240,11 @@ def clone(request, template_name='case/clone.html'):
                                 sortkey = tp.get_case_sortkey()
                         else:
                             sortkey = tp.get_case_sortkey()
-                    try:
-                        tp.add_case(tc_dest, sortkey)
-                    except:
-                        pass
+
+                        try:
+                            tp.add_case(tc_dest, sortkey)
+                        except:
+                            pass
 
                 # Add the cases to plan
                 for tp in clone_form.cleaned_data['plan']:
