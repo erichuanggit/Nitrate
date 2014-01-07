@@ -40,12 +40,14 @@ class TCR2File(object):
         self.rows = []
 
     def tcr_attrs_in_a_list(self, tcr):
-        line = [
-            tcr.pk, tcr.case.pk, tcr.case.category,
-            tcr.case_run_status, tcr.case.summary.encode('utf-8'),
-            tcr.case.script, tcr.case.is_automated,
-            self.log_links(tcr), self.bug_ids(tcr)
-        ]
+        line = (tcr.pk, tcr.case.pk,
+                tcr.case.category.name.encode('utf-8'),
+                tcr.case_run_status.name.encode('utf-8'),
+                tcr.case.summary.encode('utf-8'),
+                tcr.case.script,
+                tcr.case.is_automated,
+                self.log_links(tcr),
+                self.bug_ids(tcr))
         return line
 
     def log_links(self, tcr):
@@ -55,7 +57,8 @@ class TCR2File(object):
         '''
         log_links = tcr.links.all()
         return ' '.join(
-            tcr.links.values_list('url', flat=True)
+            [url.encode('utf-8')
+             for url in tcr.links.values_list('url', flat=True)]
         )
 
     def bug_ids(self, tcr):
