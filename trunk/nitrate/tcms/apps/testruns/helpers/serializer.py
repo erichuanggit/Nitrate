@@ -21,7 +21,6 @@ A serializer to import/export between model objects and file formats.
 '''
 
 import csv
-from lxml import etree
 
 
 class TCR2File(object):
@@ -82,29 +81,28 @@ class TCR2File(object):
         writer.writerow(self.headers)
         writer.writerows(rows)
 
-    def write_to_xml(self, fileobj):
-        root = etree.Element(self.root)
+    def write_to_xml(self, output):
+        write_to_output = output.write
+        tcr_start_elem = u'<testcaserun case_run_id="%d" case_id="%d" ' \
+                         u'category="%s" status="%s" summary="%s" ' \
+                         u'scripts="%s" automated="%s">'
+
+        write_to_output(u'<%s>' % self.root)
         for tcr in self.tcrs:
-            sub_elem = etree.Element('testcaserun')
-            sub_elem.set('case_run_id', str(tcr.pk))
-            sub_elem.set('case_id', str(tcr.case.pk))
-            sub_elem.set('category', tcr.case.category.name or u'')
-            sub_elem.set('status', str(tcr.case_run_status))
-            sub_elem.set('summary', tcr.case.summary or u'')
-            sub_elem.set('scripts', tcr.case.script or u'')
-            sub_elem.set('automated', str(tcr.case.is_automated))
-            log_sub_elem = etree.Element('loglinks')
-            for link in tcr.links.all():
-                log_elem = etree.Element('loglink')
-                log_elem.set('name', link.name)
-                log_elem.set('url', link.url)
-                log_sub_elem.append(log_elem)
-            sub_elem.append(log_sub_elem)
-            bug_sub_elem = etree.Element('bugs')
-            for bug in tcr.case_run_bug.all():
-                bug_elem = etree.Element('bug')
-                bug_elem.set('bug', str(bug.bug_id))
-                bug_sub_elem.append(bug_elem)
-            sub_elem.append(bug_sub_elem)
-            root.append(sub_elem)
-        fileobj.write(etree.tostring(root))
+            write_to_output(tcr_start_elem % (tcr.pk, tcr.case.pk,
+                                              tcr.case.category.name or u'',
+                                              tcr.case_run_status.name,
+                                              tcr.case.summary or u'',
+                                              tcr.case.script or u'',
+                                              str(tcr.case.is_automated)))
+            write_to_output(u'<loglinks>')
+            map(lambda link: write_to_output(u'<loglink name="%s" url="%s" />' %
+                                             (link.name, link.url)),
+                tcr.links.all())
+            write_to_output(u'</loglinks>')
+            write_to_output(u'<bugs>')
+            map(lambda bug: write_to_output(u'<bug id="%d" />' % bug.bug_id),
+                tcr.case_run_bug.all())
+            write_to_output(u'</bugs>')
+            write_to_output(u'</testcaserun>')
+        write_to_output(u'</%s>' % self.root)
