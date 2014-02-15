@@ -67,7 +67,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %attr(0755, apache, apache) %{_var}/%{name}
-%doc AUTHORS ChangeLog docs/README
+%doc AUTHORS ChangeLog README
 %{python_sitelib}/tcms/
 %{python_sitelib}/nitrate-%{version}-py*.egg-info/
 %{_datadir}/%{name}

@@ -1,5 +1,4 @@
-include AUTHORS
-include ChangeLog
+include AUTHORS ChangeLog README
 include nitrate.spec
 recursive-include tcms/templates *
 recursive-include tcms/core/lib/django-pagination/pagination/templates *
