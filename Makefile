@@ -15,7 +15,7 @@ PWD=$(shell pwd)
 RPMBUILD_OPTIONS=--nodeps --define "_sourcedir $(PWD)" --define "_srcrpmdir $(PWD)" --define "_rpmdir $(PWD)"
 
 WORK_DIR=/tmp/nitrate-$(VERSION)
-SOURCE_DIR = $(WORK_DIR)/nitrate/trunk/nitrate
+SOURCE_DIR = $(WORK_DIR)/nitrate
 CODE_REPO=git://git.fedorahosted.org/nitrate.git
 
 default: help

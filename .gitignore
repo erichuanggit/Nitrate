@@ -1,2 +1,11 @@
-trunk/nitrate/docs/target/
-trunk/nitrate/tcms/settings/local.py
+env.sh
+*.pyc
+*.swp
+*~
+tcms/dev.db
+tcms/dev_settings.py
+tcms/run.sh
+tcms/mysettings.py
+tcms/toys.py
+docs/guide/target
+.gitignore
