@@ -70,6 +70,7 @@ setup(
     version=PACKAGE_VER,
     description=PACKAGE_DESC,
     url=PACKAGE_URL,
+    license='GPLv2+',
     packages=find_packages(exclude='tests'),
     # package_data=get_package_data(),
     install_requires=install_requires,
