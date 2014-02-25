@@ -16,15 +16,16 @@ BuildRequires:  python-setuptools
 BuildRequires:  python-devel
 
 Requires:       Django = 1.5.5
-Requires:       MySQL-python >= 1.2.3
+Requires:       django-uuslug
+Requires:       kobo-django >= 0.2.0-3
+Requires:       mod_auth_kerb
 Requires:       mod_ssl
+Requires:       mod_wsgi
+Requires:       MySQL-python >= 1.2.3
 Requires:       python-kerberos
 Requires:       python-qpid
-Requires:       kobo-django >= 0.2.0-3
-Requires:       django-uuslug
-Requires:       mod_auth_kerb
-Requires:       mod_wsgi
 Requires:       w3m
+Requires:       wadofstuff-django-serializers >= 1.1.0
 
 %description
 Nitrate is a tool for tracking testing being done on a product.

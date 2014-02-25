@@ -3,4 +3,5 @@ MySQL-python==1.2.4
 kerberos==1.1.1
 qpid-python==0.20
 django-uuslug==1.0.0
+wadofstuff-django-serializers>=1.1.0
 https://git.fedorahosted.org/cgit/kobo.git/snapshot/kobo-0.2.1.tar.gz#egg=kobo

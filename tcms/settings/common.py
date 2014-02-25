@@ -222,7 +222,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 # wadofstuff serializer settings
 # http://code.google.com/p/wadofstuff/wiki/DjangoFullSerializers
 SERIALIZATION_MODULES = {
-    'json': 'tcms.core.lib.wadofstuff.django.serializers.json',
+    'json': 'wadofstuff.django.serializers.json',
 }
 
 # Needed by django.core.context_processors.debug:
