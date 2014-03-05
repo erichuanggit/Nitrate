@@ -549,25 +549,30 @@ def update(request, case_run_ids, values):
     form = XMLRPCUpdateCaseRunForm(values)
 
     if form.is_valid():
+        data = {}
+
         if form.cleaned_data['build']:
-            tcrs.update(build = form.cleaned_data['build'])
+            data['build'] = form.cleaned_data['build']
 
         if form.cleaned_data['assignee']:
-            tcrs.update(assignee = form.cleaned_data['assignee'])
+            data['assignee'] = form.cleaned_data['assignee']
 
         if form.cleaned_data['case_run_status']:
-            tcrs.update(case_run_status = form.cleaned_data['case_run_status'])
-            tcrs.update(tested_by = request.user)
-            tcrs.update(close_date = datetime.now())
+            data['case_run_status'] = form.cleaned_data['case_run_status']
+            data['tested_by'] = request.user
+            data['close_date'] = datetime.now()
 
         if values.has_key('notes'):
             if values['notes'] in (None, ''):
-                tcrs.update(notes = values['notes'])
+                data['notes'] = values['notes']
             if form.cleaned_data['notes']:
-                tcrs.update(notes = form.cleaned_data['notes'])
+                data['notes'] = form.cleaned_data['notes']
 
         if form.cleaned_data['sortkey']:
-            tcrs.update(sortkey = form.cleaned_data['sortkey'])
+            data['sortkey'] = form.cleaned_data['sortkey']
+
+        tcrs.update(**data)
+
     else:
         return forms.errors_to_list(form)
 
