@@ -543,9 +543,9 @@ def update(request, case_run_ids, values):
     from tcms.core import forms
     from tcms.apps.testruns.forms import XMLRPCUpdateCaseRunForm
 
-    tcrs = TestCaseRun.objects.filter(
-        pk__in = pre_process_ids(case_run_ids)
-    )
+    pks_to_update = pre_process_ids(case_run_ids)
+
+    tcrs = TestCaseRun.objects.filter(pk__in=pks_to_update)
     form = XMLRPCUpdateCaseRunForm(values)
 
     if form.is_valid():
@@ -571,7 +571,7 @@ def update(request, case_run_ids, values):
     else:
         return forms.errors_to_list(form)
 
-    query = {'pk__in': tcrs.values_list('pk', flat = True)}
+    query = {'pk__in': pks_to_update}
     return TestCaseRun.to_xmlrpc(query)
 
 
