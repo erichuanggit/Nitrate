@@ -392,12 +392,9 @@ def paginate_testcases(request, testcases):
     Return value: return the queryset for chain call
     '''
     DEFAULT_PAGE_INDEX = 1
-    # FIXME: it's better handle this default value in search form instead of
-    # here.
-    DEFAULT_PAGE_SIZE = 20
 
     POST = request.POST
-    page_index = int(POST.get('page_index', DEFAULT_PAGE_INDEX))
+    page_index = int(POST.get('page_index', settings.DEFAULT_PAGE_INDEX))
     page_size = int(POST.get('items_per_page', DEFAULT_PAGE_SIZE))
     offset = (page_index - 1) * page_size
     return testcases[offset:offset + page_size]
@@ -631,7 +628,7 @@ def search(request, template_name='case/all.html'):
     }
     return render_to_response(template_name, context_data,
                               context_instance=RequestContext(request))
-    
+
 
 def ajax_search(request, template_name='case/common/json_cases.txt'):
     """Generate the case list in search case and case zone in plan
