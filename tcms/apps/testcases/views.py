@@ -394,8 +394,8 @@ def paginate_testcases(request, testcases):
     DEFAULT_PAGE_INDEX = 1
 
     POST = request.POST
-    page_index = int(POST.get('page_index', settings.DEFAULT_PAGE_INDEX))
-    page_size = int(POST.get('items_per_page', DEFAULT_PAGE_SIZE))
+    page_index = int(POST.get('page_index', DEFAULT_PAGE_INDEX))
+    page_size = int(POST.get('items_per_page', settings.DEFAULT_PAGE_SIZE))
     offset = (page_index - 1) * page_size
     return testcases[offset:offset + page_size]
 
