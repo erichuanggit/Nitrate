@@ -30,6 +30,7 @@ from tcms.apps.testruns import signals as run_watchers
 from tcms.core.contrib.linkreference.models import LinkReference
 import datetime
 
+from tcms.core.utils.xmlrpc import XMLRPCSerializer
 
 try:
     from tcms.core.contrib.plugins_support.signals import register_model
@@ -61,27 +62,18 @@ class TestRun(TCMSActionModel):
     plan = models.ForeignKey('testplans.TestPlan', related_name='run')
     environment_id = models.IntegerField(default=0)
     build = models.ForeignKey('management.TestBuild', related_name='build_run')
-    manager = models.ForeignKey(
-        'auth.User', related_name='manager'
-    )
-    default_tester = models.ForeignKey(
-        'auth.User', related_name='default_tester', null = True,
-    )
+    manager = models.ForeignKey('auth.User', related_name='manager')
+    default_tester = models.ForeignKey('auth.User',
+                                       null=True, blank=True,
+                                       related_name='default_tester')
 
-    env_value = models.ManyToManyField(
-        'management.TCMSEnvValue',
-        through='testruns.TCMSEnvRunValueMap',
-    )
+    env_value = models.ManyToManyField('management.TCMSEnvValue',
+                                       through='testruns.TCMSEnvRunValueMap')
 
-    tag = models.ManyToManyField(
-        'management.TestTag',
-        through='testruns.TestRunTag',
-    )
+    tag = models.ManyToManyField('management.TestTag',
+                                 through='testruns.TestRunTag')
 
-    cc = models.ManyToManyField(
-        'auth.User',
-        through='testruns.TestRunCC',
-    )
+    cc = models.ManyToManyField('auth.User', through='testruns.TestRunCC')
     auto_update_run_status = models.BooleanField(default=False)
 
     class Meta:
@@ -91,6 +83,14 @@ class TestRun(TCMSActionModel):
 
     def __unicode__(self):
         return self.summary
+
+    @classmethod
+    def to_xmlrpc(cls, query=None):
+        from tcms.core.utils.xmlrpc import TestRunXMLRPCSerializer
+        _query = query or {}
+        qs = cls.objects.filter(**_query).order_by('pk')
+        s = TestRunXMLRPCSerializer(model_class=cls, queryset=qs)
+        return s.serialize_queryset()
 
     @classmethod
     def list(cls, query):
@@ -586,6 +586,13 @@ class TestCaseRun(TCMSActionModel):
 
     def __unicode__(self):
         return '%s: %s' % (self.pk, self.case_id)
+
+    @classmethod
+    def to_xmlrpc(cls, query={}):
+        from tcms.core.utils.xmlrpc import TestCaseRunXMLRPCSerializer
+        qs = cls.objects.filter(**query).order_by('pk')
+        s = TestCaseRunXMLRPCSerializer(model_class=cls, queryset=qs)
+        return s.serialize_queryset()
 
     @classmethod
     def mail_scene(cls, objects, field = None, value = None, ctype = None, object_pk = None):

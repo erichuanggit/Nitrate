@@ -29,9 +29,9 @@ from django.db.models import ObjectDoesNotExist
 from django.db.models.signals import post_save, post_delete
 from django.contrib.contenttypes import generic
 
-# from tcms
 from tcms.core.models import TCMSActionModel, TimedeltaField
 from tcms.core.models import TCMSContentTypeBaseModel
+from tcms.core.utils.xmlrpc import XMLRPCSerializer
 
 #from signal listen
 from tcms.apps.testcases import signals as case_watchers
@@ -135,8 +135,10 @@ class TestCase(TCMSActionModel):
     alias = models.CharField(max_length=255, blank=True)
     estimated_time = TimedeltaField(null=True, blank=True)
     notes = models.TextField(blank=True)
+
     case_status = models.ForeignKey(TestCaseStatus)
-    category = models.ForeignKey(TestCaseCategory, related_name='category_case')
+    category = models.ForeignKey(TestCaseCategory,
+                                 related_name='category_case')
     priority = models.ForeignKey('management.Priority',
                                  related_name='priority_case')
     author = models.ForeignKey('auth.User', related_name='cases_as_author')
@@ -147,6 +149,7 @@ class TestCase(TCMSActionModel):
     reviewer = models.ForeignKey('auth.User',
                                  related_name='cases_as_reviewer',
                                  null=True)
+
     attachment = models.ManyToManyField('management.TestAttachment',
                                         through='testcases.TestCaseAttachment')
 
@@ -167,6 +170,14 @@ class TestCase(TCMSActionModel):
 
     def __unicode__(self):
         return self.summary
+
+    @classmethod
+    def to_xmlrpc(cls, query=None):
+        from tcms.core.utils.xmlrpc import TestCaseXMLRPCSerializer
+        _query = query or {}
+        qs = cls.objects.filter(**_query).order_by('pk')
+        s = TestCaseXMLRPCSerializer(model_class=cls, queryset=qs)
+        return s.serialize_queryset()
 
     @classmethod
     def create(cls, author, values):

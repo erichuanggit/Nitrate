@@ -28,10 +28,10 @@ from django.conf import settings
 from django.db import models
 from uuslug import slugify
 
-from tcms.core.models import TCMSActionModel
-
 from tcms.apps.management.models import TCMSEnvPlanMap, Version
 from tcms.apps.testcases.models import TestCasePlan
+from tcms.core.models import TCMSActionModel
+from tcms.core.utils.xmlrpc import XMLRPCSerializer
 
 # single listen
 from tcms.apps.testplans import signals as plan_watchers
@@ -53,52 +53,37 @@ class TestPlanType(TCMSActionModel):
         ordering = ['name']
 
 class TestPlan(TCMSActionModel):
-    """
-    A plan within the TCMS
-    """
+    """A plan within the TCMS"""
+
     plan_id = models.AutoField(max_length=11, primary_key=True)
     default_product_version = models.TextField()
-    product_version = models.ForeignKey(Version, blank=True, null=True)
     name = models.CharField(max_length=255)
-    create_date = models.DateTimeField(db_column='creation_date', auto_now_add=True)
+    create_date = models.DateTimeField(db_column='creation_date',
+                                       auto_now_add=True)
     is_active = models.BooleanField(db_column='isactive', default=True)
-    extra_link = models.CharField(
-        max_length=1024,
-        default=None,
-        blank=True,
-        null=True
-    )
+    extra_link = models.CharField(max_length=1024, default=None,
+                                  blank=True, null=True)
 
-    owner  = models.ForeignKey('auth.User', blank=True, null=True, related_name='myplans')
-    parent = models.ForeignKey('self', blank=True, null=True, related_name='child_set')
+    product_version = models.ForeignKey(Version, blank=True, null=True)
+    owner  = models.ForeignKey('auth.User', blank=True, null=True,
+                               related_name='myplans')
     author = models.ForeignKey('auth.User')
     product = models.ForeignKey('management.Product', related_name='plan')
     type = models.ForeignKey(TestPlanType)
+    parent = models.ForeignKey('self', blank=True, null=True,
+                               related_name='child_set')
 
     attachment = models.ManyToManyField(
         'management.TestAttachment',
-        through='testplans.TestPlanAttachment',
-    )
-
-    case = models.ManyToManyField(
-        'testcases.TestCase',
-        through='testcases.TestCasePlan',
-    )
-
-    component = models.ManyToManyField(
-        'management.Component', through='testplans.TestPlanComponent',
-    )
-
-    env_group = models.ManyToManyField(
-        'management.TCMSEnvGroup',
-        through='management.TCMSEnvPlanMap',
-    )
-
-    tag = models.ManyToManyField(
-        'management.TestTag',
-        through='testplans.TestPlanTag',
-    )
-
+        through='testplans.TestPlanAttachment')
+    case = models.ManyToManyField('testcases.TestCase',
+                                  through='testcases.TestCasePlan')
+    component = models.ManyToManyField('management.Component',
+                                       through='testplans.TestPlanComponent')
+    env_group = models.ManyToManyField('management.TCMSEnvGroup',
+                                       through='management.TCMSEnvPlanMap')
+    tag = models.ManyToManyField('management.TestTag',
+                                 through='testplans.TestPlanTag')
 
     class Meta:
         db_table = u'test_plans'
@@ -117,6 +102,14 @@ class TestPlan(TCMSActionModel):
         )
         self.product_version = new_version
         super(TestPlan, self).save(*args, **kwargs) # Call the "real" save() method.
+
+    @classmethod
+    def to_xmlrpc(cls, query=None):
+        from tcms.core.utils.xmlrpc import TestPlanXMLRPCSerializer
+        _query = query or {}
+        qs = cls.objects.filter(**_query).order_by('pk')
+        s = TestPlanXMLRPCSerializer(model_class=cls, queryset=qs)
+        return s.serialize_queryset()
 
     @classmethod
     def list(cls, query = None):
