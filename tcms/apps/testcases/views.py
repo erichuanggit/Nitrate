@@ -366,10 +366,13 @@ def build_cases_search_form(request, populate=None, plan=None):
     action = request.REQUEST.get('a')
     if action in TESTCASE_OPERATION_ACTIONS:
         search_form = SearchForm(request.REQUEST)
+        request.session['items_per_page'] = request.POST.get('items_per_page', settings.DEFAULT_PAGE_SIZE);
     else:
         d_status = get_case_status(request.REQUEST.get('template_type'))
         d_status_ids = d_status.values_list('pk', flat=True)
-        search_form = SearchForm(initial={'case_status': d_status_ids})
+        items_per_page = request.session.get('items_per_page', settings.DEFAULT_PAGE_SIZE)
+        search_form = SearchForm(initial={'case_status': d_status_ids,
+                                          'items_per_page': items_per_page})
 
     if populate:
         if request.REQUEST.get('product'):
