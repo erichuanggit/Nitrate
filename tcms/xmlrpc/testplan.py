@@ -20,11 +20,13 @@ from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_
 from tcms.apps.testplans.models import TestPlan, TestPlanType
 from tcms.apps.testcases.models import TestCasePlan
 from tcms.apps.management.models import TestTag
+from tcms.apps.management.models import Component
 from django.core.exceptions import ObjectDoesNotExist
 from utils import pre_process_ids
 
 __all__ = (
     'add_tag',
+    'add_component',
     'check_plan_type',
     'create',
     'filter',
@@ -35,6 +37,7 @@ __all__ = (
     'get_plan_type',
     'get_product',
     'get_tags',
+    'get_components',
     'get_test_cases',
     'get_all_cases_tags',
     'get_test_runs',
@@ -42,6 +45,7 @@ __all__ = (
     'lookup_type_id_by_name',
     'lookup_type_name_by_id',
     'remove_tag',
+    'remove_component',
     'store_text',
     'update',
     'import_case_via_XML',
@@ -79,6 +83,41 @@ def add_tag(request, plan_ids, tags):
         t, c = TestTag.objects.get_or_create(name = tag)
         for tp in tps:
             tp.add_tag(tag = t)
+
+    return
+
+@log_call
+@user_passes_test(lambda u: u.has_perm('testplans.add_testplancomponent'))
+def add_component(request, plan_ids, component_ids):
+    """
+    Description: Adds one or more components to the selected test plan.
+
+    Params:      $plan_ids - Integer/Array/String: An integer representing the ID of the plan in the database.
+                 $component_ids - Integer/Array/String - The component ID, an array of Component IDs
+                                  or a comma separated list of component IDs.
+
+    Returns:     Array: empty on success or an array of hashes with failure
+                        codes if a failure occured.
+
+    Example:
+    # Add component id 54321 to plan 1234
+    >>> TestPlan.add_component(1234, 54321)
+    # Add component ids list [1234, 5678] to plan list [56789, 12345]
+    >>> TestPlan.add_component([56789, 12345], [1234, 5678])
+    # Add component ids list '1234, 5678' to plan list '56789, 12345' with String
+    >>> TestPlan.add_component('56789, 12345', '1234, 5678')
+    """
+
+    tps = TestPlan.objects.filter(
+        plan_id__in = pre_process_ids(value=plan_ids)
+    )
+    cs = Component.objects.filter(
+        id__in = pre_process_ids(value=component_ids)
+    )
+
+    for tp in tps:
+        for c in cs:
+            tp.add_component(c)
 
     return
 
@@ -301,6 +340,26 @@ def get_tags(request, plan_id):
     query = {'id__in': tag_ids}
     return TestTag.to_xmlrpc(query)
 
+def get_components(request, plan_id):
+    """"
+    Description: Get the list of components attached to this plan.
+
+    Params:      $plan_id - Integer/String: An integer representing the ID in the database
+
+    Returns:     Array: An array of component object hashes.
+
+    Example:
+    >>> TestPlan.get_components(12345)
+    """
+    try:
+        tp = TestPlan.objects.get(plan_id=plan_id)
+    except:
+        raise
+
+    component_ids = tp.component.values_list('id', flat=True)
+    query = {'id__in': component_ids}
+    return Component.to_xmlrpc(query)
+
 def get_all_cases_tags(request, plan_id):
     """
     Description: Get the list of tags attached to this plan's testcases.
@@ -437,6 +496,43 @@ def remove_tag(request, plan_ids, tags):
                 pass
             except:
                 raise
+
+    return
+
+@log_call
+@user_passes_test(lambda u: u.has_perm('testplans.delete_testplancomponent'))
+def remove_component(request, plan_ids, component_ids):
+    """
+    Description: Removes selected component from the selected test plan.
+
+    Params:      $plan_ids - Integer/Array/String: An integer representing the ID in the database,
+                             an array of plan_ids, or a string of comma separated plan_ids.
+
+                 $component_ids - Integer: - The component ID to be removed.
+
+    Returns:     Array: Empty on success.
+
+    Example:
+    # Remove component id 54321 from plan 1234
+    >>> TestPlan.remove_component(1234, 54321)
+    # Remove component ids list [1234, 5678] from plan list [56789, 12345]
+    >>> TestPlan.remove_component([56789, 12345], [1234, 5678])
+    # Remove component ids list '1234, 5678' from plan list '56789, 12345' with String
+    >>> TestPlan.remove_component('56789, 12345', '1234, 5678')
+    """
+    tps = TestPlan.objects.filter(
+        plan_id__in = pre_process_ids(value=plan_ids)
+    )
+    cs = Component.objects.filter(
+        id__in = pre_process_ids(value=component_ids)
+    )
+
+    for tp in tps:
+        for c in cs:
+            try:
+                tp.remove_component(component=c)
+            except:
+                pass
 
     return
 
