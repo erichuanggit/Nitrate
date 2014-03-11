@@ -355,24 +355,43 @@ Nitrate.TestPlans.TreeView = {
     addChildPlan: function(container, plan_id) {
         var self = this;
         var tree = Nitrate.TestPlans.TreeView;
-        var p = prompt('Enter a comma separated list of plan IDs');
-        if (!p) {
+        var childPlanIds = prompt('Enter a comma separated list of plan IDs');
+        if (!childPlanIds) {
             return false;
         }
 
-        var childPlanId = parseInt(p);
-        if (isNaN(childPlanId)) {
-            alert('Plan Id should be a numeric. $plan_id is not valid.'.replace('$plan_id', p));
-            return false;
-        }
+        var planIdRegex = /^\d+$/;
+        var cleanedChildPlanIds = [];
+        var cleaned = true;
+        childPlanIds.split(',').forEach(function(element, index) {
+            var s = element.strip();
+            if (s === '') {
+                return true;
+            }
 
-        if (childPlanId === tree.data[0].pk || childPlanId === plan_id) {
-            alert('Cannot add parent or self.');
-            return false;
+            if (!planIdRegex.test(s)) {
+                alert('Plan Id should be a numeric. ' + s + ' is not valid.');
+                cleaned = false;
+                return cleaned;
+            }
+
+            var childPlanId = parseInt(s);
+            var isParentOrThisPlan = childPlanId === tree.data[0].pk || childPlanId === plan_id;
+            if (isParentOrThisPlan) {
+                alert('Cannot add parent or self.');
+                cleaned = false;
+                return cleaned;
+            }
+
+            cleanedChildPlanIds.push(childPlanId);
+        });
+
+        if (!cleaned) {
+            return;
         }
 
         var parameters = {
-            pk__in: childPlanId,
+            pk__in: cleanedChildPlanIds.join(','),
         };
 
         var callback = function(e) {
@@ -392,7 +411,7 @@ Nitrate.TestPlans.TreeView = {
                          cbUpdateTreeView);
         };
 
-        constructPlanParentPreviewDialog(childPlanId, parameters, callback);
+        constructPlanParentPreviewDialog(childPlanIds, parameters, callback);
     },
 
     removeChildPlan: function(container, plan_id) {
