@@ -44,7 +44,7 @@ class TCR2File(object):
                 tcr.case.category.name.encode('utf-8'),
                 tcr.case_run_status.name.encode('utf-8'),
                 tcr.case.summary.encode('utf-8'),
-                tcr.case.script,
+                tcr.case.script.encode('utf-8'),
                 tcr.case.is_automated,
                 self.log_links(tcr),
                 self.bug_ids(tcr))

@@ -411,6 +411,7 @@ Nitrate.TestPlans.TreeView = {
                          cbUpdateTreeView);
         };
 
+        // FIXME: this first argument is not being used.
         constructPlanParentPreviewDialog(childPlanIds, parameters, callback);
     },
 
