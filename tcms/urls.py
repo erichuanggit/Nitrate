@@ -206,13 +206,3 @@ if settings.DEBUG:
     urlpatterns += patterns('tcms.core.utils.test_template',
         (r'^tt/(?P<template_name>.*)', 'test_template'),
     )
-
-# Installation zone
-
-if settings.FIRST_RUN:
-    urlpatterns += patterns('tcms.install',
-        (r'^install/$', 'install'),
-        (r'^upgrade/$', 'upgrade'),
-        (r'^create_groups/$', 'create_groups'),
-        (r'^port_users/$', 'port_users'),
-    )

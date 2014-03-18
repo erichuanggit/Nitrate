@@ -297,12 +297,6 @@ FOOTER_LINKS = ()
 # FILE_UPLOAD_DIR = path.join(MEDIA_DIR, 'uploads').replace('\\','/'),
 FILE_UPLOAD_DIR = '/var/nitrate/uploads'
 
-#
-# Installation settings
-#
-# First run - to detemine need port user or not.
-FIRST_RUN = True
-
 # Enable the administrator delete permission
 # In another word it's set the admin to super user or not.
 SET_ADMIN_AS_SUPERUSER = False
