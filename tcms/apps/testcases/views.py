@@ -21,6 +21,7 @@ import itertools
 
 from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db.models import Count
@@ -763,23 +764,50 @@ class SimpleTestCaseView(TemplateView):
     # NOTES: what permission is proper for this request?
     def get(self, request, case_id):
         self.case_id = case_id
-        return super(self.__class__, self).get(request, case_id)
+        return super(SimpleTestCaseView, self).get(request, case_id)
 
     def get_case(self):
         cases = TestCase.objects.filter(pk=self.case_id).only('notes')
         cases = list(cases.iterator())
-        return cases[0] if len(cases) > 0 else None
+        return cases[0] if cases else None
 
     def get_context_data(self, **kwargs):
-        data = super(self.__class__, self).get_context_data(**kwargs)
+        data = super(SimpleTestCaseView, self).get_context_data(**kwargs)
 
         case = self.get_case()
         data['test_case'] = case
         if case is not None:
             data.update({
                 'test_case_text': case.get_text_with_version(),
+                'attachments': case.attachment.only('file_name'),
+                'components': case.component.only('name'),
+                'tags': case.tag.only('name'),
             })
 
+        return data
+
+
+class TestCaseReviewPaneView(SimpleTestCaseView):
+    '''Used in Reviewing Cases tab in test plan page'''
+
+    template_name = 'case/get_details_review.html'
+
+    def get_logs(self, testcase):
+        ct = ContentType.objects.get_for_model(TestCase)
+        logs = TCMSLogModel.objects.filter(content_type=ct,
+                                           object_pk=testcase.pk,
+                                           site=settings.SITE_ID)
+        logs = logs.values('date', 'who__username', 'action')
+        return logs.order_by('date')
+
+    def get_context_data(self, **kwargs):
+        data = super(TestCaseReviewPaneView, self).get_context_data(**kwargs)
+        testcase = data['test_case']
+        if testcase is not None:
+            logs = self.get_logs(testcase)
+            data.update({
+                'logs': logs,
+            })
         return data
 
 

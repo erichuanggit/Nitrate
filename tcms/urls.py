@@ -25,6 +25,8 @@ from django.contrib import admin
 admin.autodiscover()
 
 from tcms.apps.testcases.views import SimpleTestCaseView
+from tcms.apps.testcases.views import TestCaseReviewPaneView
+
 
 # XML RPC handler
 from kobo.django.xmlrpc.views import XMLRPCHandlerFactory
@@ -128,6 +130,8 @@ urlpatterns = patterns('',
 
     url(r'^case/(?P<case_id>\d+)/readonly-pane/$', SimpleTestCaseView.as_view(),
         name='case-readonly-pane'),
+    url(r'^case/(?P<case_id>\d+)/review-pane/$', TestCaseReviewPaneView.as_view(),
+        name='case-review-pane'),
 
     # Testruns zone
     (r'^run/new/$', 'tcms.apps.testruns.views.new'),

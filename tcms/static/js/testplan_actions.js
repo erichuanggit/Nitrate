@@ -1335,6 +1335,30 @@ function toggleTestCasePane(options) {
     }
 }
 
+// TODO: merge this function with above
+function toggleTestCaseReviewPane(options) {
+    var case_id = options.case_id;
+    var casePaneContainer = options.casePaneContainer;
+    var callback = options.callback;
+
+    // If any of these is invalid, just keep quiet and don't display anything.
+    if (case_id === undefined || casePaneContainer === undefined)
+        return;
+
+    casePaneContainer.toggle();
+
+    if (casePaneContainer.find('.ajax_loading').length > 0) {
+        jQ.get('/case/' + case_id + '/review-pane/', function(data) {
+            casePaneContainer.html(data);
+
+            if (typeof callback === 'function') {
+                callback();
+            }
+        },
+        'html');
+    }
+}
+
 
 /*
  * Bind events on loaded cases.
@@ -1452,7 +1476,17 @@ function bindEventsOnLoadedCases(options) {
                 var case_content_callback = function(e) {};
             }
 
-            toggleTestCaseContents(template_type, title, content, case_id, nil, nil, case_content_callback);
+            toggleTestCaseReviewPane({
+                case_id: case_id,
+                casePaneContainer: jQ(content),
+                callback: case_content_callback
+            });
+            toggleExpandArrow({
+                caseRowContainer: jQ(title),
+                expandPaneContainer: jQ(content)
+            });
+
+            //toggleTestCaseContents(template_type, title, content, case_id, nil, nil, case_content_callback);
         });
 
         /*
