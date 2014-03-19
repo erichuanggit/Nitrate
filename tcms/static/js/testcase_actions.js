@@ -443,6 +443,35 @@ function getTestCaseContents(template_type, container, content_container, object
     }
 }
 
+
+/*
+ * Used for expanding test case in test plan page specifically
+ *
+ * Arguments:
+ * options.caseRowContainer: a jQuery object referring to the container of the
+ *                           test case that is being expanded to show more
+ *                           information.
+ * options.expandPaneContainer: a jQuery object referring to the container of
+ *                              the expanded pane showing test case detail
+ *                              information.
+ */
+function toggleExpandArrow(options) {
+    var container = options.caseRowContainer;
+    var content_container = options.expandPaneContainer;
+
+    var blind_icon = container.find('img');
+    if (content_container.css('display') == 'none') {
+        blind_icon.removeClass('collapse');
+        blind_icon.addClass('expand');
+        blind_icon.attr('src', '/static/images/t1.gif');
+    } else {
+        blind_icon.removeClass('expand');
+        blind_icon.addClass('collapse');
+        blind_icon.attr('src', '/static/images/t2.gif');
+    }
+}
+
+
 function toggleTestCaseContents(template_type, container, content_container, object_pk, case_text_version, case_run_id, callback)
 {
     if (typeof(container) != 'object')
@@ -472,16 +501,10 @@ function toggleTestCaseContents(template_type, container, content_container, obj
         });
     };
 
-    var blind_icon = container.getElementsByTagName('img')[0];
-    if (content_container.getStyle('display') == 'none') {
-        $(blind_icon).removeClassName('collapse');
-        $(blind_icon).addClassName('expand');
-        $(blind_icon).src = "/static/images/t1.gif";
-    } else {
-        $(blind_icon).removeClassName('expand');
-        $(blind_icon).addClassName('collapse');
-        $(blind_icon).src = "/static/images/t2.gif";
-    }
+    toggleExpandArrow({
+        caseRowContainer: jQ(container),
+        expandPaneContainer: jQ(content_container)
+    });
 }
 
 function changeTestCaseStatus(plan_id, selector, case_id, be_confirmed, was_confirmed)

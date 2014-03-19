@@ -24,6 +24,8 @@ from django.views.generic.base import RedirectView
 from django.contrib import admin
 admin.autodiscover()
 
+from tcms.apps.testcases.views import SimpleTestCaseView
+
 # XML RPC handler
 from kobo.django.xmlrpc.views import XMLRPCHandlerFactory
 xmlrpc_handler = XMLRPCHandlerFactory('TCMS_XML_RPC')
@@ -123,6 +125,9 @@ urlpatterns = patterns('',
     (r'^case/(?P<case_id>\d+)/log/$', 'tcms.apps.testcases.views.get_log'),
     (r'^case/(?P<case_id>\d+)/bug/$', 'tcms.apps.testcases.views.bug'),
     (r'^case/(?P<case_id>\d+)/plan/$', 'tcms.apps.testcases.views.plan'),
+
+    url(r'^case/(?P<case_id>\d+)/readonly-pane/$', SimpleTestCaseView.as_view(),
+        name='case-readonly-pane'),
 
     # Testruns zone
     (r'^run/new/$', 'tcms.apps.testruns.views.new'),

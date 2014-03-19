@@ -1316,6 +1316,26 @@ function unlinkCasesFromPlan(container, form, table)
     })
 }
 
+
+function toggleTestCasePane(options) {
+    var case_id = options.case_id;
+    var casePaneContainer = options.casePaneContainer;
+
+    // If any of these is invalid, just keep quiet and don't display anything.
+    if (case_id === undefined || casePaneContainer === undefined)
+        return;
+
+    casePaneContainer.toggle();
+
+    if (casePaneContainer.find('.ajax_loading').length > 0) {
+        jQ.get('/case/' + case_id + '/readonly-pane/', function(data) {
+            casePaneContainer.html(data);
+        },
+        'html');
+    }
+}
+
+
 /*
  * Bind events on loaded cases.
  *
@@ -1365,6 +1385,19 @@ function bindEventsOnLoadedCases(options) {
             var content = this.up().next(); // Content Containers
             var case_id = title.id;
             var template_type = form.adjacent('input[name="template_type"]')[0].value;
+
+            if (template_type === 'case') {
+                toggleTestCasePane({
+                    case_id: case_id,
+                    casePaneContainer: jQ(content),
+                });
+                toggleExpandArrow({
+                    caseRowContainer: jQ(title),
+                    expandPaneContainer: jQ(content)
+                });
+                return;
+            }
+
             // Review case content call back;
             var review_case_content_callback = function(e) {
                 var comment_container_t = new Element('div');

@@ -19,16 +19,17 @@
 import datetime
 import itertools
 
-from django.contrib.auth.decorators import user_passes_test
-from django.core.urlresolvers import reverse
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponseRedirect, HttpResponse, Http404
-from django.utils import simplejson
-from django.shortcuts import get_object_or_404, render_to_response
-from django.template.loader import render_to_string
-from django.template import RequestContext
 from django.conf import settings
+from django.contrib.auth.decorators import user_passes_test
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 from django.db.models import Count
+from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.shortcuts import get_object_or_404, render_to_response
+from django.template import RequestContext
+from django.template.loader import render_to_string
+from django.utils import simplejson
+from django.views.generic.base import TemplateView
 
 from tcms.core import forms
 from tcms.core.views import Prompt
@@ -752,6 +753,35 @@ def ajax_response(request, querySet, testplan, columnIndexNameMap, jsonTemplateP
 #    prevent from caching datatables result
 #    add_never_cache_headers(response)
     return response
+
+
+class SimpleTestCaseView(TemplateView):
+    '''Simple read-only TestCase View used in TestPlan page'''
+
+    template_name = 'case/get_details.html'
+
+    # NOTES: what permission is proper for this request?
+    def get(self, request, case_id):
+        self.case_id = case_id
+        return super(self.__class__, self).get(request, case_id)
+
+    def get_case(self):
+        cases = TestCase.objects.filter(pk=self.case_id).only('notes')
+        cases = list(cases.iterator())
+        return cases[0] if len(cases) > 0 else None
+
+    def get_context_data(self, **kwargs):
+        data = super(self.__class__, self).get_context_data(**kwargs)
+
+        case = self.get_case()
+        data['test_case'] = case
+        if case is not None:
+            data.update({
+                'test_case_text': case.get_text_with_version(),
+            })
+
+        return data
+
 
 def get(request, case_id, template_name='case/get.html'):
     """Get the case content"""
