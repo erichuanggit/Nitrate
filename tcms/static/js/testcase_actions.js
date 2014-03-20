@@ -1228,13 +1228,9 @@ function toggleCaseRunsByPlan(params, callback)
     content_container.toggle();
 
     if ($('id_loading_' + case_run_plan_id)) {
-        var url = Nitrate.http.URLConf.reverse({
-            name: 'case_details',
-            arguments: {id: case_id}
-        });
+        var url = '/case/' + case_id + '/caserun-list-pane/';
         var parameters = {
-            template_type: params.type,
-            case_run_plan_id: case_run_plan_id,
+            plan_id: case_run_plan_id
         };
 
         new Ajax.Updater(content_container, url, {

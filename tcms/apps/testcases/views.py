@@ -21,6 +21,7 @@ import itertools
 
 from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.comments.models import Comment
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
@@ -33,20 +34,21 @@ from django.utils import simplejson
 from django.views.generic.base import TemplateView
 
 from tcms.core import forms
-from tcms.core.views import Prompt
-from tcms.core.utils.raw_sql import RawSQL
 from tcms.core.logs.models import TCMSLogModel
-from tcms.search.order import order_case_queryset
+from tcms.core.utils.raw_sql import RawSQL
+from tcms.core.views import Prompt
 from tcms.search import remove_from_request_path
+from tcms.search.order import order_case_queryset
 
 from tcms.apps.testcases.actions import CategoryActions
 from tcms.apps.testcases.actions import ComponentActions
 from tcms.apps.testcases.models import TestCase, TestCaseStatus, \
         TestCaseAttachment, TestCasePlan, TestCaseCategory
+from tcms.apps.management.models import Priority, TestTag
 from tcms.apps.testcases.models import TestCaseBug
 from tcms.apps.testplans.models import TestPlan
+from tcms.apps.testruns.models import TestCaseRun
 from tcms.apps.testruns.models import TestCaseRunStatus
-from tcms.apps.management.models import Priority, TestTag
 
 from tcms.apps.testcases.forms import CaseAutomatedForm, NewCaseForm, \
         SearchCaseForm, CaseFilterForm, EditCaseForm, CaseNotifyForm, \
@@ -808,6 +810,63 @@ class TestCaseReviewPaneView(SimpleTestCaseView):
             data.update({
                 'logs': logs,
             })
+        return data
+
+
+class TestCaseCaseRunListPaneView(TemplateView):
+    '''Display case runs list when expand a plan from case page'''
+
+    template_name = 'case/get_case_runs_by_plan.html'
+
+    # FIXME: what permission here?
+    def get(self, request, case_id):
+        self.case_id = case_id
+
+        plan_id = self.request.REQUEST.get('plan_id', None)
+        self.plan_id = int(plan_id) if plan_id is not None else None
+
+        this_cls = TestCaseCaseRunListPaneView
+        return super(this_cls, self).get(request, case_id)
+
+    def get_case_runs(self):
+        qs = TestCaseRun.objects.filter(case=self.case_id,
+                                        run__plan=self.plan_id)
+        qs = qs.values(
+            'pk', 'case_id', 'run_id', 'case_text_version',
+            'close_date', 'sortkey',
+            'tested_by__username', 'assignee__username',
+            'run__plan_id', 'run__summary',
+            'case__category__name', 'case__priority__value',
+            'case_run_status__name',
+        ).order_by('pk')
+        return qs
+
+    def get_comments_count(self, caserun_ids):
+        ct = ContentType.objects.get_for_model(TestCaseRun)
+        qs = Comment.objects.filter(content_type=ct,
+                                    object_pk__in=caserun_ids)
+        qs = qs.values('object_pk').annotate(comment_count=Count('pk'))
+        result = {}
+        for item in qs.iterator():
+            result[int(item['object_pk'])] = item['comment_count']
+        return result
+
+    def get_context_data(self, **kwargs):
+        this_cls = TestCaseCaseRunListPaneView
+        data = super(this_cls, self).get_context_data(**kwargs)
+
+        case_runs = self.get_case_runs()
+
+        # Get the number of each caserun's comments, and put the count into
+        # comments query result.
+        caserun_ids = [item['pk'] for item in case_runs]
+        comments_count = self.get_comments_count(caserun_ids)
+        for case_run in case_runs:
+            case_run['comments_count'] = comments_count.get(case_run['pk'], 0)
+
+        data.update({
+            'case_runs': case_runs,
+        })
         return data
 
 
