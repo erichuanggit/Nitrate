@@ -104,18 +104,18 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.ChooseRuns.on_load);
 							</a>
 						</td>
 						<td>
-							<a href="{% url "tcms.apps.testcases.views.get" test_case.case_id %}">{{ test_case.case_id }}</a>
-							<input type="hidden" name="case" value="{{ test_case.case_id }}">
+							<a href="{% url "tcms.apps.testcases.views.get" test_case.pk %}">{{ test_case.pk }}</a>
+							<input type="hidden" name="case" value="{{ test_case.pk }}">
 						</td>
 						<td onclick="toggleTestCaseContents('{{ forloop.counter }}')">
 							<a id="link_{{ forloop.counter }}" class="blind_title_link" href="javascript:void(0);">
 								{{ test_case.summary }}
 							</a>
 						</td>
-						<td>{{ test_case.author }}</td>
+						<td>{{ test_case.author__username }}</td>
 						<td>{{ test_case.create_date }}</td>
-						<td>{{ test_case.category }}</td>
-						<td>{{ test_case.priority }}</td>
+						<td>{{ test_case.category__name }}</td>
+						<td>{{ test_case.priority__value }}</td>
 						<td>{{ test_case.sortkey }}</td>
 						<td></td>
 					</tr>

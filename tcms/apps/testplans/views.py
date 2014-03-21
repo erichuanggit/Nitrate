@@ -524,15 +524,19 @@ def choose_run(request, plan_id, template_name='plan/choose_testrun.html'):
 
         # Ready to write cases to test plan
         tcs = get_selected_testcases(request)
-        #tcs = TestCase.objects.filter(case_id__in=tcs)
+        tcs = tcs.values('pk', 'summary',
+                         'author__username',
+                         'create_date',
+                         'category__name',
+                         'priority__value', )
 
         context_data = {
             'module': MODULE_NAME,
             'sub_module': SUB_MODULE_NAME,
             'plan_id': plan_id,
             'plan': tp,
-            'test_runs': testruns,
-            'test_cases': tcs,
+            'test_runs': testruns.iterator(),
+            'test_cases': tcs.iterator(),
         }
         return render_to_response(template_name, context_data,
                                   context_instance=RequestContext(request))
