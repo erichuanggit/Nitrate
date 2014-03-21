@@ -550,11 +550,8 @@ def update_case_run_status(request):
                 pass
         targets.update(close_date=now, tested_by=request.user)
 
-    test_run = targets[0].run
     return HttpResponse(simplejson.dumps({
             'rc': 0, 'response': 'ok',
-            'c_percent': test_run.completed_case_run_percent,
-            'f_percent': test_run.failed_case_run_percent
     }))
 
 

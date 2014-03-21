@@ -222,6 +222,19 @@ Nitrate.TestRuns.Details.on_load = function()
         }
         jQ('span#'+to+' a').text(parseInt(jQ('span#'+to+' a').text())+1);
         jQ('span#'+from+' a').text(parseInt(jQ('span#'+from+' a').text())-1);
+
+        var caseRunCount = parseInt(jQ('span#TOTAL').next().text()) || 0;
+
+        var passedCaseRunCount = parseInt(jQ('span#PASSED a').text()) || 0;
+        var errorCaseRunCount = parseInt(jQ('span#ERROR a').text()) || 0;
+        var failedCaseRunCount = parseInt(jQ('span#FAILED a').text()) || 0;
+        var waivedCaseRunCount = parseInt(jQ('span#WAIVED a').text()) || 0;
+        var completePercent = 100 * ((passedCaseRunCount+errorCaseRunCount+failedCaseRunCount+waivedCaseRunCount) / caseRunCount).toFixed(2);
+        var failedPercent = 100 * ((errorCaseRunCount+failedCaseRunCount) / (passedCaseRunCount+errorCaseRunCount+failedCaseRunCount+waivedCaseRunCount)).toFixed(2);
+
+        jQ('span#complete_percent').text(completePercent);
+        jQ('div.progress-inner').attr('style','width:'+completePercent+'%');
+        jQ('div.progress-failed').attr('style','width:'+failedPercent+'%');
     });
 }
 
@@ -437,14 +450,6 @@ var updateCaseRunStatus = function(e)
         // Mark the case run to mine
         if(!title.hasClassName('mine'))
             title.addClassName('mine');
-
-        //update progress bar
-        if (typeof(t) != 'undefined'){
-            var returnobj = t.responseText.evalJSON();
-            jQ('span#complete_percent').text(returnobj.c_percent);
-            jQ('div.progress-inner').attr('style','width:'+returnobj.c_percent+'%');
-            jQ('div.progress-failed').attr('style','width:'+returnobj.f_percent+'%');
-        }
 
         // Blind down next case
         fireEvent(link, 'click');
