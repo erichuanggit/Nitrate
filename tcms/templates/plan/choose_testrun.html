@@ -54,7 +54,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.ChooseRuns.on_load);
 						{{ test_run.summary }}
 					</td>
 					<td>{{ test_run.build__name }}</td>
-					<td>{{ test_run.manager__username }}</td>
+					<td><a href="{% url "tcms.apps.profiles.views.profile" test_run.manager__username %}">{{ test_run.manager__username }}</a></td>
 					<td>{{ plan.name }}</td>
 				</tr>
 				{% empty %}
@@ -112,7 +112,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.ChooseRuns.on_load);
 								{{ test_case.summary }}
 							</a>
 						</td>
-						<td>{{ test_case.author__username }}</td>
+						<td><a href="{% url "tcms.apps.profiles.views.profile" test_case.author__username %}">{{ test_case.author__username }}</a></td>
 						<td>{{ test_case.create_date }}</td>
 						<td>{{ test_case.category__name }}</td>
 						<td>{{ test_case.priority__value }}</td>
