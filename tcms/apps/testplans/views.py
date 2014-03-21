@@ -514,40 +514,24 @@ def choose_run(request, plan_id, template_name='plan/choose_testrun.html'):
     if request.method == 'GET':
         try:
             plan_id = int(plan_id)
+            tp = TestPlan.objects.filter(
+                pk=plan_id).defer('default_product_version')[0]
         except:
-            # Raising 404 to mean the plan user is requesting does not exist.
             raise Http404
-        tp = get_object_or_404(TestPlan, plan_id=plan_id)
-        testruns = TestRun.objects.filter(plan=plan_id)
 
-        # Make sure there exists at least one testrun
-        if not len(testruns):
-            return HttpResponse( Prompt.render (
-                request=request,
-                info_type=Prompt.Info,
-                info='At least one test run is required for assigning the cases.',
-                next=reverse ('tcms.apps.testplans.views.get', args=[plan_id, ]),
-            ))
-
-        #case is required by a test run
-        if not request.REQUEST.get('case'):
-            return HttpResponse(Prompt.render(
-                request=request,
-                info_type=Prompt.Info,
-                info='At least one case is required by a run.',
-                next=reverse('tcms.apps.testplans.views.get', args=[plan_id, ]),
-            ))
+        testruns = TestRun.objects.filter(plan=plan_id).values(
+            'pk', 'summary', 'build__name', 'manager__username')
 
         # Ready to write cases to test plan
         tcs = get_selected_testcases(request)
-        tcs = TestCase.objects.filter(case_id__in=tcs)
+        #tcs = TestCase.objects.filter(case_id__in=tcs)
 
         context_data = {
             'module': MODULE_NAME,
             'sub_module': SUB_MODULE_NAME,
             'plan_id': plan_id,
             'plan': tp,
-            'test_run_list': testruns,
+            'test_runs': testruns,
             'test_cases': tcs,
         }
         return render_to_response(template_name, context_data,
