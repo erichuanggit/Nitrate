@@ -870,6 +870,60 @@ class TestCaseCaseRunListPaneView(TemplateView):
         return data
 
 
+class TestCaseSimpleCaseRunView(TemplateView):
+    '''Display caserun information in Case Runs tab in case page
+
+    This view only shows notes, comments and logs simply. So, call it simple.
+    '''
+
+    template_name = 'case/get_details_case_case_run.html'
+
+    # what permission here?
+    def get(self, request, case_id):
+        try:
+            self.caserun_id = int(request.GET.get('case_run_id', None))
+        except (TypeError, ValueError):
+            raise Http404
+
+        this_cls = TestCaseSimpleCaseRunView
+        return super(this_cls, self).get(request, case_id)
+
+    def get_caserun(self):
+        self.caserun_ct = ContentType.objects.get_for_model(TestCaseRun)
+        try:
+            return TestCaseRun.objects.filter(
+                pk=self.caserun_id).only('notes')[0]
+        except IndexError:
+            raise Http404
+
+    def get_caserun_logs(self, caserun):
+        logs = TCMSLogModel.objects.filter(content_type=self.caserun_ct,
+                                           object_pk=caserun.pk,
+                                           site_id=settings.SITE_ID)
+        return logs.values('date', 'who__username', 'action')
+
+    def get_caserun_comments(self, caserun):
+        comments = Comment.objects.filter(content_type=self.caserun_ct,
+                                          object_pk=caserun.pk,
+                                          site_id=settings.SITE_ID)
+        return comments.values('user_email', 'submit_date', 'comment')
+
+    def get_context_data(self, **kwargs):
+        this_cls = TestCaseSimpleCaseRunView
+        data = super(this_cls, self).get_context_data(**kwargs)
+
+        caserun = self.get_caserun()
+        logs = self.get_caserun_logs(caserun)
+        comments = self.get_caserun_comments(caserun)
+
+        data.update({
+            'test_caserun': caserun,
+            'logs': logs.iterator(),
+            'comments': comments.iterator(),
+        })
+        return data
+
+
 def get(request, case_id, template_name='case/get.html'):
     """Get the case content"""
     # Get the case
@@ -941,10 +995,10 @@ def get(request, case_id, template_name='case/get.html'):
     # Switch the templates for different module
     template_types = {
             'case': 'case/get_details.html',
-            'review_case': 'case/get_details_review.html',
+            #'review_case': 'case/get_details_review.html',
             'case_run': 'case/get_details_case_run.html',
-            'case_run_list': 'case/get_case_runs_by_plan.html',
-            'case_case_run': 'case/get_details_case_case_run.html',
+            #'case_run_list': 'case/get_case_runs_by_plan.html',
+            #'case_case_run': 'case/get_details_case_case_run.html',
             'execute_case_run': 'run/execute_case_run.html',
             }
 

@@ -15,6 +15,7 @@
 # 
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
+#   Chenxiong Qi <cqi@redhat.com>
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -22,36 +23,32 @@ from django.utils.encoding import smart_unicode
 
 from models import TCMSLogModel
 
-# Create your views here.
 
 class TCMSLog(object):
     """TCMS Log"""
+
     def __init__(self, model):
         super(TCMSLog, self).__init__()
-        
-        if not hasattr(model, '_meta'):
-            raise NotImplementedError
-        
         self.model = model
-    
+
     def get_new_log_object(self):
         elements = ['who', 'action']
-        
+
         for element in elements:
             if not getattr(self, element): 
                 raise NotImplementedError
-        
+
         model = self.get_log_model()
         new = model(**self.get_log_create_data())
-        
+
         return new
-        
+
     def get_log_model(self):
         """
         Get the log model to create with this class.
         """
         return TCMSLogModel
-    
+
     def get_log_create_data(self):
         return dict(
             content_object = self.model,
@@ -59,35 +56,28 @@ class TCMSLog(object):
             action = self.action,
             site_id = settings.SITE_ID
         )
-    
-    def lookup_content_type(self):
-        app, model = str(self.model._meta).split('.')
-        
-        ct = ContentType.objects.get(app_label=app, model=model)
-        
-        return ct, self.model.pk
-    
-    def get_query_set(self):
-        ctype, object_pk = self.lookup_content_type()
-        
-        model = self.get_log_model()
-        
-        qs = model.objects.filter(
-            content_type = ctype,
-            object_pk    = smart_unicode(object_pk),
-            site__pk     = settings.SITE_ID,
-        )
-        qs = qs.select_related('who__username')
-        return qs
-    
+
     def make(self, who, action):
         """Create new log"""
         self.who = who
         self.action = action
-        
+
         model = self.get_new_log_object()
         model.save()
-    
+
+    def lookup_content_type(self):
+        return ContentType.objects.get_for_model(self.model)
+
+    def get_query_set(self):
+        ctype = self.lookup_content_type()
+        model = self.get_log_model()
+
+        qs = model.objects.filter(content_type=ctype,
+                                  object_pk=smart_unicode(self.model.pk),
+                                  site=settings.SITE_ID)
+        qs = qs.select_related('who')
+        return qs
+
     def list(self):
         """List the logs"""
         return self.get_query_set().all()

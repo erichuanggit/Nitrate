@@ -267,9 +267,16 @@ Nitrate.TestCases.Details.on_load = function()
         var c_container = c.next(); // Content Containers
         var case_id = c.getElementsBySelector('input[name="case"]')[0].value;
         var case_run_id = c.getElementsBySelector('input[name="case_run"]')[0].value;
+        // FIXME: case_text_version is not used in the backend to show caserun
+        // information, notes, logs, and comments.
         var case_text_version = c.getElementsBySelector('input[name="case_text_version"]')[0].value;
         var type = 'case_case_run';
-        toggleTestCaseContents(type, c, c_container, case_id, case_text_version, case_run_id);
+        toggleSimpleCaseRunPane({
+            caserunRowContainer: jQ(c),
+            expandPaneContainer: jQ(c_container),
+            caseId: case_id,
+            caserunId: case_run_id
+        });
     }
 
     var toggle_case_runs_by_plan = function(e) {
@@ -471,6 +478,33 @@ function toggleExpandArrow(options) {
     }
 }
 
+
+/*
+ * Toggle simple caserun pane in Case Runs tab in case page.
+ */
+function toggleSimpleCaseRunPane(options) {
+    var container = options.caserunRowContainer;
+    var content_container = options.expandPaneContainer;
+    var caseId = options.caseId;
+    var caserunId = options.caserunId;
+
+    content_container.toggle();
+
+    if (container.next().find('.ajax_loading').length !== 0) {
+        var url = '/case/' + caseId + '/caserun-simple-pane/';
+        var data = {case_run_id: caserunId};
+
+        jQ.get(url, data, function(data, textStatus) {
+            content_container.html(data);
+        },
+        'html');
+    }
+
+    toggleExpandArrow({
+        caseRowContainer: container,
+        expandPaneContainer: content_container
+    });
+}
 
 function toggleTestCaseContents(template_type, container, content_container, object_pk, case_text_version, case_run_id, callback)
 {

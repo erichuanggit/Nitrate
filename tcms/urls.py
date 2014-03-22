@@ -27,6 +27,7 @@ admin.autodiscover()
 from tcms.apps.testcases.views import SimpleTestCaseView
 from tcms.apps.testcases.views import TestCaseCaseRunListPaneView
 from tcms.apps.testcases.views import TestCaseReviewPaneView
+from tcms.apps.testcases.views import TestCaseSimpleCaseRunView
 
 
 # XML RPC handler
@@ -135,6 +136,8 @@ urlpatterns = patterns('',
         name='case-review-pane'),
     url(r'^case/(?P<case_id>\d+)/caserun-list-pane/$', TestCaseCaseRunListPaneView.as_view(),
         name='caserun-list-pane'),
+    url(r'^case/(?P<case_id>\d+)/caserun-simple-pane/$', TestCaseSimpleCaseRunView.as_view(),
+        name='caserun-simple-pane'),
 
     # Testruns zone
     (r'^run/new/$', 'tcms.apps.testruns.views.new'),
