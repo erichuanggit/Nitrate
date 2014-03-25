@@ -51,23 +51,24 @@ rm -rf $RPM_BUILD_ROOT
 # Copy static content from 32/64bit-specific python dir to shared data dir:
 mkdir -p ${RPM_BUILD_ROOT}%{_datadir}/%{name}
 mkdir -p ${RPM_BUILD_ROOT}%{_docdir}/%{name}
-mkdir -p ${RPM_BUILD_ROOT}%{_var}/%{name}/static
-mkdir -p ${RPM_BUILD_ROOT}%{_var}/%{name}/uploads
+mkdir -p ${RPM_BUILD_ROOT}%{_datadir}/%{name}/static
 
 for d in contrib; do
     cp -r ${d} ${RPM_BUILD_ROOT}%{_datadir}/%{name};
-    # chown -R root:root ${RPM_BUILD_ROOT}%{_datadir}/%{name}/${d};
 done
 
 # Install apache config for the app:
 install -m 0644 -D -p contrib/conf/nitrate-httpd.conf  ${RPM_BUILD_ROOT}%{_sysconfdir}/httpd/conf.d/%{name}.conf
+
+%post
+# Collect static file for the app:
+/usr/bin/django-admin collectstatic --noinput --clear --settings=tcms.settings.product
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%attr(0755, apache, apache) %{_var}/%{name}
 %doc AUTHORS ChangeLog README.rst LICENSE
 %{python_sitelib}/tcms/
 %{python_sitelib}/nitrate-%{version}-py*.egg-info/
