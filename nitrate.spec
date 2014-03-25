@@ -2,7 +2,7 @@
 
 Name:           nitrate
 Version:        3.8.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Test Case Management System
 
 Group:          Development/Languages
