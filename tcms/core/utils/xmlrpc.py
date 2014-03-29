@@ -17,14 +17,51 @@
 #   Xuqing Kuang <xkuang@redhat.com>
 #   Chenxiong Qi <cqi@redhat.com>
 
-import datetime
-
+from datetime import datetime
+from datetime import timedelta
 from itertools import groupby
 
-from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django.db.models import ObjectDoesNotExist
+from django.db.models.fields.related import ForeignKey, ManyToManyField
 
-from tcms.core.forms.widgets import SECONDS_PER_MIN, SECONDS_PER_HOUR, SECONDS_PER_DAY
+from tcms.core.forms.widgets import SECONDS_PER_DAY
+from tcms.core.forms.widgets import SECONDS_PER_HOUR
+from tcms.core.forms.widgets import SECONDS_PER_MIN
+
+
+# TODO: to encode all strings in UTF-8 instead of mixing unicode and byte
+#       string.
+# TODO: to claim the sequence of the primary keys of each ManyToManyField is
+#       arbitrary.
+
+
+### Data format conversion functions ###
+
+do_nothing = lambda value: value
+to_str = lambda value: value if value is None else str(value)
+encode_utf8 = lambda value: value if value is None else value.encode('utf-8')
+
+
+def datetime_to_str(value):
+    if value is None:
+        return value
+    return datetime.strftime(value, "%Y-%m-%d %H:%M:%S")
+
+
+def timedelta_to_str(value):
+    if value is None:
+        return value
+
+    total_seconds = value.seconds + (value.days * SECONDS_PER_DAY)
+    hours = total_seconds / SECONDS_PER_HOUR
+    # minutes - Total seconds subtract the used hours
+    minutes = total_seconds / SECONDS_PER_MIN - \
+              total_seconds / SECONDS_PER_HOUR * 60
+    seconds = total_seconds % SECONDS_PER_MIN
+    return '%02i:%02i:%02i' % (hours, minutes, seconds)
+
+### End of functions ###
+
 
 class XMLRPCSerializer(object):
     """
@@ -52,9 +89,9 @@ class XMLRPCSerializer(object):
         elif hasattr(model, '__dict__'):
             self.model = model
             return
-        
+
         raise TypeError("QuerySet(list) or Models(dictionary) is required")
-   
+
    #FIXME: infinit loop here
    #def serialize(self):
    #     if hasattr(self, 'queryset'):
@@ -80,16 +117,10 @@ class XMLRPCSerializer(object):
                 value = getattr(self.model, field.name)
             except ObjectDoesNotExist:
                 value = None
-            if isinstance(value, datetime.datetime):
-                value = datetime.datetime.strftime(value, "%Y-%m-%d %H:%M:%S")
-            if isinstance(value, datetime.timedelta):
-                total_seconds = value.seconds + (value.days * SECONDS_PER_DAY)
-                value = '%02i:%02i:%02i' % (
-                    total_seconds / SECONDS_PER_HOUR, # hours
-                    # minutes - Total seconds subtract the used hours
-                    total_seconds / SECONDS_PER_MIN - total_seconds / SECONDS_PER_HOUR * 60,
-                    total_seconds % SECONDS_PER_MIN # seconds
-                )
+            if isinstance(value, datetime):
+                value = datetime_to_str(value)
+            if isinstance(value, timedelta):
+                value = timedelta_to_str(value)
             if isinstance(field, ForeignKey):
                 fk_id = "%s_id" % field.name
                 if value is None:
@@ -221,6 +252,22 @@ class QuerySetBasedXMLRPCSerializer(XMLRPCSerializer):
                                                          field_name)
 
     def serialize_queryset(self):
+        '''Core of QuerySet based serialization
+
+        The process of serialization has following steps
+
+        - Get data from database using QuerySet.values method
+        - Transfer data to the output destiation according to serialization
+          standard, where two things must be done,
+          - field name must be replaced with right name rather than the internal
+            name used for SQL query
+          - some data must be converted in proper type. Currently, data with
+            type datetime.datetime and datetime.timedelta must be converted to
+            str (not UNICODE).
+        - During the process of the above transfer, data associated with
+          ManyToManyField should be retrieved from database and attached to each
+          serialized data object.
+        '''
         qs = self.queryset.values(*self._get_values_fields())
         m2m_fields_query = self._query_m2m_fields()
         primary_key_field = self._get_primary_key_field()
@@ -233,9 +280,14 @@ class QuerySetBasedXMLRPCSerializer(XMLRPCSerializer):
             # Replace name from ORM side to the serialization side as expected
             new_serialized_data = {}
             if values_fields_mapping:
-                for orm_name, serialize_name in values_fields_mapping.iteritems():
-                    new_serialized_data[serialize_name] = row[orm_name]
+                for orm_name, serialize_info in values_fields_mapping.iteritems():
+                    serialize_name, conv_func = serialize_info
+                    value = conv_func(row[orm_name])
+                    new_serialized_data[serialize_name] = value
             else:
+                # If no fields mapping, just use the original row as the
+                # serialization result, and no data format conversion is
+                # required obviously
                 new_serialized_data.update(row)
 
             # Attach values of each ManyToManyField field
@@ -254,24 +306,25 @@ class TestPlanXMLRPCSerializer(QuerySetBasedXMLRPCSerializer):
     '''XMLRPC serializer specific for TestPlan'''
 
     values_fields_mapping = {
-        'plan_id': 'plan_id',
-        'default_product_version': 'default_product_version',
-        'name': 'name',
-        'create_date': 'create_date',
-        'is_active': 'is_active',
-        'extra_link': 'extra_link',
-        'product_version': 'product_version_id',
-        'product_version__value': 'product_verison',
-        'owner': 'owner_id',
-        'owner__username': 'owner',
-        'author': 'author_id',
-        'author__username': 'author',
-        'product': 'product_id',
-        'product__name': 'product',
-        'type': 'type_id',
-        'type__name': 'type',
-        'parent': 'parent_id',
-        'parent__name': 'parent',
+        'create_date': ('create_date', datetime_to_str),
+        'default_product_version': ('default_product_version', do_nothing),
+        'extra_link': ('extra_link', do_nothing),
+        'is_active': ('is_active', do_nothing),
+        'name': ('name', do_nothing),
+        'plan_id': ('plan_id', do_nothing),
+
+        'author': ('author_id', do_nothing),
+        'author__username': ('author', to_str),
+        'owner': ('owner_id', do_nothing),
+        'owner__username': ('owner', to_str),
+        'parent': ('parent_id', do_nothing),
+        'parent__name': ('parent', encode_utf8),
+        'product': ('product_id', do_nothing),
+        'product__name': ('product', encode_utf8),
+        'product_version': ('product_version_id', do_nothing),
+        'product_version__value': ('product_version', encode_utf8),
+        'type': ('type_id', do_nothing),
+        'type__name': ('type', encode_utf8),
     }
 
     m2m_fields = ('attachment', 'case', 'component', 'env_group', 'tag')
@@ -281,92 +334,86 @@ class TestCaseRunXMLRPCSerializer(QuerySetBasedXMLRPCSerializer):
     '''XMLRPC serializer specific for TestCaseRun'''
 
     values_fields_mapping = {
-        'is_current': 'is_current',
-        'case_run_id': 'case_run_id',
-        'running_date': 'running_date',
-        'close_date': 'close_data',
-        'case_text_version': 'case_text_version',
-        'sortkey': 'sortkey',
-        'environment_id': 'environment_id',
-        'notes': 'notes',
+        'case_run_id': ('case_run_id', do_nothing),
+        'case_text_version': ('case_text_version', do_nothing),
+        'close_date': ('close_date', datetime_to_str),
+        'environment_id': ('environment_id', do_nothing),
+        'is_current': ('is_current', do_nothing),
+        'notes': ('notes', do_nothing),
+        'running_date': ('running_date', datetime_to_str),
+        'sortkey': ('sortkey', do_nothing),
 
-        'assignee': 'assignee_id',
-        'assignee__username': 'assignee',
-        'tested_by': 'tested_by_id',
-        'tested_by__username': 'tested_by',
-        'run': 'run_id',
-        'run__summary': 'run',
-        'case': 'case_id',
-        'case__summary': 'case',
-        'case_run_status': 'case_run_status__id',
-        'case_run_status__name': 'case_run_status',
-        'build': 'build_id',
-        'build__name': 'build',
+        'assignee': ('assignee_id', do_nothing),
+        'assignee__username': ('assignee', to_str),
+        'build': ('build_id', do_nothing),
+        'build__name': ('build', encode_utf8),
+        'case': ('case_id', do_nothing),
+        'case__summary': ('case', encode_utf8),
+        'case_run_status': ('case_run_status_id', do_nothing),
+        'case_run_status__name': ('case_run_status', encode_utf8),
+        'run': ('run_id', do_nothing),
+        'run__summary': ('run', encode_utf8),
+        'tested_by': ('tested_by_id', do_nothing),
+        'tested_by__username': ('tested_by', to_str),
     }
-
-    def _get_m2m_fields(self):
-        '''
-        Do not handle GenericRelation field due to this field wasn't handled
-        '''
-        return []
 
 
 class TestRunXMLRPCSerializer(QuerySetBasedXMLRPCSerializer):
     '''Serializer for TestRun'''
 
     values_fields_mapping = {
-        'auto_update_run_status': 'auto_update_run_status',
-        'product_version': 'product_version',
-        'run_id': 'run_id',
-        'start_date': 'start_date',
-        'stop_date': 'stop_date',
-        'errata_id': 'errata_id',
-        'plan_text_version': 'plan_text_version',
-        'environment_id': 'environment_id',
-        'summary': 'summary',
-        'notes': 'notes',
+        'auto_update_run_status': ('auto_update_run_status', do_nothing),
+        'environment_id': ('environment_id', do_nothing),
+        'errata_id': ('errata_id', do_nothing),
+        'estimated_time': ('estimated_time', str),
+        'notes': ('notes', do_nothing),
+        'plan_text_version': ('plan_text_version', do_nothing),
+        'product_version': ('product_version', do_nothing),
+        'run_id': ('run_id', do_nothing),
+        'start_date': ('start_date', datetime_to_str),
+        'stop_date': ('stop_date', datetime_to_str),
+        'summary': ('summary', do_nothing),
 
-        'plan': 'plan_id',
-        'plan__name': 'plan',
-        'build': 'build_id',
-        'build__name': 'build',
-        'manager': 'manager_id',
-        'manager__username': 'manager',
-        'default_tester': 'default_tester_id',
-        'default_tester__username': 'default_tester',
-        'estimated_time': 'estimated_time',
-        }
+        'build': ('build_id', do_nothing),
+        'build__name': ('build', encode_utf8),
+        'default_tester': ('default_tester_id', do_nothing),
+        'default_tester__username': ('default_tester', to_str),
+        'manager': ('manager_id', do_nothing),
+        'manager__username': ('manager', to_str),
+        'plan': ('plan_id', do_nothing),
+        'plan__name': ('plan', encode_utf8),
+    }
 
 
 class TestCaseXMLRPCSerializer(QuerySetBasedXMLRPCSerializer):
     '''Serializer for TestCase'''
 
     values_fields_mapping = {
-        'is_automated_proposed': 'is_automated_proposed',
-        'extra_link': 'extra_link',
-        'summary': 'summary',
-        'requirement': 'requirement',
-        'alias': 'alias',
-        'case_id': 'case_id',
-        'create_date': 'create_date',
-        'is_automated': 'is_automated',
-        'script': 'script',
-        'arguments': 'arguments',
-        'notes': 'notes',
+        'alias': ('alias', do_nothing),
+        'arguments': ('arguments', do_nothing),
+        'case_id': ('case_id', do_nothing),
+        'create_date': ('create_date', datetime_to_str),
+        'estimated_time': ('estimated_time', str),
+        'extra_link': ('extra_link', do_nothing),
+        'is_automated': ('is_automated', do_nothing),
+        'is_automated_proposed': ('is_automated_proposed', do_nothing),
+        'notes': ('notes', do_nothing),
+        'requirement': ('requirement', do_nothing),
+        'script': ('script', do_nothing),
+        'summary': ('summary', do_nothing),
 
-        'case_status': 'case_status_id',
-        'case_status__name': 'case_status',
-        'category': 'category_id',
-        'category__name': 'category',
-        'priority': 'priority_id',
-        'priority__value': 'priority',
-        'author': 'author_id',
-        'author__username': 'author',
-        'default_tester': 'default_tester_id',
-        'default_tester__username': 'default_tester',
-        'reviewer': 'reviewer_id',
-        'reviewer__username': 'reviewer',
-        'estimated_time': 'estimated_time',
+        'author': ('author_id', do_nothing),
+        'author__username': ('author', to_str),
+        'case_status': ('case_status_id', do_nothing),
+        'case_status__name': ('case_status', encode_utf8),
+        'category': ('category_id', do_nothing),
+        'category__name': ('category', encode_utf8),
+        'default_tester': ('default_tester_id', do_nothing),
+        'default_tester__username': ('default_tester', to_str),
+        'priority': ('priority_id', do_nothing),
+        'priority__value': ('priority', encode_utf8),
+        'reviewer': ('reviewer_id', do_nothing),
+        'reviewer__username': ('reviewer', to_str),
         }
 
 
@@ -374,32 +421,33 @@ class ProductXMLRPCSerializer(QuerySetBasedXMLRPCSerializer):
     '''Serializer for Product'''
 
     values_fields_mapping = {
-        'id': 'id',
-        'name': 'name',
-        'description': 'description',
-        'milestone_url': 'milestone_url',
-        'disallow_new': 'disallow_new',
-        'vote_super_user': 'vote_super_user',
-        'max_vote_super_bug': 'max_vote_super_bug',
-        'votes_to_confirm': 'votes_to_confirm',
-        'default_milestone': 'default_milestone',
+        'id': ('id', do_nothing),
+        'name': ('name', do_nothing),
+        'description': ('description', do_nothing),
+        'milestone_url': ('milestone_url', do_nothing),
+        'disallow_new': ('disallow_new', do_nothing),
+        'vote_super_user': ('vote_super_user', do_nothing),
+        'max_vote_super_bug': ('max_vote_super_bug', do_nothing),
+        'votes_to_confirm': ('votes_to_confirm', do_nothing),
+        'default_milestone': ('default_milestone', do_nothing),
 
-        'classification': 'classification_id',
-        'classification__name': 'classification',
-        }
+        'classification': ('classification_id', do_nothing),
+        'classification__name': ('classification', encode_utf8),
+    }
 
 
 class TestBuildXMLRPCSerializer(QuerySetBasedXMLRPCSerializer):
     '''Serializer for TestBuild'''
 
     values_fields_mapping = {
-        'build_id': 'build_id',
-        'name': 'name',
-        'milestone': 'milestone',
-        'description': 'description',
-        'is_active': 'is_active',
-        'product': 'product_id',
-        'product__name': 'product',
+        'build_id': ('build_id', do_nothing),
+        'description': ('description', do_nothing),
+        'is_active': ('is_active', do_nothing),
+        'milestone': ('milestone', do_nothing),
+        'name': ('name', do_nothing),
+
+        'product': ('product_id', do_nothing),
+        'product__name': ('product', encode_utf8),
     }
 
 
