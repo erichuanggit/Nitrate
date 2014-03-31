@@ -44,7 +44,8 @@ from tcms.search.forms import RunForm
 from tcms.search.query import SmartDjangoQuery
 from tcms.core.utils.bugtrackers import Bugzilla
 
-from tcms.apps.testcases.models import TestCase, TestCasePlan, TestCaseBug
+from tcms.apps.testcases.models import TestCase, TestCasePlan, TestCaseBug, \
+        TestCaseStatus
 from tcms.apps.testplans.models import TestPlan
 from tcms.apps.testruns.models import TestRun, TestCaseRun, TestCaseRunStatus, \
         TCMSEnvRunValueMap
@@ -55,6 +56,7 @@ from tcms.apps.testcases.forms import CaseBugForm
 from tcms.apps.testruns.forms import NewRunForm, SearchRunForm, EditRunForm, \
         RunCloneForm, MulitpleRunsCloneForm
 from tcms.apps.testruns.helpers.serializer import TCR2File
+
 
 MODULE_NAME = "testruns"
 
@@ -80,17 +82,19 @@ def new(request, template_name='run/new.html'):
 
     # Ready to write cases to test plan
     from tcms.apps.testcases.views import get_selected_testcases
+    confirm_status = TestCaseStatus.get_CONFIRMED();
     selected_cases = get_selected_testcases(request)
     tcs = TestCase.objects.filter(case_id__in=selected_cases)
     tp = TestPlan.objects.select_related().get(plan_id=plan_id)
     tcrs = TestCaseRun.objects.filter(case_run_id__in=request.REQUEST.getlist('case_run_id'))
 
-    # FIXME: using group by to save potential lots of SQL statements.
-    num_unconfirmed_cases = 0
-    for tc in tcs:
-        # Hardcode here, the case_status_id is CONFIRMED
-        if not tc.case_status.is_confirmed():
-            num_unconfirmed_cases += 1
+    num_unconfirmed_cases = tcs.exclude(case_status=confirm_status).count()
+
+    tcs_values = tcs.values(
+            'case_id', 'summary',
+            'author__email', 'create_date',
+            'category', 'priority',
+            'case_status__name')
 
     if request.REQUEST.get('POSTING_TO_CREATE'):
         form = NewRunForm(request.POST)
@@ -121,6 +125,11 @@ def new(request, template_name='run/new.html'):
             keep_status = form.cleaned_data['keep_status']
             keep_assign = form.cleaned_data['keep_assignee']
 
+            try:
+                assignee_tester = User.objects.get(username=default_tester)
+            except ObjectDoesNotExist, error:
+                assignee_tester = None
+
             loop = 1
 
             # not reserve assignee and status, assignee will default set to default_tester
@@ -131,10 +140,6 @@ def new(request, template_name='run/new.html'):
                         sortkey = tcp.sortkey
                     except ObjectDoesNotExist, error:
                         sortkey = loop * 10
-                    try:
-                        assignee_tester = User.objects.get(username=default_tester)
-                    except ObjectDoesNotExist, error:
-                        assignee_tester = None
 
                     tr.add_case_run(case=case,
                                     sortkey=sortkey,
@@ -211,7 +216,7 @@ def new(request, template_name='run/new.html'):
         'sub_module': SUB_MODULE_NAME,
         'from_plan': plan_id,
         'test_plan': tp,
-        'test_cases': tcs,
+        'test_cases': tcs_values,
         'form': form,
         'num_unconfirmed_cases': num_unconfirmed_cases,
     }

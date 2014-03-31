@@ -161,18 +161,18 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 					<tr class="{% cycle 'odd' 'even' %}" id="row_{{ forloop.counter }}" >
 						<td >
 							<a href="/case/{{ test_case.case_id }}/">{{ test_case.case_id }}</a>
-							{% if test_case.case_status.is_confirmed %}
+							{% if test_case.case_status__name == 'CONFIRMED' %}
 							<input type="hidden" name="case" value="{{ test_case.case_id }}">
 							{% endif %}
 						</td>
-						<td{% if not test_case.case_status.is_confirmed %} style='text-decoration: line-through'{% endif %}>
-							{% if not test_case.case_status.is_confirmed %} <img src="{{ STATIC_URL }}images/warning.png"/>{% endif %}
+						<td{% if not test_case.case_status__name == 'CONFIRMED' %} style='text-decoration: line-through'{% endif %}>
+							{% if not test_case.case_status__name == 'CONFIRMED' %} <img src="{{ STATIC_URL }}images/warning.png"/>{% endif %}
 							<a id="link_{{ forloop.counter }}" class="blind_title_link" href="javascript:toggleTestCaseContents('{{ forloop.counter }}')">
 								{{ test_case.summary }}
 							</a>
 						</td>
 						
-						<td>{{ test_case.author.email }}</td>
+						<td>{{ test_case.author__email }}</td>
 						<td>{{ test_case.create_date }}</td>
 						<td>{{ test_case.category }}</td>
 						<td >{{ test_case.priority }}</td>
