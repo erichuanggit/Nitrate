@@ -163,7 +163,16 @@ Nitrate.TestRuns.Details.on_load = function()
             c_container.adjacent('.form_comment').invoke('stopObserving', 'submit');
             c_container.adjacent('.form_comment').invoke('observe', 'submit', rc_callback);
         }
-        toggleTestCaseContents(type, c, c_container, case_id, case_text_version, case_run_id, callback);
+        // toggleTestCaseContents(type, c, c_container, case_id, case_text_version, case_run_id, callback);
+
+        toggleTestCaseRunPane({
+            callback: callback,
+            caseId: case_id,
+            caserunId: case_run_id,
+            caseTextVersion: case_text_version,
+            caserunRowContainer: jQ(c),
+            expandPaneContainer: jQ(c_container)
+        });
     }
     $$('.expandable').invoke('observe', 'click', toggle_case_run);
 
@@ -1333,5 +1342,69 @@ function initialize_addlink_dialog(link_target)
 	 * this must be set
 	 */
 	target_id: null,
+    });
+}
+
+
+/*
+ * Toggle TestCaseRun panel to edit a case run in run page.
+ *
+ * Arguments:
+ * options.casrunContainer:
+ * options.expandPaneContainer:
+ * options.caseId:
+ * options.caserunId:
+ * options.caseTextVersion:
+ * options.callback:
+ */
+function toggleTestCaseRunPane(options) {
+    var container = options.caserunRowContainer;
+    var content_container = options.expandPaneContainer;
+    var callback = options.callback;
+
+    content_container.toggle();
+
+    // if ($('id_loading_' + object_pk)) {
+    //     var url = Nitrate.http.URLConf.reverse({
+    //         name: 'case_details',
+    //         arguments: {id: object_pk}
+    //     });
+    //     var parameters = {
+    //         template_type: template_type,
+    //         case_text_version: case_text_version,
+    //         case_run_id: case_run_id,
+    //     };
+
+    //     new Ajax.Updater(content_container, url, {
+    //         method: 'get',
+    //         parameters: parameters,
+    //         onComplete: callback,
+    //         onFailure: html_failure
+    //     });
+    // };
+
+    // toggleExpandArrow({
+    //     caseRowContainer: jQ(container),
+    //     expandPaneContainer: jQ(content_container)
+    // });
+
+
+    if (content_container.find('.ajax_loading').length !== 0) {
+        var url = '/case/' + options.caseId + '/caserun-detail-pane/';
+        var data = {
+            case_run_id: options.caserunId,
+            case_text_version: options.caseTextVersion
+        };
+
+        jQ.get(url, data, function(data, textStatus) {
+            content_container.html(data);
+            callback();
+        },
+        'html');
+    }
+
+    toggleExpandArrow({
+        caseRowContainer: container,
+        expandPaneContainer: content_container
     });
 }
