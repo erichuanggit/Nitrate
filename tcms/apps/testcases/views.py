@@ -1380,16 +1380,36 @@ def text_history(request, case_id, template_name='case/history.html'):
 
     tc = get_object_or_404(TestCase, case_id=case_id)
     tp = plan_from_request_or_none(request)
+    tctxts = tc.text.values('case_id',
+                            'case_text_version',
+                            'author__email',
+                            'create_date').order_by('-case_text_version')
 
-    tctxts = tc.text.all()
     context_data = {
         'module': request.GET.get('from_plan') and 'testplans' or MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'testplan': tp,
         'testcase': tc,
-        'test_case_texts': tctxts,
-        'select_case_text_version': int(request.REQUEST.get('case_text_version', 0)),
+        'test_case_texts': tctxts.iterator(),
     }
+
+    try:
+        case_text_version = int(request.GET.get('case_text_version'))
+        text_to_show = tc.text.filter(case_text_version=case_text_version)
+        text_to_show = text_to_show.values('action',
+                                           'effect',
+                                           'setup',
+                                           'breakdown')
+
+        context_data.update({
+            'select_case_text_version': case_text_version,
+            'text_to_show': text_to_show.iterator(),
+        })
+    except (TypeError, ValueError):
+        # If case_text_version is not a valid number, no text to display for a
+        # selected text history
+        pass
+
     return render_to_response(template_name, context_data,
                               context_instance=RequestContext(request))
 
