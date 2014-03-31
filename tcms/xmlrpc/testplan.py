@@ -341,7 +341,7 @@ def get_tags(request, plan_id):
     return TestTag.to_xmlrpc(query)
 
 def get_components(request, plan_id):
-    """"
+    """
     Description: Get the list of components attached to this plan.
 
     Params:      $plan_id - Integer/String: An integer representing the ID in the database
