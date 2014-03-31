@@ -466,7 +466,7 @@ function toggleExpandArrow(options) {
     var container = options.caseRowContainer;
     var content_container = options.expandPaneContainer;
 
-    var blind_icon = container.find('img');
+    var blind_icon = container.find('img.blind_icon');
     if (content_container.css('display') == 'none') {
         blind_icon.removeClass('collapse');
         blind_icon.addClass('expand');
