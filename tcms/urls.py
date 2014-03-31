@@ -25,6 +25,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 from tcms.apps.testcases.views import SimpleTestCaseView
+from tcms.apps.testcases.views import TestCaseCaseRunDetailPanelView
 from tcms.apps.testcases.views import TestCaseCaseRunListPaneView
 from tcms.apps.testcases.views import TestCaseReviewPaneView
 from tcms.apps.testcases.views import TestCaseSimpleCaseRunView
@@ -138,6 +139,8 @@ urlpatterns = patterns('',
         name='caserun-list-pane'),
     url(r'^case/(?P<case_id>\d+)/caserun-simple-pane/$', TestCaseSimpleCaseRunView.as_view(),
         name='caserun-simple-pane'),
+    url(r'^case/(?P<case_id>\d+)/caserun-detail-pane/$', TestCaseCaseRunDetailPanelView.as_view(),
+        name='caserun-detail-pane'),
 
     # Testruns zone
     (r'^run/new/$', 'tcms.apps.testruns.views.new'),

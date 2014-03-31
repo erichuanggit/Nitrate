@@ -123,7 +123,6 @@ def update_case_email_settings(tc, n_form):
 
 def group_case_bugs(bugs):
     """Group bugs using bug_id."""
-    bugs = sorted(bugs, key=lambda b: b.bug_id)
     bugs = itertools.groupby(bugs, lambda b: b.bug_id)
     bugs = [(pk, list(_bugs)) for pk, _bugs in bugs]
     return bugs
@@ -758,6 +757,21 @@ def ajax_response(request, querySet, testplan, columnIndexNameMap, jsonTemplateP
     return response
 
 
+class TestCaseViewDataMixin(object):
+    '''Mixin class to get view data of test case'''
+
+    def get_case_contenttype(self):
+        return ContentType.objects.get_for_model(TestCase)
+
+    def get_case_logs(self, testcase):
+        ct = self.get_case_contenttype()
+        logs = TCMSLogModel.objects.filter(content_type=ct,
+                                           object_pk=testcase.pk,
+                                           site=settings.SITE_ID)
+        logs = logs.values('date', 'who__username', 'action')
+        return logs.order_by('date')
+
+
 class SimpleTestCaseView(TemplateView):
     '''Simple read-only TestCase View used in TestPlan page'''
 
@@ -789,24 +803,16 @@ class SimpleTestCaseView(TemplateView):
         return data
 
 
-class TestCaseReviewPaneView(SimpleTestCaseView):
+class TestCaseReviewPaneView(SimpleTestCaseView, TestCaseViewDataMixin):
     '''Used in Reviewing Cases tab in test plan page'''
 
     template_name = 'case/get_details_review.html'
-
-    def get_logs(self, testcase):
-        ct = ContentType.objects.get_for_model(TestCase)
-        logs = TCMSLogModel.objects.filter(content_type=ct,
-                                           object_pk=testcase.pk,
-                                           site=settings.SITE_ID)
-        logs = logs.values('date', 'who__username', 'action')
-        return logs.order_by('date')
 
     def get_context_data(self, **kwargs):
         data = super(TestCaseReviewPaneView, self).get_context_data(**kwargs)
         testcase = data['test_case']
         if testcase is not None:
-            logs = self.get_logs(testcase)
+            logs = self.get_case_logs(testcase)
             data.update({
                 'logs': logs,
             })
@@ -870,7 +876,28 @@ class TestCaseCaseRunListPaneView(TemplateView):
         return data
 
 
-class TestCaseSimpleCaseRunView(TemplateView):
+class TestCaseRunViewDataMixin(object):
+    '''Mixin class to get view data of test case run'''
+
+    def get_caserun_contenttype(self):
+        return ContentType.objects.get_for_model(TestCaseRun)
+
+    def get_caserun_logs(self, caserun):
+        caserun_ct = self.get_caserun_contenttype()
+        logs = TCMSLogModel.objects.filter(content_type=caserun_ct,
+                                           object_pk=caserun.pk,
+                                           site_id=settings.SITE_ID)
+        return logs.values('date', 'who__username', 'action')
+
+    def get_caserun_comments(self, caserun):
+        caserun_ct = self.get_caserun_contenttype()
+        comments = Comment.objects.filter(content_type=caserun_ct,
+                                          object_pk=caserun.pk,
+                                          site_id=settings.SITE_ID)
+        return comments.values('user_email', 'submit_date', 'comment')
+
+
+class TestCaseSimpleCaseRunView(TemplateView, TestCaseRunViewDataMixin):
     '''Display caserun information in Case Runs tab in case page
 
     This view only shows notes, comments and logs simply. So, call it simple.
@@ -889,24 +916,11 @@ class TestCaseSimpleCaseRunView(TemplateView):
         return super(this_cls, self).get(request, case_id)
 
     def get_caserun(self):
-        self.caserun_ct = ContentType.objects.get_for_model(TestCaseRun)
         try:
             return TestCaseRun.objects.filter(
                 pk=self.caserun_id).only('notes')[0]
         except IndexError:
             raise Http404
-
-    def get_caserun_logs(self, caserun):
-        logs = TCMSLogModel.objects.filter(content_type=self.caserun_ct,
-                                           object_pk=caserun.pk,
-                                           site_id=settings.SITE_ID)
-        return logs.values('date', 'who__username', 'action')
-
-    def get_caserun_comments(self, caserun):
-        comments = Comment.objects.filter(content_type=self.caserun_ct,
-                                          object_pk=caserun.pk,
-                                          site_id=settings.SITE_ID)
-        return comments.values('user_email', 'submit_date', 'comment')
 
     def get_context_data(self, **kwargs):
         this_cls = TestCaseSimpleCaseRunView
@@ -921,6 +935,65 @@ class TestCaseSimpleCaseRunView(TemplateView):
             'logs': logs.iterator(),
             'comments': comments.iterator(),
         })
+        return data
+
+
+class TestCaseCaseRunDetailPanelView(TemplateView,
+                                     TestCaseViewDataMixin,
+                                     TestCaseRunViewDataMixin):
+    '''Display case run detail in run page'''
+
+    template_name = 'case/get_details_case_run.html'
+
+    def get(self, request, case_id):
+        self.case_id = case_id
+        try:
+            self.caserun_id = int(request.GET.get('case_run_id'))
+            self.case_text_version = int(request.GET.get('case_text_version'))
+        except (TypeError, ValueError):
+            raise Http404
+
+        this_cls = TestCaseCaseRunDetailPanelView
+        return super(this_cls, self).get(request, case_id)
+
+    def get_context_data(self, **kwargs):
+        this_cls = TestCaseCaseRunDetailPanelView
+        data = super(this_cls, self).get_context_data(**kwargs)
+
+        try:
+            qs = TestCase.objects.filter(pk=self.case_id)
+            qs = qs.prefetch_related('attachment',
+                                     'component',
+                                     'tag').only('pk')
+            case = qs[0]
+
+            qs = TestCaseRun.objects.filter(pk=self.caserun_id).order_by('pk')
+            case_run = qs[0]
+        except IndexError:
+            raise Http404
+
+        # Data of TestCase
+        test_case_text = case.get_text_with_version(self.case_text_version)
+
+        # Data of TestCaseRun
+        caserun_comments = self.get_caserun_comments(case_run)
+        caserun_logs = self.get_caserun_logs(case_run)
+
+        caserun_status = TestCaseRunStatus.objects.values('pk', 'name')
+        caserun_status = caserun_status.order_by('sortkey')
+        bugs = group_case_bugs(case_run.case.get_bugs().order_by('bug_id'))
+
+        data.update({
+            'test_case': case,
+            'test_case_text': test_case_text,
+
+            'test_case_run': case_run,
+            'caserun_comments': caserun_comments,
+            'caserun_logs': caserun_logs,
+            'test_case_run_status': caserun_status,
+            'grouped_case_bugs': bugs,
+        })
+
         return data
 
 

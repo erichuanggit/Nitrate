@@ -506,6 +506,7 @@ function toggleSimpleCaseRunPane(options) {
     });
 }
 
+
 function toggleTestCaseContents(template_type, container, content_container, object_pk, case_text_version, case_run_id, callback)
 {
     if (typeof(container) != 'object')
