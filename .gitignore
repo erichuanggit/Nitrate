@@ -9,3 +9,9 @@ tcms/mysettings.py
 tcms/toys.py
 docs/guide/target
 .gitignore
+tags
+.tags
+dist/
+build/
+*egg*/
+docs/target/
