@@ -59,9 +59,8 @@ copyright = u'2013, Red Hat, Inc.'
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-from tcms import get_version
-VERSION = get_version()
 # The short X.Y version.
+VERSION = open('../../VERSION.txt', 'r').read().strip('\r\n')
 version = VERSION
 # The full version, including alpha/beta/rc tags.
 release = VERSION

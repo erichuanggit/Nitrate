@@ -20,7 +20,9 @@
 import os
 from setuptools import setup, find_packages
 
-from tcms import get_version
+def get_version():
+    return open('VERSION.txt', 'r').read().strip('\r\n')
+
 
 PACKAGE_NAME = 'nitrate'
 PACKAGE_VER = get_version()

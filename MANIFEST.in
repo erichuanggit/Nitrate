@@ -1,4 +1,4 @@
-include AUTHORS ChangeLog README.rst LICENSE
+include AUTHORS ChangeLog README.rst LICENSE VERSION.txt
 include nitrate.spec
 recursive-include tcms/templates *
 recursive-include tcms/core/lib/django-pagination/pagination/templates *

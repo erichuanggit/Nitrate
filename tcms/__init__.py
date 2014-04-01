@@ -15,8 +15,3 @@
 #
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>, Chenxiong Qi <cqi@redhat.com>
-
-VERSION = '3.8.6'
-
-def get_version(*args, **kwargs):
-    return VERSION
