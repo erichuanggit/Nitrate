@@ -2,7 +2,7 @@
 
 Name:           nitrate
 Version:        3.8.6
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -77,6 +77,8 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{python_sitelib}/tcms/settings/product.py
 
 %changelog
+* Tue Apr 01 2014 Chenxiong Qi <cqi@redhat.com> - 3.8.6-5
+- 1082150 Backward-incompatible change in TestRun.get_test_case_runs()
 
 * Tue Dec 10 2013 Chenxiong Qi <cqi@redhat.com> - 3.8.5-5
 - 1036538 [advance search]printable copy, test cases is null even if select cases/plan from advance search list
