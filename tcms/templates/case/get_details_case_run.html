@@ -73,7 +73,7 @@
 					<span>
 						[ <a href="{% url "tcms.apps.testruns.views.bug" test_case_run.pk %}?a=file" target="_blank" class="buglink" title="File a bug on bugzilla">File</a>&nbsp;|&nbsp;
 						{% if perms.testcases.add_testcasebug %}
-						<a href="javascript:void(0);" title="Add" onclick="addCaseRunBug({{ test_case_run.run_pk }}, this.up(6).previous(), this.up(6), {{ test_case_run.case_id }}, {{ test_case_run.pk }})">Add</a>
+						<a href="javascript:void(0);" title="Add" onclick="addCaseRunBug({{ test_case_run.run_id }}, this.up(6).previous(), this.up(6), {{ test_case_run.case_id }}, {{ test_case_run.pk }})">Add</a>
 						{% endif %} ]
 					</span>
 				</h4>
