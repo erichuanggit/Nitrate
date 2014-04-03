@@ -1,3 +1,11 @@
+Change Log
+==========
+
+3.8.6-5 (Apr 01 2014)
+----------------------
+
+- Bug 1082150 - Backward-incompatible change in TestRun.get_test_case_runs()
+
 v3.8.4 (Sep 17 2013)
 --------------------
 - Fixed bug # 1005797 - [RFE] Add a column with number of comments into Case Runs table
