@@ -1,6 +1,19 @@
 Change Log
 ==========
 
+3.8.7-1 (Apr 03 2014)
+----------------------
+
+- Bug 1034100 - [Performance] opening plan/id/chooseruns page causes Python interpreter consumes very hight, around 100%, CPU usage
+- TCMS-171 [BZ 866974] Provide TestPlan.{add,get,remove}_component
+- TCMS-177 It takes over one min to mark one case to pass in test case run.
+- TCMS-186 Too slow when create test run
+- TCMS-187 [Performance] Loading test case when expand a test case pane in Cases and Reviewing Cases tabs in a test plan page is too slow.
+- TCMS-188 [Performance] Loading test case when expand a test case pane in test run page is too slow
+- TCMS-194 [Performance] Expand a plan to display case run list in Case Runs tab in a case page
+- TCMS-195 [Performance] Expand a case run from case run list in Case Runs tab in a case page
+- Using VERSION.txt file instead of writing version into tcms module directly
+
 3.8.6-5 (Apr 01 2014)
 ----------------------
 

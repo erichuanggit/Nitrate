@@ -1,8 +1,8 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:           nitrate
-Version:        3.8.6
-Release:        5%{?dist}
+Version:        3.8.7
+Release:        1%{?dist}
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -77,6 +77,18 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{python_sitelib}/tcms/settings/product.py
 
 %changelog
+
+* Thu Apr 03 2014 Chenxiong Qi <cqi@redhat.com> - 3.8.7-1
+- Bug 1034100 - [Performance] opening plan/id/chooseruns page causes Python interpreter consumes very hight, around 100%, CPU usage
+- TCMS-171 [BZ 866974] Provide TestPlan.{add,get,remove}_component
+- TCMS-177 It takes over one min to mark one case to pass in test case run.
+- TCMS-186 Too slow when create test run
+- TCMS-187 [Performance] Loading test case when expand a test case pane in Cases and Reviewing Cases tabs in a test plan page is too slow.
+- TCMS-188 [Performance] Loading test case when expand a test case pane in test run page is too slow
+- TCMS-194 [Performance] Expand a plan to display case run list in Case Runs tab in a case page
+- TCMS-195 [Performance] Expand a case run from case run list in Case Runs tab in a case page
+- Using VERSION.txt file instead of writing version into tcms module directly
+
 * Tue Apr 01 2014 Chenxiong Qi <cqi@redhat.com> - 3.8.6-5
 - 1082150 Backward-incompatible change in TestRun.get_test_case_runs()
 
