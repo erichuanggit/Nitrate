@@ -15,6 +15,7 @@
 #
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>, Chaobin Tang <ctang@redhat.com>
+#   Chenxiong Qi <cqi@redhat.com>
 
 '''
 Functions that help access comments
@@ -32,6 +33,7 @@ from datetime import datetime
 
 _SITE = Site.objects.get(pk=settings.SITE_ID)
 
+
 def add_comment(objs, comments, user, submit_date=None):
     '''
     Generic approach adding django.comment for an object.
@@ -45,13 +47,18 @@ def add_comment(objs, comments, user, submit_date=None):
     >>> comments = 'stupid comments by Homer'
     >>> add_comment([testrun,], comments, testuser)
     '''
-    c_type = ContentType.objects.get(model=objs[0].__class__.__name__)
+    c_type = ContentType.objects.get_for_model(model=objs[0].__class__)
+    create_comment = Comment.objects.create
     for obj in objs:
-        Comment.objects.create(
-            content_type=c_type, site=_SITE,
-            object_pk=obj.pk, user=user,
-            comment=comments, submit_date=submit_date or datetime.now()
-        )
+        create_comment(content_type=c_type,
+                       site=_SITE,
+                       object_pk=obj.pk,
+                       user=user,
+                       comment=comments,
+                       submit_date=submit_date or datetime.now(),
+                       user_email=user.email,
+                       user_name=user.username)
+
 
 if __name__ == '__main__':
     import doctest

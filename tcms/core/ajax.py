@@ -15,6 +15,7 @@
 #
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
+#   Chenxiong Qi <cqi@redhat.com>
 
 """
 Shared functions for plan/case/run.
@@ -811,13 +812,16 @@ def comment_case_runs(request):
     '''
     Add comment to one or more caseruns at a time.
     '''
-    data    = request.REQUEST.copy()
+    data = request.REQUEST.copy()
     comment = data.get('comment', None)
-    if not comment: return say_no('Comments needed')
+    if not comment:
+        return say_no('Comments needed')
     run_ids = [i for i in data.get('run', '').split(',') if i]
-    if not run_ids: return say_no('No runs selected.');
-    runs    = TestCaseRun.objects.filter(pk__in=run_ids)
-    if not runs: return say_no('No caserun found.')
+    if not run_ids:
+        return say_no('No runs selected.');
+    runs = TestCaseRun.objects.filter(pk__in=run_ids).only('pk')
+    if not runs:
+        return say_no('No caserun found.')
     add_comment(runs, comment, request.user)
     return say_yes()
 
