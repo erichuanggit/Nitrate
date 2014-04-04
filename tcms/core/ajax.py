@@ -41,7 +41,8 @@ from django.template import RequestContext
 from tcms.apps.management.models import Component, TestBuild, Version
 from tcms.apps.management.models import Priority
 from tcms.apps.management.models import TestTag, TestTag
-from tcms.apps.testcases.models import TestCase, TestCaseTag, TestCaseBugSystem as BugSystem
+from tcms.apps.testcases.models import TestCase, TestCaseTag, TestCaseBug, \
+        TestCaseBugSystem as BugSystem
 from tcms.apps.testcases.models import TestCaseCategory
 from tcms.apps.testcases.models import TestCasePlan
 from tcms.apps.testcases.models import TestCaseStatus
@@ -861,15 +862,17 @@ def update_bugs_to_caseruns(request):
     if error: return say_no(error)
     runs    = TestCaseRun.objects.filter(pk__in=data['runs'])
     bg_sys  = data['bug_system']
-    bugs    = data['bugs']
+    bug_ids    = data['bugs']
     action  = data['action']
+    bugs = TestCaseBug.objects.filter(bug_id__in=bug_ids)
     try:
         for run in runs:
             for bug in bugs:
                 if action == 'add':
-                    run.add_bug(bug_id=bug, bug_system=bg_sys)
+                    run.add_bug(bug_id=bug.bug_id, bug_system=bg_sys)
                 else:
-                    run.remove_bug(bug)
+                    if bug.case_run_id == run.pk:
+                        run.remove_bug(bug.bug_id)
     except Exception, e:
         return say_no(str(e))
     return say_yes()
