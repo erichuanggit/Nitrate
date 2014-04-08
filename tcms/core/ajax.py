@@ -872,7 +872,7 @@ def update_bugs_to_caseruns(request):
                     run.add_bug(bug_id=bug.bug_id, bug_system=bg_sys)
                 else:
                     if bug.case_run_id == run.pk:
-                        run.remove_bug(bug.bug_id)
+                        run.remove_bug(bug.bug_id, run.pk)
     except Exception, e:
         return say_no(str(e))
     return say_yes()
