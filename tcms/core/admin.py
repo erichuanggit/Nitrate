@@ -24,6 +24,7 @@ from kobo.django.xmlrpc.models import XmlRpcLog
 class NitrateXmlRpcLogAdmin(admin.ModelAdmin):
     list_display = ('happened_on', 'user_username', 'method')
     list_per_page = 50
+    list_filter = ('dt_inserted',)
 
     user_cache = {}
 
