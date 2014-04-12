@@ -15,6 +15,7 @@
 #
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
+#   Chenxiong Qi <cqi@redhat.com>
 
 """
 Shared functions for plan/case/run.
@@ -40,7 +41,8 @@ from django.template import RequestContext
 from tcms.apps.management.models import Component, TestBuild, Version
 from tcms.apps.management.models import Priority
 from tcms.apps.management.models import TestTag, TestTag
-from tcms.apps.testcases.models import TestCase, TestCaseTag, TestCaseBugSystem as BugSystem
+from tcms.apps.testcases.models import TestCase, TestCaseTag, TestCaseBug, \
+        TestCaseBugSystem as BugSystem
 from tcms.apps.testcases.models import TestCaseCategory
 from tcms.apps.testcases.models import TestCasePlan
 from tcms.apps.testcases.models import TestCaseStatus
@@ -811,13 +813,16 @@ def comment_case_runs(request):
     '''
     Add comment to one or more caseruns at a time.
     '''
-    data    = request.REQUEST.copy()
+    data = request.REQUEST.copy()
     comment = data.get('comment', None)
-    if not comment: return say_no('Comments needed')
+    if not comment:
+        return say_no('Comments needed')
     run_ids = [i for i in data.get('run', '').split(',') if i]
-    if not run_ids: return say_no('No runs selected.');
-    runs    = TestCaseRun.objects.filter(pk__in=run_ids)
-    if not runs: return say_no('No caserun found.')
+    if not run_ids:
+        return say_no('No runs selected.');
+    runs = TestCaseRun.objects.filter(pk__in=run_ids).only('pk')
+    if not runs:
+        return say_no('No caserun found.')
     add_comment(runs, comment, request.user)
     return say_yes()
 
@@ -857,15 +862,17 @@ def update_bugs_to_caseruns(request):
     if error: return say_no(error)
     runs    = TestCaseRun.objects.filter(pk__in=data['runs'])
     bg_sys  = data['bug_system']
-    bugs    = data['bugs']
+    bug_ids    = data['bugs']
     action  = data['action']
+    bugs = TestCaseBug.objects.filter(bug_id__in=bug_ids)
     try:
         for run in runs:
             for bug in bugs:
                 if action == 'add':
-                    run.add_bug(bug_id=bug, bug_system=bg_sys)
+                    run.add_bug(bug_id=bug.bug_id, bug_system=bg_sys)
                 else:
-                    run.remove_bug(bug)
+                    if bug.case_run_id == run.pk:
+                        run.remove_bug(bug.bug_id, run.pk)
     except Exception, e:
         return say_no(str(e))
     return say_yes()

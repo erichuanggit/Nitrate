@@ -81,7 +81,7 @@
 				{% for comment in case_comments %}
 					<li>
 						<span class="strong">#{{ forloop.counter }}</span>
-						<span class="strong">{{ comment.user_email }}</span>
+						<span class="strong">{{ comment.user__email }}</span>
 						<span class="grey">{{ comment.submit_date }}</span>
 						<br/>
 						{{ comment.comment|redhat_urlize|linebreaksbr }}

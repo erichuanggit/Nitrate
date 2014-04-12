@@ -894,7 +894,7 @@ class TestCaseRunViewDataMixin(object):
         comments = Comment.objects.filter(content_type=caserun_ct,
                                           object_pk=caserun.pk,
                                           site_id=settings.SITE_ID)
-        return comments.values('user_email', 'submit_date', 'comment')
+        return comments.values('user__email', 'submit_date', 'comment')
 
 
 class TestCaseSimpleCaseRunView(TemplateView, TestCaseRunViewDataMixin):

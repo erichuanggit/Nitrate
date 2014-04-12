@@ -2,7 +2,7 @@
 
 Name:           nitrate
 Version:        3.8.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -77,6 +77,10 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{python_sitelib}/tcms/settings/product.py
 
 %changelog
+
+* Fri Apr 11 2014 Jian Chen <jianchen@redhat.com> - 3.8.7-2
+- Bug 1083958 - [test run]In run detail page, using 'bugs-remove' link can remove the bug which does not belong to the current caserun.
+- Bug 1083965 - [test run]In run detail page, using 'comment-add' link to add comment, system does not record author.
 
 * Thu Apr 03 2014 Chenxiong Qi <cqi@redhat.com> - 3.8.7-1
 - Bug 1034100 - [Performance] opening plan/id/chooseruns page causes Python interpreter consumes very hight, around 100%, CPU usage
