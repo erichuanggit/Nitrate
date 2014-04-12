@@ -1013,7 +1013,7 @@ def get(request, case_id, template_name='case/get.html'):
 
     # log
     log_id = str(case_id)
-    logs = TCMSLogModel.objects.filter(object_pk=log_id)
+    logs = TCMSLogModel.get_logs_for_model(TestCase, log_id)
 
     logs = itertools.groupby(logs, lambda l: l.date)
     logs = [(day, list(actions)) for day, actions in logs]
