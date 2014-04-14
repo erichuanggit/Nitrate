@@ -14,13 +14,17 @@
 # distribution and at <http://www.gnu.org/licenses>.
 #
 # Authors:
-#   Xuqing Kuang <xkuang@redhat.com>, Chenxiong Qi <cqi@redhat.com>
+#   Xuqing Kuang <xkuang@redhat.com>
+#   Chenxiong Qi <cqi@redhat.com>
 
-from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
 from django.core.exceptions import ObjectDoesNotExist
+
+from kobo.django.xmlrpc.decorators import user_passes_test, login_required
+
+from tcms.apps.management.models import TestTag
 from tcms.apps.testcases.models import TestCase
 from tcms.apps.testruns.models import TestRun, TestCaseRun
-from tcms.apps.management.models import TestTag
+from tcms.core.decorators import log_call
 from utils import pre_process_ids
 
 __all__ = (
@@ -46,7 +50,7 @@ __all__ = (
     'unlink_env_value'
 )
 
-@log_call
+@log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.add_testcaserun'))
 def add_cases(request, run_ids, case_ids):
     """
@@ -78,7 +82,7 @@ def add_cases(request, run_ids, case_ids):
 
     return
 
-@log_call
+@log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.delete_testcaserun'))
 def remove_cases(request, run_ids, case_ids):
     """
@@ -119,7 +123,7 @@ def remove_cases(request, run_ids, case_ids):
         message = '%s: %s' % (err.__class__.__name__, err.message)
         return { 'status': 1, 'message': message }
 
-@log_call
+@log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.add_testruntag'))
 def add_tag(request, run_ids, tags):
     """
@@ -152,7 +156,7 @@ def add_tag(request, run_ids, tags):
 
     return
 
-@log_call
+@log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.add_testrun'))
 def create(request, values):
     """
@@ -239,7 +243,7 @@ def create(request, values):
 
     return tr.serialize()
 
-@log_call
+@log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.change_tcmsenvrunvaluemap'))
 def env_value(request, action, run_ids, env_value_ids):
     """
@@ -508,7 +512,7 @@ def get_test_plan(request, run_id):
     """
     return TestRun.objects.select_related('plan').get(run_id = run_id).plan.serialize()
 
-@log_call
+@log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.delete_testruntag'))
 def remove_tag(request, run_ids, tags):
     """
@@ -547,7 +551,7 @@ def remove_tag(request, run_ids, tags):
 
     return
 
-@log_call
+@log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
 def update(request, run_ids, values):
     """
@@ -639,7 +643,7 @@ def update(request, run_ids, values):
     query = {'pk__in': trs.values_list('pk', flat=True)}
     return TestRun.to_xmlrpc(query)
 
-@log_call
+@log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.add_tcmsenvrunvaluemap'))
 def link_env_value(request, run_ids, env_value_ids):
     """
@@ -660,7 +664,7 @@ def link_env_value(request, run_ids, env_value_ids):
     """
     return env_value(request, 'add', run_ids, env_value_ids)
 
-@log_call
+@log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.delete_tcmsenvrunvaluemap'))
 def unlink_env_value(request, run_ids, env_value_ids):
     """

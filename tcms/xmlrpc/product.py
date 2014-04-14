@@ -17,8 +17,9 @@
 #   Xuqing Kuang <xkuang@redhat.com>
 
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required
-from kobo.django.xmlrpc.decorators import log_call, log_traceback
+from kobo.django.xmlrpc.decorators import log_traceback
 from tcms.apps.management.models import Product
+from tcms.core.decorators import log_call
 from utils import pre_check_product
 
 __all__ = (
@@ -405,7 +406,7 @@ def get_tag(request, id):
     from tcms.apps.management.models import TestTag
     return TestTag.objects.get(pk=id).serialize()
 
-@log_call
+@log_call(namespace='Product')
 @user_passes_test(lambda u: u.has_perm('management.add_version'))
 def add_version(request, values):
     """

@@ -19,8 +19,9 @@
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import PermissionDenied
 
-from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
+from kobo.django.xmlrpc.decorators import user_passes_test, login_required
 
+from tcms.core.decorators import log_call
 from tcms.core.utils.xmlrpc import XMLRPCSerializer
 
 __all__ = (
@@ -38,7 +39,7 @@ def get_user_dict(user):
         del u['password']
     return u
 
-@log_call
+@log_call(namespace='User')
 def filter(request, query):
     """
     Description: Performs a search and returns the resulting list of test cases.
@@ -149,7 +150,7 @@ def update(request, values = None, id = None):
     u.save()
     return get_user_dict(u)
 
-@log_call
+@log_call(namespace='User')
 @user_passes_test(lambda u: u.has_perm('auth.change_user'))
 def join(request, username, groupname):
     """

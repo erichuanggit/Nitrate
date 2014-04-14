@@ -15,12 +15,15 @@
 #
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
+#   Chenxiong Qi <cqi@redhat.com>
 
-from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
+from kobo.django.xmlrpc.decorators import user_passes_test, login_required
+
 from tcms.apps.testruns.models import TestCaseRun, TestCaseRunStatus
-from utils import pre_process_ids
-from tcms.core.utils.xmlrpc import XMLRPCSerializer
 from tcms.core.contrib.linkreference.models import create_link, LinkReference
+from tcms.core.decorators import log_call
+from tcms.core.utils.xmlrpc import XMLRPCSerializer
+from utils import pre_process_ids
 
 
 
@@ -69,7 +72,7 @@ class GetCaseRun(object):
 gcr = GetCaseRun()
 
 
-@log_call
+@log_call(namespace='TestCaseRun')
 def add_comment(request, case_run_ids, comment):
     """
     Description: Adds comments to selected test case runs.
@@ -101,7 +104,7 @@ def add_comment(request, case_run_ids, comment):
 
     return c.add()
 
-@log_call
+@log_call(namespace='TestCaseRun')
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasebug'))
 def attach_bug(request, values):
     """
@@ -173,7 +176,7 @@ def check_case_run_status(request, name):
     """
     return TestCaseRunStatus.objects.get(name = name).serialize()
 
-@log_call
+@log_call(namespace='TestCaseRun')
 @user_passes_test(lambda u: u.has_perm('testruns.add_testcaserun'))
 def create(request, values):
     """
@@ -231,7 +234,7 @@ def create(request, values):
 
     return tcr.serialize()
 
-@log_call
+@log_call(namespace='TestCaseRun')
 @user_passes_test(lambda u: u.has_perm('testcases.delete_testcasebug'))
 def detach_bug(request, case_run_ids, bug_ids):
     """
@@ -506,7 +509,7 @@ def lookup_status_id_by_name(request, name):
     """
     return check_case_run_status(request = request, name = name)
 
-@log_call
+@log_call(namespace='TestCaseRun')
 @user_passes_test(lambda u: u.has_perm('testruns.change_testcaserun'))
 def update(request, case_run_ids, values):
     """
