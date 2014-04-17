@@ -228,25 +228,25 @@ jQ(function() {
 	
 	<div class="statu" style="float:left;" onCreate="var complete_status = new ProgressBar( new ProgressBar( 'complete_status_{{ test_run.run_id }}', {classProgressBar: 'progressBar4', style: ProgressBar.DETERMINATE, selection: {{ test_run.complete_cases|floatformat:0 }}} );">
 		<div class="progress-bar" style="float:none">
-			<div class="percent"><span id='complete_percent'>{{ status_counter.complete_percent|floatformat:0 }}</span>%</div>
-			<div class="progress-inner" style="width:{{ status_counter.complete_percent|floatformat:"0" }}%;">
-				<div class="progress-failed" style="width:{{ status_counter.failed_percent|floatformat:"0" }}%;"></div>
+			<div class="percent"><span id='complete_percent'>{{ case_runs_complete_percent|floatformat:0 }}</span>%</div>
+			<div class="progress-inner" style="width:{{ case_runs_complete_percent|floatformat:"0" }}%;">
+				<div class="progress-failed" style="width:{{ case_runs_failure_percent|floatformat:"0" }}%;"></div>
 			</div>
 		</div>
 		<ul>
-			{% for k, v in status_counter.count_data.items %}
+			{% for status_name, total_info in caserun_statuss_subtotal.iteritems %}
 			<li>
-				<label>{{ k }}</label>
-				{% ifnotequal v 0 %}
-                    <span id='{{ k }}'>[<a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '{{ k.pk }}')">{{ v }}</a>]</span>
+				<label>{{ status_name }}</label>
+				{% ifnotequal total_info.0 0 %}
+				<span id='{{ status_name }}'>[<a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '{{ total_info.1.pk }}')">{{ total_info.0 }}</a>]</span>
 				{% else %}
-				    <span id='{{ k }}'>[<a>{{ v }}</a>]</span>
+				<span id='{{ status_name }}'>[<a>{{ total_info.0 }}</a>]</span>
 				{% endifnotequal %}
 			</li>
 			{% endfor %}
 			<li>
 				<label>TOTAL</label>
-				<span id="TOTAL">[</span><a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '')">{{ test_run.case_run.count }}</a><span>]</span>
+				<span id="TOTAL">[</span><a href="javascript:void(0)" onclick="showCaseRunsWithSelectedStatus($('id_filter'), '')">{{ test_case_runs_count }}</a><span>]</span>
 			</li>
 			
 		</ul>

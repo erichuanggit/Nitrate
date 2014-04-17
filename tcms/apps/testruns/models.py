@@ -388,6 +388,9 @@ class TestRun(TCMSActionModel):
 
 class TestCaseRunStatus(TCMSActionModel):
 
+    complete_status_names = ('PASSED', 'ERROR', 'FAILED', 'WAIVED')
+    failure_status_names = ('ERROR', 'FAILED')
+
     id = models.AutoField(db_column='case_run_status_id', primary_key=True)
     name = models.CharField(max_length=60, blank=True)
     sortkey = models.IntegerField(null=True, blank=True, default=0)

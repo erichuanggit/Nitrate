@@ -18,6 +18,7 @@
 
 from tcms.apps.testruns.models import TestCaseRunStatus
 
+
 class CaseRunStatusCounter:
     """
     The class is use for handle count the case run with status.

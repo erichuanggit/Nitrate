@@ -533,61 +533,110 @@ def ajax_response(request, querySet, columnIndexNameMap, jsonTemplatePath='run/c
 #    add_never_cache_headers(response)
     return response
 
+
+def stats_caserun_status(case_runs, case_run_statuss):
+    '''Get statistics based on case runs' status
+
+    @return: the statistics including the number of each status mapping,
+        complete percent, and failure percent.
+    @rtype: tuple
+    '''
+    caserun_statuss_subtotal = {status.name: [0, status] for status in case_run_statuss}
+    complete_count = 0
+    failure_count = 0
+    status_complete_names = TestCaseRunStatus.complete_status_names
+    status_failure_names = TestCaseRunStatus.failure_status_names
+
+    for case_run in case_runs:
+        status_name = case_run.case_run_status.name
+        caserun_statuss_subtotal[status_name][0] += 1
+        if status_name in status_complete_names:
+            complete_count += 1
+        if status_name in status_failure_names:
+            failure_count += 1
+
+    # Final calculation
+    complete_percent = complete_count * 100.0 / len(case_runs)
+    failure_percent = .0
+    if complete_count:
+        failure_percent = failure_count * 100.0 / complete_count
+
+    return caserun_statuss_subtotal, complete_percent, failure_percent
+
+
 def get(request, run_id, template_name='run/get.html'):
     """Display testrun's detail"""
     SUB_MODULE_NAME = "runs"
 
     # Get the test run
     try:
+        # 1. get test run itself
         tr = TestRun.objects.select_related().get(run_id=run_id)
     except ObjectDoesNotExist, error:
         raise Http404
 
     # Get the test case runs belong to the run
+    # 2. get test run's all case runs
     tcrs = tr.case_run.all()
-    # Get the list of testcases belong to the run
-    tcs = [tcr.case_id for tcr in tcrs]
-    # Count the status
-    status_counter = CaseRunStatusCounter(tcrs)
-
-    # Redirect to assign case page when a run does not contain any case run
-    if not tcrs.count():
-        return HttpResponseRedirect(
-            reverse('tcms.apps.testruns.views.assign_case', args=[run_id,])
-        )
-
-    # Continue to search the case runs with conditions
-    tcrs = tcrs.filter(**clean_request(request))
-    if request.REQUEST.get('order_by'):
-        tcrs = tcrs.order_by(request.REQUEST['order_by'])
-
     tcrs = tcrs.select_related(
             'run', 'case_run_status', 'build', 'environment',
             'environment__product', 'case__components', 'tested_by',
             'case__priority', 'case__category', 'case__author',
             'case', 'assignee')
-
     # Get the bug count for each case run
+    # 5. have to show the number of bugs of each case run
     tcrs = tcrs.extra(select={
         'num_bug': RawSQL.num_case_run_bugs,
     })
     tcrs = tcrs.distinct()
+    # Continue to search the case runs with conditions
+    # 4. case runs preparing for render case runs table
+    tcrs = tcrs.filter(**clean_request(request))
+    order_by = request.REQUEST.get('order_by')
+    if order_by:
+        tcrs = tcrs.order_by(order_by)
+
+    case_run_statuss = TestCaseRunStatus.objects.only('pk', 'name')
+    case_run_statuss = case_run_statuss.order_by('pk')
+
+    # Count the status
+    # 3. calculate number of case runs of each status
+    #status_counter = CaseRunStatusCounter(tcrs)
+    stats_result = stats_caserun_status(tcrs, case_run_statuss)
+    caserun_statuss_subtotal, complete_percent, failure_percent = stats_result
+
+    # Redirect to assign case page when a run does not contain any case run
+    if not len(tcrs):
+        return HttpResponseRedirect(
+            reverse('tcms.apps.testruns.views.assign_case', args=[run_id,])
+        )
+
     # Get the test case run bugs summary
-    tcr_bugs = TestCaseBug.objects.select_related('bug_system').all()
-    tcr_bugs = tcr_bugs.filter(case_run__case_run_id__in=tcrs.values_list('case_run_id', flat=True))
-    tcr_bugs = tcr_bugs.values_list('bug_id', flat=True)
-    tcr_bugs = set(tcr_bugs)
+    # 6. get the number of bugs of this run
+    tcr_bugs = set(TestCaseBug.objects.filter(
+        case_run__run_id=run_id).values_list('bug_id', flat=True).iterator())
+
     # Get tag list of testcases
-    ttags = TestTag.objects.filter(testcase__in=tcs).order_by('name').distinct()
+    # 7. get tags
+    # Get the list of testcases belong to the run
+    tcs = [tcr.case_id for tcr in tcrs]
+    ttags = TestTag.objects.filter(testcase__in=tcs).values_list('name',
+                                                                 flat=True)
+    ttags = list(set(ttags.iterator()))
+    ttags.sort()
+
     context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_run': tr,
         'from_plan': request.GET.get('from_plan', False),
         'test_case_runs': tcrs,
-        'status_counter': status_counter,
+        'test_case_runs_count': len(tcrs),
+        'caserun_statuss_subtotal': caserun_statuss_subtotal,
+        'case_runs_complete_percent': complete_percent,
+        'case_runs_failure_percent': failure_percent,
         'test_case_run_bugs': tcr_bugs,
-        'test_case_run_status': TestCaseRunStatus.objects.order_by('pk'),
+        'test_case_run_status': case_run_statuss,
         'priorities': Priority.objects.all(),
         'case_own_tags': ttags,
         'errata_url_prefix': settings.ERRATA_URL_PREFIX,
