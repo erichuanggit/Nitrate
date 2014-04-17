@@ -70,7 +70,7 @@ class TCMSContentTypeBaseModel(models.Model):
         verbose_name='content type',
         related_name="content_type_set_for_%(class)s",
         blank=True, null=True)
-    object_pk = models.TextField('object ID', blank=True, null=True)
+    object_pk = models.PositiveIntegerField('object ID', blank=True, null=True)
     content_object = generic.GenericForeignKey(ct_field="content_type",
                                                fk_field="object_pk")
 

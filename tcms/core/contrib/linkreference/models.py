@@ -30,6 +30,7 @@ class LinkReference(TCMSContentTypeBaseModel):
 
     class Meta:
         db_table = 'tcms_linkrefs'
+        index_together = (('content_type', 'object_pk', 'site'),)
 
     @classmethod
     def get_from(cls, target):
