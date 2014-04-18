@@ -276,7 +276,7 @@ class QuerySetBasedXMLRPCSerializer(XMLRPCSerializer):
 
         # Handle ManyToManyFields, add such fields' values to final
         # serialization
-        for row in qs:
+        for row in qs.iterator():
             # Replace name from ORM side to the serialization side as expected
             new_serialized_data = {}
             if values_fields_mapping:
