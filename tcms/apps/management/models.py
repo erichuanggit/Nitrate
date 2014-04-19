@@ -53,9 +53,9 @@ class Classification(TCMSActionModel):
     name = models.CharField(unique=True, max_length=64)
     description = models.TextField(blank=True)
     sortkey = models.IntegerField(default=0)
+
     class Meta:
         db_table = u'classifications'
-        ordering = ['sortkey', 'id']
 
     def __unicode__(self):
         return self.name
@@ -82,7 +82,6 @@ class Product(TCMSActionModel):
                                          default='---')
 
     class Meta:
-        ordering = ['name']
         db_table = u'products'
 
     # Auto-generated attributes from back-references:
@@ -149,7 +148,6 @@ class Priority(TCMSActionModel):
     class Meta:
         db_table = u'priority'
         verbose_name_plural = u'priorities'
-        ordering = ['value', ]
 
     def __unicode__(self):
         return self.value
@@ -204,7 +202,6 @@ class Version(TCMSActionModel):
     class Meta:
         db_table = u'versions'
         unique_together = ('product', 'value')
-        ordering = ['-value']
 
     def __unicode__(self):
         return self.value
@@ -260,7 +257,6 @@ class TestBuild(TCMSActionModel):
     class Meta:
         db_table = u'test_builds'
         unique_together = ('product', 'name')
-        ordering = ['-name']
         verbose_name = u'build'
         verbose_name_plural = u'builds'
 
@@ -461,7 +457,6 @@ class TCMSEnvGroup(TCMSActionModel):
 
     class Meta:
         db_table = u'tcms_env_groups'
-        ordering = ['name']
 
     def __unicode__(self):
         return unicode(self.name)
@@ -485,7 +480,6 @@ class TCMSEnvProperty(TCMSActionModel):
 
     class Meta:
         db_table = u'tcms_env_properties'
-        ordering = ['name']
 
     def __unicode__(self):
         return unicode(self.name)
@@ -509,7 +503,6 @@ class TCMSEnvValue(TCMSActionModel):
     is_active = models.BooleanField(default=True)
     class Meta:
         db_table = u'tcms_env_values'
-        ordering = ['value']
         unique_together = ('property', 'value')
 
     def __unicode__(self):

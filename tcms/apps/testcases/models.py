@@ -166,7 +166,6 @@ class TestCase(TCMSActionModel):
     #   'texts' : list of TestCaseTexts (from TestCaseTexts.case)
     class Meta:
         db_table = u'test_cases'
-        ordering = ['summary', 'case_id',]
 
     def __unicode__(self):
         return self.summary
