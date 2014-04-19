@@ -558,6 +558,7 @@ class TestCasePlan(models.Model):
 
     class Meta:
         db_table = u'test_case_plans'
+        index_together = [['plan', 'case'],]
 
 
 class TestCaseAttachment(models.Model):
