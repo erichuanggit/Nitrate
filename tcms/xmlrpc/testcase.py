@@ -17,12 +17,18 @@
 #   Xuqing Kuang <xkuang@redhat.com>, Chenxiong Qi <cqi@redhat.com>
 
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
+
 from django.core.exceptions import ObjectDoesNotExist
-from tcms.apps.testcases.models import TestCase
+from django.db import connection
+from django.db import transaction
+from django.forms import EmailField, ValidationError
+
 from tcms.apps.management.models import TestTag
+from tcms.apps.testcases.models import TestCase
+from tcms.apps.testcases.models import TestCasePlan
+from tcms.apps.testplans.models import TestPlan
 from utils import pre_process_ids, compare_list
 
-from django.forms import EmailField, ValidationError
 
 __all__ = (
     'add_comment',
@@ -983,18 +989,15 @@ def unlink_plan(requst, case_id, plan_id):
     Example:
     >>> TestCase.unlink_plan(12345, 137)
     """
-    from tcms.apps.testplans.models import TestPlan
-    try:
-        tc = TestCase.objects.get(case_id = case_id)
-        tp = tc.plan.get(plan_id = plan_id)
-    except:
-        raise
+    sql = 'DELETE FROM test_case_plans WHERE plan_id = %s and case_id = %s'
+    cursor = connection.cursor()
+    cursor.execute(sql, [int(plan_id), int(case_id)])
+    transaction.commit_unless_managed()
 
-    tc.remove_plan(plan = tp)
+    plan_pks = TestCasePlan.objects.filter(case=case_id).values_list('plan',
+                                                                     flat=True)
+    return TestPlan.to_xmlrpc(query={'pk__in': plan_pks})
 
-    plan_ids = tc.plan.values_list('plan_id', flat = True)
-    query = {'plan_id__in': plan_ids}
-    return TestPlan.to_xmlrpc(query)
 
 @log_call
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
