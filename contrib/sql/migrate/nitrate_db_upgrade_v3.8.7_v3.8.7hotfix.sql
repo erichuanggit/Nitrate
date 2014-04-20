@@ -11,3 +11,4 @@ CREATE INDEX `tcms_bookmarks_62ffa694` ON `tcms_bookmarks` (`content_type_id`, `
 CREATE INDEX `tcms_logs_62ffa694` ON `tcms_logs` (`content_type_id`, `object_pk`, `site_id`);
 CREATE INDEX `tcms_contacts_62ffa694` ON `tcms_contacts` (`content_type_id`, `object_pk`, `site_id`);
 CREATE INDEX `tcms_linkrefs_62ffa694` ON `tcms_linkrefs` (`object_pk`, `content_type_id`, `site_id`);
+CREATE UNIQUE INDEX uniq_idx_case_run_status_name ON test_case_run_status (name);

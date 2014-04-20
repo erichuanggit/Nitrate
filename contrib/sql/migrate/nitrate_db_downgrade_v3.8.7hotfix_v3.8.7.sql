@@ -10,6 +10,8 @@ DROP INDEX `tcms_linkrefs_62ffa694` ON `tcms_linkrefs`;
 -- that did not specify a key length.
 DROP INDEX object_pk ON tcms_logs;
 
+DROP INDEX uniq_idx_case_run_status_name ON test_case_run_status;
+
 -- Convert column `object_pk` data type from int(11) to text.
 ALTER TABLE `tcms_linkrefs` MODIFY COLUMN `object_pk` text;
 ALTER TABLE `tcms_logs` MODIFY COLUMN `object_pk` text;
