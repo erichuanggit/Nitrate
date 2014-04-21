@@ -309,6 +309,9 @@ SET_ADMIN_AS_SUPERUSER = False
 BUGZILLA3_RPC_SERVER = ''
 BUGZILLA_URL = ''
 
+# Turn on/off bugzilla external tracker
+BUGZILLA_EXTERNAL_TRACKER = False
+
 # Turn on/off listening signals sent by models.
 LISTENING_MODEL_SIGNAL = True
 
