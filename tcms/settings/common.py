@@ -331,6 +331,12 @@ USER_GUIDE_URL = ''
 # consistent user experiece to users.
 DEFAULT_PAGE_SIZE = 20
 
+# Disable TCMS to produce test run progress info to consumers by qpid for
+# reducing unnecessary I/O access and errata does not subscribe tcms msg now.
+# If you want to continue sending msg to qpid, please overwrite it in product
+# .py and make sure qpid config is correct.
+ENABLE_QPID = False
+
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error when DEBUG=False.

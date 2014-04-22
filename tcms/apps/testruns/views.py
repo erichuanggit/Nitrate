@@ -16,46 +16,44 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-import datetime
+import itertools
 import time
 import urllib
 
+from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
-from django.db.models import Q
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
-from django.shortcuts import render_to_response
-from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.utils import simplejson
-from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.db import connection, transaction
+from django.db.models import Q
+from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.shortcuts import render_to_response
 from django.shortcuts import get_object_or_404
-from django.template.loader import render_to_string
 from django.template import RequestContext
+from django.template.loader import render_to_string
+from django.utils import simplejson
 
+from tcms.apps.management.models import Priority, TCMSEnvValue, TestTag
+from tcms.apps.testcases.forms import CaseBugForm
+from tcms.apps.testcases.models import TestCase, TestCasePlan, TestCaseBug, \
+    TestCaseStatus
+from tcms.apps.testplans.models import TestPlan
+from tcms.apps.testruns.forms import NewRunForm, SearchRunForm, EditRunForm, \
+    RunCloneForm, MulitpleRunsCloneForm
+from tcms.apps.testruns.helpers.serializer import TCR2File
+from tcms.apps.testruns.models import TestRun, TestCaseRun, TestCaseRunStatus, \
+    TCMSEnvRunValueMap
 from tcms.core.views import Prompt
-from tcms.core.utils.raw_sql import RawSQL
 from tcms.core.utils import clean_request
+from tcms.core.utils.raw_sql import RawSQL
+from tcms.core.utils.bugtrackers import Bugzilla
 from tcms.core.utils.counter import CaseRunStatusCounter
-from tcms.search.order import order_run_queryset
 from tcms.search import remove_from_request_path
 from tcms.search.forms import RunForm
+from tcms.search.order import order_run_queryset
 from tcms.search.query import SmartDjangoQuery
-from tcms.core.utils.bugtrackers import Bugzilla
-
-from tcms.apps.testcases.models import TestCase, TestCasePlan, TestCaseBug, \
-        TestCaseStatus
-from tcms.apps.testplans.models import TestPlan
-from tcms.apps.testruns.models import TestRun, TestCaseRun, TestCaseRunStatus, \
-        TCMSEnvRunValueMap
-from tcms.apps.management.models import Priority, TCMSEnvValue, \
-        TestTag
-
-from tcms.apps.testcases.forms import CaseBugForm
-from tcms.apps.testruns.forms import NewRunForm, SearchRunForm, EditRunForm, \
-        RunCloneForm, MulitpleRunsCloneForm
-from tcms.apps.testruns.helpers.serializer import TCR2File
 
 
 MODULE_NAME = "testruns"
@@ -595,6 +593,8 @@ def get(request, run_id, template_name='run/get.html'):
     order_by = request.REQUEST.get('order_by')
     if order_by:
         tcrs = tcrs.order_by(order_by)
+    else:
+        tcrs = tcrs.order_by('sortkey')
 
     case_run_statuss = TestCaseRunStatus.objects.only('pk', 'name')
     case_run_statuss = case_run_statuss.order_by('pk')
@@ -1033,24 +1033,37 @@ def order_case(request, run_id):
     # Current we should rewrite all of cases belong to the plan.
     # Because the cases sortkey in database is chaos,
     # Most of them are None.
-    tr = get_object_or_404(TestRun, run_id=run_id)
+    get_object_or_404(TestRun, run_id=run_id)
 
     if not request.REQUEST.get('case_run'):
         return HttpResponse(Prompt.render(
-                request = request,
-                info_type = Prompt.Info,
-                info = 'At least one case is required by re-oder in run.',
-                next = reverse('tcms.apps.testruns.views.get', args=[run_id, ]),
+            request=request,
+            info_type=Prompt.Info,
+            info='At least one case is required by re-oder in run.',
+            next=reverse('tcms.apps.testruns.views.get', args=[run_id, ]),
         ))
 
     case_run_ids = request.REQUEST.getlist('case_run')
-    tcrs = TestCaseRun.objects.filter(case_run_id__in=case_run_ids)
-
-    for tcr in tcrs:
-        new_sort_key = (case_run_ids.index(str(tcr.case_run_id)) + 1) * 10
-        if tcr.sortkey != new_sort_key:
-            tcr.sortkey = new_sort_key
-            tcr.save()
+    sql = 'UPDATE `test_case_runs` SET `sortkey` = %s WHERE `test_case_runs`' \
+          '.`case_run_id` = %s'
+    cursor = connection.cursor()
+    # sort key begin with 10, end with length*10, step 10.
+    # e.g.
+    #    case_run_ids = [10334, 10294, 10315, 10443]
+    #                      |      |      |      |
+    #          sort key -> 10     20     30     40
+    # then zip case_run_ids and new_sort_keys to pairs
+    # e.g.
+    #    sort_key, case_run_id
+    #         (10, 10334)
+    #         (20, 10294)
+    #         (30, 10315)
+    #         (40, 10443)
+    new_sort_keys = xrange(10, (len(case_run_ids) + 1) * 10, 10)
+    key_id_pairs = itertools.izip(new_sort_keys, case_run_ids)
+    for key_id_pair in key_id_pairs:
+        cursor.execute(sql, key_id_pair)
+    transaction.commit_unless_managed()
 
     return HttpResponseRedirect(
         reverse('tcms.apps.testruns.views.get', args=[run_id, ])
