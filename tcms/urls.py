@@ -151,6 +151,7 @@ urlpatterns = patterns('',
     (r'^run/(?P<run_id>\d+)/$', 'tcms.apps.testruns.views.get'),
     (r'^run/(?P<run_id>\d+)/clone/$','tcms.apps.testruns.views.new_run_with_caseruns'),
     (r'^run/(?P<run_id>\d+)/delete/$', 'tcms.apps.testruns.views.delete'),
+    # TODO: Deprecated url
     (r'^run/(?P<run_id>\d+)/execute/$', 'tcms.apps.testruns.views.execute'),
     (r'^run/(?P<run_id>\d+)/edit/$', 'tcms.apps.testruns.views.edit'),
     (r'^run/(?P<run_id>\d+)/report/$', 'tcms.apps.testruns.views.report'),
