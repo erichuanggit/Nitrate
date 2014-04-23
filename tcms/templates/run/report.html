@@ -14,7 +14,7 @@
 <body>
 	<div class="report_title">
 	Test Log Report
-	<div class="report_sub_title"><a href='{% url "tcms.apps.testruns.views.get" test_run.run_id %}'>[{{ test_run.run_id }}] {{ test_run.summary}}</a></div></div>
+	<div class="report_sub_title"><a href='{% url "tcms.apps.testruns.views.get" test_run.run_id %}'>[{{ test_run.run_id }}] {{ test_run.summary }}</a></div></div>
 	<div class="report_content">
 	<div id="content">
 		<div class="listinfo_content" style="float:left; width:95%">
@@ -44,7 +44,6 @@
 						</ul>
 					</div>
 				</div>
-			
 			</div>
 			<div class="rightlistinfo">
 				<div class="listinfo">
@@ -55,11 +54,7 @@
 				</div>
 				<div class="listinfo">
 					<span class="title">Default Tester:</span>
-					{% if test_run.default_tester %}
-				{{ test_run.default_tester.email }}
-				{% else %}
-				{{ test_run.default_tester }}
-				{% endif %}
+					{% if test_run.default_tester_id %}{{ test_run.default_tester.email }}{% else %}{{ test_run.default_tester }}{% endif %}
 				</div>
 				<div class="listinfo">
 					<span class="title">Started at:</span>{{ test_run.start_date }}
@@ -75,12 +70,13 @@
 		</div>
 		<div class="clear"></div>
 		<div class="table_noborder">
-	         Manual Cases<span class="red">{{test_run.case_run.get_manual_case_count|percentage:test_run.case_run.count}}({{test_run.case_run.get_manual_case_count}}/{{test_run.case_run.count}})</span>Automated Cases<span class="red">{{test_run.case_run.get_automated_case_count|percentage:test_run.case_run.count}}({{test_run.case_run.get_automated_case_count}}/{{test_run.case_run.count}})</span>Manual/Automated Cases<span class="red">{{test_run.case_run.get_both|percentage:test_run.case_run.count}}({{test_run.case_run.get_both}}/{{test_run.case_run.count}})</span></td>
+			Manual Cases<span class="red">{{ mode_stats.manual|percentage:test_case_runs_count }}({{ mode_stats.manual }}/{{ test_case_runs_count }})</span>
+			Automated Cases<span class="red">{{ mode_stats.automated|percentage:test_case_runs_count }}({{ mode_stats.automated }}/{{ test_case_runs_count }})</span>
+			Manual/Automated Cases<span class="red">{{ mode_stats.manual_automated|percentage:test_case_runs_count }}({{ mode_stats.manual_automated }}/{{ test_case_runs_count }})</span></td>
 		</div>
-		{% if test_case_runs.count %}
-		
-		
-		<table	class="list border-1" cellpadding="0" cellspacing="0">
+
+		{% if test_case_runs %}
+		<table class="list border-1" cellpadding="0" cellspacing="0">
 			<tr>
 				<th class="widthID">Case-Run ID</th>
 				<th class="widthID">Case ID</th>
@@ -97,48 +93,45 @@
 				<td>{{ test_case_run.case_id }}</td>
 				<td>{{ test_case_run.case.summary }}</td>
 				<td>{{ test_case_run.case.get_is_automated_status }}</td>
-				<td>{{ test_case_run.tested_by }}</td>
-				<td>{{ test_case_run.case.category }}</td>
+				<td>{{ test_case_run.tested_by.username }}</td>
+				<td>{{ test_case_run.case.category.name }}</td>
 				<td><span class="highlight">{{ test_case_run.case_run_status.name|upper }}</span></td>
 				<td>{{ test_case_run.close_date }}</td>
 			</tr>
 			<tr>
 				<td align="left" valign="top" colspan="8" class='hide'>
-					{% if test_case_run.get_bugs %}
+					{% if test_case_run.bugs %}
 					<span class='notes_title'>Bugs ID:</span>
-					{% for bug in test_case_run.get_bugs %}
-					
-					<a href="{{ bug.get_absolute_url }}">{{ bug }}</a>
-					
+					{% for bug in test_case_run.bugs %}
+					<a href="{{ bug.bug_url }}">{{ bug.bug_id }}</a>
 					{% endfor %}
 					{% endif %}
-					
-					{% get_comment_list for test_case_run as comments %}
-					{% if comments %}
+
+					{% if test_case_run.user_comments %}
 					<h4 style='padding:0px;margin:0px'>Comments</h4>
 					<span class="notes" >
 						<ul style="margin-left:10px;" class='comment'>
-							{% for comment in comments %}
+							{% for comment in test_case_run.user_comments %}
 							<li><b>{{ comment.user }}</b><span class='grey' style='margin-left:5px'>[{{ comment.submit_date }}]</span>	<br />{{ comment.comment|redhat_urlize|linebreaksbr }}</li>
 							{% endfor %}
 						</ul>
 					</span> 
 					{% endif %}
-					{% endfor %}
-				</td>
+
+					</td>
 			</tr>
-			
+			{% endfor %}
 		</table>
 		{% endif %}
-		<h3>Total: {{ test_case_runs.count_by_status.total }}</h3>
-		<h2>Pending test cases: {{ test_case_runs.count_by_status.IDLE }}</h2>
-		<h3>Test run completed: {{ test_case_runs.count_by_status.complete_percent|floatformat:2 }} %</h3>
-		
-	   
+
+		<h3>Total: {{ test_case_runs_count }}</h3>
+		<h3>Pending test cases: {{ summary_stats.idle }}</h3>
+		<h3>Test run completed: {{ summary_stats.complete|percentage:test_case_runs_count }}</h3>
+
 		{% if test_case_run_bugs %}
 		<hr style="margin:40px auto 20px;"/>
 		<h2><a name="buglist" style="cursor:default; text-decoration:none">Bug List:</a></h2>
-		
+
 		<table	class="list border-1" cellpadding="0" cellspacing="0">
 			<tr>
 				<th width="150px">Bug ID</th>
@@ -147,21 +140,16 @@
 			{% for bug in test_case_run_bugs %}
 			<tr>
 				<td>{{ bug }}</td>
-				<td><a href="{{ SETTINGS.BUGZILLA_URL }}show_bug.cgi?id={{ bug }}" >{{ SETTINGS.BUGZILLA_URL }}show_bug.cgi?id={{ bug }}</a></td>
+				<td><a href="{{ SETTINGS.BUGZILLA_URL }}show_bug.cgi?id={{ bug }}" target="_blank">{{ SETTINGS.BUGZILLA_URL }}show_bug.cgi?id={{ bug }}</a></td>
 			</tr>
 			{% endfor %}
 			<tr>
 				<td>View all bugs</td>
-				<td><a href="{{ SETTINGS.BUGZILLA_URL }}buglist.cgi?bugidtype=include&bug_id={% for bug in test_case_run_bugs %}{{ bug }}{% if not forloop.last %},{% endif %}{% endfor %}">
+				<td><a href="{{ SETTINGS.BUGZILLA_URL }}buglist.cgi?bugidtype=include&bug_id={% for bug in test_case_run_bugs %}{{ bug }}{% if not forloop.last %},{% endif %}{% endfor %}" target="_blank">
 							 {{ SETTINGS.BUGZILLA_URL }}buglist.cgi?bugidtype=include&bug_id={% for bug in test_case_run_bugs %}{{ bug }}{% if not forloop.last %},{% endif %}{% endfor %}</a></td>
 			</tr>
 		</table>
-		
 		{% endif %}
-		
-		
-		
-
 	</div>
 	</div>
 </body>

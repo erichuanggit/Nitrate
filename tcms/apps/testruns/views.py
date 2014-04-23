@@ -20,40 +20,51 @@ import itertools
 import time
 import urllib
 
+from itertools import groupby
+from itertools import izip
+
 from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
-from django.db import connection, transaction
+from django.db import connection
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.shortcuts import render_to_response
 from django.shortcuts import get_object_or_404
+from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils import simplejson
+from django.views.generic.base import TemplateView
 
-from tcms.apps.management.models import Priority, TCMSEnvValue, TestTag
-from tcms.apps.testcases.forms import CaseBugForm
-from tcms.apps.testcases.models import TestCase, TestCasePlan, TestCaseBug, \
-    TestCaseStatus
-from tcms.apps.testplans.models import TestPlan
-from tcms.apps.testruns.forms import NewRunForm, SearchRunForm, EditRunForm, \
-    RunCloneForm, MulitpleRunsCloneForm
-from tcms.apps.testruns.helpers.serializer import TCR2File
-from tcms.apps.testruns.models import TestRun, TestCaseRun, TestCaseRunStatus, \
-    TCMSEnvRunValueMap
-from tcms.core.views import Prompt
-from tcms.core.utils import clean_request
-from tcms.core.utils.raw_sql import RawSQL
 from tcms.core.utils.bugtrackers import Bugzilla
 from tcms.core.utils.counter import CaseRunStatusCounter
-from tcms.search import remove_from_request_path
+from tcms.core.utils import clean_request
+from tcms.core.utils.raw_sql import RawSQL
+from tcms.core.views import Prompt
 from tcms.search.forms import RunForm
+from tcms.search import remove_from_request_path
 from tcms.search.order import order_run_queryset
 from tcms.search.query import SmartDjangoQuery
+
+from tcms.apps.testcases.models import TestCase, TestCasePlan, TestCaseBug, \
+        TestCaseStatus
+from tcms.apps.testplans.models import TestPlan
+from tcms.apps.testruns.models import TestRun, TestCaseRun, TestCaseRunStatus, \
+        TCMSEnvRunValueMap
+from tcms.apps.management.models import Priority, TCMSEnvValue, \
+        TestTag
+from tcms.apps.testruns.data import TestCaseRunDataMixin
+from tcms.apps.testruns.data import get_caseruns_bug_ids
+from tcms.apps.testruns.data import stats_caseruns_status
+
+from tcms.apps.testcases.forms import CaseBugForm
+from tcms.apps.testruns.forms import NewRunForm, SearchRunForm, EditRunForm, \
+        RunCloneForm, MulitpleRunsCloneForm
+from tcms.apps.testruns.helpers.serializer import TCR2File
 
 
 MODULE_NAME = "testruns"
@@ -532,36 +543,6 @@ def ajax_response(request, querySet, columnIndexNameMap, jsonTemplatePath='run/c
     return response
 
 
-def stats_caserun_status(case_runs, case_run_statuss):
-    '''Get statistics based on case runs' status
-
-    @return: the statistics including the number of each status mapping,
-        complete percent, and failure percent.
-    @rtype: tuple
-    '''
-    caserun_statuss_subtotal = {status.name: [0, status] for status in case_run_statuss}
-    complete_count = 0
-    failure_count = 0
-    status_complete_names = TestCaseRunStatus.complete_status_names
-    status_failure_names = TestCaseRunStatus.failure_status_names
-
-    for case_run in case_runs:
-        status_name = case_run.case_run_status.name
-        caserun_statuss_subtotal[status_name][0] += 1
-        if status_name in status_complete_names:
-            complete_count += 1
-        if status_name in status_failure_names:
-            failure_count += 1
-
-    # Final calculation
-    complete_percent = complete_count * 100.0 / len(case_runs)
-    failure_percent = .0
-    if complete_count:
-        failure_percent = failure_count * 100.0 / complete_count
-
-    return caserun_statuss_subtotal, complete_percent, failure_percent
-
-
 def get(request, run_id, template_name='run/get.html'):
     """Display testrun's detail"""
     SUB_MODULE_NAME = "runs"
@@ -602,7 +583,7 @@ def get(request, run_id, template_name='run/get.html'):
     # Count the status
     # 3. calculate number of case runs of each status
     #status_counter = CaseRunStatusCounter(tcrs)
-    stats_result = stats_caserun_status(tcrs, case_run_statuss)
+    stats_result = stats_caseruns_status(tcrs, case_run_statuss)
     caserun_statuss_subtotal, complete_percent, failure_percent = stats_result
 
     # Redirect to assign case page when a run does not contain any case run
@@ -613,8 +594,7 @@ def get(request, run_id, template_name='run/get.html'):
 
     # Get the test case run bugs summary
     # 6. get the number of bugs of this run
-    tcr_bugs = set(TestCaseBug.objects.filter(
-        case_run__run_id=run_id).values_list('bug_id', flat=True).iterator())
+    tcr_bugs = get_caseruns_bug_ids(run_id)
 
     # Get tag list of testcases
     # 7. get tags
@@ -732,8 +712,59 @@ def execute(request, run_id, template_name='run/execute.html'):
     return get(request, run_id, template_name)
 
 
-def report(request, run_id, template_name='run/report.html'):
-    return get(request, run_id, template_name)
+class TestRunReportView(TemplateView, TestCaseRunDataMixin):
+    '''Test Run report'''
+
+    template_name = 'run/report.html'
+
+    def get(self, request, run_id):
+        self.run_id = run_id
+        return super(TestRunReportView, self).get(request, run_id)
+
+    def get_context_data(self, **kwargs):
+        '''Generate report for specific TestRun
+
+        There are four data source to generate this report.
+        1. TestRun
+        2. Test case runs included in the TestRun
+        3. Comments associated with each test case run
+        4. Statistics
+        5. bugs
+        '''
+        run = TestRun.objects.select_related('manager', 'plan').get(pk=self.run_id)
+
+        case_runs = TestCaseRun.objects.filter(run=run).select_related(
+            'case_run_status', 'case', 'tested_by', 'case__category').only(
+                'close_date',
+                'case_run_status__name',
+                'case__category__name',
+                'case__summary', 'case__is_automated',
+                'case__is_automated_proposed',
+                'tested_by__username')
+        mode_stats = self.stats_mode_caseruns(case_runs)
+        summary_stats = self.get_summary_stats(case_runs)
+        bug_ids = get_caseruns_bug_ids(self.run_id)
+
+        caserun_bugs = self.get_caseruns_bugs(run.pk)
+        comments = self.get_caseruns_comments(run.pk)
+
+        for case_run in case_runs:
+            bugs = caserun_bugs.get(case_run.pk, ())
+            case_run.bugs = bugs
+            user_comments = comments.get(case_run.pk, [])
+            case_run.user_comments = user_comments
+
+        context = super(TestRunReportView, self).get_context_data(**kwargs)
+        context.update({
+            'test_run': run,
+            'test_case_runs': case_runs,
+            'test_case_runs_count': len(case_runs),
+            'test_case_run_bugs': bug_ids,
+            'mode_stats': mode_stats,
+            'summary_stats': summary_stats,
+        })
+
+        return context
 
 
 @user_passes_test(lambda u: u.has_perm('testruns.change_testcaserun'))
