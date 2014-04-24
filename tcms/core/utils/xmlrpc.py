@@ -228,14 +228,13 @@ class QuerySetBasedXMLRPCSerializer(XMLRPCSerializer):
         @rtype: dict
         '''
         qs = self.queryset.values('pk', field_name).order_by('pk')
-        return {pk: list(values)
-                for pk, values in groupby(qs.iterator(),
-                                          lambda item: item['pk'])}
+        return dict(groupby(qs.iterator(), lambda item: item['pk']))
 
     def _query_m2m_fields(self):
         m2m_fields = self._get_m2m_fields()
-        return {field_name: self._query_m2m_field(field_name)
-                for field_name in m2m_fields}
+        result = [(field_name, self._query_m2m_field(field_name))
+                  for field_name in m2m_fields]
+        return dict(result)
 
     def _get_single_field_related_object_pks(self,
                                              m2m_field_query,
