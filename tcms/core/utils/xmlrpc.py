@@ -267,9 +267,10 @@ class QuerySetBasedXMLRPCSerializer(XMLRPCSerializer):
           serialized data object.
         '''
         qs = self.queryset.values(*self._get_values_fields())
-        m2m_fields_query = self._query_m2m_fields()
         primary_key_field = self._get_primary_key_field()
         values_fields_mapping = self._get_values_fields_mapping()
+        m2m_fields = self._get_m2m_fields()
+        m2m_not_queried = True
         serialize_result = []
 
         # Handle ManyToManyFields, add such fields' values to final
@@ -289,8 +290,13 @@ class QuerySetBasedXMLRPCSerializer(XMLRPCSerializer):
                 new_serialized_data.update(row)
 
             # Attach values of each ManyToManyField field
+            # Lazy ManyToManyField query, to avoid query on ManyToManyFields if
+            # serialization data is empty from database.
+            if m2m_not_queried:
+                m2m_fields_query = self._query_m2m_fields()
+                m2m_not_queried = False
             model_pk = row[primary_key_field]
-            for field_name in self._get_m2m_fields():
+            for field_name in m2m_fields:
                 related_object_pks = self._get_related_object_pks(m2m_fields_query,
                                                                   model_pk,
                                                                   field_name)
