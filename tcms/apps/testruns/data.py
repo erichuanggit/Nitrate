@@ -35,7 +35,8 @@ def stats_caseruns_status(case_runs, case_run_statuss):
         complete percent, and failure percent.
     @rtype: tuple
     '''
-    caserun_statuss_subtotal = {status.name: [0, status] for status in case_run_statuss}
+    caserun_statuss_subtotal = dict([(status.name, [0, status])
+                                    for status in case_run_statuss])
     complete_count = 0
     failure_count = 0
     status_complete_names = TestCaseRunStatus.complete_status_names
@@ -129,12 +130,10 @@ class TestCaseRunDataMixin(object):
             row = cursor.fetchone()
             if row is None:
                 break
-            row = {field_name: value
-                for field_name, value in izip(field_names, row)}
+            row = dict(izip(field_names, row))
             row['bug_url'] = row['url_reg_exp'] % row['bug_id']
             rows.append(row)
-        return {key: list(groups) for key, groups in
-                groupby(rows, lambda row: row['case_run_id'])}
+        return dict(groupby(rows, lambda row: row['case_run_id']))
 
     def get_caseruns_comments(self, run_pk):
         '''Get case runs' comments
@@ -166,10 +165,8 @@ class TestCaseRunDataMixin(object):
             row = cursor.fetchone()
             if row is None:
                 break
-            rows.append({field_name: value
-                         for field_name, value in izip(field_names, row)})
-        return {key: list(groups) for key, groups in
-                groupby(rows, lambda row: row['case_run_id'])}
+            rows.append(dict(izip(field_names, row)))
+        return dict(groupby(rows, lambda row: row['case_run_id']))
 
     def get_summary_stats(self, case_runs):
         '''Get summary statistics from case runs
