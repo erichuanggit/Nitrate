@@ -150,7 +150,7 @@ def lookup_name_by_id(request, build_id):
     """
     return get(request, build_id)
 
-@log_call(namespce='TestBuild')
+@log_call(namespace='TestBuild')
 @user_passes_test(lambda u: u.has_perm('management.change_testbuild'))
 def update(request, build_id, values):
     """
