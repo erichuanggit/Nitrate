@@ -30,7 +30,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
-from django.db import connection
+from django.db import connection, transaction
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
