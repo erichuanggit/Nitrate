@@ -133,7 +133,8 @@ class TestCaseRunDataMixin(object):
             row = dict(izip(field_names, row))
             row['bug_url'] = row['url_reg_exp'] % row['bug_id']
             rows.append(row)
-        return dict(groupby(rows, lambda row: row['case_run_id']))
+        return dict([(key, list(groups)) for key, groups in
+                     groupby(rows, lambda row: row['case_run_id'])])
 
     def get_caseruns_comments(self, run_pk):
         '''Get case runs' comments
@@ -166,7 +167,8 @@ class TestCaseRunDataMixin(object):
             if row is None:
                 break
             rows.append(dict(izip(field_names, row)))
-        return dict(groupby(rows, lambda row: row['case_run_id']))
+        return dict([(key, list(groups)) for key, groups in
+                     groupby(rows, lambda row: row['case_run_id'])])
 
     def get_summary_stats(self, case_runs):
         '''Get summary statistics from case runs
