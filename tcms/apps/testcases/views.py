@@ -34,6 +34,7 @@ from django.utils import simplejson
 from django.views.generic.base import TemplateView
 
 from tcms.core import forms
+from tcms.core.db import execute_sql
 from tcms.core.logs.models import TCMSLogModel
 from tcms.core.utils.raw_sql import RawSQL
 from tcms.core.views import Prompt
@@ -428,7 +429,6 @@ def query_testcases(request, plan, search_form):
                              'priority',
                              'category',
                              'reviewer')
-    tcs = tcs.distinct()
     return tcs
 
 
@@ -535,6 +535,28 @@ def get_selected_cases_ids(request):
         return []
 
 
+def get_tags_from_cases(plan_id, case_ids):
+    '''Get all tags from test cases
+
+    @param cases: an iterable object containing test cases' ids
+    @type cases: list, tuple
+    @return: a list containing all found tags with id and name
+    @rtype: list
+    '''
+    case_id_list = ', '.join((str(item) for item in case_ids))
+    sql = '''
+SELECT DISTINCT test_tags.tag_id, test_tags.tag_name
+FROM test_tags
+INNER JOIN test_case_tags ON (test_tags.tag_id = test_case_tags.tag_id)
+INNER JOIN test_cases ON (test_case_tags.case_id = test_cases.case_id)
+INNER JOIN test_case_plans ON (test_cases.case_id = test_case_plans.case_id)
+WHERE test_cases.case_id IN ({0}) AND test_case_plans.plan_id = %s
+'''.format(case_id_list if case_id_list else '0')
+
+    rows = execute_sql(sql, (plan_id,))
+    return sorted(rows, key=lambda tag: tag['tag_name'])
+
+
 def all(request, template_name="case/all.html"):
     """Generate the case list in search case and case zone in plan
 
@@ -558,7 +580,7 @@ def all(request, template_name="case/all.html"):
     selected_case_ids = get_selected_cases_ids(request)
 
     # Get the tags own by the cases
-    ttags = TestTag.objects.filter(testcase__in=tcs).order_by('name').distinct()
+    ttags = get_tags_from_cases(tp.pk, (case.pk for case in tcs))
 
     tcs = paginate_testcases(request, tcs)
 
