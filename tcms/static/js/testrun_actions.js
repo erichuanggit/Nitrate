@@ -579,7 +579,7 @@ function taggleSortCaseRun(event)
             t.checked = true;
             t.disabled = false;
         });
-        postToURL('ordercaserun/', serializeCaseRunFromInputList('id_table_cases', 'case_run'), 'get');
+        postToURL('ordercaserun/', serializeCaseRunFromInputList('id_table_cases', 'case_run'));
     }
 }
 function selectcase(){
