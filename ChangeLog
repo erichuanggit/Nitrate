@@ -1,6 +1,22 @@
 Change Log
 ==========
 
+3.8.7-3 (Apr 22 2014)
+---------------------
+
+- TCMS-264 - Temp workaround to avoid updates automatically bugzilla with TCMS
+  test case ID.
+- TCMS-240 - Convert column type, add composite index and add migrate sql for
+  each release version.
+
+3.8.7-2 (Apr 11 2014)
+---------------------
+
+- Bug 1083958 - [test run]In run detail page, using 'bugs-remove' link can
+  remove the bug which does not belong to the current caserun.
+- Bug 1083965 - [test run]In run detail page, using 'comment-add' link to add
+  comment, system does not record author.
+
 3.8.7-1 (Apr 03 2014)
 ----------------------
 
