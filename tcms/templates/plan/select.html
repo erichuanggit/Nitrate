@@ -82,8 +82,10 @@
                     <td valign="top"><B>{{ testplan.testcases_count }}</B></td>
                     <td valign="top"><B>{{ testplan.testruns_count }}</B></td>
                     <td valign="top" ALIGN="middle">
-                    <!--<a href="/plan/{{ testplan.plan_id }}/">Details</a>
-                        &nbsp;|&nbsp;-->
+                    {% comment %}
+                    <a href="/plan/{{ testplan.plan_id }}/">Details</a>
+                        &nbsp;|&nbsp;
+                    {% endcomment %}
                         <font color="GRAY"><a href="/tt/createrun.html">Create New Run</a></font>
                     </td>
                 </tr>

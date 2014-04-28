@@ -51,11 +51,11 @@
                     <a href="{% url "tcms.apps.management.views.product_edit" product.id %}" class="editlink">{{ product.name }}</a>
                     <br />
                     {% if product.description %}<span class="description">{{ product.description }}</span>{% endif %}
-                    <!--
+                    {% comment %}
                     <a id="blind_link_{{ forloop.counter }}" href="javascript:blinddownProductContent({{ forloop.counter }}, {{ product.id }})">
                     <img id="blind_icon_{{ forloop.counter }}" src="/static/skins/danqing/style/images/t1.png" border="0" alt="" />
                     </a>
-                    -->
+                    {% endcomment %}
                 </th>
                 {# <td id="id_default_milstone_of_{{ product.id }}">{{ product.defaultmilestone }}</td> #}
                 <td colspan="2" style="border-right:1px solid #ccc;">

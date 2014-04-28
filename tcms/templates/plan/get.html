@@ -67,12 +67,12 @@ Nitrate.TestPlans.Instance = {
 			{% endif %}
 			<input id="btn_export" type="button" value="Export All Cases " title="Export all cases to XML file" onclick="window.location.href='{% url "tcms.apps.testcases.views.export" %}?plan={{ test_plan.pk }}'">
 			<input id="btn_print" type="button" value="Print Plan " title="Print Plan" onclick="window.location.href='{% url "tcms.apps.testcases.views.printable" %}?plan={{ test_plan.pk }}'">	
-			<!--
+			{% comment %}
 			<span class="right-action">
 				<img src="{{ STATIC_URL }}images/icon_printer.png" width="16px">
 				<a href="{% url "tcms.apps.testcases.views.printable" %}?plan={{ test_plan.pk }}">Print Plan</a>
 			</span>
-	-->
+            {% endcomment %}
 		</span>
 	</div>
 	<h2 id="display_title" class="{% ifequal test_plan.is_active 0 %}line-through{% endifequal %}">
@@ -84,10 +84,12 @@ Nitrate.TestPlans.Instance = {
 				<div class="title grey">Author&nbsp;:</div>
 				<div id="display_author"  class="name " > <a href="{% url "tcms.apps.profiles.views.profile" test_plan.author.username %}">{{ test_plan.author }}</a></div>
 			</div>
-			<!--<div class="listinfo">
+			{% comment %}
+            <div class="listinfo">
 				<div class="title grey">Doc Author/Manager&nbsp;:</div>
 				<div id="display_author"  class="name" ><a href="{% url "tcms.apps.profiles.views.profile" test_plan.latest_text.author.username|default:"unknown" %}">{{ test_plan.latest_text.author }}</a></div>
-			</div>-->
+			</div>
+            {% endcomment %}
 			<div class="listinfo">
 				<div class="title grey">Owner&nbsp;:</div>
 				<div id="display_author"  class="name" >

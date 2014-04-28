@@ -33,7 +33,7 @@ test_cases should be a queryset of a list of TestCases.
 		{% endif %}
 	</td>
 	<td class="col_tester_content expandable">{{ test_case.get_is_automated_status }}</td>
-	<!-- <td >{{ testcase.create_date }}</td>-->
+	{# <td >{{ testcase.create_date }}</td> #}
 
 	<td status='{{ test_case.case_status }}'>
 		{% if perms.testcases.change_testcase %}
