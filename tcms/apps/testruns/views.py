@@ -57,9 +57,10 @@ from tcms.apps.testruns.models import TestRun, TestCaseRun, TestCaseRunStatus, \
         TCMSEnvRunValueMap
 from tcms.apps.management.models import Priority, TCMSEnvValue, \
         TestTag
-from tcms.apps.testruns.data import TestCaseRunDataMixin
-from tcms.apps.testruns.data import get_caseruns_bug_ids
+from tcms.apps.testruns.data import get_run_bug_ids
+from tcms.apps.testruns.data import get_run_bugs_count
 from tcms.apps.testruns.data import stats_caseruns_status
+from tcms.apps.testruns.data import TestCaseRunDataMixin
 
 from tcms.apps.testcases.forms import CaseBugForm
 from tcms.apps.testruns.forms import NewRunForm, SearchRunForm, EditRunForm, \
@@ -582,9 +583,7 @@ def get(request, run_id, template_name='run/get.html'):
 
     # Count the status
     # 3. calculate number of case runs of each status
-    #status_counter = CaseRunStatusCounter(tcrs)
-    stats_result = stats_caseruns_status(tcrs, case_run_statuss)
-    caserun_statuss_subtotal, complete_percent, failure_percent = stats_result
+    status_stats_result = stats_caseruns_status(run_id, case_run_statuss)
 
     # Redirect to assign case page when a run does not contain any case run
     if not len(tcrs):
@@ -594,7 +593,7 @@ def get(request, run_id, template_name='run/get.html'):
 
     # Get the test case run bugs summary
     # 6. get the number of bugs of this run
-    tcr_bugs = get_caseruns_bug_ids(run_id)
+    tcr_bugs_count = get_run_bugs_count(run_id)
 
     # Get tag list of testcases
     # 7. get tags
@@ -612,10 +611,8 @@ def get(request, run_id, template_name='run/get.html'):
         'from_plan': request.GET.get('from_plan', False),
         'test_case_runs': tcrs,
         'test_case_runs_count': len(tcrs),
-        'caserun_statuss_subtotal': caserun_statuss_subtotal,
-        'case_runs_complete_percent': complete_percent,
-        'case_runs_failure_percent': failure_percent,
-        'test_case_run_bugs': tcr_bugs,
+        'status_stats': status_stats_result,
+        'test_case_run_bugs_count': tcr_bugs_count,
         'test_case_run_status': case_run_statuss,
         'priorities': Priority.objects.all(),
         'case_own_tags': ttags,
@@ -743,7 +740,7 @@ class TestRunReportView(TemplateView, TestCaseRunDataMixin):
                 'tested_by__username')
         mode_stats = self.stats_mode_caseruns(case_runs)
         summary_stats = self.get_summary_stats(case_runs)
-        bug_ids = get_caseruns_bug_ids(self.run_id)
+        bug_ids = get_run_bug_ids(self.run_id)
 
         caserun_bugs = self.get_caseruns_bugs(run.pk)
         comments = self.get_caseruns_comments(run.pk)

@@ -16,6 +16,7 @@
 # Authors:
 #   Chenxiong Qi <cqi@redhat.com>
 
+from collections import namedtuple
 from itertools import izip
 from itertools import groupby
 
@@ -26,50 +27,99 @@ from django.db import connection
 from tcms.apps.testcases.models import TestCaseBug
 from tcms.apps.testruns.models import TestCaseRun
 from tcms.apps.testruns.models import TestCaseRunStatus
+from tcms.core.db import execute_sql
+
+TestCaseRunStatusSubtotal = namedtuple('TestCaseRunStatusSubtotal',
+                                       'StatusSubtotal '
+                                       'CaseRunsTotalCount '
+                                       'CompletedPercentage '
+                                       'FailurePercentage')
 
 
-def stats_caseruns_status(case_runs, case_run_statuss):
+def stats_caseruns_status(run_id, case_run_statuss):
     '''Get statistics based on case runs' status
 
+    @param run_id: id of test run from where to get statistics
+    @type run_id: int
+    @param case_run_statuss: iterable object containing TestCaseRunStatus
+        objects
+    @type case_run_statuss: iterable object
     @return: the statistics including the number of each status mapping,
-        complete percent, and failure percent.
-    @rtype: tuple
+        total number of case runs, complete percent, and failure percent.
+    @rtype: namedtuple
     '''
-    caserun_statuss_subtotal = dict([(status.name, [0, status])
+    sql = '''
+SELECT test_case_runs.case_run_status_id, COUNT(*) AS status_count
+FROM test_case_runs
+WHERE test_case_runs.run_id = %s
+GROUP BY test_case_runs.case_run_status_id'''
+    rows = execute_sql(sql, [run_id,])
+
+    caserun_statuss_subtotal = dict([(status.pk, [0, status])
                                     for status in case_run_statuss])
+
+    for row in rows:
+        status_pk = row['case_run_status_id']
+        caserun_statuss_subtotal[status_pk][0] = row['status_count']
+
     complete_count = 0
     failure_count = 0
+    caseruns_total_count = 0
     status_complete_names = TestCaseRunStatus.complete_status_names
     status_failure_names = TestCaseRunStatus.failure_status_names
 
-    for case_run in case_runs:
-        status_name = case_run.case_run_status.name
-        caserun_statuss_subtotal[status_name][0] += 1
+    for status_pk, total_info in caserun_statuss_subtotal.iteritems():
+        status_caseruns_count, caserun_status = total_info
+        status_name = caserun_status.name
+
+        caseruns_total_count += status_caseruns_count
         if status_name in status_complete_names:
-            complete_count += 1
+            complete_count += status_caseruns_count
         if status_name in status_failure_names:
-            failure_count += 1
+            failure_count += status_caseruns_count
 
     # Final calculation
-    complete_percent = complete_count * 100.0 / len(case_runs)
+    complete_percent = .0
+    if caseruns_total_count:
+        complete_percent = complete_count * 100.0 / caseruns_total_count
     failure_percent = .0
     if complete_count:
         failure_percent = failure_count * 100.0 / complete_count
 
-    return caserun_statuss_subtotal, complete_percent, failure_percent
+    return TestCaseRunStatusSubtotal(caserun_statuss_subtotal,
+                                     caseruns_total_count,
+                                     complete_percent,
+                                     failure_percent)
 
 
-def get_caseruns_bug_ids(run_id):
-    '''Get case runs' bug ids
+def get_run_bugs_count(run_id):
+    '''Get the number of bugs within a test run
 
-    @param run_id: from whose case runs to get bug ids
+    This data is collected from all contained case runs.
+
+    @param run_id: from whose case runs to get bugs count
     @type: int
-    @return: bug ids
-    @rtype: iterable object
+    @return: the number of bugs
+    @rtype: int
     '''
-    bug_ids = TestCaseBug.objects.filter(
-        case_run__run_id=run_id).values_list('bug_id', flat=True)
-    return set(bug_ids.iterator())
+    sql = '''
+SELECT COUNT(DISTINCT test_case_bugs.bug_id) AS bugs_count
+FROM test_case_bugs INNER JOIN test_case_runs
+    ON (test_case_bugs.case_run_id = test_case_runs.case_run_id)
+WHERE test_case_runs.run_id = %s'''
+    rows = execute_sql(sql, [run_id,])
+    for row in rows:
+        return row['bugs_count']
+
+
+def get_run_bug_ids(run_id):
+    sql = '''
+SELECT test_case_bugs.bug_id
+FROM test_case_bugs INNER JOIN test_case_runs
+    ON (test_case_bugs.case_run_id = test_case_runs.case_run_id)
+WHERE test_case_runs.run_id = %s'''
+    rows = execute_sql(sql, [run_id,])
+    return set((row['bug_id'] for row in rows))
 
 
 class TestCaseRunDataMixin(object):
