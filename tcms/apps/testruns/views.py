@@ -585,12 +585,6 @@ def get(request, run_id, template_name='run/get.html'):
     # 3. calculate number of case runs of each status
     status_stats_result = stats_caseruns_status(run_id, case_run_statuss)
 
-    # Redirect to assign case page when a run does not contain any case run
-    if not len(tcrs):
-        return HttpResponseRedirect(
-            reverse('tcms.apps.testruns.views.assign_case', args=[run_id,])
-        )
-
     # Get the test case run bugs summary
     # 6. get the number of bugs of this run
     tcr_bugs_count = get_run_bugs_count(run_id)
@@ -1122,7 +1116,9 @@ def remove_case_run(request, run_id):
 
     case_runs.delete()
 
-    return HttpResponseRedirect(reverse('tcms.apps.testruns.views.get', args=[run_id]))
+    return HttpResponseRedirect(
+        reverse('tcms.apps.testruns.views.assign_case', args=[run_id,]))
+
 
 
 @user_passes_test(lambda u: u.has_perm('testruns.add_testcaserun'))
