@@ -18,7 +18,10 @@ WORK_DIR=/tmp/nitrate-$(VERSION)
 SOURCE_DIR = $(WORK_DIR)/nitrate
 CODE_REPO=git://git.fedorahosted.org/nitrate.git
 
+.PHONY: help refresh-tags refresh-etags
+
 default: help
+
 # Target: build a local RPM
 local-rpm: $(SRPM)
 	echo "$(SRPM)"
@@ -91,4 +94,12 @@ help:
 	@echo '  test             - Run command: python manage.py test'
 	@echo '  build            - Run command: python setup.py build'
 	@echo '  install          - Run command: python setup.py install'
+	@echo '  refresh-tags     - Refresh tags using ctags'
+	@echo '  refresh-etags    - Refresh tags using ctags for Emacs specifically'
 	@echo '  help             - Show this help message and exit'
+
+refresh-tags:
+	@ctags -R --languages=Python,CSS,Javascript -f ctags
+
+refresh-etags:
+	@ctags -R -e --languages=Python,CSS,Javascript -f ctags
