@@ -27,7 +27,7 @@ def get_version():
 PACKAGE_NAME = 'nitrate'
 PACKAGE_VER = get_version()
 PACKAGE_DESC = 'Test Case Management System'
-PACKAGE_URL = 'https://fedorahosted.org/nitrate/browser/trunk/nitrate'
+PACKAGE_URL = 'https://fedorahosted.org/nitrate/wiki'
 
 
 def get_files_below(path):
