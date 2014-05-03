@@ -32,6 +32,15 @@ Nitrate is a tool for tracking testing being done on a product.
 
 It is a database-backed web application, implemented using Django
 
+%package doc
+Summary:        Documentation for Nitrate
+Group:          Documentation
+URL:            http://nitrate.readthedocs.org/en/latest/
+BuildRequires:  python-sphinx >= 1.1.2
+
+%description doc
+Documentation of Nitrate
+
 %prep
 %setup -q
 
@@ -43,6 +52,10 @@ sed --in-place \
 
 %build
 %{__python} setup.py build
+
+pushd docs
+make html
+popd
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -75,6 +88,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/%{name}
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 %config(noreplace) %{python_sitelib}/tcms/settings/product.py
+
+%files doc
+%defattr(-,root,root,-)
+%doc docs/target/html
 
 %changelog
 
