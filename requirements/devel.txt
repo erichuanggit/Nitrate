@@ -1,5 +1,5 @@
 -r base.txt
 django-debug-toolbar==0.11.0
-Sphinx==1.2b3
+Sphinx>=1.1.2
 flake8==2.1.0
 South>=0.8.2
