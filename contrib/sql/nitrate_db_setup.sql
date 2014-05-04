@@ -334,7 +334,7 @@ DROP TABLE IF EXISTS `django_comments`;
 CREATE TABLE `django_comments` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `content_type_id` int(11) NOT NULL,
-  `object_pk` longtext NOT NULL,
+  `object_pk` int(11) NOT NULL,
   `site_id` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
   `user_name` varchar(50) NOT NULL,
@@ -347,8 +347,8 @@ CREATE TABLE `django_comments` (
   `is_removed` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `content_type_id_refs_id_f2a7975b` (`content_type_id`),
-  KEY `site_id_refs_id_8db720f8` (`site_id`),
-  KEY `user_id_refs_id_81622011` (`user_id`)
+  KEY `user_id_refs_id_81622011` (`user_id`),
+  KEY `idx_comments_site_contenttype_objpk` (`site_id`,`content_type_id`,`object_pk`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1357,7 +1357,8 @@ CREATE TABLE `test_case_run_status` (
   `sortkey` int(11) DEFAULT NULL,
   `description` mediumtext,
   `auto_blinddown` tinyint(4) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`case_run_status_id`)
+  PRIMARY KEY (`case_run_status_id`),
+  UNIQUE KEY `uniq_idx_case_run_status_name` (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
