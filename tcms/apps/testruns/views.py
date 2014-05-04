@@ -1110,15 +1110,33 @@ def change_status(request, run_id):
 @user_passes_test(lambda u: u.has_perm('testruns.delete_testcaserun'))
 def remove_case_run(request, run_id):
     """Remove specific case run from the run"""
-    tr = get_object_or_404(TestRun, run_id=run_id)
 
-    case_runs = tr.case_run.filter(case_run_id__in=request.REQUEST.getlist('case_run'))
+    # Ignore invalid case run ids
+    case_run_ids = []
+    for item in request.REQUEST.getlist('case_run'):
+        try:
+            case_run_ids.append(int(item))
+        except (ValueError, TypeError):
+            pass
 
-    case_runs.delete()
+    # If no case run to remove, no further operation is required, just return
+    # back to run page immediately.
+    if not case_run_ids:
+        return HttpResponseRedirect(reverse('tcms.apps.testruns.views.get',
+                                            args=[run_id,]))
 
-    return HttpResponseRedirect(
-        reverse('tcms.apps.testruns.views.assign_case', args=[run_id,]))
+    run = get_object_or_404(TestRun.objects.only('pk'), pk=run_id)
 
+    # Restrict to delete those case runs that belongs to run
+    TestCaseRun.objects.filter(run_id=run.pk, pk__in=case_run_ids).delete()
+
+    caseruns_exist = TestCaseRun.objects.filter(run_id=run.pk).exists()
+    if caseruns_exist:
+        redirect_to = 'tcms.apps.testruns.views.get'
+    else:
+        redirect_to = 'tcms.apps.testruns.views.assign_case'
+
+    return HttpResponseRedirect(reverse(redirect_to, args=[run_id,]))
 
 
 @user_passes_test(lambda u: u.has_perm('testruns.add_testcaserun'))
