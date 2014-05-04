@@ -228,7 +228,18 @@ class QuerySetBasedXMLRPCSerializer(XMLRPCSerializer):
         @rtype: dict
         '''
         qs = self.queryset.values('pk', field_name).order_by('pk')
-        return dict(groupby(qs.iterator(), lambda item: item['pk']))
+        # From Python document 2.x:
+        #   The returned group is itself an iterator that shares the underlying
+        #   iterable with groupby(). Because the source is shared, when the
+        #   groupby() object is advanced, the previous group is no longer
+        #   visible. So, if that data is needed later, it should be stored as a
+        #   list
+        #
+        # dict(groupby(qs.iterator(), lambda item: item['pk']))
+        # will lose the group values and can not use dict comprehension in
+        # Pyhton2.6
+        return dict((pk, list(values)) for pk, values in groupby(qs.iterator(),
+                                                                  lambda item: item['pk']))
 
     def _query_m2m_fields(self):
         m2m_fields = self._get_m2m_fields()
