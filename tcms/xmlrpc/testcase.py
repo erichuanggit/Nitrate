@@ -22,13 +22,14 @@ from django.db import transaction
 from django.forms import EmailField, ValidationError
 from kobo.django.xmlrpc.decorators import user_passes_test
 
+from kobo.django.xmlrpc.decorators import user_passes_test, login_required
+
 from tcms.apps.management.models import TestTag
 from tcms.apps.testcases.models import TestCase
 from tcms.apps.testcases.models import TestCasePlan
 from tcms.apps.testplans.models import TestPlan
 from tcms.core.decorators import log_call
-from tcms.xmlrpc.utils import pre_process_ids, compare_list
-
+from tcms.xmlrpc.utils import pre_process_ids, compare_list, distinct_count
 
 __all__ = (
     'add_comment',
@@ -573,7 +574,7 @@ def filter_count(request, values={}):
     Example:
     # See TestCase.filter()
     """
-    return TestCase.objects.filter(**values).count()
+    return distinct_count(TestCase, values)
 
 
 def get(request, case_id):

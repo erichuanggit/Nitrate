@@ -18,28 +18,23 @@
 
 from datetime import datetime
 
-from django.core.urlresolvers import reverse
-from django.db import models, connection, transaction
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.cache import cache
-from django.utils.safestring import mark_safe, SafeData
-from django.db.models.signals import post_save, post_delete
 from django.conf import settings
-from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import models, connection
+from django.db.models.signals import post_save, post_delete
 from uuslug import slugify
 
 from tcms.apps.management.models import TCMSEnvPlanMap, Version
 from tcms.apps.testcases.models import TestCasePlan
-from tcms.core.models import TCMSActionModel
-from tcms.core.utils.xmlrpc import XMLRPCSerializer
-
-# single listen
 from tcms.apps.testplans import signals as plan_watchers
+from tcms.core.models import TCMSActionModel
+from tcms.xmlrpc.utils import distinct_filter
 
 try:
     from tcms.core.contrib.plugins_support.signals import register_model
 except ImportError:
     register_model = None
+
 
 class TestPlanType(TCMSActionModel):
     id = models.AutoField(db_column='type_id', primary_key=True)
@@ -51,6 +46,7 @@ class TestPlanType(TCMSActionModel):
     class Meta:
         db_table = u'test_plan_types'
         ordering = ['name']
+
 
 class TestPlan(TCMSActionModel):
     """A plan within the TCMS"""
@@ -106,7 +102,7 @@ class TestPlan(TCMSActionModel):
     def to_xmlrpc(cls, query=None):
         from tcms.core.utils.xmlrpc import TestPlanXMLRPCSerializer
         _query = query or {}
-        qs = cls.objects.filter(**_query).order_by('pk')
+        qs = distinct_filter(TestPlan, _query).order_by('pk')
         s = TestPlanXMLRPCSerializer(model_class=cls, queryset=qs)
         return s.serialize_queryset()
 
@@ -286,6 +282,7 @@ class TestPlan(TCMSActionModel):
             return TestPlanEmailSettings.objects.create(plan=self)
     emailing = property(_get_email_conf)
 
+
 class TestPlanText(TCMSActionModel):
 
     plan = models.ForeignKey(TestPlan, related_name='text')
@@ -304,6 +301,7 @@ class TestPlanText(TCMSActionModel):
         self.plan_text = html2text(self.plan_text)
         return self
 
+
 class TestPlanPermission(models.Model):
     userid = models.IntegerField(max_length=9, unique=True, primary_key=True)
     permissions = models.IntegerField(max_length=4)
@@ -315,12 +313,15 @@ class TestPlanPermission(models.Model):
         db_table = u'test_plan_permissions'
         unique_together = ('plan', 'userid')
 
+
 class TestPlanPermissionsRegexp(models.Model):
     plan = models.ForeignKey(TestPlan, primary_key=True)
     user_regexp = models.TextField()
     permissions = models.IntegerField(max_length=4)
+
     class Meta:
         db_table = u'test_plan_permissions_regexp'
+
 
 class TestPlanAttachment(models.Model):
     attachment = models.ForeignKey(
@@ -328,8 +329,10 @@ class TestPlanAttachment(models.Model):
         primary_key=True
     )
     plan = models.ForeignKey(TestPlan)
+
     class Meta:
         db_table = u'test_plan_attachments'
+
 
 class TestPlanActivity(models.Model):
     plan = models.ForeignKey(TestPlan) # plan_id
@@ -338,8 +341,10 @@ class TestPlanActivity(models.Model):
     changed = models.DateTimeField(primary_key=True)
     oldvalue = models.TextField(blank=True)
     newvalue = models.TextField(blank=True)
+
     class Meta:
         db_table = u'test_plan_activity'
+
 
 class TestPlanTag(models.Model):
     tag = models.ForeignKey(
@@ -351,6 +356,7 @@ class TestPlanTag(models.Model):
     class Meta:
         db_table = u'test_plan_tags'
 
+
 class TestPlanComponent(models.Model):
     plan = models.ForeignKey(TestPlan)
     component = models.ForeignKey('management.Component')
@@ -358,6 +364,7 @@ class TestPlanComponent(models.Model):
     class Meta:
         db_table = u'test_plan_components'
         unique_together = ('plan', 'component')
+
 
 class TestPlanEmailSettings(models.Model):
     plan = models.OneToOneField(TestPlan, related_name='email_settings')
@@ -380,9 +387,11 @@ if register_model:
     register_model(TestPlanTag)
     register_model(TestPlanComponent)
 
+
 def _listen():
     post_save.connect(plan_watchers.on_plan_save, TestPlan)
     post_delete.connect(plan_watchers.on_plan_delete, TestPlan)
+
 
 if settings.LISTENING_MODEL_SIGNAL:
     _listen()

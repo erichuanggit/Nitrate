@@ -18,14 +18,13 @@
 #   Chenxiong Qi <cqi@redhat.com>
 
 from django.db.models import ObjectDoesNotExist
-from kobo.django.xmlrpc.decorators import user_passes_test, login_required
+from kobo.django.xmlrpc.decorators import user_passes_test
 
 from tcms.apps.testruns.models import TestCaseRun, TestCaseRunStatus
 from tcms.core.contrib.linkreference.models import create_link, LinkReference
 from tcms.core.decorators import log_call
 from tcms.core.utils.xmlrpc import XMLRPCSerializer
-from tcms.xmlrpc.utils import pre_process_ids
-
+from tcms.xmlrpc.utils import pre_process_ids, distinct_count
 
 __all__ = (
     'add_comment',
@@ -320,11 +319,11 @@ def filter_count(request, values={}):
     Returns:     Integer - total matching cases.
 
     Example:
-    # See TestCaseRun.filter()
+    # See distinct_count()
     """
     from tcms.apps.testruns.models import TestCaseRun
 
-    return TestCaseRun.objects.filter(**values).count()
+    return distinct_count(TestCaseRun, values)
 
 
 def get(request, case_run_id):

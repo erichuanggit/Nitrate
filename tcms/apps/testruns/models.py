@@ -16,6 +16,7 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
+import datetime
 
 from django.core.urlresolvers import reverse
 from django.db import models, connection
@@ -23,21 +24,17 @@ from django.db.models.signals import post_save, post_delete
 from django.contrib.contenttypes import generic
 from django.conf import settings
 
-from tcms.core.models import TCMSActionModel, TimedeltaField
-
 from tcms.apps.testcases.models import TestCaseBug, TestCaseText, NoneText
 from tcms.apps.testruns import signals as run_watchers
 from tcms.core.contrib.linkreference.models import LinkReference
-import datetime
-
-from tcms.core.utils.xmlrpc import XMLRPCSerializer
+from tcms.core.models import TCMSActionModel, TimedeltaField
+from tcms.xmlrpc.utils import distinct_filter
 
 try:
     from tcms.core.contrib.plugins_support.signals import register_model
 except ImportError:
     register_model = None
 
-# Create your models here.
 
 class TestRun(TCMSActionModel):
 
@@ -87,7 +84,7 @@ class TestRun(TCMSActionModel):
     def to_xmlrpc(cls, query=None):
         from tcms.core.utils.xmlrpc import TestRunXMLRPCSerializer
         _query = query or {}
-        qs = cls.objects.filter(**_query).order_by('pk')
+        qs = distinct_filter(TestRun, _query).order_by('pk')
         s = TestRunXMLRPCSerializer(model_class=cls, queryset=qs)
         return s.serialize_queryset()
 
@@ -385,6 +382,7 @@ class TestRun(TCMSActionModel):
                 self.stop_date = None
             self.save()
 
+
 class TestCaseRunStatus(TCMSActionModel):
 
     complete_status_names = ('PASSED', 'ERROR', 'FAILED', 'WAIVED')
@@ -530,6 +528,7 @@ class TestCaseRunStatus(TCMSActionModel):
 
         super(self.__class__, self).save(*args, **kwargs)
 
+
 class TestCaseRunManager(models.Manager):
 
     def get_automated_case_count(self):
@@ -537,7 +536,6 @@ class TestCaseRunManager(models.Manager):
 
     def get_manual_case_count(self):
         return self.filter(case__is_automated = 0).count()
-
 
     def get_both(self):
         count1 = self.get_automated_case_count()
@@ -591,7 +589,7 @@ class TestCaseRun(TCMSActionModel):
     @classmethod
     def to_xmlrpc(cls, query={}):
         from tcms.core.utils.xmlrpc import TestCaseRunXMLRPCSerializer
-        qs = cls.objects.filter(**query).order_by('pk')
+        qs = distinct_filter(TestCaseRun, query).order_by('pk')
         s = TestCaseRunXMLRPCSerializer(model_class=cls, queryset=qs)
         return s.serialize_queryset()
 
@@ -680,6 +678,7 @@ class TestCaseRun(TCMSActionModel):
         self.is_current = True
         self.save()
 
+
 class TestRunTag(models.Model):
     tag = models.ForeignKey(
         'management.TestTag'
@@ -690,6 +689,7 @@ class TestRunTag(models.Model):
     class Meta:
         db_table = u'test_run_tags'
 
+
 class TestRunCC(models.Model):
     run = models.ForeignKey(TestRun, primary_key=True)
     user = models.ForeignKey('auth.User', db_column='who')
@@ -697,12 +697,14 @@ class TestRunCC(models.Model):
     class Meta:
         db_table = u'test_run_cc'
 
+
 class TCMSEnvRunValueMap(models.Model):
     run = models.ForeignKey(TestRun)
     value = models.ForeignKey('management.TCMSEnvValue')
 
     class Meta:
         db_table = u'tcms_env_run_value_map'
+
 
 # Signals handler
 def _run_listen():

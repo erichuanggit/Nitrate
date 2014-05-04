@@ -18,23 +18,19 @@
 
 # from stdlib
 from datetime import datetime
-from itertools import ifilter
 
 # from django
-from django.core.urlresolvers import reverse
-from django.core.exceptions import MultipleObjectsReturned
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.db import models, connection, transaction
 from django.db.models import ObjectDoesNotExist
 from django.db.models.signals import post_save, post_delete
 from django.contrib.contenttypes import generic
 
+from tcms.apps.testcases import signals as case_watchers
 from tcms.core.models import TCMSActionModel, TimedeltaField
 from tcms.core.models import TCMSContentTypeBaseModel
-from tcms.core.utils.xmlrpc import XMLRPCSerializer
-
-#from signal listen
-from tcms.apps.testcases import signals as case_watchers
+from tcms.xmlrpc.utils import distinct_filter
 
 try:
     from tcms.core.contrib.plugins_support.signals import register_model
@@ -47,6 +43,7 @@ AUTOMATED_CHOICES = (
     (2, 'Both'),
 )
 
+
 class NoneText:
     author = None
     case_text_version = 0
@@ -55,6 +52,7 @@ class NoneText:
     setup = None
     breakdown = None
     create_date = datetime.now()
+
 
 class TestCaseStatus(TCMSActionModel):
     id = models.AutoField(
@@ -102,6 +100,7 @@ class TestCaseStatus(TCMSActionModel):
     def is_confirmed(self):
         return self.name == 'CONFIRMED'
 
+
 class TestCaseCategory(TCMSActionModel):
     id = models.AutoField(db_column='category_id', primary_key=True)
     name = models.CharField(max_length=720)
@@ -115,6 +114,7 @@ class TestCaseCategory(TCMSActionModel):
 
     def __unicode__(self):
         return self.name
+
 
 class TestCase(TCMSActionModel):
     case_id = models.AutoField(max_length=10, primary_key=True)
@@ -174,7 +174,7 @@ class TestCase(TCMSActionModel):
     def to_xmlrpc(cls, query=None):
         from tcms.core.utils.xmlrpc import TestCaseXMLRPCSerializer
         _query = query or {}
-        qs = cls.objects.filter(**_query).order_by('pk')
+        qs = distinct_filter(TestCase, _query).order_by('pk')
         s = TestCaseXMLRPCSerializer(model_class=cls, queryset=qs)
         return s.serialize_queryset()
 
@@ -518,6 +518,7 @@ class TestCase(TCMSActionModel):
             return TestCaseEmailSettings.objects.create(case=self)
     emailing = property(_get_email_conf)
 
+
 class TestCaseText(TCMSActionModel):
 
     case = models.ForeignKey(TestCase, related_name='text')
@@ -545,6 +546,7 @@ class TestCaseText(TCMSActionModel):
 
         return self
 
+
 class TestCasePlan(models.Model):
     # plan_id = models.IntegerField(max_length=11, primary_key=True)
     # case_id = models.IntegerField(max_length=11, primary_key=True)
@@ -570,18 +572,22 @@ class TestCaseAttachment(models.Model):
         default=None,
         related_name='case_run_attachment'
     )
+
     class Meta:
         db_table = u'test_case_attachments'
+
 
 class TestCaseComponent(models.Model):
     case = models.ForeignKey(TestCase, primary_key=True) # case_id
     component = models.ForeignKey('management.Component') # component_id
+
     class Meta:
         db_table = u'test_case_components'
 
     #def __unicode__(self):
         #Another choice: return the related case summary too?
     #    return "%s, %s" %(self.component.name, self.case.summary)
+
 
 class TestCaseTag(models.Model):
     tag = models.ForeignKey(
@@ -592,6 +598,7 @@ class TestCaseTag(models.Model):
 
     class Meta:
         db_table = u'test_case_tags'
+
 
 class TestCaseBugSystem(TCMSActionModel):
     name = models.CharField(max_length=255)
@@ -678,6 +685,7 @@ class Contact(TCMSContentTypeBaseModel):
         c.save()
         return c
 
+
 class TestCaseEmailSettings(models.Model):
     case = models.OneToOneField(TestCase, related_name='email_settings')
     notify_on_case_update = models.BooleanField(default=False)
@@ -753,6 +761,7 @@ class TestCaseEmailSettings(models.Model):
         emails_to_delete = self.filter_unnecessary_emails(origin_emails, email_addrs)
         self.remove_cc(emails_to_delete)
         self.add_cc(self.filter_new_emails(origin_emails, email_addrs))
+
 
 def _listen():
     """ signals listen """

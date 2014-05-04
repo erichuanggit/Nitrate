@@ -18,13 +18,13 @@
 #   Chenxiong Qi <cqi@redhat.com>
 
 from django.core.exceptions import ObjectDoesNotExist
-from kobo.django.xmlrpc.decorators import user_passes_test, login_required
+from kobo.django.xmlrpc.decorators import user_passes_test
 
 from tcms.apps.management.models import Component
 from tcms.apps.management.models import TestTag
 from tcms.apps.testplans.models import TestPlan, TestPlanType
 from tcms.core.decorators import log_call
-from tcms.xmlrpc.utils import pre_process_ids
+from tcms.xmlrpc.utils import pre_process_ids, distinct_count
 
 __all__ = (
     'add_tag',
@@ -251,9 +251,10 @@ def filter_count(request, values={}):
     Returns:     Integer - total matching plans.
 
     Example:
-    # See TestPlan.filter()
+    # See distinct_count()
     """
-    return TestPlan.objects.filter(**values).count()
+    return distinct_count(TestPlan, values)
+
 
 
 def get(request, plan_id):

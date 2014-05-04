@@ -24,7 +24,7 @@ from tcms.apps.management.models import TestTag
 from tcms.apps.testcases.models import TestCase
 from tcms.apps.testruns.models import TestRun, TestCaseRun
 from tcms.core.decorators import log_call
-from tcms.xmlrpc.utils import pre_process_ids
+from tcms.xmlrpc.utils import pre_process_ids, distinct_count
 
 __all__ = (
     'add_cases',
@@ -333,9 +333,9 @@ def filter_count(request, values={}):
     Returns:     Integer - total matching runs.
 
     Example:
-    # See TestRun.filter()
+    # See distinct_count()
     """
-    return TestRun.objects.filter(**values).count()
+    return distinct_count(TestRun, values)
 
 
 def get(request, run_id):
@@ -392,8 +392,8 @@ def get_bugs(request, run_ids):
         run__run_id__in=trs.values_list('run_id', flat=True)
     )
 
-    query = {
-    'case_run__case_run_id__in': tcrs.values_list('case_run_id', flat=True)}
+    query = {'case_run__case_run_id__in': tcrs.values_list('case_run_id',
+                                                           flat=True)}
     return TestCaseBug.to_xmlrpc(query)
 
 
@@ -508,8 +508,8 @@ def get_test_cases(request, run_id):
 
     tc_ids = tr.case_run.values_list('case_id', flat=True)
     tc_run_id = dict(tr.case_run.values_list('case_id', 'case_run_id'))
-    tc_status = dict(
-        tr.case_run.values_list('case_id', 'case_run_status__name'))
+    tc_status = dict(tr.case_run.values_list('case_id',
+                                             'case_run_status__name'))
     tcs = TestCase.objects.filter(case_id__in=tc_ids)
     tcs_serializer = XMLRPCSerializer(tcs).serialize_queryset()
     for case in tcs_serializer:
