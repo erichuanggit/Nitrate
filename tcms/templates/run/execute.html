@@ -34,7 +34,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.Execute.on_load);
 	<h3><a href="{% url "tcms.apps.testruns.views.get" test_run.run_id %}">{{ test_run.summary }}</a></h3>
 	<fieldset name="" id="" class="option_prefer">
 		<legend class="strong">Testing Option</legend>
-		<input id="id_check_box_auto_blinddown" type="checkbox" checked=true />
+		<input id="id_check_box_auto_blinddown" type="checkbox" />
 		<label for="id_check_box_auto_blinddown"> Automatically display next test case</label><br />
 		<input id="id_check_box_blinddownallcase" type="checkbox" />
 		<label for="id_check_box_blinddownallcase"> Expand all case</label><br/>

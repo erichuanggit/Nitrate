@@ -1,14 +1,14 @@
 {% load extra_filters %}
 <form id="id_form_case_runs">
 <div class="mixbar"> 
-	<span class="tit" style='float:left'>Cases: {{ test_case_runs.count }}</span>
+	<span class="tit" style='float:left'>Cases: {{ test_case_runs_count }}</span>
 	<ul class="btnBlue btnBlueFilter" id="showFilterBtn">
 		<li class="btnBlueL"></li>
 		<li class="btnBlueC"><a title="Click to show filter case-run options" id='filter_case_run'>Show filter options</a></li>
 		<li class="btnBlueR"></li>
 	</ul>
 	<div class='right_float tit'>
-		<input id="id_check_box_auto_blinddown" type="checkbox" checked="true" />
+		<input id="id_check_box_auto_blinddown" type="checkbox" />
 		<label for="id_check_box_auto_blinddown" title="Automatically display next text case">Automatically</label>
 		<input id="id_check_box_highlight" type="checkbox" />
 		<label for="id_check_box_highlight" title="Highlight my assigned runs">Highlight</label>

@@ -645,7 +645,7 @@ DROP TABLE IF EXISTS `tcms_bookmarks`;
 CREATE TABLE `tcms_bookmarks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `content_type_id` int(11) DEFAULT NULL,
-  `object_pk` longtext,
+  `object_pk` int(11),
   `site_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `category_id` int(11) DEFAULT NULL,
@@ -656,7 +656,8 @@ CREATE TABLE `tcms_bookmarks` (
   KEY `tcms_bookmarks_e4470c6e` (`content_type_id`),
   KEY `tcms_bookmarks_6223029` (`site_id`),
   KEY `tcms_bookmarks_fbfc09f1` (`user_id`),
-  KEY `tcms_bookmarks_42dc49bc` (`category_id`)
+  KEY `tcms_bookmarks_42dc49bc` (`category_id`),
+  KEY `tcms_bookmarks_62ffa694` (`content_type_id`, `object_pk`, `site_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -679,14 +680,15 @@ DROP TABLE IF EXISTS `tcms_contacts`;
 CREATE TABLE `tcms_contacts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `content_type_id` int(11) DEFAULT NULL,
-  `object_pk` longtext,
+  `object_pk` int(11),
   `site_id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL,
   `email` varchar(75) NOT NULL,
   `date_joined` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `content_type_id_refs_id_ffc690d8` (`content_type_id`),
-  KEY `site_id_refs_id_cd57d185` (`site_id`)
+  KEY `site_id_refs_id_cd57d185` (`site_id`),
+  KEY `tcms_contacts_62ffa694` (`content_type_id`, `object_pk`, `site_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -868,14 +870,15 @@ DROP TABLE IF EXISTS `tcms_linkrefs`;
 CREATE TABLE `tcms_linkrefs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `content_type_id` int(11) DEFAULT NULL,
-  `object_pk` longtext,
+  `object_pk` int(11),
   `site_id` int(11) NOT NULL,
   `name` varchar(64) NOT NULL,
   `url` longtext NOT NULL,
   `created_on` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `tcms_linkrefs_1bb8f392` (`content_type_id`),
-  KEY `tcms_linkrefs_6223029` (`site_id`)
+  KEY `tcms_linkrefs_6223029` (`site_id`),
+  KEY `tcms_linkrefs_62ffa694` (`object_pk`, `content_type_id`, `site_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -898,7 +901,7 @@ DROP TABLE IF EXISTS `tcms_logs`;
 CREATE TABLE `tcms_logs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `content_type_id` int(11) NOT NULL,
-  `object_pk` longtext NOT NULL,
+  `object_pk` int(11) NOT NULL,
   `site_id` int(11) NOT NULL,
   `who_id` int(11) NOT NULL,
   `date` datetime NOT NULL,
@@ -907,7 +910,8 @@ CREATE TABLE `tcms_logs` (
   KEY `tcms_logs_content_type_id` (`content_type_id`),
   KEY `tcms_logs_site_id` (`site_id`),
   KEY `tcms_logs_who_id` (`who_id`),
-  KEY `object_pk` (`object_pk`(20))
+  KEY `object_pk` (`object_pk`),
+  KEY `tcms_logs_62ffa694` (`content_type_id`, `object_pk`, `site_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

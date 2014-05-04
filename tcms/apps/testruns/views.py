@@ -16,33 +16,39 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-import datetime
+import itertools
 import time
 import urllib
 
+from itertools import groupby
+from itertools import izip
+
+from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
-from django.db.models import Q
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
-from django.shortcuts import render_to_response
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.utils import simplejson
-from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.db import connection, transaction
+from django.db.models import Q
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
-from django.template.loader import render_to_string
+from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.template.loader import render_to_string
+from django.utils import simplejson
+from django.views.generic.base import TemplateView
 
-from tcms.core.views import Prompt
-from tcms.core.utils.raw_sql import RawSQL
-from tcms.core.utils import clean_request
-from tcms.core.utils.counter import CaseRunStatusCounter
-from tcms.search.order import order_run_queryset
-from tcms.search import remove_from_request_path
-from tcms.search.forms import RunForm
-from tcms.search.query import SmartDjangoQuery
 from tcms.core.utils.bugtrackers import Bugzilla
+from tcms.core.utils.counter import CaseRunStatusCounter
+from tcms.core.utils import clean_request
+from tcms.core.utils.raw_sql import RawSQL
+from tcms.core.views import Prompt
+from tcms.search.forms import RunForm
+from tcms.search import remove_from_request_path
+from tcms.search.order import order_run_queryset
+from tcms.search.query import SmartDjangoQuery
 
 from tcms.apps.testcases.models import TestCase, TestCasePlan, TestCaseBug, \
         TestCaseStatus
@@ -51,6 +57,10 @@ from tcms.apps.testruns.models import TestRun, TestCaseRun, TestCaseRunStatus, \
         TCMSEnvRunValueMap
 from tcms.apps.management.models import Priority, TCMSEnvValue, \
         TestTag
+from tcms.apps.testruns.data import get_run_bug_ids
+from tcms.apps.testruns.data import get_run_bugs_count
+from tcms.apps.testruns.data import stats_caseruns_status
+from tcms.apps.testruns.data import TestCaseRunDataMixin
 
 from tcms.apps.testcases.forms import CaseBugForm
 from tcms.apps.testruns.forms import NewRunForm, SearchRunForm, EditRunForm, \
@@ -533,61 +543,71 @@ def ajax_response(request, querySet, columnIndexNameMap, jsonTemplatePath='run/c
 #    add_never_cache_headers(response)
     return response
 
+
 def get(request, run_id, template_name='run/get.html'):
     """Display testrun's detail"""
     SUB_MODULE_NAME = "runs"
 
     # Get the test run
     try:
+        # 1. get test run itself
         tr = TestRun.objects.select_related().get(run_id=run_id)
     except ObjectDoesNotExist, error:
         raise Http404
 
     # Get the test case runs belong to the run
+    # 2. get test run's all case runs
     tcrs = tr.case_run.all()
-    # Get the list of testcases belong to the run
-    tcs = [tcr.case_id for tcr in tcrs]
-    # Count the status
-    status_counter = CaseRunStatusCounter(tcrs)
-
-    # Redirect to assign case page when a run does not contain any case run
-    if not tcrs.count():
-        return HttpResponseRedirect(
-            reverse('tcms.apps.testruns.views.assign_case', args=[run_id,])
-        )
-
-    # Continue to search the case runs with conditions
-    tcrs = tcrs.filter(**clean_request(request))
-    if request.REQUEST.get('order_by'):
-        tcrs = tcrs.order_by(request.REQUEST['order_by'])
-
     tcrs = tcrs.select_related(
             'run', 'case_run_status', 'build', 'environment',
             'environment__product', 'case__components', 'tested_by',
             'case__priority', 'case__category', 'case__author',
             'case', 'assignee')
-
     # Get the bug count for each case run
+    # 5. have to show the number of bugs of each case run
     tcrs = tcrs.extra(select={
         'num_bug': RawSQL.num_case_run_bugs,
     })
     tcrs = tcrs.distinct()
+    # Continue to search the case runs with conditions
+    # 4. case runs preparing for render case runs table
+    tcrs = tcrs.filter(**clean_request(request))
+    order_by = request.REQUEST.get('order_by')
+    if order_by:
+        tcrs = tcrs.order_by(order_by)
+    else:
+        tcrs = tcrs.order_by('sortkey')
+
+    case_run_statuss = TestCaseRunStatus.objects.only('pk', 'name')
+    case_run_statuss = case_run_statuss.order_by('pk')
+
+    # Count the status
+    # 3. calculate number of case runs of each status
+    status_stats_result = stats_caseruns_status(run_id, case_run_statuss)
+
     # Get the test case run bugs summary
-    tcr_bugs = TestCaseBug.objects.select_related('bug_system').all()
-    tcr_bugs = tcr_bugs.filter(case_run__case_run_id__in=tcrs.values_list('case_run_id', flat=True))
-    tcr_bugs = tcr_bugs.values_list('bug_id', flat=True)
-    tcr_bugs = set(tcr_bugs)
+    # 6. get the number of bugs of this run
+    tcr_bugs_count = get_run_bugs_count(run_id)
+
     # Get tag list of testcases
-    ttags = TestTag.objects.filter(testcase__in=tcs).order_by('name').distinct()
+    # 7. get tags
+    # Get the list of testcases belong to the run
+    tcs = [tcr.case_id for tcr in tcrs]
+    ttags = TestTag.objects.filter(testcase__in=tcs).values_list('name',
+                                                                 flat=True)
+    ttags = list(set(ttags.iterator()))
+    ttags.sort()
+
     context_data = {
         'module': MODULE_NAME,
         'sub_module': SUB_MODULE_NAME,
         'test_run': tr,
         'from_plan': request.GET.get('from_plan', False),
         'test_case_runs': tcrs,
-        'status_counter': status_counter,
-        'test_case_run_bugs': tcr_bugs,
-        'test_case_run_status': TestCaseRunStatus.objects.order_by('pk'),
+        'test_case_runs_count': len(tcrs),
+        'status_stats': status_stats_result,
+        'test_case_run_bugs_count': tcr_bugs_count,
+        'test_case_run_status': case_run_statuss,
         'priorities': Priority.objects.all(),
         'case_own_tags': ttags,
         'errata_url_prefix': settings.ERRATA_URL_PREFIX,
@@ -683,8 +703,59 @@ def execute(request, run_id, template_name='run/execute.html'):
     return get(request, run_id, template_name)
 
 
-def report(request, run_id, template_name='run/report.html'):
-    return get(request, run_id, template_name)
+class TestRunReportView(TemplateView, TestCaseRunDataMixin):
+    '''Test Run report'''
+
+    template_name = 'run/report.html'
+
+    def get(self, request, run_id):
+        self.run_id = run_id
+        return super(TestRunReportView, self).get(request, run_id)
+
+    def get_context_data(self, **kwargs):
+        '''Generate report for specific TestRun
+
+        There are four data source to generate this report.
+        1. TestRun
+        2. Test case runs included in the TestRun
+        3. Comments associated with each test case run
+        4. Statistics
+        5. bugs
+        '''
+        run = TestRun.objects.select_related('manager', 'plan').get(pk=self.run_id)
+
+        case_runs = TestCaseRun.objects.filter(run=run).select_related(
+            'case_run_status', 'case', 'tested_by', 'case__category').only(
+                'close_date',
+                'case_run_status__name',
+                'case__category__name',
+                'case__summary', 'case__is_automated',
+                'case__is_automated_proposed',
+                'tested_by__username')
+        mode_stats = self.stats_mode_caseruns(case_runs)
+        summary_stats = self.get_summary_stats(case_runs)
+        bug_ids = get_run_bug_ids(self.run_id)
+
+        caserun_bugs = self.get_caseruns_bugs(run.pk)
+        comments = self.get_caseruns_comments(run.pk)
+
+        for case_run in case_runs:
+            bugs = caserun_bugs.get(case_run.pk, ())
+            case_run.bugs = bugs
+            user_comments = comments.get(case_run.pk, [])
+            case_run.user_comments = user_comments
+
+        context = super(TestRunReportView, self).get_context_data(**kwargs)
+        context.update({
+            'test_run': run,
+            'test_case_runs': case_runs,
+            'test_case_runs_count': len(case_runs),
+            'test_case_run_bugs': bug_ids,
+            'mode_stats': mode_stats,
+            'summary_stats': summary_stats,
+        })
+
+        return context
 
 
 @user_passes_test(lambda u: u.has_perm('testruns.change_testcaserun'))
@@ -984,24 +1055,37 @@ def order_case(request, run_id):
     # Current we should rewrite all of cases belong to the plan.
     # Because the cases sortkey in database is chaos,
     # Most of them are None.
-    tr = get_object_or_404(TestRun, run_id=run_id)
+    get_object_or_404(TestRun, run_id=run_id)
 
     if not request.REQUEST.get('case_run'):
         return HttpResponse(Prompt.render(
-                request = request,
-                info_type = Prompt.Info,
-                info = 'At least one case is required by re-oder in run.',
-                next = reverse('tcms.apps.testruns.views.get', args=[run_id, ]),
+            request=request,
+            info_type=Prompt.Info,
+            info='At least one case is required by re-oder in run.',
+            next=reverse('tcms.apps.testruns.views.get', args=[run_id, ]),
         ))
 
     case_run_ids = request.REQUEST.getlist('case_run')
-    tcrs = TestCaseRun.objects.filter(case_run_id__in=case_run_ids)
-
-    for tcr in tcrs:
-        new_sort_key = (case_run_ids.index(str(tcr.case_run_id)) + 1) * 10
-        if tcr.sortkey != new_sort_key:
-            tcr.sortkey = new_sort_key
-            tcr.save()
+    sql = 'UPDATE `test_case_runs` SET `sortkey` = %s WHERE `test_case_runs`' \
+          '.`case_run_id` = %s'
+    cursor = connection.cursor()
+    # sort key begin with 10, end with length*10, step 10.
+    # e.g.
+    #    case_run_ids = [10334, 10294, 10315, 10443]
+    #                      |      |      |      |
+    #          sort key -> 10     20     30     40
+    # then zip case_run_ids and new_sort_keys to pairs
+    # e.g.
+    #    sort_key, case_run_id
+    #         (10, 10334)
+    #         (20, 10294)
+    #         (30, 10315)
+    #         (40, 10443)
+    new_sort_keys = xrange(10, (len(case_run_ids) + 1) * 10, 10)
+    key_id_pairs = itertools.izip(new_sort_keys, case_run_ids)
+    for key_id_pair in key_id_pairs:
+        cursor.execute(sql, key_id_pair)
+    transaction.commit_unless_managed()
 
     return HttpResponseRedirect(
         reverse('tcms.apps.testruns.views.get', args=[run_id, ])
@@ -1032,7 +1116,9 @@ def remove_case_run(request, run_id):
 
     case_runs.delete()
 
-    return HttpResponseRedirect(reverse('tcms.apps.testruns.views.get', args=[run_id]))
+    return HttpResponseRedirect(
+        reverse('tcms.apps.testruns.views.assign_case', args=[run_id,]))
+
 
 
 @user_passes_test(lambda u: u.has_perm('testruns.add_testcaserun'))

@@ -121,6 +121,7 @@ class Bookmark(TCMSContentTypeBaseModel):
     url = models.CharField(max_length=8192)
     class Meta:
         db_table = u'tcms_bookmarks'
+        index_together = (('content_type', 'object_pk', 'site'),)
 
     def __unicode__(self):
         return self.name

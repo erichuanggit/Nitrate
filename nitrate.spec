@@ -2,7 +2,7 @@
 
 Name:           nitrate
 Version:        3.8.7
-Release:        2%{?dist}
+Release:        4%{?dist}
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -94,6 +94,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc docs/target/html
 
 %changelog
+
+* Tue Apr 22 2014 Jian Chen <jianchen@redhat.com> - 3.8.7-3
+- TCMS-264 - Temp workaround to avoid updates automatically bugzilla with TCMS test case ID.
+- TCMS-240 - Convert column type, add composite index and add migrate sql for each release version.
 
 * Fri Apr 11 2014 Jian Chen <jianchen@redhat.com> - 3.8.7-2
 - Bug 1083958 - [test run]In run detail page, using 'bugs-remove' link can remove the bug which does not belong to the current caserun.

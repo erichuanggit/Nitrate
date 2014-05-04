@@ -52,7 +52,6 @@ class TestReview(TCMSActionModel):
 
     class Meta:
         db_table = u'tcms_reviews'
-        ordering = ['-id']
 
     def add_case(self, case, sort_key = 0):
         self.review_case.create(
@@ -116,9 +115,9 @@ class TestReviewCase(TCMSActionModel):
     close_date = models.DateTimeField(null = True, blank=True)
     is_current = models.BooleanField(default=False)
     sort_key = models.IntegerField(default=0)
+
     class Meta:
         db_table = u'tcms_review_cases'
-        ordering = ['sort_key', 'id']
 
     def get_text_with_version(self, case_text_version=None):
         if case_text_version:

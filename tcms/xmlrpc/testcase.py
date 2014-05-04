@@ -16,13 +16,19 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>, Chenxiong Qi <cqi@redhat.com>
 
-from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
+from kobo.django.xmlrpc.decorators import user_passes_test, login_required
 from django.core.exceptions import ObjectDoesNotExist
-from tcms.apps.testcases.models import TestCase
+from django.db import connection
+from django.db import transaction
+from django.forms import EmailField, ValidationError
+
 from tcms.apps.management.models import TestTag
+from tcms.apps.testcases.models import TestCase
+from tcms.apps.testcases.models import TestCasePlan
+from tcms.apps.testplans.models import TestPlan
+from tcms.core.decorators import log_call
 from utils import pre_process_ids, compare_list
 
-from django.forms import EmailField, ValidationError
 
 __all__ = (
     'add_comment',
@@ -66,7 +72,7 @@ __all__ = (
     'update',
 )
 
-@log_call
+@log_call(namespace='TestCase')
 def add_comment(request, case_ids, comment):
     """
     Description: Adds comments to selected test cases.
@@ -98,7 +104,7 @@ def add_comment(request, case_ids, comment):
 
     return c.add()
 
-@log_call
+@log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasecomponent'))
 def add_component(request, case_ids, component_ids):
     """
@@ -139,7 +145,7 @@ def add_component(request, case_ids, component_ids):
 
     return
 
-@log_call
+@log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasetag'))
 def add_tag(request, case_ids, tags):
     """
@@ -175,7 +181,7 @@ def add_tag(request, case_ids, tags):
 
     return
 
-@log_call
+@log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testruns.add_testcaserun'))
 def add_to_run(request, case_ids, run_ids):
     """
@@ -216,7 +222,7 @@ def add_to_run(request, case_ids, run_ids):
 
     return
 
-@log_call
+@log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasebug'))
 def attach_bug(request, values):
     """
@@ -360,7 +366,7 @@ def calculate_total_estimated_time(request, case_ids):
         seconds % 60      # Seconds
     )
 
-@log_call
+@log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcase'))
 def create(request, values):
     """
@@ -454,7 +460,7 @@ def create(request, values):
 
     return get(request, tc.case_id)
 
-@log_call
+@log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.delete_testcasebug'))
 def detach_bug(request, case_ids, bug_ids):
     """
@@ -490,6 +496,7 @@ def detach_bug(request, case_ids, bug_ids):
 
     return
 
+@log_call(namespace='TestCase')
 def filter(request, query):
     """
     Description: Performs a search and returns the resulting list of test cases.
@@ -771,7 +778,7 @@ def get_priority(request, id):
     from tcms.apps.management.models import Priority
     return Priority.objects.get(id = id).serialize()
 
-@log_call
+@log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcaseplan'))
 def link_plan(request, case_ids, plan_ids):
     """"
@@ -853,7 +860,7 @@ def lookup_status_id_by_name(request, name):
     """DEPRECATED - CONSIDERED HARMFUL Use TestCase.check_case_status instead"""
     return check_case_status(request = request, name = name)
 
-@log_call
+@log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.delete_testcasecomponent'))
 def remove_component(request, case_ids, component_ids):
     """
@@ -891,7 +898,7 @@ def remove_component(request, case_ids, component_ids):
 
     return
 
-@log_call
+@log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.delete_testcasetag'))
 def remove_tag(request, case_ids, tags):
     """
@@ -930,7 +937,7 @@ def remove_tag(request, case_ids, tags):
 
     return
 
-@log_call
+@log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasetext'))
 def store_text(request, case_id, action, effect = '', setup = '', breakdown = '', author_id = None):
     """
@@ -968,7 +975,7 @@ def store_text(request, case_id, action, effect = '', setup = '', breakdown = ''
         breakdown = breakdown,
     ).serialize()
 
-@log_call
+@log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.delete_testcaseplan'))
 def unlink_plan(requst, case_id, plan_id):
     """
@@ -983,20 +990,17 @@ def unlink_plan(requst, case_id, plan_id):
     Example:
     >>> TestCase.unlink_plan(12345, 137)
     """
-    from tcms.apps.testplans.models import TestPlan
-    try:
-        tc = TestCase.objects.get(case_id = case_id)
-        tp = tc.plan.get(plan_id = plan_id)
-    except:
-        raise
+    sql = 'DELETE FROM test_case_plans WHERE plan_id = %s and case_id = %s'
+    cursor = connection.cursor()
+    cursor.execute(sql, [int(plan_id), int(case_id)])
+    transaction.commit_unless_managed()
 
-    tc.remove_plan(plan = tp)
+    plan_pks = TestCasePlan.objects.filter(case=case_id).values_list('plan',
+                                                                     flat=True)
+    return TestPlan.to_xmlrpc(query={'pk__in': plan_pks})
 
-    plan_ids = tc.plan.values_list('plan_id', flat = True)
-    query = {'plan_id__in': plan_ids}
-    return TestPlan.to_xmlrpc(query)
 
-@log_call
+@log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
 def update(request, case_ids, values):
     """
@@ -1086,7 +1090,7 @@ def validate_cc_list(cc_list):
             field.error_messages['invalid'] % {
                 'value': ', '.join(invalid_emails)})
 
-@log_call
+@log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
 def notification_add_cc(request, case_ids, cc_list):
     '''
@@ -1125,7 +1129,7 @@ def notification_add_cc(request, case_ids, cc_list):
 
     return { 'status': 0, 'message': 'Succeed' }
 
-@log_call
+@log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
 def notification_remove_cc(request, case_ids, cc_list):
     '''
@@ -1159,7 +1163,7 @@ def notification_remove_cc(request, case_ids, cc_list):
 
     return { 'status': 0, 'message': 'Succeed' }
 
-@log_call
+@log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
 def notification_get_cc_list(request, case_ids):
     '''

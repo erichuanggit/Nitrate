@@ -14,10 +14,13 @@
 # distribution and at <http://www.gnu.org/licenses>.
 #
 # Authors:
-#   Xuqing Kuang <xkuang@redhat.com>
+#    Xuqing Kuang <xkuang@redhat.com>
+#    Chenxiong Qi <cqi@redhat.com>
 
-from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
+from kobo.django.xmlrpc.decorators import user_passes_test, login_required
+
 from tcms.apps.management.models import Product, TestBuild
+from tcms.core.decorators import log_call
 from utils import pre_check_product
 
 __all__ = (
@@ -48,7 +51,7 @@ def check_build(request, name, product):
 
     return tb.serialize()
 
-@log_call
+@log_call(namespace='TestBuild')
 @user_passes_test(lambda u: u.has_perm('management.add_testbuild'))
 def create(request, values):
     """
@@ -147,7 +150,7 @@ def lookup_name_by_id(request, build_id):
     """
     return get(request, build_id)
 
-@log_call
+@log_call(namespace='TestBuild')
 @user_passes_test(lambda u: u.has_perm('management.change_testbuild'))
 def update(request, build_id, values):
     """

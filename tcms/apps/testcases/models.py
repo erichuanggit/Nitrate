@@ -89,7 +89,7 @@ class TestCaseStatus(TCMSActionModel):
             return None
 
     @classmethod
-    def string_to_instance(self, name):
+    def string_to_instance(cls, name):
         return cls.objects.get(name=name)
 
     @classmethod
@@ -166,7 +166,6 @@ class TestCase(TCMSActionModel):
     #   'texts' : list of TestCaseTexts (from TestCaseTexts.case)
     class Meta:
         db_table = u'test_cases'
-        ordering = ['summary', 'case_id',]
 
     def __unicode__(self):
         return self.summary
@@ -299,7 +298,7 @@ class TestCase(TCMSActionModel):
         return q.distinct()
 
     @classmethod
-    def list_confirmed(self):
+    def list_confirmed(cls):
         confirmed_case_status = TestCaseStatus.get_CONFIRMED()
 
         query = {
@@ -558,6 +557,7 @@ class TestCasePlan(models.Model):
 
     class Meta:
         db_table = u'test_case_plans'
+        index_together = [['plan', 'case'],]
 
 
 class TestCaseAttachment(models.Model):
@@ -662,6 +662,7 @@ class Contact(TCMSContentTypeBaseModel):
 
     class Meta:
         db_table = u'tcms_contacts'
+        index_together = (('content_type', 'object_pk', 'site'),)
 
     @classmethod
     def create(cls, email, content_object, name=None):
@@ -703,7 +704,7 @@ class TestCaseEmailSettings(models.Model):
 
         emailaddr_list = []
         if not isinstance(email_addrs, list):
-            emailaddr_list.append(email_addr)
+            emailaddr_list.append(email_addrs)
         else:
             emailaddr_list = list(email_addrs)
 

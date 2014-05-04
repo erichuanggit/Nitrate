@@ -87,7 +87,6 @@ class TestPlan(TCMSActionModel):
 
     class Meta:
         db_table = u'test_plans'
-        ordering = ['-plan_id', 'name']
 
     def __unicode__(self):
         return self.name

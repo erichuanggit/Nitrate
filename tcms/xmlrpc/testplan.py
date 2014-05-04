@@ -15,13 +15,17 @@
 #
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
+#   Chenxiong Qi <cqi@redhat.com>
 
-from kobo.django.xmlrpc.decorators import user_passes_test, login_required, log_call
-from tcms.apps.testplans.models import TestPlan, TestPlanType
-from tcms.apps.testcases.models import TestCasePlan
-from tcms.apps.management.models import TestTag
-from tcms.apps.management.models import Component
 from django.core.exceptions import ObjectDoesNotExist
+
+from kobo.django.xmlrpc.decorators import user_passes_test, login_required
+
+from tcms.apps.management.models import Component
+from tcms.apps.management.models import TestTag
+from tcms.apps.testcases.models import TestCasePlan
+from tcms.apps.testplans.models import TestPlan, TestPlanType
+from tcms.core.decorators import log_call
 from utils import pre_process_ids
 
 __all__ = (
@@ -51,7 +55,7 @@ __all__ = (
     'import_case_via_XML',
 )
 
-@log_call
+@log_call(namespace='TestPlan')
 @user_passes_test(lambda u: u.has_perm('testplans.add_testplantag'))
 def add_tag(request, plan_ids, tags):
     """
@@ -86,7 +90,7 @@ def add_tag(request, plan_ids, tags):
 
     return
 
-@log_call
+@log_call(namespace='TestPlan')
 @user_passes_test(lambda u: u.has_perm('testplans.add_testplancomponent'))
 def add_component(request, plan_ids, component_ids):
     """
@@ -132,7 +136,7 @@ def check_plan_type(request, name):
     """
     return TestPlanType.objects.get(name = name).serialize()
 
-@log_call
+@log_call(namespace='TestPlan')
 @user_passes_test(lambda u: u.has_perm('testplans.add_testplan'))
 def create(request, values):
     """
@@ -459,7 +463,7 @@ def lookup_type_name_by_id(request, id):
     """DEPRECATED - CONSIDERED HARMFUL Use TestPlan.get_plan_type instead"""
     return get_plan_type(request = request, id = id)
 
-@log_call
+@log_call(namespace='TestPlan')
 @user_passes_test(lambda u: u.has_perm('testplans.delete_testplantag'))
 def remove_tag(request, plan_ids, tags):
     """
@@ -499,7 +503,7 @@ def remove_tag(request, plan_ids, tags):
 
     return
 
-@log_call
+@log_call(namespace='TestPlan')
 @user_passes_test(lambda u: u.has_perm('testplans.delete_testplancomponent'))
 def remove_component(request, plan_ids, component_ids):
     """
@@ -536,7 +540,7 @@ def remove_component(request, plan_ids, component_ids):
 
     return
 
-@log_call
+@log_call(namespace='TestPlan')
 @user_passes_test(lambda u: u.has_perm('testplans.add_testplantext'))
 def store_text(request, plan_id, text, author = None):
     """
@@ -566,7 +570,7 @@ def store_text(request, plan_id, text, author = None):
         plan_text = text,
     ).serialize()
 
-@log_call
+@log_call(namespace='TestPlan')
 @user_passes_test(lambda u: u.has_perm('testplans.change_testplan'))
 def update(request, plan_ids, values):
     """

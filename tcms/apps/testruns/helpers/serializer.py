@@ -15,12 +15,26 @@
 #
 # Authors:
 #   Chaobin Tang <ctang@redhat.com>
+#   Chenxiong Qi <cqi@redhat.com>
 
 '''
 A serializer to import/export between model objects and file formats.
 '''
 
 import csv
+
+from xml.sax.saxutils import escape
+
+
+def escape_entities(text):
+    '''Convert all XML entities
+
+    @param text: a string containing entities possibly
+    @type text: str
+    @return: converted version of text
+    @rtype: str
+    '''
+    return escape(text, {'"': '&quot;'}) if text else text
 
 
 class TCR2File(object):
@@ -92,11 +106,13 @@ class TCR2File(object):
 
         write_to_output(u'<%s>' % self.root)
         for tcr in self.tcrs:
+            summary = escape_entities(tcr.case.summary)
+            script = escape_entities(tcr.case.script)
             write_to_output(tcr_start_elem % (tcr.pk, tcr.case.pk,
                                               tcr.case.category.name or u'',
                                               tcr.case_run_status.name,
-                                              tcr.case.summary or u'',
-                                              tcr.case.script or u'',
+                                              summary or u'',
+                                              script or u'',
                                               str(tcr.case.is_automated)))
             write_to_output(u'<loglinks>')
             map(lambda link: write_to_output(u'<loglink name="%s" url="%s" />' %

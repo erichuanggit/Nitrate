@@ -105,7 +105,7 @@
 				</ul>
 			</div>
 			<div class="container" style="min-height:50px;">
-				{% if test_case_run.log %}
+				{% if caserun_logs %}
 				<h4 class="borderB">Change Log<span>[ <a href="javascript:void(0);" onClick="toggleDiv(this, 'changeLog{{ test_case_run.pk }}');">Show All</a> ]</span></h4>
 				<ul id="changeLog{{test_case_run.pk}}" style="display:none;">
 					{% for log in caserun_logs %}

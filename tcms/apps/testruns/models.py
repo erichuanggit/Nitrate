@@ -79,7 +79,6 @@ class TestRun(TCMSActionModel):
     class Meta:
         db_table = u'test_runs'
         unique_together = ('run_id', 'product_version', 'plan_text_version')
-        ordering = ['-run_id', 'summary']
 
     def __unicode__(self):
         return self.summary
@@ -388,15 +387,18 @@ class TestRun(TCMSActionModel):
 
 class TestCaseRunStatus(TCMSActionModel):
 
+    complete_status_names = ('PASSED', 'ERROR', 'FAILED', 'WAIVED')
+    failure_status_names = ('ERROR', 'FAILED')
+    idle_status_names = ('IDLE',)
+
     id = models.AutoField(db_column='case_run_status_id', primary_key=True)
-    name = models.CharField(max_length=60, blank=True)
+    name = models.CharField(max_length=60, blank=True, unique=True)
     sortkey = models.IntegerField(null=True, blank=True, default=0)
     description = models.TextField(null=True, blank=True)
     auto_blinddown = models.BooleanField(default=1)
 
     class Meta:
         db_table = u'test_case_run_status'
-        ordering = ['sortkey', 'name', 'id']
 
     def __unicode__(self):
         return unicode(self.name)
@@ -582,7 +584,6 @@ class TestCaseRun(TCMSActionModel):
     class Meta:
         db_table = u'test_case_runs'
         unique_together = ('case', 'run', 'case_text_version')
-        ordering = ['sortkey', 'case_run_id']
 
     def __unicode__(self):
         return '%s: %s' % (self.pk, self.case_id)

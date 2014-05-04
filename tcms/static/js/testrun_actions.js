@@ -430,11 +430,6 @@ var updateCaseRunStatus = function(e)
 
     // Callback when 
     var callback = function(t) {
-        // Reset the content to loading
-        var ajax_loading = getAjaxLoading();
-        ajax_loading.id = 'id_loading_' + parameters['case_id'];
-        container.update(ajax_loading);
-
         // Update the contents
         if (parameters['value'] != '') {
             // Update the case run status icon
@@ -477,6 +472,10 @@ var updateCaseRunStatus = function(e)
 
     // Add comment
     if (parameters['comment'] != '') {
+        // Reset the content to loading
+        var ajax_loading = getAjaxLoading();
+        ajax_loading.id = 'id_loading_' + parameters['case_id'];
+        container.update(ajax_loading);
         var c = new Element('div');
         if(parameters['value'] != '')
             submitComment(c, parameters);
@@ -486,6 +485,10 @@ var updateCaseRunStatus = function(e)
 
     // Update the object when changing the status
     if(parameters['value'] != '') {
+        // Reset the content to loading
+        var ajax_loading = getAjaxLoading();
+        ajax_loading.id = 'id_loading_' + parameters['case_id'];
+        container.update(ajax_loading);
         updateRunStatus(ctype, object_pk, field, value, vtype, callback);
     }
 }
@@ -579,7 +582,7 @@ function taggleSortCaseRun(event)
             t.checked = true;
             t.disabled = false;
         });
-        postToURL('ordercaserun/', serializeCaseRunFromInputList('id_table_cases', 'case_run'), 'get');
+        postToURL('ordercaserun/', serializeCaseRunFromInputList('id_table_cases', 'case_run'));
     }
 }
 function selectcase(){
