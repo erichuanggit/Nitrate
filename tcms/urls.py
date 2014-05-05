@@ -30,6 +30,7 @@ from tcms.apps.testcases.views import TestCaseCaseRunListPaneView
 from tcms.apps.testcases.views import TestCaseReviewPaneView
 from tcms.apps.testcases.views import TestCaseSimpleCaseRunView
 from tcms.apps.testruns.views import TestRunReportView
+from tcms.apps.testruns.views import AddCasesToRunView
 
 
 # XML RPC handler
@@ -155,13 +156,14 @@ urlpatterns = patterns('',
     # TODO: Deprecated url
     (r'^run/(?P<run_id>\d+)/execute/$', 'tcms.apps.testruns.views.execute'),
     (r'^run/(?P<run_id>\d+)/edit/$', 'tcms.apps.testruns.views.edit'),
-    url(r'^run/(?P<run_id>\d+)/report/$', TestRunReportView.as_view(),
-        name='run-report'),
+    url(r'^run/(?P<run_id>\d+)/report/$', TestRunReportView.as_view(), name='run-report'),
     (r'^run/(?P<run_id>\d+)/ordercase/$', 'tcms.apps.testruns.views.order_case'),
     (r'^run/(?P<run_id>\d+)/changestatus/$', 'tcms.apps.testruns.views.change_status'),
     (r'^run/(?P<run_id>\d+)/ordercaserun/$', 'tcms.apps.testruns.views.order_case'),
     (r'^run/(?P<run_id>\d+)/removecaserun/$', 'tcms.apps.testruns.views.remove_case_run'),
-    (r'^run/(?P<run_id>\d+)/assigncase/$', 'tcms.apps.testruns.views.assign_case'),
+
+    url(r'^run/(?P<run_id>\d+)/assigncase/$', AddCasesToRunView.as_view(), name='add-cases-to-run'),
+
     (r'^run/(?P<run_id>\d+)/cc/$', 'tcms.apps.testruns.views.cc'),
     (r'^run/(?P<run_id>\d+)/update/$', 'tcms.apps.testruns.views.update_case_run_text'),
     (r'^run/(?P<run_id>\d+)/export/$', 'tcms.apps.testruns.views.export'),

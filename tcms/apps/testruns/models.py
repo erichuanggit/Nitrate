@@ -242,27 +242,34 @@ class TestRun(TCMSActionModel):
         version = self.get_product_version()
         return version and version.id or None
 
-    def add_case_run(self, case, case_run_status = 1, assignee = None, case_text_version = None, build = None, notes = None, sortkey = 0):
-        return self.case_run.create(
-            case = case,
-            assignee = assignee or (
-                case.default_tester_id and case.default_tester
-            ) or (
-                self.default_tester_id and self.default_tester
-            ),
-            tested_by = None,
-            case_run_status = isinstance(case_run_status, int) \
-                and TestCaseRunStatus.objects.get(id = case_run_status) \
-                or case_run_status,
-            case_text_version = case_text_version or case.latest_text().case_text_version,
-            build = build or self.build,
-            notes = notes,
-            sortkey = sortkey,
-            environment_id = self.environment_id,
-            running_date = None,
-            close_date = None,
-            is_current = False,
-        )
+    # FIXME: rewrite to use multiple values INSERT statement
+    def add_case_run(self, case, case_run_status=1, assignee=None, case_text_version=None, build=None, notes=None, sortkey=0):
+        _case_text_version = case_text_version
+        if not _case_text_version:
+            _case_text_version = case.latest_text(
+                text_required=False).case_text_version
+
+        _assignee = assignee or \
+                    (case.default_tester_id and case.default_tester) or \
+                    (self.default_tester_id and self.default_tester)
+
+        get_caserun_status = TestCaseRunStatus.objects.get
+        _case_run_status = isinstance(case_run_status, int) and \
+                           get_caserun_status(id=case_run_status) or \
+                           case_run_status
+
+        return self.case_run.create(case=case,
+                                    assignee=_assignee,
+                                    tested_by=None,
+                                    case_run_status=_case_run_status,
+                                    case_text_version=_case_text_version,
+                                    build=build or self.build,
+                                    notes=notes,
+                                    sortkey=sortkey,
+                                    environment_id=self.environment_id,
+                                    running_date=None,
+                                    close_date=None,
+                                    is_current=False)
 
     def add_tag(self, tag):
         return TestRunTag.objects.get_or_create(

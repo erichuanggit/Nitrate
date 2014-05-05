@@ -31,3 +31,41 @@ def execute_sql(sql, *params):
         if row is None:
             break
         yield dict(izip(field_names, row))
+
+
+# FIXME: migrate execute_sql to SQLExecution class
+
+
+class SQLExecution(object):
+    '''Cursor.execute proxy class
+
+    This proxy class provides two major abitlities.
+
+    1. iteration of visiting each row selected by SELECT statement from db
+    server.
+
+    2. get the affected rows' count. This will benefit developers to avoid
+    issuing extra SQL to count the number of rows current SELECT statement is
+    retrieving.
+
+    Compatibility: the second item above relies on cursor.rowcount attribute
+    described in PEP-0249. Cannot guarantee all database backends supports this
+    by following 249 specificiation. But, at least, MySQLdb and psycopg2 does.
+    '''
+
+    def __init__(self, sql, params):
+        self.cursor = connection.cursor()
+        self.cursor.execute(sql, params)
+        self.field_names = [field[0] for field in self.cursor.description]
+
+    @property
+    def rowcount(self):
+        return self.cursor.rowcount
+
+    @property
+    def rows(self):
+        while 1:
+            row = self.cursor.fetchone()
+            if row is None:
+                break
+            yield dict(izip(self.field_names, row))

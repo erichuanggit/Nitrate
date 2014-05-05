@@ -41,19 +41,19 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.AssignCase.on_load);
 			<td class="lab">Test Plan</td>
 			<td><a href="{{ test_run.plan.get_absolute_url }}">{{ test_run.plan.name }}</a></td>
 			<td class="lab">All Confirmed Cases</td>
-			<td><a>{{ confirmed_cases|length }}</a></td>
+			<td><a>{{ confirmed_cases_count }}</a></td>
 		</tr>
 		<tr class="cell">
 			<td></td>
 			<td></td>
 			<td class="lab"><span>Test Cases in Run</span></td>
-			<td>{{ test_case_run|length }}</td>
+			<td>{{ test_case_runs_count }}</td>
 		</tr>
 	</table>
-	<form action="{% url "tcms.apps.testruns.views.assign_case" test_run.run_id %}" method="post">
+	<form action="{% url "add-cases-to-run" test_run.run_id %}" method="post">
 		<div class="Detailform border-1" id="testcases_selected">
 			<div class="mixbar">
-				<span class="tit"><b>Cases in this Run: {{ test_case_run|length }}</b></span>
+				<span class="tit"><b>Cases in this Run: {{ test_case_runs_count }}</b></span>
 				<input id="id_checkbox_plan_sortkey" type="checkbox" name="_use_plan_sortkey" />
 				<label for="id_checkbox_plan_sortkey" title="Uncheck it will set the sortkey to 0">Use the sortkey stored in plan</label>
 				<input type="submit" value="Update" title="Update the cases in this run"/>
@@ -106,10 +106,10 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.AssignCase.on_load);
 								{{ test_case.summary }}
 							</a>
 						</td>
-						<td>{{ test_case.author }}</td>
-						<td>{{ test_case.create_date }}</td>
-						<td>{{ test_case.category }}</td>
-						<td>{{ test_case.priority }}</td>
+						<td>{{ test_case.author_username }}</td>
+						<td>{{ test_case.creation_date }}</td>
+						<td>{{ test_case.category_name }}</td>
+						<td>{{ test_case.priority_value }}</td>
 						<td></td>
 					</tr>
 					<tr class="hide"  id="hidenRow_{{ forloop.counter }}" class="Detailform border-1" style="display: none;">

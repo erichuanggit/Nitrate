@@ -466,9 +466,12 @@ class TestCase(TCMSActionModel):
 
         return self.latest_text()
 
-    def latest_text(self):
+    def latest_text(self, text_required=True):
         try:
-            return self.text.order_by('-case_text_version')[0]
+            text = self.text
+            if not text_required:
+                text = text.defer('action', 'effect', 'setup', 'breakdown')
+            return text.order_by('-case_text_version')[0]
         except IndexError:
             return NoneText
 

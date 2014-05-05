@@ -15,6 +15,7 @@
 #
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
+#   Chenxiong Qi <cqi@redhat.com>
 
 import itertools
 import time
@@ -38,15 +39,18 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils import simplejson
+from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
+from django.views.generic.base import View
 
+from tcms.core.db import SQLExecution
+from tcms.core.utils import clean_request
 from tcms.core.utils.bugtrackers import Bugzilla
 from tcms.core.utils.counter import CaseRunStatusCounter
-from tcms.core.utils import clean_request
 from tcms.core.utils.raw_sql import RawSQL
 from tcms.core.views import Prompt
-from tcms.search.forms import RunForm
 from tcms.search import remove_from_request_path
+from tcms.search.forms import RunForm
 from tcms.search.order import order_run_queryset
 from tcms.search.query import SmartDjangoQuery
 
@@ -1143,78 +1147,116 @@ def remove_case_run(request, run_id):
     if caseruns_exist:
         redirect_to = 'tcms.apps.testruns.views.get'
     else:
-        redirect_to = 'tcms.apps.testruns.views.assign_case'
+        redirect_to = 'add-cases-to-run'
 
     return HttpResponseRedirect(reverse(redirect_to, args=[run_id,]))
 
 
-@user_passes_test(lambda u: u.has_perm('testruns.add_testcaserun'))
-def assign_case(request, run_id, template_name="run/assign_case.html"):
-    """Assign case to run"""
-    SUB_MODULE_NAME = "runs"
+class AddCasesToRunView(View):
+    '''Add cases to a TestRun'''
 
-    try:
-        tr = TestRun.objects.select_related(
-                'plan',
-                'manager__email',
-                'build').get(run_id=run_id)
-    except ObjectDoesNotExist, error:
-        raise Http404
+    permission = 'testruns.add_testcaserun'
+    template_name = 'run/assign_case.html'
 
-    tp = tr.plan
-    tcs = tr.plan.case.select_related('author__email',
-            'category',
-            'priority').filter(case_status__name='CONFIRMED')
-    ctcs = tcs.filter(case_status__name='CONFIRMED')
-    tcrs = tr.case_run.all()
-    # Exist case ids
-    etcrs_id = tcrs.values_list('case', flat=True)
+    @method_decorator(user_passes_test(
+        lambda u: u.has_perm(AddCasesToRunView.permission)))
+    def dispatch(self, *args, **kwargs):
+        return super(AddCasesToRunView, self).dispatch(*args, **kwargs)
 
-    if request.method == 'POST':
-        # New case ids
+    def post(self, request, run_id):
+        # Selected cases' ids to add to run
         ncs_id = request.REQUEST.getlist('case')
         if not ncs_id:
             return HttpResponse(Prompt.render(
                 request=request,
                 info_type=Prompt.Info,
                 info='At least one case is required by a run.',
-                next=reverse('tcms.apps.testruns.views.get', args=[run_id, ]),
+                next=reverse('add-cases-to-run', args=[run_id, ]),
             ))
 
-        for nc_id in ncs_id:
-            if nc_id in etcrs_id:
-                ncs_id.remove(nc_id)
+        try:
+            ncs_id = map(int, ncs_id)
+        except (ValueError, TypeError):
+            return HttpResponse(Prompt.render(
+                request=request,
+                info_type=Prompt.Info,
+                info='At least one case id is invalid.',
+                next=reverse('add-cases-to-run', args=[run_id, ]),
+            ))
 
+        try:
+            qs = TestRun.objects.select_related('plan').only('plan__plan_id')
+            tr = qs.get(run_id=run_id)
+        except ObjectDoesNotExist:
+            raise Http404
+
+        etcrs_id = tr.case_run.values_list('case', flat=True)
+
+        # avoid add cases that are already in current run with pk run_id
+        ncs_id = set(ncs_id) - set(etcrs_id)
+
+        tp = tr.plan
+        tcs = tr.plan.case.filter(case_status__name='CONFIRMED')
+        tcs = tcs.select_related('default_tester').only('default_tester__id',
+                                                        'estimated_time')
         ncs = tcs.filter(case_id__in=ncs_id)
 
-        estimated_time = reduce(lambda x, y: x + y, [nc.estimated_time for nc in ncs])
+        estimated_time = reduce(lambda x, y: x + y,
+                                (nc.estimated_time for nc in ncs))
         tr.estimated_time = tr.estimated_time + estimated_time
-        tr.save()
+        tr.save(update_fields=['estimated_time'])
 
         if request.REQUEST.get('_use_plan_sortkey'):
+            case_pks = (case.pk for case in ncs)
+            qs = TestCasePlan.objects.filter(
+                plan=tp, case__in=case_pks).values('case', 'sortkey')
+            sortkeys_in_plan = dict((row['case'], row['sortkey'])
+                                    for row in qs.iterator())
             for nc in ncs:
-                try:
-                    tcp = TestCasePlan.objects.get(plan=tp, case=nc)
-                    sortkey = tcp.sortkey
-                except ObjectDoesNotExist, error:
-                    sortkey = 0
-                tr.add_case_run(case=nc, sortkey=sortkey,)
+                sortkey = sortkeys_in_plan.get(nc.pk, 0)
+                tr.add_case_run(case=nc, sortkey=sortkey)
         else:
             for nc in ncs:
-                tr.add_case_run(case=nc,)
+                tr.add_case_run(case=nc)
 
-        return HttpResponseRedirect(reverse('tcms.apps.testruns.views.get', args=[tr.run_id, ]))
+        return HttpResponseRedirect(reverse('tcms.apps.testruns.views.get',
+                                            args=[tr.run_id, ]))
 
-    context_data = {
-        'module': MODULE_NAME,
-        'sub_module': SUB_MODULE_NAME,
-        'test_run': tr,
-        'confirmed_cases': ctcs,
-        'test_case_run': tcrs,
-        'exist_case_run_ids': etcrs_id,
-    }
-    return render_to_response(template_name, context_data,
-                              context_instance=RequestContext(request))
+    def get(self, request, run_id):
+        qs = TestRun.objects.select_related('plan', 'manager', 'build')
+        qs = qs.only('plan__name', 'manager__email', 'build__name')
+        tr = qs.get(run_id=run_id)
+
+        tp = tr.plan
+
+        # We need all confirmed cases
+        sql = '''SELECT
+`test_cases`.`case_id`, `test_cases`.`creation_date`, `test_cases`.`summary`,
+`test_case_categories`.`name` as category_name,
+`priority`.`value` as priority_value, `auth_user`.`username` as author_username
+FROM `test_cases`
+INNER JOIN `test_case_plans` ON (`test_cases`.`case_id` = `test_case_plans`.`case_id`)
+INNER JOIN `test_case_categories` ON (`test_cases`.`category_id` = `test_case_categories`.`category_id`)
+INNER JOIN `priority` ON (`test_cases`.`priority_id` = `priority`.`id`)
+INNER JOIN `auth_user` ON (`test_cases`.`author_id` = `auth_user`.`id`)
+WHERE `test_case_plans`.`plan_id` = %s AND `test_cases`.`case_status_id` = 2
+'''
+        sql_execution = SQLExecution(sql, [tp.pk,])
+        rows = sql_execution.rows
+
+        etcrs_id = tr.case_run.values_list('case', flat=True)
+
+        data = {
+            'test_run': tr,
+            'confirmed_cases': rows,
+            'confirmed_cases_count': sql_execution.rowcount,
+            'test_case_runs_count': len(etcrs_id),
+            'exist_case_run_ids': etcrs_id,
+        }
+
+        return render_to_response(self.template_name,
+                                  data,
+                                  context_instance=RequestContext(request))
 
 
 def cc(request, run_id):
