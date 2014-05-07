@@ -166,6 +166,7 @@ def recent(request, username, template_name='profile/recent.html'):
     })
     tps_active = tps.filter(is_active=True)
     trs = TestRun.list(runs_query)
+    latest_fifteen_testruns = trs.order_by('-run_id')[:15]
     test_plans_disable_count = tps.count() - tps_active.count()
 
     context_data = {
@@ -175,7 +176,7 @@ def recent(request, username, template_name='profile/recent.html'):
         'test_plans_disable_count':test_plans_disable_count,
         'test_runs_count': trs.count(),
         'last_15_test_plans': tps_active[:15],
-        'last_15_test_runs': trs[:15],
+        'last_15_test_runs': latest_fifteen_testruns,
     }
     return render_to_response(template_name, context_data,
                               context_instance=RequestContext(request))
