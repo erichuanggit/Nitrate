@@ -535,7 +535,7 @@ def get_selected_cases_ids(request):
         return []
 
 
-def get_tags_from_cases(plan_id, case_ids):
+def get_tags_from_cases(case_ids, plan_id=None):
     '''Get all tags from test cases
 
     @param cases: an iterable object containing test cases' ids
@@ -544,16 +544,27 @@ def get_tags_from_cases(plan_id, case_ids):
     @rtype: list
     '''
     case_id_list = ', '.join((str(item) for item in case_ids))
-    sql = '''
-SELECT DISTINCT test_tags.tag_id, test_tags.tag_name
-FROM test_tags
-INNER JOIN test_case_tags ON (test_tags.tag_id = test_case_tags.tag_id)
-INNER JOIN test_cases ON (test_case_tags.case_id = test_cases.case_id)
-INNER JOIN test_case_plans ON (test_cases.case_id = test_case_plans.case_id)
-WHERE test_cases.case_id IN ({0}) AND test_case_plans.plan_id = %s
-'''.format(case_id_list if case_id_list else '0')
+    if plan_id:
+        sql = '''
+            SELECT DISTINCT test_tags.tag_id, test_tags.tag_name
+            FROM test_tags
+            INNER JOIN test_case_tags ON (test_tags.tag_id = test_case_tags.tag_id)
+            INNER JOIN test_cases ON (test_case_tags.case_id = test_cases.case_id)
+            INNER JOIN test_case_plans ON (test_cases.case_id = test_case_plans.case_id)
+            WHERE test_cases.case_id IN ({0}) AND test_case_plans.plan_id = %s
+            '''.format(case_id_list if case_id_list else '0')
 
-    rows = execute_sql(sql, (plan_id,))
+        rows = execute_sql(sql, plan_id)
+    else:
+        sql = '''
+            SELECT DISTINCT test_tags.tag_id, test_tags.tag_name
+            FROM test_tags
+            INNER JOIN test_case_tags ON (test_tags.tag_id = test_case_tags.tag_id)
+            INNER JOIN test_cases ON (test_case_tags.case_id = test_cases.case_id)
+            WHERE test_cases.case_id IN ({0})
+            '''.format(case_id_list if case_id_list else '0')
+        rows = execute_sql(sql)
+
     return sorted(rows, key=lambda tag: tag['tag_name'])
 
 
@@ -580,7 +591,10 @@ def all(request, template_name="case/all.html"):
     selected_case_ids = get_selected_cases_ids(request)
 
     # Get the tags own by the cases
-    ttags = get_tags_from_cases(tp.pk, (case.pk for case in tcs))
+    if tp:
+        ttags = get_tags_from_cases((case.pk for case in tcs), tp.pk)
+    else:
+        ttags = get_tags_from_cases((case.pk for case in tcs))
 
     tcs = paginate_testcases(request, tcs)
 
@@ -633,6 +647,7 @@ def search(request, template_name='case/all.html'):
     """
     generate the function of searching cases with search criteria
     """
+
     search_form = SearchCaseForm(request.REQUEST)
     if request.REQUEST.get('product'):
         search_form.populate(product_id=request.REQUEST['product'])
