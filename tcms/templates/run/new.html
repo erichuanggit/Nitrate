@@ -117,11 +117,9 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 						</fieldset>
 						{% empty%}
 						<div class="system_help">
-							
-                            <p>
-                            Environment group must be set for this test plan (<b>{{ test_plan.product.name }}</b>:<b>{{ test_plan.default_product_version }}</b>:<b><a href="{{ test_plan.get_absolute_url }}">{{ test_plan }}</a></b>) before you will be able to select environments for this test run.If you do not have permission to edit this plan, please contact the author of this plan, mailto <a href="mailto:{{ test_plan.author.email }}">{{ test_plan.author.email }}</a>
-                            
-                            </p>
+							<p>
+								Environment group must be set for this test plan (<b>{{ test_plan.product.name }}</b>:<b>{{ test_plan.default_product_version }}</b>:<b><a href="{{ test_plan.get_absolute_url }}">{{ test_plan }}</a></b>) before you will be able to select environments for this test run.If you do not have permission to edit this plan, please contact the author of this plan, mailto <a href="mailto:{{ test_plan.author.email }}">{{ test_plan.author.email }}</a>
+							</p>
 						</div>
 						{% endfor %}
 					</td>
@@ -165,21 +163,18 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 							<input type="hidden" name="case" value="{{ test_case.case_id }}">
 							{% endif %}
 						</td>
-						<td{% if not test_case.case_status__name == 'CONFIRMED' %} style='text-decoration: line-through'{% endif %}>
-							{% if not test_case.case_status__name == 'CONFIRMED' %} <img src="{{ STATIC_URL }}images/warning.png"/>{% endif %}
+						<td{% if not test_case.case_status.name == 'CONFIRMED' %} style='text-decoration: line-through'{% endif %}>
+							{% if not test_case.case_status.name == 'CONFIRMED' %} <img src="{{ STATIC_URL }}images/warning.png"/>{% endif %}
 							<a id="link_{{ forloop.counter }}" class="blind_title_link" href="javascript:toggleTestCaseContents('{{ forloop.counter }}')">
 								{{ test_case.summary }}
 							</a>
 						</td>
-						
-						<td>{{ test_case.author__email }}</td>
+						<td>{{ test_case.author.email }}</td>
 						<td>{{ test_case.create_date }}</td>
 						<td>{{ test_case.category }}</td>
 						<td >{{ test_case.priority }}</td>
-						<td > 
-							<a class="deletelink" href="javascript:removeItem('row_{{ forloop.counter }}');">
-								remove
-							</a>
+						<td>
+							<a class="deletelink" href="javascript:removeItem('row_{{ forloop.counter }}');">Remove</a>
 						</td>
 					</tr>
 					{% endfor %}
@@ -188,11 +183,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 			{% else %}
 			<span class="prompt-message">
 				<center>
-					No testcase in this testrun , you may 
-					<a href="{{ test_plan.get_absolute_url }}">
-						<strong>Select Cases </strong>
-					</a>
-					from test plan.
+					No testcase in this testrun , you may <a href="{{ test_plan.get_absolute_url }}"><strong>Select Cases</strong></a> from test plan.
 				</center>
 			</span>
 			<script type="text/javascript">

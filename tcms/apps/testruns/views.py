@@ -57,6 +57,7 @@ from tcms.apps.testruns.models import TestRun, TestCaseRun, TestCaseRunStatus, \
         TCMSEnvRunValueMap
 from tcms.apps.management.models import Priority, TCMSEnvValue, \
         TestTag
+from tcms.apps.testcases.views import get_selected_testcases
 from tcms.apps.testruns.data import get_run_bug_ids
 from tcms.apps.testruns.data import get_run_bugs_count
 from tcms.apps.testruns.data import stats_caseruns_status
@@ -91,20 +92,27 @@ def new(request, template_name='run/new.html'):
         ))
 
     # Ready to write cases to test plan
-    from tcms.apps.testcases.views import get_selected_testcases
     confirm_status = TestCaseStatus.get_CONFIRMED();
-    selected_cases = get_selected_testcases(request)
-    tcs = TestCase.objects.filter(case_id__in=selected_cases)
+    tcs = get_selected_testcases(request)
+    # FIXME: optimize this query, only get necessary columns, not all fields are
+    # necessary
     tp = TestPlan.objects.select_related().get(plan_id=plan_id)
     tcrs = TestCaseRun.objects.filter(case_run_id__in=request.REQUEST.getlist('case_run_id'))
 
     num_unconfirmed_cases = tcs.exclude(case_status=confirm_status).count()
 
-    tcs_values = tcs.values(
-            'case_id', 'summary',
-            'author__email', 'create_date',
-            'category', 'priority',
-            'case_status__name')
+    tcs_values = tcs.select_related('author',
+                                    'case_status',
+                                    'category',
+                                    'priority')
+    tcs_values = tcs_values.only('case_id',
+                                 'summary',
+                                 'estimated_time',
+                                 'author__email',
+                                 'create_date',
+                                 'category__name',
+                                 'priority__value',
+                                 'case_status__name')
 
     if request.REQUEST.get('POSTING_TO_CREATE'):
         form = NewRunForm(request.POST)
@@ -206,7 +214,8 @@ def new(request, template_name='run/new.html'):
                 )
 
     else:
-        estimated_time = reduce(lambda x, y: x + y, [tc.estimated_time for tc in tcs])
+        estimated_time = reduce(lambda x, y: x + y,
+                                (tc.estimated_time for tc in tcs_values))
         form = NewRunForm(initial={
             'summary': 'Test run for %s on %s' % (
                 tp.name,

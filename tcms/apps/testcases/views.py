@@ -1151,6 +1151,8 @@ def printable(request, template_name='case/printable.html'):
     plan_pks = req_getlist('plan')
     case_pks = req_getlist('case')
     select_all = req_get('selectAll')
+
+    # Dead code. Not find printable_case_status in other place, *.js and *.html
     case_status_pks = req_getlist('printable_case_status')
 
     # After supporting Select All, querying TestCase requires the existance of
@@ -1174,6 +1176,7 @@ def printable(request, template_name='case/printable.html'):
         tp.case_list = tp.case.values_list('pk', flat=True)
 
     # Preparing for TestCases
+    testcase_queryset = TestCase.objects
     query = {}
 
     if plan_pks:
@@ -1183,7 +1186,7 @@ def printable(request, template_name='case/printable.html'):
         query['case_status__pk__in'] = case_status_pks
 
     if case_pks or select_all is not None:
-        query['pk__in'] = get_selected_testcases(request)
+        testcase_queryset = get_selected_testcases(request)
 
     # Disabled cases ignored in default
     # FIXME: case_status__pk__in must exist when code execution flows here. Why
@@ -1193,10 +1196,22 @@ def printable(request, template_name='case/printable.html'):
             name='DISABLED'
         ).values_list('pk', flat=True)
 
-    tcs = TestCase.objects.filter(**query)
+    tcs = testcase_queryset.filter(**query)
+
+    # FIXME: here to select_related aims to clear previous select_related.
+    # However, this is being supported by django 1.6 only. In django 1.5, latter
+    # select_related will override previous action.
+    #
+    # After upgrading to django 1.6, using QuerySet.select_related(None)
+    #
+    # Why select case_status rather than else? To avoid unnecessary INNER JOIN
+    # to other table in database. case_status is a necessary criteria for
+    # preparing cases to print, thus, the join to TestCaseStatus is always there
+    tcs = tcs.select_related('case_status').only('summary', 'case_status__id')
+
     context_data = {
-            'test_plans': tps,
-            'test_cases': tcs,
+        'test_plans': tps,
+        'test_cases': tcs,
     }
     return render_to_response(template_name, context_data,
                               context_instance=RequestContext(request))
@@ -1449,7 +1464,6 @@ def text_history(request, case_id, template_name='case/history.html'):
 
     return render_to_response(template_name, context_data,
                               context_instance=RequestContext(request))
-
 
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcase'))
 def clone(request, template_name='case/clone.html'):

@@ -991,14 +991,12 @@ def cases(request, plan_id):
                                       context_instance=RequestContext(request))
 
         def delete_cases(self):
-
             if not request.REQUEST.get('case'):
                 ajax_response['rc'] = 1
                 ajax_response['reponse'] = 'At least one case is required to delete.'
                 return HttpResponse(json_dumps(ajax_response))
 
-            selected_cases = get_selected_testcases(request)
-            tcs = TestCase.objects.filter(case_id__in=selected_cases)
+            tcs = get_selected_testcases(request)
 
             # Log Action
             tp_log = TCMSLog(model=tp)
