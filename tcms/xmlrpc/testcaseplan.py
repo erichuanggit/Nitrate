@@ -83,7 +83,7 @@ def update(request, case_id, plan_id, sortkey):
 
     if isinstance(sortkey, int):
         tcp.sortkey = sortkey
-        tcp.save()
+        tcp.save(update_fields=['sortkey'])
 
     return XMLRPCSerializer(model=tcp).serialize_model()
 

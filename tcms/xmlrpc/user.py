@@ -133,9 +133,11 @@ def update(request, values = None, id = None):
     
     if not request.user.has_perm('auth.change_changeuser') and request.user != u:
         raise PermissionDenied
-        
+
+    _update_fields = list()
     for f in editable_fields:
         if values.get(f):
+            _update_fields.append(f)
             if f == 'password':
                 if not request.user.has_perm('auth.change_changeuser') and not values.get('old_password'):
                     raise PermissionDenied('Old password is required')
@@ -146,8 +148,8 @@ def update(request, values = None, id = None):
                 u.set_password(values['password'])
             else:
                 setattr(u, f, values[f])
-            
-    u.save()
+
+    u.save(update_fields=_update_fields)
     return get_user_dict(u)
 
 @log_call(namespace='User')

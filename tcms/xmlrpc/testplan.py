@@ -617,23 +617,27 @@ def update(request, plan_ids, values):
     tps = TestPlan.objects.filter(pk__in = pre_process_ids(value = plan_ids))
 
     if form.is_valid():
+        _values = dict()
         if form.cleaned_data['name']:
-            tps.update(name = form.cleaned_data['name'])
+            _values['name'] = form.cleaned_data['name']
 
         if form.cleaned_data['type']:
-            tps.update(type = form.cleaned_data['type'])
+            _values['type'] = form.cleaned_data['type']
 
         if form.cleaned_data['product']:
-            tps.update(product = form.cleaned_data['product'])
+            _values['product'] = form.cleaned_data['product']
 
         if form.cleaned_data['default_product_version']:
-            tps.update(default_product_version = form.cleaned_data['default_product_version'])
+            _values['default_product_version'] = form.cleaned_data[
+                'default_product_version']
 
         if form.cleaned_data['parent']:
-            tps.update(parent = form.cleaned_data['parent'])
+            _values['parent'] = form.cleaned_data['parent']
 
         if isinstance(form.cleaned_data['is_active'], int):
-            tps.update(is_active = form.cleaned_data['is_active'])
+            _values['is_active'] = form.cleaned_data['is_active']
+
+        tps.update(**_values)
 
         if form.cleaned_data['env_group']:
             for tp in tps:

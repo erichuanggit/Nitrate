@@ -596,47 +596,52 @@ def update(request, run_ids, values):
         form.populate(product_id = values['product'])
 
     if form.is_valid():
-        trs = TestRun.objects.filter(pk__in = pre_process_ids(value = run_ids))
-
+        trs = TestRun.objects.filter(pk__in=pre_process_ids(value=run_ids))
+        _values = dict()
         if form.cleaned_data['plan']:
-            trs.update(plan = form.cleaned_data['plan'])
+            _values['plan'] = form.cleaned_data['plan']
 
         if form.cleaned_data['build']:
-            trs.update(build = form.cleaned_data['build'])
+            _values['build'] = form.cleaned_data['build']
 
         if form.cleaned_data['errata_id']:
-            trs.update(errata_id = form.cleaned_data['errata_id'])
+            _values['errata_id'] = form.cleaned_data['errata_id']
 
         if form.cleaned_data['manager']:
-            trs.update(manager = form.cleaned_data['manager'])
-        if values.has_key('default_tester'):
-            if values.get('default_tester') and form.cleaned_data['default_tester']:
-                trs.update(default_tester = form.cleaned_data['default_tester'])
+            _values['manager'] = form.cleaned_data['manager']
+
+        if 'default_tester' in values:
+            if values.get('default_tester') and \
+                    form.cleaned_data['default_tester']:
+                _values['default_tester'] = form.cleaned_data['default_tester']
             else:
-                trs.update(default_tester = None)
+                _values['default_tester'] = None
+
         if form.cleaned_data['summary']:
-            trs.update(summary = form.cleaned_data['summary'])
+            _values['summary'] = form.cleaned_data['summary']
 
         if form.cleaned_data['estimated_time']:
-            trs.update(estimated_time = form.cleaned_data['estimated_time'])
+            _values['estimated_time'] = form.cleaned_data['estimated_time']
 
         if form.cleaned_data['product_version']:
-            trs.update(product_version = form.cleaned_data['product_version'])
+            _values['product_version'] = form.cleaned_data['product_version']
 
-        if values.has_key('notes'):
+        if 'notes' in values:
             if values['notes'] in (None, ''):
-                trs.update(notes = values['notes'])
+                _values['notes'] = values['notes']
             if form.cleaned_data['notes']:
-                trs.update(notes = form.cleaned_data['notes'])
+                _values['notes'] = form.cleaned_data['notes']
 
         if form.cleaned_data['plan_text_version']:
-            trs.update(plan_text_version = form.cleaned_data['plan_text_version'])
+            _values['plan_text_version'] = form.cleaned_data['plan_text_version']
 
         if isinstance(form.cleaned_data['status'], int):
             if form.cleaned_data['status']:
-                trs.update(stop_date = datetime.now())
+                _values['stop_date'] = datetime.now()
             else:
-                trs.update(stop_date = None)
+                _values['stop_date'] = None
+
+        trs.update(**_values)
     else:
         return forms.errors_to_list(form)
 

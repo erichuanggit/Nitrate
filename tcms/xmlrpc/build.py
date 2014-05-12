@@ -183,15 +183,22 @@ def update(request, build_id, values):
     except TestBuild.DoesNotExist, error:
         return error
 
-    try:
-        if values.get('product'):
-            p = check_product(values)
-            tb.product = p
+    def _update_value(obj, name, value):
+        setattr(obj, name, value)
+        update_fields.append(name)
 
-        if values.get('name'): tb.name = values['name']
-        if values.get('description'): tb.description = values['description']
-        if values.get('is_active'): tb.is_active = values.get('is_active', True)
-        tb.save()
+    try:
+        update_fields = list()
+        if values.get('product'):
+            _update_value(tb, 'product', pre_check_product(values))
+        if values.get('name'):
+            _update_value(tb, 'name', values['name'])
+        if values.get('description'):
+            _update_value(tb, 'description', values['description'])
+        if values.get('is_active'):
+            _update_value(tb, 'is_active', values.get('is_active', True))
+
+        tb.save(update_fields=update_fields)
     except ValueError, error:
         return error
     except:
