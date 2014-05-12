@@ -16,18 +16,18 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>, Chenxiong Qi <cqi@redhat.com>
 
-from kobo.django.xmlrpc.decorators import user_passes_test, login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db import transaction
 from django.forms import EmailField, ValidationError
+from kobo.django.xmlrpc.decorators import user_passes_test
 
 from tcms.apps.management.models import TestTag
 from tcms.apps.testcases.models import TestCase
 from tcms.apps.testcases.models import TestCasePlan
 from tcms.apps.testplans.models import TestPlan
 from tcms.core.decorators import log_call
-from utils import pre_process_ids, compare_list
+from tcms.xmlrpc.utils import pre_process_ids, compare_list
 
 
 __all__ = (
@@ -72,6 +72,7 @@ __all__ = (
     'update',
 )
 
+
 @log_call(namespace='TestCase')
 def add_comment(request, case_ids, comment):
     """
@@ -94,15 +95,17 @@ def add_comment(request, case_ids, comment):
     >>> TestCase.add_comment('56789, 12345', 'foobar')
     """
     from utils import Comment
-    object_pks = pre_process_ids(value = case_ids)
+
+    object_pks = pre_process_ids(value=case_ids)
     c = Comment(
-        request = request,
-        content_type = 'testcases.testcase',
-        object_pks = object_pks,
-        comment = comment
+        request=request,
+        content_type='testcases.testcase',
+        object_pks=object_pks,
+        comment=comment
     )
 
     return c.add()
+
 
 @log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasecomponent'))
@@ -130,20 +133,21 @@ def add_component(request, case_ids, component_ids):
     from tcms.apps.management.models import Component
 
     tcs = TestCase.objects.filter(
-        case_id__in = pre_process_ids(value = case_ids)
+        case_id__in=pre_process_ids(value=case_ids)
     )
     cs = Component.objects.filter(
-        id__in = pre_process_ids(value = component_ids)
+        id__in=pre_process_ids(value=component_ids)
     )
 
     try:
         for tc in tcs:
             for c in cs:
-                tc.add_component(component = c)
+                tc.add_component(component=c)
     except:
         pass
 
     return
+
 
 @log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasetag'))
@@ -169,17 +173,18 @@ def add_tag(request, case_ids, tags):
     >>> TestCase.add_tag('12345, 67890', 'foo, bar')
     """
     tcs = TestCase.objects.filter(
-        case_id__in = pre_process_ids(value = case_ids)
+        case_id__in=pre_process_ids(value=case_ids)
     )
 
     tags = TestTag.string_to_list(tags)
 
     for tag in tags:
-        t, c = TestTag.objects.get_or_create(name = tag)
+        t, c = TestTag.objects.get_or_create(name=tag)
         for tc in tcs:
-            tc.add_tag(tag = t)
+            tc.add_tag(tag=t)
 
     return
+
 
 @log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testruns.add_testcaserun'))
@@ -205,22 +210,24 @@ def add_to_run(request, case_ids, run_ids):
     >>> TestCase.add_to_run('56789, 12345', '1234, 5678')
     """
     from tcms.apps.testruns.models import TestRun
+
     case_ids = pre_process_ids(case_ids)
     run_ids = pre_process_ids(run_ids)
 
-    trs = TestRun.objects.filter(run_id__in = run_ids)
+    trs = TestRun.objects.filter(run_id__in=run_ids)
     if not trs:
-        raise ValueError, 'Invalid run_ids'
+        raise ValueError('Invalid run_ids')
 
-    tcs = TestCase.objects.filter(case_id__in = case_ids)
+    tcs = TestCase.objects.filter(case_id__in=case_ids)
     if not tcs:
-        raise ValueError, 'Invalid case_ids'
+        raise ValueError('Invalid case_ids')
 
     for tr in trs:
         for tc in tcs:
-            tr.add_case_run(case = tc)
+            tr.add_case_run(case=tc)
 
     return
+
 
 @log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasebug'))
@@ -266,22 +273,24 @@ def attach_bug(request, values):
             value['bug_system_id'] = 1
 
         try:
-            bug_system = TestCaseBugSystem.objects.get(id = value['bug_system_id'])
+            bug_system = TestCaseBugSystem.objects.get(
+                id=value['bug_system_id'])
         except:
             raise
 
         try:
-            tc = TestCase.objects.get(case_id = value['case_id'])
+            tc = TestCase.objects.get(case_id=value['case_id'])
             tc.add_bug(
-                bug_id = value['bug_id'],
-                bug_system = bug_system,
-                summary = value.get('summary'),
-                description = value.get('description')
+                bug_id=value['bug_id'],
+                bug_system=bug_system,
+                summary=value.get('summary'),
+                description=value.get('description')
             )
         except:
             raise
 
     return
+
 
 def check_case_status(request, name):
     """
@@ -295,7 +304,9 @@ def check_case_status(request, name):
     >>> TestCase.check_case_status('proposed')
     """
     from tcms.apps.testcases.models import TestCaseStatus
-    return TestCaseStatus.objects.get(name = name).serialize()
+
+    return TestCaseStatus.objects.get(name=name).serialize()
+
 
 def check_priority(request, value):
     """
@@ -309,7 +320,9 @@ def check_priority(request, value):
     >>> TestCase.check_priority('p1')
     """
     from tcms.apps.management.models import Priority
-    return Priority.objects.get(value = value).serialize()
+
+    return Priority.objects.get(value=value).serialize()
+
 
 def calculate_average_estimated_time(request, case_ids):
     """
@@ -325,7 +338,7 @@ def calculate_average_estimated_time(request, case_ids):
     from datetime import timedelta
     from tcms.core.utils.xmlrpc import SECONDS_PER_DAY
 
-    tcs = TestCase.objects.filter(pk__in = pre_process_ids(case_ids))
+    tcs = TestCase.objects.filter(pk__in=pre_process_ids(case_ids))
     time = timedelta(0)
     for tc in tcs:
         time += tc.estimated_time
@@ -334,10 +347,11 @@ def calculate_average_estimated_time(request, case_ids):
     seconds = seconds / len(tcs)
 
     return '%02i:%02i:%02i' % (
-        seconds / 3600,   # Hours
-        seconds / 60,     # Minutes
-        seconds % 60      # Seconds
+        seconds / 3600,  # Hours
+        seconds / 60,  # Minutes
+        seconds % 60  # Seconds
     )
+
 
 def calculate_total_estimated_time(request, case_ids):
     """
@@ -353,7 +367,7 @@ def calculate_total_estimated_time(request, case_ids):
     from datetime import timedelta
     from tcms.core.utils.xmlrpc import SECONDS_PER_DAY
 
-    tcs = TestCase.objects.filter(pk__in = pre_process_ids(case_ids))
+    tcs = TestCase.objects.filter(pk__in=pre_process_ids(case_ids))
     time = timedelta(0)
     for tc in tcs:
         time += tc.estimated_time
@@ -361,10 +375,11 @@ def calculate_total_estimated_time(request, case_ids):
     seconds = time.seconds + (time.days * SECONDS_PER_DAY)
 
     return '%02i:%02i:%02i' % (
-        seconds / 3600,   # Hours
-        seconds / 60,     # Minutes
-        seconds % 60      # Seconds
+        seconds / 3600,  # Hours
+        seconds / 60,  # Minutes
+        seconds % 60  # Seconds
     )
+
 
 @log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcase'))
@@ -430,35 +445,36 @@ def create(request, values):
 
     if form.is_valid():
         # Create the case
-        tc = TestCase.create(author = request.user, values = form.cleaned_data)
+        tc = TestCase.create(author=request.user, values=form.cleaned_data)
 
         # Add case text to the case
         tc.add_text(
-            action = form.cleaned_data['action'] or '',
-            effect = form.cleaned_data['effect'] or '',
-            setup = form.cleaned_data['setup'] or '',
-            breakdown = form.cleaned_data['breakdown'] or '',
+            action=form.cleaned_data['action'] or '',
+            effect=form.cleaned_data['effect'] or '',
+            setup=form.cleaned_data['setup'] or '',
+            breakdown=form.cleaned_data['breakdown'] or '',
         )
 
         # Add the case to specific plans
         for p in form.cleaned_data['plan']:
-            tc.add_to_plan(plan = p)
+            tc.add_to_plan(plan=p)
             del p
 
         # Add components to the case
         for c in form.cleaned_data['component']:
-            tc.add_component(component = c)
+            tc.add_component(component=c)
             del c
 
         # Add tag to the case
         for tag in TestTag.string_to_list(values.get('tag', [])):
-            t, c = TestTag.objects.get_or_create(name = tag)
-            tc.add_tag(tag = t)
+            t, c = TestTag.objects.get_or_create(name=tag)
+            tc.add_tag(tag=t)
     else:
         # Print the errors if the form is not passed validation.
         return forms.errors_to_list(form)
 
     return get(request, tc.case_id)
+
 
 @log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.delete_testcasebug'))
@@ -486,15 +502,16 @@ def detach_bug(request, case_ids, bug_ids):
     case_ids = pre_process_ids(case_ids)
     bug_ids = pre_process_ids(bug_ids)
 
-    tcs = TestCase.objects.filter(case_id__in = case_ids)
+    tcs = TestCase.objects.filter(case_id__in=case_ids)
     for tc in tcs:
         for opk in bug_ids:
             try:
-                tc.remove_bug(bug_id = opk)
-            except ObjectDoesNotExist, error:
+                tc.remove_bug(bug_id=opk)
+            except ObjectDoesNotExist:
                 pass
 
     return
+
 
 @log_call(namespace='TestCase')
 def filter(request, query):
@@ -544,7 +561,8 @@ def filter(request, query):
     """
     return TestCase.to_xmlrpc(query)
 
-def filter_count(request, values = {}):
+
+def filter_count(request, values={}):
     """
     Description: Performs a search and returns the resulting count of cases.
 
@@ -556,6 +574,7 @@ def filter_count(request, values = {}):
     # See TestCase.filter()
     """
     return TestCase.objects.filter(**values).count()
+
 
 def get(request, case_id):
     """
@@ -569,7 +588,7 @@ def get(request, case_id):
     >>> TestCase.get(1193)
     """
     try:
-        tc = TestCase.objects.get(case_id = case_id)
+        tc = TestCase.objects.get(case_id=case_id)
     except:
         raise
 
@@ -582,10 +601,11 @@ def get(request, case_id):
     query = {'id__in': tag_ids}
     tags = TestTag.to_xmlrpc(query)
     #cut 'id' attribute off, only leave 'name' here
-    tags_without_id = map(lambda x:x["name"], tags)
+    tags_without_id = map(lambda x: x["name"], tags)
     #replace tag_id list in the serialize return data
     response["tag"] = tags_without_id
     return response
+
 
 def get_bug_systems(request, id):
     """
@@ -599,7 +619,9 @@ def get_bug_systems(request, id):
     >>> TestCase.get_bug_systems(1)
     """
     from tcms.apps.testcases.models import TestCaseBugSystem
-    return TestCaseBugSystem.objects.get(pk = id).serialize()
+
+    return TestCaseBugSystem.objects.get(pk=id).serialize()
+
 
 def get_bugs(request, case_ids):
     """
@@ -620,11 +642,12 @@ def get_bugs(request, case_ids):
     from tcms.apps.testcases.models import TestCaseBug
 
     tcs = TestCase.objects.filter(
-        case_id__in = pre_process_ids(value = case_ids)
+        case_id__in=pre_process_ids(value=case_ids)
     )
 
     query = {'case__case_id__in': tcs.values_list('case_id', flat=True)}
     return TestCaseBug.to_xmlrpc(query)
+
 
 def get_case_run_history(request, case_id):
     """
@@ -641,7 +664,8 @@ def get_case_run_history(request, case_id):
     """
     pass
 
-def get_case_status(request, id = None):
+
+def get_case_status(request, id=None):
     """
     Description: Get the case status matching the given id.
 
@@ -656,10 +680,12 @@ def get_case_status(request, id = None):
     >>> TestCase.get_case_status(1)
     """
     from tcms.apps.testcases.models import TestCaseStatus
+
     if id:
-        return TestCaseStatus.objects.get(id = id).serialize()
+        return TestCaseStatus.objects.get(id=id).serialize()
 
     return TestCaseStatus.to_xmlrpc()
+
 
 def get_change_history(request, case_id):
     """
@@ -675,6 +701,7 @@ def get_change_history(request, case_id):
     """
     pass
 
+
 def get_components(request, case_id):
     """"
     Description: Get the list of components attached to this case.
@@ -687,14 +714,16 @@ def get_components(request, case_id):
     >>> TestCase.get_components(12345)
     """
     from tcms.apps.management.models import Component
+
     try:
-        tc = TestCase.objects.get(case_id = case_id)
+        tc = TestCase.objects.get(case_id=case_id)
     except:
         raise
 
-    component_ids = tc.component.values_list('id', flat = True)
+    component_ids = tc.component.values_list('id', flat=True)
     query = {'id__in': component_ids}
     return Component.to_xmlrpc(query)
+
 
 def get_plans(request, case_id):
     """
@@ -708,14 +737,16 @@ def get_plans(request, case_id):
     >>> TestCase.get_plans(12345)
     """
     from tcms.apps.testplans.models import TestPlan
+
     try:
-        tc = TestCase.objects.get(case_id = case_id)
+        tc = TestCase.objects.get(case_id=case_id)
     except:
         raise
 
-    plan_ids = tc.plan.values_list('plan_id', flat = True)
+    plan_ids = tc.plan.values_list('plan_id', flat=True)
     query = {'plan_id__in': plan_ids}
     return TestPlan.to_xmlrpc(query)
+
 
 def get_tags(request, case_id):
     """
@@ -729,7 +760,7 @@ def get_tags(request, case_id):
     >>> TestCase.get_tags(12345)
     """
     try:
-        tc = TestCase.objects.get(case_id = case_id)
+        tc = TestCase.objects.get(case_id=case_id)
     except:
         raise
 
@@ -737,7 +768,8 @@ def get_tags(request, case_id):
     query = {'id__in': tag_ids}
     return TestTag.to_xmlrpc(query)
 
-def get_text(request, case_id, case_text_version = None):
+
+def get_text(request, case_id, case_text_version=None):
     """
     Description: The associated large text fields: Action, Expected Results, Setup, Breakdown
                  for a given version.
@@ -756,13 +788,13 @@ def get_text(request, case_id, case_text_version = None):
     >>> TestCase.get_text(12345, 4)
     """
     try:
-        tc = TestCase.objects.get(case_id = case_id)
+        tc = TestCase.objects.get(case_id=case_id)
     except:
         raise
 
     return tc.get_text_with_version(
-        case_text_version = case_text_version
-    ).serialize()
+        case_text_version=case_text_version).serialize()
+
 
 def get_priority(request, id):
     """
@@ -776,7 +808,9 @@ def get_priority(request, id):
     >>> TestCase.get_priority(1)
     """
     from tcms.apps.management.models import Priority
-    return Priority.objects.get(id = id).serialize()
+
+    return Priority.objects.get(id=id).serialize()
+
 
 @log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcaseplan'))
@@ -803,22 +837,22 @@ def link_plan(request, case_ids, plan_ids):
     """
     from tcms.apps.testplans.models import TestPlan
 
-    case_ids = pre_process_ids(value = case_ids)
-    plan_ids = pre_process_ids(value = plan_ids)
+    case_ids = pre_process_ids(value=case_ids)
+    plan_ids = pre_process_ids(value=plan_ids)
 
-    tcs = TestCase.objects.filter(pk__in = case_ids)
-    tps = TestPlan.objects.filter(pk__in = plan_ids)
+    tcs = TestCase.objects.filter(pk__in=case_ids)
+    tps = TestPlan.objects.filter(pk__in=plan_ids)
 
     # Check the non-exist case ids.
     if len(tcs) < len(case_ids):
         raise ObjectDoesNotExist(
-            "TestCase",compare_list(case_ids, tcs.values_list('pk', flat=True))
+            "TestCase", compare_list(case_ids, tcs.values_list('pk', flat=True))
         )
 
     # Check the non-exist plan ids.
     if len(tps) < len(plan_ids):
         raise ObjectDoesNotExist(
-            "TestPlan",compare_list(plan_ids, tps.values_list('pk', flat=True))
+            "TestPlan", compare_list(plan_ids, tps.values_list('pk', flat=True))
         )
 
     # Link the plans to cases
@@ -828,37 +862,46 @@ def link_plan(request, case_ids, plan_ids):
 
     return
 
+
 def lookup_category_name_by_id(request, id):
     """DEPRECATED - CONSIDERED HARMFUL Use Product.get_category instead"""
     from product import get_category
-    return get_category(request = request, id = id)
+
+    return get_category(request=request, id=id)
+
 
 def lookup_category_id_by_name(request, name, product):
     """
     DEPRECATED - CONSIDERED HARMFUL Use Product.check_category instead
     """
     from product import check_category
-    return check_category(request = request, name = name, product = product)
+
+    return check_category(request=request, name=name, product=product)
+
 
 def lookup_priority_name_by_id(request, id):
     """
     DEPRECATED - CONSIDERED HARMFUL Use TestCase.get_priority instead
     """
-    return get_priority(request = request, id = id)
+    return get_priority(request=request, id=id)
+
 
 def lookup_priority_id_by_name(request, value):
     """
     DEPRECATED - CONSIDERED HARMFUL Use TestCase.check_priority instead
     """
-    return check_priority(request = request, value = value)
+    return check_priority(request=request, value=value)
+
 
 def lookup_status_name_by_id(request, id):
     """DEPRECATED - CONSIDERED HARMFUL Use TestCase.get_case_status instead"""
-    return get_case_status(request = request, id = id)
+    return get_case_status(request=request, id=id)
+
 
 def lookup_status_id_by_name(request, name):
     """DEPRECATED - CONSIDERED HARMFUL Use TestCase.check_case_status instead"""
-    return check_case_status(request = request, name = name)
+    return check_case_status(request=request, name=name)
+
 
 @log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.delete_testcasecomponent'))
@@ -882,21 +925,23 @@ def remove_component(request, case_ids, component_ids):
     >>> TestCase.remove_component('56789, 12345', '1234, 5678')
     """
     from tcms.apps.management.models import Component
+
     tcs = TestCase.objects.filter(
-        case_id__in = pre_process_ids(value = case_ids)
+        case_id__in=pre_process_ids(value=case_ids)
     )
     tccs = Component.objects.filter(
-        id__in = pre_process_ids(value = component_ids)
+        id__in=pre_process_ids(value=component_ids)
     )
 
     for tc in tcs:
         for tcc in tccs:
             try:
-                tc.remove_component(component = tcc)
+                tc.remove_component(component=tcc)
             except:
                 pass
 
     return
+
 
 @log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.delete_testcasetag'))
@@ -920,10 +965,10 @@ def remove_tag(request, case_ids, tags):
     >>> TestCase.remove_tag('56789, 12345', 'foo, bar')
     """
     tcs = TestCase.objects.filter(
-        case_id__in = pre_process_ids(value = case_ids)
+        case_id__in=pre_process_ids(value=case_ids)
     )
     tgs = TestTag.objects.filter(
-        name__in = TestTag.string_to_list(tags)
+        name__in=TestTag.string_to_list(tags)
     )
 
     for tc in tcs:
@@ -937,9 +982,11 @@ def remove_tag(request, case_ids, tags):
 
     return
 
+
 @log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasetext'))
-def store_text(request, case_id, action, effect = '', setup = '', breakdown = '', author_id = None):
+def store_text(request, case_id, action, effect='', setup='', breakdown='',
+               author_id=None):
     """
     Description: Update the large text fields of a case.
 
@@ -957,23 +1004,25 @@ def store_text(request, case_id, action, effect = '', setup = '', breakdown = ''
     >>> TestCase.store_text(12345, 'Action', 'Effect', 'Setup', 'Breakdown', 2260)
     """
     from django.contrib.auth.models import User
+
     try:
-        tc = TestCase.objects.get(case_id = case_id)
+        tc = TestCase.objects.get(case_id=case_id)
     except:
         raise
 
     if author_id:
-        author = User.objects.get(id = author_id)
+        author = User.objects.get(id=author_id)
     else:
         author = request.user
 
     return tc.add_text(
-        author = author,
-        action = action,
-        effect = effect,
-        setup = setup,
-        breakdown = breakdown,
+        author=author,
+        action=action,
+        effect=effect,
+        setup=setup,
+        breakdown=breakdown,
     ).serialize()
+
 
 @log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.delete_testcaseplan'))
@@ -1051,18 +1100,19 @@ def update(request, case_ids, values):
         raise ValueError('Product ID is required for category')
 
     if values.get('product'):
-        form.populate(product_id = values['product'])
+        form.populate(product_id=values['product'])
 
     if form.is_valid():
         tcs = TestCase.update(
-            case_ids = pre_process_ids(value = case_ids),
-            values = form.cleaned_data,
+            case_ids=pre_process_ids(value=case_ids),
+            values=form.cleaned_data,
         )
     else:
         return forms.errors_to_list(form)
 
-    query = {'pk__in': tcs.values_list('pk', flat = True)}
+    query = {'pk__in': tcs.values_list('pk', flat=True)}
     return TestCase.to_xmlrpc(query)
+
 
 def validate_cc_list(cc_list):
     '''Validate each email in cc_list argument
@@ -1090,6 +1140,7 @@ def validate_cc_list(cc_list):
             field.error_messages['invalid'] % {
                 'value': ', '.join(invalid_emails)})
 
+
 @log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
 def notification_add_cc(request, case_ids, cc_list):
@@ -1110,8 +1161,8 @@ def notification_add_cc(request, case_ids, cc_list):
     try:
         validate_cc_list(cc_list)
     except (TypeError, ValidationError), err:
-        return { 'status': 1,
-                 'message': '%s: %s' % (err.__class__.__name__, str(err)) }
+        return {'status': 1,
+                'message': '%s: %s' % (err.__class__.__name__, str(err))}
 
     try:
         tc_ids = pre_process_ids(case_ids)
@@ -1124,10 +1175,11 @@ def notification_add_cc(request, case_ids, cc_list):
             tc.emailing.add_cc(adding_cc)
 
     except (TypeError, ValueError, Exception), err:
-        return { 'status': 1,
-                 'message': '%s: %s' % (err.__class__.__name__, str(err))}
+        return {'status': 1,
+                'message': '%s: %s' % (err.__class__.__name__, str(err))}
 
-    return { 'status': 0, 'message': 'Succeed' }
+    return {'status': 0, 'message': 'Succeed'}
+
 
 @log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
@@ -1149,8 +1201,8 @@ def notification_remove_cc(request, case_ids, cc_list):
     try:
         validate_cc_list(cc_list)
     except (TypeError, ValidationError), err:
-        return { 'status': 1,
-                 'message': '%s: %s' % (err.__class__.__name__, str(err))}
+        return {'status': 1,
+                'message': '%s: %s' % (err.__class__.__name__, str(err))}
 
     try:
         tc_ids = pre_process_ids(case_ids)
@@ -1158,10 +1210,11 @@ def notification_remove_cc(request, case_ids, cc_list):
         for tc in TestCase.objects.filter(pk__in=tc_ids):
             tc.emailing.cc_list.filter(email__in=cc_list).delete()
     except (TypeError, ValueError, Exception), err:
-        return { 'status': 1,
-                 'message': '%s: %s' % (err.__class__.__name__, str(err))}
+        return {'status': 1,
+                'message': '%s: %s' % (err.__class__.__name__, str(err))}
 
-    return { 'status': 0, 'message': 'Succeed' }
+    return {'status': 0, 'message': 'Succeed'}
+
 
 @log_call(namespace='TestCase')
 @user_passes_test(lambda u: u.has_perm('testcases.change_testcase'))
@@ -1185,7 +1238,7 @@ def notification_get_cc_list(request, case_ids):
             result[str(tc.pk)] = cc_list
 
     except (TypeError, ValueError, Exception), err:
-        return { 'status': 1,
-                 'message': '%s: %s' % (err.__class__.__name__, str(err))}
+        return {'status': 1,
+                'message': '%s: %s' % (err.__class__.__name__, str(err))}
 
     return result

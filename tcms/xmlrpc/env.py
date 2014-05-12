@@ -16,8 +16,8 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>
 
-from tcms.apps.management.models import TCMSEnvGroup, TCMSEnvProperty, TCMSEnvValue
-from utils import pre_process_ids
+from tcms.apps.management.models import TCMSEnvGroup, TCMSEnvProperty, \
+    TCMSEnvValue
 
 __all__ = (
     'filter_groups',
@@ -26,6 +26,7 @@ __all__ = (
     'get_properties',
     'get_values',
 )
+
 
 def filter_groups(request, query):
     """
@@ -53,6 +54,7 @@ def filter_groups(request, query):
     """
     return TCMSEnvGroup.to_xmlrpc(query)
 
+
 def filter_properties(request, query):
     """
     Description: Performs a search and returns the resulting list of env properties.
@@ -78,6 +80,7 @@ def filter_properties(request, query):
     """
     return TCMSEnvProperty.to_xmlrpc(query)
 
+
 def filter_values(request, query):
     """
     Description: Performs a search and returns the resulting list of env properties.
@@ -102,7 +105,8 @@ def filter_values(request, query):
     """
     return TCMSEnvValue.to_xmlrpc(query)
 
-def get_properties(request, env_group_id = None, is_active = True):
+
+def get_properties(request, env_group_id=None, is_active=True):
     """
     Description: Get the list of properties associated with this env group.
 
@@ -118,12 +122,13 @@ def get_properties(request, env_group_id = None, is_active = True):
     # Get the properties in group 10
     >>> Env.get_properties(10)
     """
-    query = { 'is_active': is_active }
+    query = {'is_active': is_active}
     if env_group_id: query['group__pk'] = env_group_id
 
     return TCMSEnvProperty.to_xmlrpc(query)
 
-def get_values(request, env_property_id = None, is_active = True):
+
+def get_values(request, env_property_id=None, is_active=True):
     """
     Description: Get the list of values associated with this env property.
 
@@ -139,7 +144,7 @@ def get_values(request, env_property_id = None, is_active = True):
     # Get the properties in group 10
     >>> Env.get_properties(10)
     """
-    query = { 'is_active': is_active }
+    query = {'is_active': is_active}
     if env_property_id: query['property__pk'] = env_property_id
 
     return TCMSEnvValue.to_xmlrpc(query)

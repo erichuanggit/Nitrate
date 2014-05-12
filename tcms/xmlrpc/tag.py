@@ -20,6 +20,7 @@ from tcms.apps.management.models import TestTag
 
 __all__ = ('get_tags', )
 
+
 def get_tags(request, values):
     """
     Description:  Get the list of tags.

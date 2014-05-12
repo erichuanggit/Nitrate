@@ -21,25 +21,32 @@ def api_version(request):
     Description: Return the API version of Nitrate.
     """
     from tcms import XMLRPC_VERSION
+
     return XMLRPC_VERSION
-    
+
+
 def testopia_version(request):
     """
     Description: Returns the version of Nitrate on this server.
     """
     from tcms import VERSION
+
     return VERSION
+
 
 def nitrate_version(request):
     """
     Description: Returns the version of Nitrate on this server.
     """
     from tcms import VERSION
+
     return VERSION
+
 
 def tcms_version(request):
     """
     Description: Returns the version of Nitrate on this server.
     """
     from tcms import VERSION
+
     return VERSION

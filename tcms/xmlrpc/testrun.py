@@ -18,14 +18,13 @@
 #   Chenxiong Qi <cqi@redhat.com>
 
 from django.core.exceptions import ObjectDoesNotExist
-
-from kobo.django.xmlrpc.decorators import user_passes_test, login_required
+from kobo.django.xmlrpc.decorators import user_passes_test
 
 from tcms.apps.management.models import TestTag
 from tcms.apps.testcases.models import TestCase
 from tcms.apps.testruns.models import TestRun, TestCaseRun
 from tcms.core.decorators import log_call
-from utils import pre_process_ids
+from tcms.xmlrpc.utils import pre_process_ids
 
 __all__ = (
     'add_cases',
@@ -50,6 +49,7 @@ __all__ = (
     'unlink_env_value'
 )
 
+
 @log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.add_testcaserun'))
 def add_cases(request, run_ids, case_ids):
@@ -73,14 +73,15 @@ def add_cases(request, run_ids, case_ids):
     # Add case ids list '1234, 5678' to run list '56789, 12345' with String
     >>> TestRun.add_cases('56789, 12345', '1234, 5678')
     """
-    trs = TestRun.objects.filter(run_id__in = pre_process_ids(run_ids))
-    tcs = TestCase.objects.filter(case_id__in = pre_process_ids(case_ids))
+    trs = TestRun.objects.filter(run_id__in=pre_process_ids(run_ids))
+    tcs = TestCase.objects.filter(case_id__in=pre_process_ids(case_ids))
 
     for tr in trs:
         for tc in tcs:
-            tr.add_case_run(case = tc)
+            tr.add_case_run(case=tc)
 
     return
+
 
 @log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.delete_testcaserun'))
@@ -116,12 +117,14 @@ def remove_cases(request, run_ids, case_ids):
         trs = TestRun.objects.filter(run_id__in=pre_process_ids(run_ids))
 
         for tr in trs:
-            crs = TestCaseRun.objects.filter(run=tr, case__in=pre_process_ids(case_ids))
+            crs = TestCaseRun.objects.filter(run=tr,
+                                             case__in=pre_process_ids(case_ids))
             crs.delete()
 
     except Exception, err:
         message = '%s: %s' % (err.__class__.__name__, err.message)
-        return { 'status': 1, 'message': message }
+        return {'status': 1, 'message': message}
+
 
 @log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.add_testruntag'))
@@ -146,15 +149,16 @@ def add_tag(request, run_ids, tags):
     # Add tag list ['foo', 'bar'] to run list [12345, 67890] with String
     >>> TestPlan.add_tag('12345, 67890', 'foo, bar')
     """
-    trs = TestRun.objects.filter(pk__in = pre_process_ids(value = run_ids))
+    trs = TestRun.objects.filter(pk__in=pre_process_ids(value=run_ids))
     tags = TestTag.string_to_list(tags)
 
     for tag in tags:
-        t, c = TestTag.objects.get_or_create(name = tag)
+        t, c = TestTag.objects.get_or_create(name=tag)
         for tr in trs:
-            tr.add_tag(tag = t)
+            tr.add_tag(tag=t)
 
     return
+
 
 @log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.add_testrun'))
@@ -204,29 +208,29 @@ def create(request, values):
         raise ValueError('Value of product is required')
 
     if values.get('case'):
-        values['case'] = pre_process_ids(value = values['case'])
+        values['case'] = pre_process_ids(value=values['case'])
 
     form = XMLRPCNewRunForm(values)
-    form.populate(product_id = values['product'])
+    form.populate(product_id=values['product'])
 
     if form.is_valid():
         tr = TestRun.objects.create(
-            product_version = form.cleaned_data['product_version'],
-            plan_text_version = form.cleaned_data['plan_text_version'],
-            stop_date = form.cleaned_data['status'] and datetime.now() or None,
-            summary = form.cleaned_data['summary'],
-            notes = form.cleaned_data['notes'],
-            estimated_time = form.cleaned_data['estimated_time'],
-            plan = form.cleaned_data['plan'],
-            build = form.cleaned_data['build'],
-            errata_id = form.cleaned_data['errata_id'],
-            manager = form.cleaned_data['manager'],
-            default_tester = form.cleaned_data['default_tester'],
+            product_version=form.cleaned_data['product_version'],
+            plan_text_version=form.cleaned_data['plan_text_version'],
+            stop_date=form.cleaned_data['status'] and datetime.now() or None,
+            summary=form.cleaned_data['summary'],
+            notes=form.cleaned_data['notes'],
+            estimated_time=form.cleaned_data['estimated_time'],
+            plan=form.cleaned_data['plan'],
+            build=form.cleaned_data['build'],
+            errata_id=form.cleaned_data['errata_id'],
+            manager=form.cleaned_data['manager'],
+            default_tester=form.cleaned_data['default_tester'],
         )
 
         if form.cleaned_data['case']:
             for c in form.cleaned_data['case']:
-                tr.add_case_run(case = c)
+                tr.add_case_run(case=c)
                 del c
 
         if form.cleaned_data['tag']:
@@ -235,13 +239,14 @@ def create(request, values):
                 tags = [c.strip() for c in tags.split(',') if c]
 
             for tag in tags:
-                t, c = TestTag.objects.get_or_create(name = tag)
-                tr.add_tag(tag = t)
+                t, c = TestTag.objects.get_or_create(name=tag)
+                tr.add_tag(tag=t)
                 del tag, t, c
     else:
         return forms.errors_to_list(form)
 
     return tr.serialize()
+
 
 @log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.change_tcmsenvrunvaluemap'))
@@ -265,22 +270,23 @@ def env_value(request, action, run_ids, env_value_ids):
     """
     from tcms.apps.management.models import TCMSEnvValue
 
-    trs = TestRun.objects.filter(pk__in = pre_process_ids(value = run_ids))
+    trs = TestRun.objects.filter(pk__in=pre_process_ids(value=run_ids))
     evs = TCMSEnvValue.objects.filter(
-        pk__in = pre_process_ids(value = env_value_ids)
+        pk__in=pre_process_ids(value=env_value_ids)
     )
 
     for tr in trs:
         for ev in evs:
             try:
                 func = getattr(tr, action + '_env_value')
-                func(env_value = ev)
+                func(env_value=ev)
             except:
                 pass
 
     return
 
-def filter(request, values = {}):
+
+def filter(request, values={}):
     """
     Description: Performs a search and returns the resulting list of test runs.
 
@@ -317,7 +323,8 @@ def filter(request, values = {}):
     """
     return TestRun.to_xmlrpc(values)
 
-def filter_count(request, values = {}):
+
+def filter_count(request, values={}):
     """
     Description: Performs a search and returns the resulting count of runs.
 
@@ -329,6 +336,7 @@ def filter_count(request, values = {}):
     # See TestRun.filter()
     """
     return TestRun.objects.filter(**values).count()
+
 
 def get(request, run_id):
     """
@@ -342,7 +350,7 @@ def get(request, run_id):
     >>> TestRun.get(1193)
     """
     try:
-        tr = TestRun.objects.get(run_id = run_id)
+        tr = TestRun.objects.get(run_id=run_id)
     except TestRun.DoesNotExist, error:
         return error
     response = tr.serialize()
@@ -351,10 +359,11 @@ def get(request, run_id):
     query = {'id__in': tag_ids}
     tags = TestTag.to_xmlrpc(query)
     #cut 'id' attribute off, only leave 'name' here
-    tags_without_id = map(lambda x:x["name"], tags)
+    tags_without_id = map(lambda x: x["name"], tags)
     #replace tag_id list in the serialize return data
     response["tag"] = tags_without_id
     return response
+
 
 def get_bugs(request, run_ids):
     """
@@ -375,15 +384,18 @@ def get_bugs(request, run_ids):
     >>> TestRun.get_bugs('12456, 23456')
     """
     from tcms.apps.testcases.models import TestCaseBug
+
     trs = TestRun.objects.filter(
-        run_id__in = pre_process_ids(value = run_ids)
+        run_id__in=pre_process_ids(value=run_ids)
     )
     tcrs = TestCaseRun.objects.filter(
-        run__run_id__in = trs.values_list('run_id', flat = True)
+        run__run_id__in=trs.values_list('run_id', flat=True)
     )
 
-    query = {'case_run__case_run_id__in': tcrs.values_list('case_run_id', flat = True)}
+    query = {
+    'case_run__case_run_id__in': tcrs.values_list('case_run_id', flat=True)}
     return TestCaseBug.to_xmlrpc(query)
+
 
 def get_change_history(request, run_id):
     """
@@ -395,6 +407,7 @@ def get_change_history(request, run_id):
     Returns:     Array: An array of hashes with changed fields and their details.
     """
     pass
+
 
 def get_completion_report(request, run_ids):
     """
@@ -410,6 +423,7 @@ def get_completion_report(request, run_ids):
     """
     pass
 
+
 def get_env_values(request, run_id):
     """
     Description: Get the list of env values to this run.
@@ -422,8 +436,10 @@ def get_env_values(request, run_id):
     >>> TestRun.get_env_values(8748)
     """
     from tcms.apps.management.models import TCMSEnvValue
+
     query = {'testrun__pk': run_id}
     return TCMSEnvValue.to_xmlrpc(query)
+
 
 def get_tags(request, run_id):
     """
@@ -437,7 +453,7 @@ def get_tags(request, run_id):
     >>> TestRun.get_tags(1193)
     """
     try:
-        tr = TestRun.objects.get(run_id = run_id)
+        tr = TestRun.objects.get(run_id=run_id)
     except:
         raise
 
@@ -445,7 +461,8 @@ def get_tags(request, run_id):
     query = {'id__in': tag_ids}
     return TestTag.to_xmlrpc(query)
 
-def get_test_case_runs(request, run_id, is_current = None):
+
+def get_test_case_runs(request, run_id, is_current=None):
     """
     Description: Get the list of cases that this run is linked to.
 
@@ -467,6 +484,7 @@ def get_test_case_runs(request, run_id, is_current = None):
     if is_current is not None:
         query['is_current'] = is_current
     return TestCaseRun.to_xmlrpc(query)
+
 
 def get_test_cases(request, run_id):
     """
@@ -490,13 +508,15 @@ def get_test_cases(request, run_id):
 
     tc_ids = tr.case_run.values_list('case_id', flat=True)
     tc_run_id = dict(tr.case_run.values_list('case_id', 'case_run_id'))
-    tc_status = dict(tr.case_run.values_list('case_id', 'case_run_status__name'))
+    tc_status = dict(
+        tr.case_run.values_list('case_id', 'case_run_status__name'))
     tcs = TestCase.objects.filter(case_id__in=tc_ids)
     tcs_serializer = XMLRPCSerializer(tcs).serialize_queryset()
     for case in tcs_serializer:
         case['case_run_id'] = tc_run_id[case['case_id']]
         case['case_run_status'] = tc_status[case['case_id']]
     return tcs_serializer
+
 
 def get_test_plan(request, run_id):
     """
@@ -510,7 +530,9 @@ def get_test_plan(request, run_id):
     Example:
     >>> TestRun.get_test_plan(1193)
     """
-    return TestRun.objects.select_related('plan').get(run_id = run_id).plan.serialize()
+    return TestRun.objects.select_related('plan').get(
+        run_id=run_id).plan.serialize()
+
 
 @log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.delete_testruntag'))
@@ -534,22 +556,23 @@ def remove_tag(request, run_ids, tags):
     >>> TestRun.remove_tag('56789, 12345', 'foo, bar')
     """
     trs = TestRun.objects.filter(
-        run_id__in = pre_process_ids(value = run_ids)
+        run_id__in=pre_process_ids(value=run_ids)
     )
     tgs = TestTag.objects.filter(
-        name__in = TestTag.string_to_list(tags)
+        name__in=TestTag.string_to_list(tags)
     )
 
     for tr in trs:
         for tg in tgs:
             try:
-                tr.remove_tag(tag = tg)
+                tr.remove_tag(tag=tg)
             except ObjectDoesNotExist:
                 pass
             except:
                 raise
 
     return
+
 
 @log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.change_testrun'))
@@ -593,7 +616,7 @@ def update(request, run_ids, values):
 
     form = XMLRPCUpdateRunForm(values)
     if values.get('product_version'):
-        form.populate(product_id = values['product'])
+        form.populate(product_id=values['product'])
 
     if form.is_valid():
         trs = TestRun.objects.filter(pk__in=pre_process_ids(value=run_ids))
@@ -633,7 +656,8 @@ def update(request, run_ids, values):
                 _values['notes'] = form.cleaned_data['notes']
 
         if form.cleaned_data['plan_text_version']:
-            _values['plan_text_version'] = form.cleaned_data['plan_text_version']
+            _values['plan_text_version'] = form.cleaned_data[
+                'plan_text_version']
 
         if isinstance(form.cleaned_data['status'], int):
             if form.cleaned_data['status']:
@@ -647,6 +671,7 @@ def update(request, run_ids, values):
 
     query = {'pk__in': trs.values_list('pk', flat=True)}
     return TestRun.to_xmlrpc(query)
+
 
 @log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.add_tcmsenvrunvaluemap'))
@@ -668,6 +693,7 @@ def link_env_value(request, run_ids, env_value_ids):
     >>> TestRun.link_env_value(8748, 13)
     """
     return env_value(request, 'add', run_ids, env_value_ids)
+
 
 @log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.delete_tcmsenvrunvaluemap'))

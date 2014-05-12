@@ -17,14 +17,14 @@
 #   Xuqing Kuang <xkuang@redhat.com>
 #   Chenxiong Qi <cqi@redhat.com>
 
+from django.db.models import ObjectDoesNotExist
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required
 
 from tcms.apps.testruns.models import TestCaseRun, TestCaseRunStatus
 from tcms.core.contrib.linkreference.models import create_link, LinkReference
 from tcms.core.decorators import log_call
 from tcms.core.utils.xmlrpc import XMLRPCSerializer
-from utils import pre_process_ids
-
+from tcms.xmlrpc.utils import pre_process_ids
 
 
 __all__ = (
@@ -52,11 +52,12 @@ __all__ = (
     'update',
 )
 
+
 class GetCaseRun(object):
     def pre_process_tcr(self, case_run_id):
-        return TestCaseRun.objects.get(pk = case_run_id)
+        return TestCaseRun.objects.get(pk=case_run_id)
 
-    def pre_process_tcr_s(self, run_id, case_id, build_id, environment_id = 0):
+    def pre_process_tcr_s(self, run_id, case_id, build_id, environment_id=0):
         query = {
             'run__pk': run_id,
             'case__pk': case_id,
@@ -68,6 +69,7 @@ class GetCaseRun(object):
             return TestCaseRun.objects.get(**query)
 
         return TestCaseRun.objects.get(**query)
+
 
 gcr = GetCaseRun()
 
@@ -94,15 +96,17 @@ def add_comment(request, case_run_ids, comment):
     >>> TestCaseRun.add_comment('56789, 12345', 'foobar')
     """
     from utils import Comment
-    object_pks = pre_process_ids(value = case_run_ids)
+
+    object_pks = pre_process_ids(value=case_run_ids)
     c = Comment(
-        request = request,
-        content_type = 'testruns.testcaserun',
-        object_pks = object_pks,
-        comment = comment
+        request=request,
+        content_type='testruns.testcaserun',
+        object_pks=object_pks,
+        comment=comment
     )
 
     return c.add()
+
 
 @log_call(namespace='TestCaseRun')
 @user_passes_test(lambda u: u.has_perm('testcases.add_testcasebug'))
@@ -148,22 +152,24 @@ def attach_bug(request, values):
             value['bug_system_id'] = 1
 
         try:
-            bug_system = TestCaseBugSystem.objects.get(id = value['bug_system_id'])
+            bug_system = TestCaseBugSystem.objects.get(
+                id=value['bug_system_id'])
         except:
             raise
 
         try:
-            tcr = TestCaseRun.objects.get(case_run_id = value['case_run_id'])
+            tcr = TestCaseRun.objects.get(case_run_id=value['case_run_id'])
             tcr.add_bug(
-                bug_id = value['bug_id'],
-                bug_system = bug_system,
-                summary = value.get('summary'),
-                description = value.get('description')
+                bug_id=value['bug_id'],
+                bug_system=bug_system,
+                summary=value.get('summary'),
+                description=value.get('description')
             )
         except:
             raise
 
     return
+
 
 def check_case_run_status(request, name):
     """
@@ -174,7 +180,8 @@ def check_case_run_status(request, name):
     Example:
     >>> TestCaseRun.check_case_run_status('idle')
     """
-    return TestCaseRunStatus.objects.get(name = name).serialize()
+    return TestCaseRunStatus.objects.get(name=name).serialize()
+
 
 @log_call(namespace='TestCaseRun')
 @user_passes_test(lambda u: u.has_perm('testruns.add_testcaserun'))
@@ -211,8 +218,6 @@ def create(request, values):
     >>> TestCaseRun.create(values)
     """
     from tcms.core import forms
-    from tcms.apps.testcases.models import TestCase
-    from tcms.apps.testruns.models import TestRun
     from tcms.apps.testruns.forms import XMLRPCNewCaseRunForm
 
     form = XMLRPCNewCaseRunForm(values)
@@ -221,18 +226,19 @@ def create(request, values):
         tr = form.cleaned_data['run']
 
         tcr = tr.add_case_run(
-            case = form.cleaned_data['case'],
-            build = form.cleaned_data['build'],
-            assignee = form.cleaned_data['assignee'],
-            case_run_status = form.cleaned_data['case_run_status'],
-            case_text_version = form.cleaned_data['case_text_version'],
-            notes = form.cleaned_data['notes'],
-            sortkey = form.cleaned_data['sortkey']
+            case=form.cleaned_data['case'],
+            build=form.cleaned_data['build'],
+            assignee=form.cleaned_data['assignee'],
+            case_run_status=form.cleaned_data['case_run_status'],
+            case_text_version=form.cleaned_data['case_text_version'],
+            notes=form.cleaned_data['notes'],
+            sortkey=form.cleaned_data['sortkey']
         )
     else:
         return forms.errors_to_list(form)
 
     return tcr.serialize()
+
 
 @log_call(namespace='TestCaseRun')
 @user_passes_test(lambda u: u.has_perm('testcases.delete_testcasebug'))
@@ -258,7 +264,7 @@ def detach_bug(request, case_run_ids, bug_ids):
     >>> TestCaseRun.detach_bug('56789, 12345', '1234, 5678')
     """
     tcrs = TestCaseRun.objects.filter(
-        case_run_id__in = pre_process_ids(case_run_ids)
+        case_run_id__in=pre_process_ids(case_run_ids)
     )
     bug_ids = pre_process_ids(bug_ids)
 
@@ -267,12 +273,13 @@ def detach_bug(request, case_run_ids, bug_ids):
         for opk in bug_ids:
             try:
                 tcr.remove_bug(bug_id=opk, run_id=case_run_id)
-            except ObjectDoesNotExist, error:
+            except ObjectDoesNotExist:
                 pass
 
     return
 
-def filter(request, values = {}):
+
+def filter(request, values={}):
     """
     Description: Performs a search and returns the resulting list of test cases.
 
@@ -303,7 +310,8 @@ def filter(request, values = {}):
     """
     return TestCaseRun.to_xmlrpc(values)
 
-def filter_count(request, values = {}):
+
+def filter_count(request, values={}):
     """
     Description: Performs a search and returns the resulting count of cases.
 
@@ -315,7 +323,9 @@ def filter_count(request, values = {}):
     # See TestCaseRun.filter()
     """
     from tcms.apps.testruns.models import TestCaseRun
+
     return TestCaseRun.objects.filter(**values).count()
+
 
 def get(request, case_run_id):
     """
@@ -329,9 +339,10 @@ def get(request, case_run_id):
     Example:
     >>> TestCaseRun.get(1193)
     """
-    return gcr.pre_process_tcr(case_run_id = case_run_id).serialize()
+    return gcr.pre_process_tcr(case_run_id=case_run_id).serialize()
 
-def get_s(request, case_id, run_id, build_id, environment_id = 0):
+
+def get_s(request, case_id, run_id, build_id, environment_id=0):
     """
     Description: Used to load an existing test case from the database.
 
@@ -345,7 +356,9 @@ def get_s(request, case_id, run_id, build_id, environment_id = 0):
     Example:
     >>> TestCaseRun.get_s(3113, 565, 72, 90)
     """
-    return gcr.pre_process_tcr_s(run_id, case_id, build_id, environment_id).serialize()
+    return gcr.pre_process_tcr_s(run_id, case_id, build_id,
+                                 environment_id).serialize()
+
 
 def get_bugs(request, case_run_id):
     """
@@ -360,15 +373,17 @@ def get_bugs(request, case_run_id):
     >>> TestCase.get_bugs(12345)
     """
     from tcms.apps.testcases.models import TestCaseBug
+
     try:
-        tcr = gcr.pre_process_tcr(case_run_id = case_run_id)
+        tcr = gcr.pre_process_tcr(case_run_id=case_run_id)
     except:
         raise
 
     query = {'case_run__case_run_id': tcr.case_run_id}
     return TestCaseBug.to_xmlrpc(query)
 
-def get_bugs_s(request, run_id, case_id, build_id, environment_id = 0):
+
+def get_bugs_s(request, run_id, case_id, build_id, environment_id=0):
     """
     Description: Get the list of bugs that are associated with this test case.
 
@@ -383,12 +398,13 @@ def get_bugs_s(request, run_id, case_id, build_id, environment_id = 0):
     >>> TestCaseRun.get_bugs_s(3113, 565, 72, 90)
     """
     from tcms.apps.testcases.models import TestCaseBug
+
     try:
         tcr = gcr.pre_process_tcr_s(
-            run_id = run_id,
-            case_id = case_id,
-            build_id = build_id,
-            environment_id = environment_id,
+            run_id=run_id,
+            case_id=case_id,
+            build_id=build_id,
+            environment_id=environment_id,
         )
     except:
         raise
@@ -396,7 +412,8 @@ def get_bugs_s(request, run_id, case_id, build_id, environment_id = 0):
     query = {'case_run__case_run_id': tcr.case_run_id}
     return TestCaseBug.to_xmlrpc(query)
 
-def get_case_run_status(request, id = None):
+
+def get_case_run_status(request, id=None):
     """
     Params:      $case_run_status_id - Integer(Optional): ID of the status to return
 
@@ -411,9 +428,10 @@ def get_case_run_status(request, id = None):
     >>> TestCaseRun.get_case_run_status(1)
     """
     if id:
-        return TestCaseRunStatus.objects.get(id = id).serialize()
+        return TestCaseRunStatus.objects.get(id=id).serialize()
 
     return TestCaseRunStatus.to_xmlrpc()
+
 
 def get_completion_time(request, case_run_id):
     """
@@ -431,7 +449,7 @@ def get_completion_time(request, case_run_id):
     """
     from tcms.core.forms.widgets import SECONDS_PER_DAY
 
-    tcr = gcr.pre_process_tcr(case_run_id = case_run_id)
+    tcr = gcr.pre_process_tcr(case_run_id=case_run_id)
     if not tcr.running_date or not tcr.close_date:
         return
 
@@ -439,7 +457,8 @@ def get_completion_time(request, case_run_id):
     time = time.days * SECONDS_PER_DAY + time.seconds
     return time
 
-def get_completion_time_s(request, run_id, case_id, build_id, environment_id = 0):
+
+def get_completion_time_s(request, run_id, case_id, build_id, environment_id=0):
     """
     Description: Returns the time in seconds that it took for this case to complete.
 
@@ -455,11 +474,12 @@ def get_completion_time_s(request, run_id, case_id, build_id, environment_id = 0
     >>> TestCaseRun.get_completion_time_s(3113, 565, 72, 90)
     """
     from tcms.core.forms.widgets import SECONDS_PER_DAY
+
     tcr = gcr.pre_process_tcr_s(
-        run_id = run_id,
-        case_id = case_id,
-        build_id = build_id,
-        environment_id = environment_id,
+        run_id=run_id,
+        case_id=case_id,
+        build_id=build_id,
+        environment_id=environment_id,
     )
     if not tcr.running_date or not tcr.close_date:
         return
@@ -467,6 +487,7 @@ def get_completion_time_s(request, run_id, case_id, build_id, environment_id = 0
     time = tcr.close_date - tcr.running_date
     time = time.days * SECONDS_PER_DAY + time.seconds
     return time
+
 
 def get_history(request, case_run_id):
     """
@@ -480,6 +501,7 @@ def get_history(request, case_run_id):
     Returns:     Array: An array of case-run object hashes.
     """
     pass
+
 
 def get_history_s(request, run_id, build_id, environment_id):
     """
@@ -496,18 +518,20 @@ def get_history_s(request, run_id, build_id, environment_id):
     """
     raise NotImplementedError
 
+
 def lookup_status_name_by_id(request, id):
     """
     DEPRECATED - CONSIDERED HARMFUL Use TestCaseRun.get_case_run_status instead
     """
-    return get_case_run_status(request = request, id = id)
+    return get_case_run_status(request=request, id=id)
 
 
 def lookup_status_id_by_name(request, name):
     """
     DEPRECATED - CONSIDERED HARMFUL Use TestCaseRun.check_case_run_status instead
     """
-    return check_case_run_status(request = request, name = name)
+    return check_case_run_status(request=request, name=name)
+
 
 @log_call(namespace='TestCaseRun')
 @user_passes_test(lambda u: u.has_perm('testruns.change_testcaserun'))
@@ -593,7 +617,7 @@ def attach_log(request, case_run_id, name, url):
     """
     try:
         test_case_run = TestCaseRun.objects.get(pk=case_run_id)
-    except ObjectDoesNotExist, error:
+    except ObjectDoesNotExist:
         raise
 
     create_link(name=name, url=url, link_to=test_case_run)
@@ -609,7 +633,7 @@ def detach_log(request, case_run_id, link_id):
     """
     try:
         test_case_run = TestCaseRun.objects.get(pk=case_run_id)
-    except ObjectDoesNotExist, error:
+    except ObjectDoesNotExist:
         raise
 
     try:
@@ -628,7 +652,7 @@ def get_logs(request, case_run_id):
     """
     try:
         test_case_run = TestCaseRun.objects.get(pk=case_run_id)
-    except ObjectDoesNotExist, error:
+    except ObjectDoesNotExist:
         raise
 
     links = LinkReference.get_from(test_case_run)

@@ -6,6 +6,7 @@ __all__ = (
     'get',
 )
 
+
 def get(request):
     '''
     Description: Retrieve XMLRPC's version

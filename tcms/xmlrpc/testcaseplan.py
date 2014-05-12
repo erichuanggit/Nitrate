@@ -16,12 +16,14 @@
 # Authors:
 #   Jian Chen <jianchen@redhat.com>
 
+from django.core.exceptions import ObjectDoesNotExist
+
 from tcms.apps.testcases.models import TestCase, TestCasePlan
 from tcms.apps.testplans.models import TestPlan
 from tcms.core.utils.xmlrpc import XMLRPCSerializer
-from django.core.exceptions import ObjectDoesNotExist
 
 __all__ = ('get', 'update')
+
 
 def get(request, case_id, plan_id):
     """
@@ -51,6 +53,7 @@ def get(request, case_id, plan_id):
         return error
 
     return XMLRPCSerializer(model=tcp).serialize_model()
+
 
 def update(request, case_id, plan_id, sortkey):
     """

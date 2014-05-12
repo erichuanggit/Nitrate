@@ -17,16 +17,17 @@
 #    Xuqing Kuang <xkuang@redhat.com>
 #    Chenxiong Qi <cqi@redhat.com>
 
-from kobo.django.xmlrpc.decorators import user_passes_test, login_required
+from kobo.django.xmlrpc.decorators import user_passes_test
 
-from tcms.apps.management.models import Product, TestBuild
+from tcms.apps.management.models import TestBuild
 from tcms.core.decorators import log_call
-from utils import pre_check_product
+from tcms.xmlrpc.utils import pre_check_product
 
 __all__ = (
     'check_build', 'create', 'get', 'get_runs', 'get_caseruns',
     'lookup_id_by_name', 'lookup_name_by_id', 'update'
 )
+
 
 def check_build(request, name, product):
     """
@@ -43,13 +44,14 @@ def check_build(request, name, product):
     # Get with product name
     >>> Build.check_build('2008-02-25', 'Red Hat Enterprise Linux 5')
     """
-    p = pre_check_product(values = product)
+    p = pre_check_product(values=product)
     try:
-        tb = TestBuild.objects.get(name = name, product = p)
+        tb = TestBuild.objects.get(name=name, product=p)
     except TestBuild.DoesNotExist, error:
         return error
 
     return tb.serialize()
+
 
 @log_call(namespace='TestBuild')
 @user_passes_test(lambda u: u.has_perm('management.add_testbuild'))
@@ -83,11 +85,12 @@ def create(request, values):
     p = pre_check_product(values)
 
     return TestBuild.objects.create(
-        product = p,
-        name = values['name'],
-        description = values.get('description'),
-        is_active = values.get('is_active', True)
+        product=p,
+        name=values['name'],
+        description=values.get('description'),
+        is_active=values.get('is_active', True)
     ).serialize()
+
 
 def get(request, build_id):
     """
@@ -100,7 +103,8 @@ def get(request, build_id):
     Example:
     >>> Build.get(1234)
     """
-    return TestBuild.objects.get(build_id = build_id).serialize()
+    return TestBuild.objects.get(build_id=build_id).serialize()
+
 
 def get_runs(request, build_id):
     """
@@ -115,10 +119,11 @@ def get_runs(request, build_id):
     """
     from tcms.apps.testruns.models import TestRun
 
-    tb = TestBuild.objects.get(build_id = build_id)
+    tb = TestBuild.objects.get(build_id=build_id)
     query = {'build': tb}
 
     return TestRun.to_xmlrpc(query)
+
 
 def get_caseruns(request, build_id):
     """
@@ -133,10 +138,11 @@ def get_caseruns(request, build_id):
     """
     from tcms.apps.testruns.models import TestCaseRun
 
-    tb = TestBuild.objects.get(build_id = build_id)
+    tb = TestBuild.objects.get(build_id=build_id)
     query = {'build': tb}
 
     return TestCaseRun.to_xmlrpc(query)
+
 
 def lookup_id_by_name(request, name, product):
     """
@@ -144,11 +150,13 @@ def lookup_id_by_name(request, name, product):
     """
     return check_build(request, name, product)
 
+
 def lookup_name_by_id(request, build_id):
     """
     DEPRECATED Use Build.get instead
     """
     return get(request, build_id)
+
 
 @log_call(namespace='TestBuild')
 @user_passes_test(lambda u: u.has_perm('management.change_testbuild'))
@@ -179,7 +187,7 @@ def update(request, build_id, values):
     >>> Build.update(702, {'is_active': 0})
     """
     try:
-        tb = TestBuild.objects.get(build_id = build_id)
+        tb = TestBuild.objects.get(build_id=build_id)
     except TestBuild.DoesNotExist, error:
         return error
 

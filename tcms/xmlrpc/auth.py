@@ -24,13 +24,15 @@ __all__ = (
     'login', 'logout', 'login_krbv'
 )
 
+
 def check_user_name(parameters):
     username = parameters.get('username')
     password = parameters.get('password')
     if not username or not password:
         raise PermissionDenied('Username and password is required')
-    
+
     return username, password
+
 
 def login(request, parameters):
     """
@@ -50,19 +52,22 @@ def login(request, parameters):
     >>> Auth.login({'username': 'foo', 'password': 'bar'})
     """
     from tcms.core.contrib.auth import get_backend
+
     user = None
-    
+
     for backend_str in settings.AUTHENTICATION_BACKENDS:
         backend = get_backend(backend_str)
         user = backend.authenticate(*check_user_name(parameters))
-        
+
         if user:
-            user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
+            user.backend = "%s.%s" % (
+            backend.__module__, backend.__class__.__name__)
             django.contrib.auth.login(request, user)
             return request.session.session_key
-            
+
     if user is None:
         raise PermissionDenied('Wrong username or password')
+
 
 def login_krbv(request):
     """
@@ -83,6 +88,7 @@ def login_krbv(request):
     user = middleware.process_request(request)
 
     return request.session.session_key
+
 
 def logout(request):
     """Description: Delete session information."""

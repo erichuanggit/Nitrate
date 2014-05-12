@@ -18,8 +18,7 @@
 
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import PermissionDenied
-
-from kobo.django.xmlrpc.decorators import user_passes_test, login_required
+from kobo.django.xmlrpc.decorators import user_passes_test
 
 from tcms.core.decorators import log_call
 from tcms.core.utils.xmlrpc import XMLRPCSerializer
@@ -32,12 +31,14 @@ __all__ = (
     'join'
 )
 
+
 def get_user_dict(user):
-    u = XMLRPCSerializer(model = user)
+    u = XMLRPCSerializer(model=user)
     u = u.serialize_model()
     if u.get('password'):
         del u['password']
     return u
+
 
 @log_call(namespace='User')
 def filter(request, query):
@@ -67,6 +68,7 @@ def filter(request, query):
     users = User.objects.filter(**query)
     return [get_user_dict(u) for u in users]
 
+
 def get(request, id):
     """
     Description: Used to load an existing test case from the database.
@@ -78,7 +80,8 @@ def get(request, id):
     Example:
     >>> User.get(2206)
     """
-    return get_user_dict(User.objects.get(pk = id))
+    return get_user_dict(User.objects.get(pk=id))
+
 
 def get_me(request):
     """
@@ -91,7 +94,8 @@ def get_me(request):
     """
     return get_user_dict(request.user)
 
-def update(request, values = None, id = None):
+
+def update(request, values=None, id=None):
     """
     Description: Updates the fields of the selected user. it also can change the
                  informations of other people if you have permission.
@@ -122,16 +126,17 @@ def update(request, values = None, id = None):
     >>> User.update({'password': 'foo', 'old_password': '123'}, 2206)
     """
     if id:
-        u = User.objects.get(pk = id)
+        u = User.objects.get(pk=id)
     else:
         u = request.user
-    
+
     if values is None:
         values = {}
-        
+
     editable_fields = ['first_name', 'last_name', 'email', 'password']
-    
-    if not request.user.has_perm('auth.change_changeuser') and request.user != u:
+
+    if not request.user.has_perm(
+            'auth.change_changeuser') and request.user != u:
         raise PermissionDenied
 
     _update_fields = list()
@@ -139,18 +144,23 @@ def update(request, values = None, id = None):
         if values.get(f):
             _update_fields.append(f)
             if f == 'password':
-                if not request.user.has_perm('auth.change_changeuser') and not values.get('old_password'):
+                if not request.user.has_perm(
+                        'auth.change_changeuser') and not values.get(
+                        'old_password'):
                     raise PermissionDenied('Old password is required')
-                    
-                if not request.user.has_perm('auth.change_changeuser') and not u.check_password(values.get('old_password')):
+
+                if not request.user.has_perm(
+                        'auth.change_changeuser') and not u.check_password(
+                        values.get('old_password')):
                     raise PermissionDenied('Password is incorrect')
-                
+
                 u.set_password(values['password'])
             else:
                 setattr(u, f, values[f])
 
     u.save(update_fields=_update_fields)
     return get_user_dict(u)
+
 
 @log_call(namespace='User')
 @user_passes_test(lambda u: u.has_perm('auth.change_user'))

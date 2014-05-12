@@ -18,15 +18,13 @@
 #   Chenxiong Qi <cqi@redhat.com>
 
 from django.core.exceptions import ObjectDoesNotExist
-
 from kobo.django.xmlrpc.decorators import user_passes_test, login_required
 
 from tcms.apps.management.models import Component
 from tcms.apps.management.models import TestTag
-from tcms.apps.testcases.models import TestCasePlan
 from tcms.apps.testplans.models import TestPlan, TestPlanType
 from tcms.core.decorators import log_call
-from utils import pre_process_ids
+from tcms.xmlrpc.utils import pre_process_ids
 
 __all__ = (
     'add_tag',
@@ -55,6 +53,7 @@ __all__ = (
     'import_case_via_XML',
 )
 
+
 @log_call(namespace='TestPlan')
 @user_passes_test(lambda u: u.has_perm('testplans.add_testplantag'))
 def add_tag(request, plan_ids, tags):
@@ -79,16 +78,17 @@ def add_tag(request, plan_ids, tags):
     >>> TestPlan.add_tag('12345, 67890', 'foo, bar')
     """
     tps = TestPlan.objects.filter(
-        plan_id__in = pre_process_ids(value = plan_ids)
+        plan_id__in=pre_process_ids(value=plan_ids)
     )
     tags = TestTag.string_to_list(tags)
 
     for tag in tags:
-        t, c = TestTag.objects.get_or_create(name = tag)
+        t, c = TestTag.objects.get_or_create(name=tag)
         for tp in tps:
-            tp.add_tag(tag = t)
+            tp.add_tag(tag=t)
 
     return
+
 
 @log_call(namespace='TestPlan')
 @user_passes_test(lambda u: u.has_perm('testplans.add_testplancomponent'))
@@ -113,10 +113,10 @@ def add_component(request, plan_ids, component_ids):
     """
 
     tps = TestPlan.objects.filter(
-        plan_id__in = pre_process_ids(value=plan_ids)
+        plan_id__in=pre_process_ids(value=plan_ids)
     )
     cs = Component.objects.filter(
-        id__in = pre_process_ids(value=component_ids)
+        id__in=pre_process_ids(value=component_ids)
     )
 
     for tp in tps:
@@ -124,6 +124,7 @@ def add_component(request, plan_ids, component_ids):
             tp.add_component(c)
 
     return
+
 
 def check_plan_type(request, name):
     """
@@ -134,7 +135,8 @@ def check_plan_type(request, name):
     Example:
     >>> TestPlan.check_plan_type('regression')
     """
-    return TestPlanType.objects.get(name = name).serialize()
+    return TestPlanType.objects.get(name=name).serialize()
+
 
 @log_call(namespace='TestPlan')
 @user_passes_test(lambda u: u.has_perm('testplans.add_testplan'))
@@ -177,29 +179,31 @@ def create(request, values):
         raise ValueError('Value of product is required')
 
     form = XMLRPCNewPlanForm(values)
-    form.populate(product_id = values['product'])
+    form.populate(product_id=values['product'])
 
     if form.is_valid():
         tp = TestPlan.objects.create(
-            product = form.cleaned_data['product'],
-            name = form.cleaned_data['name'],
-            type = form.cleaned_data['type'],
-            author = request.user,
-            default_product_version = form.cleaned_data['default_product_version'],
-            parent = form.cleaned_data['parent'],
-            is_active = form.cleaned_data['is_active']
+            product=form.cleaned_data['product'],
+            name=form.cleaned_data['name'],
+            type=form.cleaned_data['type'],
+            author=request.user,
+            default_product_version=form.cleaned_data[
+                'default_product_version'],
+            parent=form.cleaned_data['parent'],
+            is_active=form.cleaned_data['is_active']
         )
 
         tp.add_text(
-            author = request.user,
-            plan_text = values['text'],
+            author=request.user,
+            plan_text=values['text'],
         )
 
         return tp.serialize()
     else:
         return forms.errors_to_list(form)
 
-def filter(request, values = {}):
+
+def filter(request, values={}):
     """
     Description: Performs a search and returns the resulting list of test plans.
 
@@ -237,7 +241,8 @@ def filter(request, values = {}):
     """
     return TestPlan.to_xmlrpc(values)
 
-def filter_count(request, values = {}):
+
+def filter_count(request, values={}):
     """
     Description: Performs a search and returns the resulting count of plans.
 
@@ -249,6 +254,7 @@ def filter_count(request, values = {}):
     # See TestPlan.filter()
     """
     return TestPlan.objects.filter(**values).count()
+
 
 def get(request, plan_id):
     """
@@ -262,7 +268,7 @@ def get(request, plan_id):
     >>> TestPlan.get(137)
     """
     try:
-        tp = TestPlan.objects.get(plan_id = plan_id)
+        tp = TestPlan.objects.get(plan_id=plan_id)
     except TestPlan.DoesNotExist, error:
         return error
     response = tp.serialize()
@@ -271,10 +277,11 @@ def get(request, plan_id):
     query = {'id__in': tag_ids}
     tags = TestTag.to_xmlrpc(query)
     #cut 'id' attribute off, only leave 'name' here
-    tags_without_id = map(lambda x:x["name"], tags)
+    tags_without_id = map(lambda x: x["name"], tags)
     #replace tag_id list in the serialize return data
     response["tag"] = tags_without_id
     return response
+
 
 def get_change_history(request, plan_id):
     """
@@ -286,6 +293,7 @@ def get_change_history(request, plan_id):
     Returns:     Array: An array of hashes with changed fields and their details.
     """
     pass
+
 
 def get_env_groups(request, plan_id):
     """
@@ -300,6 +308,7 @@ def get_env_groups(request, plan_id):
     query = {'testplan__pk': plan_id}
     return TCMSEnvGroup.to_xmlrpc(query)
 
+
 def get_plan_type(request, id):
     """
     Params:      $id - Integer: ID of the plan type to return
@@ -309,7 +318,8 @@ def get_plan_type(request, id):
     Example:
     >>> TestPlan.get_plan_type(3)
     """
-    return TestPlanType.objects.get(id = id).serialize()
+    return TestPlanType.objects.get(id=id).serialize()
+
 
 def get_product(request, plan_id):
     """
@@ -322,7 +332,9 @@ def get_product(request, plan_id):
     Example:
     >>> TestPlan.get_product(137)
     """
-    return TestPlan.objects.select_related('product').get(pk = plan_id).product.serialize()
+    return TestPlan.objects.select_related('product').get(
+        pk=plan_id).product.serialize()
+
 
 def get_tags(request, plan_id):
     """
@@ -336,13 +348,14 @@ def get_tags(request, plan_id):
     >>> TestPlan.get_tags(137)
     """
     try:
-        tp = TestPlan.objects.get(plan_id = plan_id)
+        tp = TestPlan.objects.get(plan_id=plan_id)
     except:
         raise
 
     tag_ids = tp.tag.values_list('id', flat=True)
     query = {'id__in': tag_ids}
     return TestTag.to_xmlrpc(query)
+
 
 def get_components(request, plan_id):
     """
@@ -364,6 +377,7 @@ def get_components(request, plan_id):
     query = {'id__in': component_ids}
     return Component.to_xmlrpc(query)
 
+
 def get_all_cases_tags(request, plan_id):
     """
     Description: Get the list of tags attached to this plan's testcases.
@@ -376,17 +390,18 @@ def get_all_cases_tags(request, plan_id):
     >>> TestPlan.get_all_cases_tags(137)
     """
     try:
-        tp = TestPlan.objects.get(plan_id = plan_id)
+        tp = TestPlan.objects.get(plan_id=plan_id)
     except:
         raise
 
     tcs = tp.case.all()
-    tag_ids=[]
+    tag_ids = []
     for tc in tcs:
         tag_ids.extend(tc.tag.values_list('id', flat=True))
-    tag_ids=list(set(tag_ids))
+    tag_ids = list(set(tag_ids))
     query = {'id__in': tag_ids}
     return TestTag.to_xmlrpc(query)
+
 
 def get_test_cases(request, plan_id):
     """
@@ -402,6 +417,7 @@ def get_test_cases(request, plan_id):
     from tcms.apps.testcases.models import TestCase
     from tcms.apps.testplans.models import TestPlan
     from tcms.core.utils.xmlrpc import XMLRPCSerializer
+
     try:
         tp = TestPlan.objects.get(pk=plan_id)
     except TestPlan.DoesNotExist, err:
@@ -416,6 +432,7 @@ def get_test_cases(request, plan_id):
             serialized_tc['sortkey'] = tcp.sortkey
     return serialized_tcs
 
+
 def get_test_runs(request, plan_id):
     """
     Description: Get the list of runs in this plan.
@@ -428,10 +445,12 @@ def get_test_runs(request, plan_id):
     >>> TestPlan.get_test_runs(plan_id)
     """
     from tcms.apps.testruns.models import TestRun
+
     query = {'plan': plan_id}
     return TestRun.to_xmlrpc(query)
 
-def get_text(request, plan_id, plan_text_version = None):
+
+def get_text(request, plan_id, plan_text_version=None):
     """
     Description: The plan document for a given test plan.
 
@@ -448,20 +467,24 @@ def get_text(request, plan_id, plan_text_version = None):
     # Get all case text with version 4
     >>> TestPlan.get_text(137, 4)
     """
-    tp = TestPlan.objects.get(plan_id = plan_id)
-    test_plan_text = tp.get_text_with_version(plan_text_version = plan_text_version)
+    tp = TestPlan.objects.get(plan_id=plan_id)
+    test_plan_text = tp.get_text_with_version(
+        plan_text_version=plan_text_version)
     if test_plan_text:
         return test_plan_text.serialize()
     else:
         return "No plan text with version '%s' found." % plan_text_version
 
+
 def lookup_type_id_by_name(request, name):
     """DEPRECATED - CONSIDERED HARMFUL Use TestPlan.check_plan_type instead"""
-    return check_plan_type(request = request, name = name)
+    return check_plan_type(request=request, name=name)
+
 
 def lookup_type_name_by_id(request, id):
     """DEPRECATED - CONSIDERED HARMFUL Use TestPlan.get_plan_type instead"""
-    return get_plan_type(request = request, id = id)
+    return get_plan_type(request=request, id=id)
+
 
 @log_call(namespace='TestPlan')
 @user_passes_test(lambda u: u.has_perm('testplans.delete_testplantag'))
@@ -485,23 +508,25 @@ def remove_tag(request, plan_ids, tags):
     >>> TestPlan.remove_tag('56789, 12345', 'foo, bar')
     """
     from tcms.apps.management.models import TestTag
+
     tps = TestPlan.objects.filter(
-        plan_id__in = pre_process_ids(value = plan_ids)
+        plan_id__in=pre_process_ids(value=plan_ids)
     )
     tgs = TestTag.objects.filter(
-        name__in = TestTag.string_to_list(tags)
+        name__in=TestTag.string_to_list(tags)
     )
 
     for tp in tps:
         for tg in tgs:
             try:
-                tp.remove_tag(tag = tg)
+                tp.remove_tag(tag=tg)
             except ObjectDoesNotExist:
                 pass
             except:
                 raise
 
     return
+
 
 @log_call(namespace='TestPlan')
 @user_passes_test(lambda u: u.has_perm('testplans.delete_testplancomponent'))
@@ -525,10 +550,10 @@ def remove_component(request, plan_ids, component_ids):
     >>> TestPlan.remove_component('56789, 12345', '1234, 5678')
     """
     tps = TestPlan.objects.filter(
-        plan_id__in = pre_process_ids(value=plan_ids)
+        plan_id__in=pre_process_ids(value=plan_ids)
     )
     cs = Component.objects.filter(
-        id__in = pre_process_ids(value=component_ids)
+        id__in=pre_process_ids(value=component_ids)
     )
 
     for tp in tps:
@@ -540,9 +565,10 @@ def remove_component(request, plan_ids, component_ids):
 
     return
 
+
 @log_call(namespace='TestPlan')
 @user_passes_test(lambda u: u.has_perm('testplans.add_testplantext'))
-def store_text(request, plan_id, text, author = None):
+def store_text(request, plan_id, text, author=None):
     """
     Description: Update the document field of a plan.
 
@@ -558,17 +584,18 @@ def store_text(request, plan_id, text, author = None):
     """
     from django.contrib.auth.models import User
 
-    tp = TestPlan.objects.get(plan_id = plan_id)
+    tp = TestPlan.objects.get(plan_id=plan_id)
 
     if author:
-        author = User.objects.get(id = author)
+        author = User.objects.get(id=author)
     else:
         author = request.user
 
     return tp.add_text(
-        author = author,
-        plan_text = text,
+        author=author,
+        plan_text=text,
     ).serialize()
+
 
 @log_call(namespace='TestPlan')
 @user_passes_test(lambda u: u.has_perm('testplans.change_testplan'))
@@ -612,9 +639,9 @@ def update(request, plan_ids, values):
         raise ValueError('Product value is required by default product version')
 
     if values.get('default_product_version') and values.get('product'):
-        form.populate(product_id = values['product'])
+        form.populate(product_id=values['product'])
 
-    tps = TestPlan.objects.filter(pk__in = pre_process_ids(value = plan_ids))
+    tps = TestPlan.objects.filter(pk__in=pre_process_ids(value=plan_ids))
 
     if form.is_valid():
         _values = dict()
@@ -646,8 +673,9 @@ def update(request, plan_ids, values):
     else:
         return forms.errors_to_list(form)
 
-    query = {'pk__in': tps.values_list('pk', flat = True)}
+    query = {'pk__in': tps.values_list('pk', flat=True)}
     return TestPlan.to_xmlrpc(query)
+
 
 def import_case_via_XML(request, plan_id, values):
     """
@@ -666,7 +694,7 @@ def import_case_via_XML(request, plan_id, values):
     """
     from tcms.apps.testplans.models import TestPlan
     from tcms.apps.testcases.models import TestCase, TestCasePlan, \
-            TestCaseCategory
+        TestCaseCategory
 
     try:
         tp = TestPlan.objects.get(pk=plan_id)
@@ -675,7 +703,7 @@ def import_case_via_XML(request, plan_id, values):
 
     try:
         new_case_from_xml = clean_xml_file(values)
-    except Exception, error:
+    except Exception:
         return "Invalid XML File"
 
     i = 0
@@ -684,11 +712,11 @@ def import_case_via_XML(request, plan_id, values):
         # Get the case category from the case and related to the product of the plan
         try:
             category = TestCaseCategory.objects.get(
-                product = tp.product, name = case['category_name']
+                product=tp.product, name=case['category_name']
             )
         except TestCaseCategory.DoesNotExist:
             category = TestCaseCategory.objects.create(
-                product = tp.product, name = case['category_name']
+                product=tp.product, name=case['category_name']
             )
         # Start to create the objects
         tc = TestCase.objects.create(
@@ -706,14 +734,14 @@ def import_case_via_XML(request, plan_id, values):
             default_tester_id=case['default_tester_id'],
             notes=case['notes'],
         )
-        TestCasePlan.objects.create(plan=tp, case=tc, sortkey=i*10)
+        TestCasePlan.objects.create(plan=tp, case=tc, sortkey=i * 10)
 
         tc.add_text(case_text_version=1,
                     author=case['author'],
                     action=case['action'],
                     effect=case['effect'],
                     setup=case['setup'],
-                    breakdown=case['breakdown'],)
+                    breakdown=case['breakdown'], )
 
         #handle tags
         if case['tags']:
@@ -722,6 +750,7 @@ def import_case_via_XML(request, plan_id, values):
 
         tc.add_to_plan(plan=tp)
     return "Success update %d cases" % (i, )
+
 
 def clean_xml_file(xml_file):
     from django.conf import settings
@@ -733,7 +762,8 @@ def clean_xml_file(xml_file):
     try:
         xml = XML2Dict()
         xml_data = xml.fromstring(xml_file)
-        if not xml_data['testopia'].get('version') != settings.TESTOPIA_XML_VERSION:
+        if not xml_data['testopia'].get(
+                'version') != settings.TESTOPIA_XML_VERSION:
             raise
         if xml_data.get('testopia') and xml_data['testopia'].get('testcase'):
             new_case_from_xml = []
@@ -741,14 +771,16 @@ def clean_xml_file(xml_file):
                 for case in xml_data['testopia']['testcase']:
                     new_case_from_xml.append(process_case(case))
             elif isinstance(xml_data['testopia']['testcase'], dict):
-                new_case_from_xml.append(process_case(xml_data['testopia']['testcase']))
+                new_case_from_xml.append(
+                    process_case(xml_data['testopia']['testcase']))
             else:
                 raise
         else:
             raise
-    except Exception, error:
+    except Exception:
         raise
     return new_case_from_xml
+
 
 def process_case(case):
     from django.contrib.auth.models import User
@@ -759,7 +791,7 @@ def process_case(case):
     element = 'author'
     if case.get(element, {}).get('value'):
         try:
-            author = User.objects.get(email = case[element]['value'])
+            author = User.objects.get(email=case[element]['value'])
             author_id = author.id
         except User.DoesNotExist:
             raise
@@ -799,7 +831,8 @@ def process_case(case):
     element = 'status'
     if case.get(element, {}).get('value'):
         try:
-            case_status = TestCaseStatus.objects.get(name = case[element]['value'])
+            case_status = TestCaseStatus.objects.get(
+                name=case[element]['value'])
             case_status_id = case_status.id
         except TestCaseStatus.DoesNotExist:
             raise
@@ -823,12 +856,14 @@ def process_case(case):
     if case.get(element, {}):
         tags = []
         if isinstance(case[element], dict):
-            tag, create = TestTag.objects.get_or_create(name=case[element]['value'])
+            tag, create = TestTag.objects.get_or_create(
+                name=case[element]['value'])
             tags.append(tag)
 
         if isinstance(case[element], list):
             for tag_name in case[element]:
-                tag, create = TestTag.objects.get_or_create(name=tag_name['value'])
+                tag, create = TestTag.objects.get_or_create(
+                    name=tag_name['value'])
                 tags.append(tag)
     else:
         tags = None
