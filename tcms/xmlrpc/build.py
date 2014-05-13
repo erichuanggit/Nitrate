@@ -45,11 +45,7 @@ def check_build(request, name, product):
     >>> Build.check_build('2008-02-25', 'Red Hat Enterprise Linux 5')
     """
     p = pre_check_product(values=product)
-    try:
-        tb = TestBuild.objects.get(name=name, product=p)
-    except TestBuild.DoesNotExist, error:
-        return error
-
+    tb = TestBuild.objects.get(name=name, product=p)
     return tb.serialize()
 
 
@@ -186,30 +182,22 @@ def update(request, build_id, values):
     # Update status to inactive for build id 702
     >>> Build.update(702, {'is_active': 0})
     """
-    try:
-        tb = TestBuild.objects.get(build_id=build_id)
-    except TestBuild.DoesNotExist, error:
-        return error
+    tb = TestBuild.objects.get(build_id=build_id)
 
     def _update_value(obj, name, value):
         setattr(obj, name, value)
         update_fields.append(name)
 
-    try:
-        update_fields = list()
-        if values.get('product'):
-            _update_value(tb, 'product', pre_check_product(values))
-        if values.get('name'):
-            _update_value(tb, 'name', values['name'])
-        if values.get('description'):
-            _update_value(tb, 'description', values['description'])
-        if values.get('is_active'):
-            _update_value(tb, 'is_active', values.get('is_active', True))
+    update_fields = list()
+    if values.get('product'):
+        _update_value(tb, 'product', pre_check_product(values))
+    if values.get('name'):
+        _update_value(tb, 'name', values['name'])
+    if values.get('description'):
+        _update_value(tb, 'description', values['description'])
+    if values.get('is_active'):
+        _update_value(tb, 'is_active', values.get('is_active', True))
 
-        tb.save(update_fields=update_fields)
-    except ValueError, error:
-        return error
-    except:
-        return 'Unknown error'
+    tb.save(update_fields=update_fields)
 
     return tb.serialize()

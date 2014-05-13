@@ -48,4 +48,4 @@ def get_tags(request, values):
         query = {'name__in': values.get('names')}
         return TestTag.to_xmlrpc(query)
     else:
-        raise
+        raise ValueError('Must specify ids or names at least.')

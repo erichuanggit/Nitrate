@@ -37,21 +37,9 @@ def get(request, case_id, plan_id):
     Example:
     >>> TestCasePlan.get(81307, 3551)
     """
-    try:
-        tc = TestCase.objects.get(pk=case_id)
-    except ObjectDoesNotExist, error:
-        return error
-
-    try:
-        tp = TestPlan.objects.get(pk=plan_id)
-    except ObjectDoesNotExist, error:
-        return error
-
-    try:
-        tcp = TestCasePlan.objects.get(plan=tp, case=tc)
-    except ObjectDoesNotExist, error:
-        return error
-
+    tc = TestCase.objects.get(pk=case_id)
+    tp = TestPlan.objects.get(pk=plan_id)
+    tcp = TestCasePlan.objects.get(plan=tp, case=tc)
     return XMLRPCSerializer(model=tcp).serialize_model()
 
 
@@ -69,20 +57,9 @@ def update(request, case_id, plan_id, sortkey):
     # Update sortkey of selected test-case-plan to 450
     >>> TestCasePlan.update(81307, 3551, 450)
     """
-    try:
-        tc = TestCase.objects.get(pk=case_id)
-    except ObjectDoesNotExist, error:
-        return error
-
-    try:
-        tp = TestPlan.objects.get(pk=plan_id)
-    except ObjectDoesNotExist, error:
-        return error
-
-    try:
-        tcp = TestCasePlan.objects.get(plan=tp, case=tc)
-    except ObjectDoesNotExist, error:
-        return error
+    tc = TestCase.objects.get(pk=case_id)
+    tp = TestPlan.objects.get(pk=plan_id)
+    tcp = TestCasePlan.objects.get(plan=tp, case=tc)
 
     if isinstance(sortkey, int):
         tcp.sortkey = sortkey

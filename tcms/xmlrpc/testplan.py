@@ -200,7 +200,7 @@ def create(request, values):
 
         return tp.serialize()
     else:
-        return forms.errors_to_list(form)
+        raise ValueError(forms.errors_to_list(form))
 
 
 def filter(request, values={}):
@@ -268,10 +268,7 @@ def get(request, plan_id):
     Example:
     >>> TestPlan.get(137)
     """
-    try:
-        tp = TestPlan.objects.get(plan_id=plan_id)
-    except TestPlan.DoesNotExist, error:
-        return error
+    tp = TestPlan.objects.get(plan_id=plan_id)
     response = tp.serialize()
     #get the xmlrpc tags
     tag_ids = tp.tag.values_list('id', flat=True)
@@ -418,11 +415,7 @@ def get_test_cases(request, plan_id):
     from tcms.apps.testcases.models import TestCase
     from tcms.apps.testplans.models import TestPlan
     from tcms.core.utils.xmlrpc import XMLRPCSerializer
-
-    try:
-        tp = TestPlan.objects.get(pk=plan_id)
-    except TestPlan.DoesNotExist, err:
-        return err.message
+    tp = TestPlan.objects.get(pk=plan_id)
     tcs = TestCase.objects.filter(plan=tp).order_by('testcaseplan__sortkey')
     serialized_tcs = XMLRPCSerializer(tcs).serialize_queryset()
     if serialized_tcs:
@@ -561,8 +554,10 @@ def remove_component(request, plan_ids, component_ids):
         for c in cs:
             try:
                 tp.remove_component(component=c)
-            except:
+            except ObjectDoesNotExist:
                 pass
+            except:
+                raise
 
     return
 
@@ -672,7 +667,7 @@ def update(request, plan_ids, values):
                 tp.clear_env_groups()
                 tp.add_env_group(form.cleaned_data['env_group'])
     else:
-        return forms.errors_to_list(form)
+        raise ValueError(forms.errors_to_list(form))
 
     query = {'pk__in': tps.values_list('pk', flat=True)}
     return TestPlan.to_xmlrpc(query)
@@ -704,8 +699,8 @@ def import_case_via_XML(request, plan_id, values):
 
     try:
         new_case_from_xml = clean_xml_file(values)
-    except Exception:
-        return "Invalid XML File"
+    except :
+        raise TypeError("Invalid XML File")
 
     i = 0
     for case in new_case_from_xml:

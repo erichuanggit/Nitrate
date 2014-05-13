@@ -135,9 +135,8 @@ def update(request, values=None, id=None):
 
     editable_fields = ['first_name', 'last_name', 'email', 'password']
 
-    if not request.user.has_perm(
-            'auth.change_changeuser') and request.user != u:
-        raise PermissionDenied
+    if not request.user.has_perm('auth.change_changeuser') and request.user != u:
+        raise PermissionDenied('Permission denied')
 
     _update_fields = list()
     for f in editable_fields:
@@ -174,7 +173,7 @@ def join(request, username, groupname):
             Object.DoesNotExist
 
     Example:
-    >>> User.join('username', groupname')
+    >>> User.join('username', 'groupname')
     """
     try:
         user = User.objects.get(username=username)

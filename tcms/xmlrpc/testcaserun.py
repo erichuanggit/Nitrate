@@ -234,7 +234,7 @@ def create(request, values):
             sortkey=form.cleaned_data['sortkey']
         )
     else:
-        return forms.errors_to_list(form)
+        raise ValueError(forms.errors_to_list(form))
 
     return tcr.serialize()
 
@@ -515,7 +515,7 @@ def get_history_s(request, run_id, build_id, environment_id):
 
     Returns:     Array: An array of case-run object hashes.
     """
-    raise NotImplementedError
+    raise NotImplementedError('Not implemented RPC method')
 
 
 def lookup_status_name_by_id(request, id):
@@ -600,7 +600,7 @@ def update(request, case_run_ids, values):
         tcrs.update(**data)
 
     else:
-        return forms.errors_to_list(form)
+        raise ValueError(forms.errors_to_list(form))
 
     query = {'pk__in': pks_to_update}
     return TestCaseRun.to_xmlrpc(query)

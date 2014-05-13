@@ -470,7 +470,7 @@ def add_version(request, values):
         return version.serialize()
 
     else:
-        return forms.errors_to_list(form)
+        raise ValueError(forms.errors_to_list(form))
 
 
 def get_versions(request, product):

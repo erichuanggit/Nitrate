@@ -145,7 +145,7 @@ def add_component(request, case_ids, component_ids):
             for c in cs:
                 tc.add_component(component=c)
     except:
-        pass
+        raise
 
     return
 
@@ -472,7 +472,7 @@ def create(request, values):
             tc.add_tag(tag=t)
     else:
         # Print the errors if the form is not passed validation.
-        return forms.errors_to_list(form)
+        raise ValueError(forms.errors_to_list(form))
 
     return get(request, tc.case_id)
 
@@ -938,7 +938,7 @@ def remove_component(request, case_ids, component_ids):
         for tcc in tccs:
             try:
                 tc.remove_component(component=tcc)
-            except:
+            except ObjectDoesNotExist:
                 pass
 
     return
@@ -1109,7 +1109,7 @@ def update(request, case_ids, values):
             values=form.cleaned_data,
         )
     else:
-        return forms.errors_to_list(form)
+        raise ValueError(forms.errors_to_list(form))
 
     query = {'pk__in': tcs.values_list('pk', flat=True)}
     return TestCase.to_xmlrpc(query)
@@ -1161,9 +1161,8 @@ def notification_add_cc(request, case_ids, cc_list):
 
     try:
         validate_cc_list(cc_list)
-    except (TypeError, ValidationError), err:
-        return {'status': 1,
-                'message': '%s: %s' % (err.__class__.__name__, str(err))}
+    except (TypeError, ValidationError):
+        raise
 
     try:
         tc_ids = pre_process_ids(case_ids)
@@ -1175,11 +1174,8 @@ def notification_add_cc(request, case_ids, cc_list):
 
             tc.emailing.add_cc(adding_cc)
 
-    except (TypeError, ValueError, Exception), err:
-        return {'status': 1,
-                'message': '%s: %s' % (err.__class__.__name__, str(err))}
-
-    return {'status': 0, 'message': 'Succeed'}
+    except (TypeError, ValueError, Exception):
+        raise
 
 
 @log_call(namespace='TestCase')
@@ -1201,20 +1197,16 @@ def notification_remove_cc(request, case_ids, cc_list):
 
     try:
         validate_cc_list(cc_list)
-    except (TypeError, ValidationError), err:
-        return {'status': 1,
-                'message': '%s: %s' % (err.__class__.__name__, str(err))}
+    except (TypeError, ValidationError):
+        raise
 
     try:
         tc_ids = pre_process_ids(case_ids)
 
         for tc in TestCase.objects.filter(pk__in=tc_ids):
             tc.emailing.cc_list.filter(email__in=cc_list).delete()
-    except (TypeError, ValueError, Exception), err:
-        return {'status': 1,
-                'message': '%s: %s' % (err.__class__.__name__, str(err))}
-
-    return {'status': 0, 'message': 'Succeed'}
+    except (TypeError, ValueError, Exception):
+        raise
 
 
 @log_call(namespace='TestCase')
@@ -1238,8 +1230,7 @@ def notification_get_cc_list(request, case_ids):
             cc_list = tc.emailing.get_cc_list()
             result[str(tc.pk)] = cc_list
 
-    except (TypeError, ValueError, Exception), err:
-        return {'status': 1,
-                'message': '%s: %s' % (err.__class__.__name__, str(err))}
+    except (TypeError, ValueError, Exception):
+        raise
 
     return result

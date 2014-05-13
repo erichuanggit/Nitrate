@@ -121,9 +121,8 @@ def remove_cases(request, run_ids, case_ids):
                                              case__in=pre_process_ids(case_ids))
             crs.delete()
 
-    except Exception, err:
-        message = '%s: %s' % (err.__class__.__name__, err.message)
-        return {'status': 1, 'message': message}
+    except Exception:
+        raise
 
 
 @log_call(namespace='TestRun')
@@ -243,7 +242,7 @@ def create(request, values):
                 tr.add_tag(tag=t)
                 del tag, t, c
     else:
-        return forms.errors_to_list(form)
+        raise ValueError(forms.errors_to_list(form))
 
     return tr.serialize()
 
@@ -280,8 +279,10 @@ def env_value(request, action, run_ids, env_value_ids):
             try:
                 func = getattr(tr, action + '_env_value')
                 func(env_value=ev)
-            except:
+            except ObjectDoesNotExist:
                 pass
+            except:
+                raise
 
     return
 
@@ -667,7 +668,7 @@ def update(request, run_ids, values):
 
         trs.update(**_values)
     else:
-        return forms.errors_to_list(form)
+        raise ValueError(forms.errors_to_list(form))
 
     query = {'pk__in': trs.values_list('pk', flat=True)}
     return TestRun.to_xmlrpc(query)
