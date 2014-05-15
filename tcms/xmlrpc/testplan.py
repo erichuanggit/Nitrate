@@ -84,7 +84,7 @@ def add_tag(request, plan_ids, tags):
 
     for tag in tags:
         t, c = TestTag.objects.get_or_create(name=tag)
-        for tp in tps:
+        for tp in tps.iterator():
             tp.add_tag(tag=t)
 
     return
@@ -119,8 +119,8 @@ def add_component(request, plan_ids, component_ids):
         id__in=pre_process_ids(value=component_ids)
     )
 
-    for tp in tps:
-        for c in cs:
+    for tp in tps.iterator():
+        for c in cs.iterator():
             tp.add_component(c)
 
     return
@@ -394,7 +394,7 @@ def get_all_cases_tags(request, plan_id):
 
     tcs = tp.case.all()
     tag_ids = []
-    for tc in tcs:
+    for tc in tcs.iterator():
         tag_ids.extend(tc.tag.values_list('id', flat=True))
     tag_ids = list(set(tag_ids))
     query = {'id__in': tag_ids}
@@ -417,7 +417,7 @@ def get_test_cases(request, plan_id):
     from tcms.core.utils.xmlrpc import XMLRPCSerializer
     tp = TestPlan.objects.get(pk=plan_id)
     tcs = TestCase.objects.filter(plan=tp).order_by('testcaseplan__sortkey')
-    serialized_tcs = XMLRPCSerializer(tcs).serialize_queryset()
+    serialized_tcs = XMLRPCSerializer(tcs.iterator()).serialize_queryset()
     if serialized_tcs:
         for serialized_tc in serialized_tcs:
             case_id = serialized_tc.get('case_id', None)
@@ -510,8 +510,8 @@ def remove_tag(request, plan_ids, tags):
         name__in=TestTag.string_to_list(tags)
     )
 
-    for tp in tps:
-        for tg in tgs:
+    for tp in tps.iterator():
+        for tg in tgs.iterator():
             try:
                 tp.remove_tag(tag=tg)
             except ObjectDoesNotExist:
@@ -550,8 +550,8 @@ def remove_component(request, plan_ids, component_ids):
         id__in=pre_process_ids(value=component_ids)
     )
 
-    for tp in tps:
-        for c in cs:
+    for tp in tps.iterator():
+        for c in cs.iterator():
             try:
                 tp.remove_component(component=c)
             except ObjectDoesNotExist:
@@ -663,7 +663,7 @@ def update(request, plan_ids, values):
         tps.update(**_values)
 
         if form.cleaned_data['env_group']:
-            for tp in tps:
+            for tp in tps.iterator():
                 tp.clear_env_groups()
                 tp.add_env_group(form.cleaned_data['env_group'])
     else:

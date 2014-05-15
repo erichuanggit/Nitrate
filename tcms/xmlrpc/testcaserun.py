@@ -267,7 +267,7 @@ def detach_bug(request, case_run_ids, bug_ids):
     )
     bug_ids = pre_process_ids(bug_ids)
 
-    for tcr in tcrs:
+    for tcr in tcrs.iterator():
         case_run_id = tcr.case_run_id
         for opk in bug_ids:
             try:

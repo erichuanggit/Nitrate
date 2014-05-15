@@ -172,7 +172,7 @@ class Comment(object):
         except:
             raise
 
-        for target in targets:
+        for target in targets.iterator():
             d_form = comment_form(target)
             timestamp = str(time.time()).split('.')[0]
             object_pk = str(target.pk)

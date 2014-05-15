@@ -76,8 +76,8 @@ def add_cases(request, run_ids, case_ids):
     trs = TestRun.objects.filter(run_id__in=pre_process_ids(run_ids))
     tcs = TestCase.objects.filter(case_id__in=pre_process_ids(case_ids))
 
-    for tr in trs:
-        for tc in tcs:
+    for tr in trs.iterator():
+        for tc in tcs.iterator():
             tr.add_case_run(case=tc)
 
     return
@@ -116,7 +116,7 @@ def remove_cases(request, run_ids, case_ids):
     try:
         trs = TestRun.objects.filter(run_id__in=pre_process_ids(run_ids))
 
-        for tr in trs:
+        for tr in trs.iterator():
             crs = TestCaseRun.objects.filter(run=tr,
                                              case__in=pre_process_ids(case_ids))
             crs.delete()
@@ -154,7 +154,7 @@ def add_tag(request, run_ids, tags):
 
     for tag in tags:
         t, c = TestTag.objects.get_or_create(name=tag)
-        for tr in trs:
+        for tr in trs.iterator():
             tr.add_tag(tag=t)
 
     return
@@ -275,8 +275,8 @@ def env_value(request, action, run_ids, env_value_ids):
         pk__in=pre_process_ids(value=env_value_ids)
     )
 
-    for tr in trs:
-        for ev in evs:
+    for tr in trs.iterator():
+        for ev in evs.iterator():
             try:
                 func = getattr(tr, action + '_env_value')
                 func(env_value=ev)
@@ -564,8 +564,8 @@ def remove_tag(request, run_ids, tags):
         name__in=TestTag.string_to_list(tags)
     )
 
-    for tr in trs:
-        for tg in tgs:
+    for tr in trs.iterator():
+        for tg in tgs.iterator():
             try:
                 tr.remove_tag(tag=tg)
             except ObjectDoesNotExist:

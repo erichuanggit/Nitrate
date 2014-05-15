@@ -134,15 +134,13 @@ def add_component(request, case_ids, component_ids):
     from tcms.apps.management.models import Component
 
     tcs = TestCase.objects.filter(
-        case_id__in=pre_process_ids(value=case_ids)
-    )
+        case_id__in=pre_process_ids(value=case_ids))
     cs = Component.objects.filter(
-        id__in=pre_process_ids(value=component_ids)
-    )
+        id__in=pre_process_ids(value=component_ids))
 
     try:
-        for tc in tcs:
-            for c in cs:
+        for tc in tcs.iterator():
+            for c in cs.iterator():
                 tc.add_component(component=c)
     except:
         raise
@@ -174,14 +172,13 @@ def add_tag(request, case_ids, tags):
     >>> TestCase.add_tag('12345, 67890', 'foo, bar')
     """
     tcs = TestCase.objects.filter(
-        case_id__in=pre_process_ids(value=case_ids)
-    )
+        case_id__in=pre_process_ids(value=case_ids))
 
     tags = TestTag.string_to_list(tags)
 
     for tag in tags:
         t, c = TestTag.objects.get_or_create(name=tag)
-        for tc in tcs:
+        for tc in tcs.iterator():
             tc.add_tag(tag=t)
 
     return
@@ -216,15 +213,15 @@ def add_to_run(request, case_ids, run_ids):
     run_ids = pre_process_ids(run_ids)
 
     trs = TestRun.objects.filter(run_id__in=run_ids)
-    if not trs:
+    if not trs.exists():
         raise ValueError('Invalid run_ids')
 
     tcs = TestCase.objects.filter(case_id__in=case_ids)
-    if not tcs:
+    if not tcs.exists():
         raise ValueError('Invalid case_ids')
 
-    for tr in trs:
-        for tc in tcs:
+    for tr in trs.iterator():
+        for tc in tcs.iterator():
             tr.add_case_run(case=tc)
 
     return
@@ -341,11 +338,15 @@ def calculate_average_estimated_time(request, case_ids):
 
     tcs = TestCase.objects.filter(pk__in=pre_process_ids(case_ids))
     time = timedelta(0)
-    for tc in tcs:
+    case_count = 0
+    for tc in tcs.iterator():
+        case_count += 1
         time += tc.estimated_time
 
     seconds = time.seconds + (time.days * SECONDS_PER_DAY)
-    seconds = seconds / len(tcs)
+    # iterator will not populate cache so here will access db again
+    # seconds = seconds / len(tcs)
+    seconds = seconds / case_count
 
     return '%02i:%02i:%02i' % (
         seconds / 3600,  # Hours
@@ -368,7 +369,7 @@ def calculate_total_estimated_time(request, case_ids):
     from datetime import timedelta
     from tcms.core.utils.xmlrpc import SECONDS_PER_DAY
 
-    tcs = TestCase.objects.filter(pk__in=pre_process_ids(case_ids))
+    tcs = TestCase.objects.filter(pk__in=pre_process_ids(case_ids)).iterator()
     time = timedelta(0)
     for tc in tcs:
         time += tc.estimated_time
@@ -503,7 +504,7 @@ def detach_bug(request, case_ids, bug_ids):
     case_ids = pre_process_ids(case_ids)
     bug_ids = pre_process_ids(bug_ids)
 
-    tcs = TestCase.objects.filter(case_id__in=case_ids)
+    tcs = TestCase.objects.filter(case_id__in=case_ids).iterator()
     for tc in tcs:
         for opk in bug_ids:
             try:
@@ -845,20 +846,24 @@ def link_plan(request, case_ids, plan_ids):
     tps = TestPlan.objects.filter(pk__in=plan_ids)
 
     # Check the non-exist case ids.
-    if len(tcs) < len(case_ids):
+    if tcs.count() < len(case_ids):
         raise ObjectDoesNotExist(
-            "TestCase", compare_list(case_ids, tcs.values_list('pk', flat=True))
+            "TestCase", compare_list(case_ids,
+                                     tcs.values_list('pk',
+                                                     flat=True).iterator())
         )
 
     # Check the non-exist plan ids.
-    if len(tps) < len(plan_ids):
+    if tps.count() < len(plan_ids):
         raise ObjectDoesNotExist(
-            "TestPlan", compare_list(plan_ids, tps.values_list('pk', flat=True))
+            "TestPlan", compare_list(plan_ids,
+                                     tps.values_list('pk',
+                                                     flat=True).iterator())
         )
 
     # Link the plans to cases
-    for tc in tcs:
-        for tp in tps:
+    for tc in tcs.iterator():
+        for tp in tps.iterator():
             tc.add_to_plan(tp)
 
     return
@@ -934,8 +939,8 @@ def remove_component(request, case_ids, component_ids):
         id__in=pre_process_ids(value=component_ids)
     )
 
-    for tc in tcs:
-        for tcc in tccs:
+    for tc in tcs.iterator():
+        for tcc in tccs.iterator():
             try:
                 tc.remove_component(component=tcc)
             except ObjectDoesNotExist:
@@ -972,8 +977,8 @@ def remove_tag(request, case_ids, tags):
         name__in=TestTag.string_to_list(tags)
     )
 
-    for tc in tcs:
-        for tg in tgs:
+    for tc in tcs.iterator():
+        for tg in tgs.iterator():
             try:
                 tc.remove_tag(tg)
             except ObjectDoesNotExist:
@@ -1167,7 +1172,7 @@ def notification_add_cc(request, case_ids, cc_list):
     try:
         tc_ids = pre_process_ids(case_ids)
 
-        for tc in TestCase.objects.filter(pk__in=tc_ids):
+        for tc in TestCase.objects.filter(pk__in=tc_ids).iterator():
             # First, find those that do not exist yet.
             existing_cc = tc.emailing.get_cc_list()
             adding_cc = list(set(cc_list) - set(existing_cc))
@@ -1203,7 +1208,7 @@ def notification_remove_cc(request, case_ids, cc_list):
     try:
         tc_ids = pre_process_ids(case_ids)
 
-        for tc in TestCase.objects.filter(pk__in=tc_ids):
+        for tc in TestCase.objects.filter(pk__in=tc_ids).iterator():
             tc.emailing.cc_list.filter(email__in=cc_list).delete()
     except (TypeError, ValueError, Exception):
         raise
@@ -1226,7 +1231,7 @@ def notification_get_cc_list(request, case_ids):
     try:
         tc_ids = pre_process_ids(case_ids)
 
-        for tc in TestCase.objects.filter(pk__in=tc_ids):
+        for tc in TestCase.objects.filter(pk__in=tc_ids).iterator():
             cc_list = tc.emailing.get_cc_list()
             result[str(tc.pk)] = cc_list
 
