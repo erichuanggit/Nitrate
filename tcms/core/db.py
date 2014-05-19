@@ -22,7 +22,7 @@ from itertools import izip
 __all__ = ('execute_sql',)
 
 
-def execute_sql(sql, params):
+def execute_sql(sql, *params):
     cursor = connection.cursor()
     cursor.execute(sql, params)
     field_names = [field[0] for field in cursor.description]

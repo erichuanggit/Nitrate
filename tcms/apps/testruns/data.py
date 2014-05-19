@@ -53,7 +53,7 @@ SELECT test_case_runs.case_run_status_id, COUNT(*) AS status_count
 FROM test_case_runs
 WHERE test_case_runs.run_id = %s
 GROUP BY test_case_runs.case_run_status_id'''
-    rows = execute_sql(sql, [run_id,])
+    rows = execute_sql(sql, run_id)
 
     caserun_statuss_subtotal = dict([(status.pk, [0, status])
                                     for status in case_run_statuss])
@@ -107,7 +107,7 @@ SELECT COUNT(DISTINCT test_case_bugs.bug_id) AS bugs_count
 FROM test_case_bugs INNER JOIN test_case_runs
     ON (test_case_bugs.case_run_id = test_case_runs.case_run_id)
 WHERE test_case_runs.run_id = %s'''
-    rows = execute_sql(sql, [run_id,])
+    rows = execute_sql(sql, run_id)
     for row in rows:
         return row['bugs_count']
 
@@ -118,7 +118,7 @@ SELECT test_case_bugs.bug_id
 FROM test_case_bugs INNER JOIN test_case_runs
     ON (test_case_bugs.case_run_id = test_case_runs.case_run_id)
 WHERE test_case_runs.run_id = %s'''
-    rows = execute_sql(sql, [run_id,])
+    rows = execute_sql(sql, run_id)
     return set((row['bug_id'] for row in rows))
 
 
