@@ -386,8 +386,8 @@ def get_bugs_s(request, run_id, case_id, build_id, environment_id=0):
     """
     Description: Get the list of bugs that are associated with this test case.
 
-    Params:      $case_id - Integer: An integer representing the ID of the test case in the database.
-                 $run_id - Integer: An integer representing the ID of the test run in the database.
+    Params:      $run_id - Integer: An integer representing the ID of the test run in the database.
+                 $case_id - Integer: An integer representing the ID of the test case in the database.
                  $build_id - Integer: An integer representing the ID of the test build in the database.
                  $environment_id - Optional Integer: An integer representing the ID of the environment in the database.
 
