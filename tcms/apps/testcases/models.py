@@ -30,7 +30,6 @@ from django.contrib.contenttypes import generic
 from tcms.apps.testcases import signals as case_watchers
 from tcms.core.models import TCMSActionModel, TimedeltaField
 from tcms.core.models import TCMSContentTypeBaseModel
-from tcms.xmlrpc.utils import distinct_filter
 
 try:
     from tcms.core.contrib.plugins_support.signals import register_model
@@ -173,6 +172,8 @@ class TestCase(TCMSActionModel):
     @classmethod
     def to_xmlrpc(cls, query=None):
         from tcms.core.utils.xmlrpc import TestCaseXMLRPCSerializer
+        from tcms.xmlrpc.utils import distinct_filter
+
         _query = query or {}
         qs = distinct_filter(TestCase, _query).order_by('pk')
         s = TestCaseXMLRPCSerializer(model_class=cls, queryset=qs)

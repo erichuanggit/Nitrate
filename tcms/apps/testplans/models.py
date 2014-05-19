@@ -28,7 +28,6 @@ from tcms.apps.management.models import TCMSEnvPlanMap, Version
 from tcms.apps.testcases.models import TestCasePlan
 from tcms.apps.testplans import signals as plan_watchers
 from tcms.core.models import TCMSActionModel
-from tcms.xmlrpc.utils import distinct_filter
 
 try:
     from tcms.core.contrib.plugins_support.signals import register_model
@@ -101,6 +100,8 @@ class TestPlan(TCMSActionModel):
     @classmethod
     def to_xmlrpc(cls, query=None):
         from tcms.core.utils.xmlrpc import TestPlanXMLRPCSerializer
+        from tcms.xmlrpc.utils import distinct_filter
+
         _query = query or {}
         qs = distinct_filter(TestPlan, _query).order_by('pk')
         s = TestPlanXMLRPCSerializer(model_class=cls, queryset=qs)

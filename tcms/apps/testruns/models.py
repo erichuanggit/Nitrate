@@ -28,7 +28,6 @@ from tcms.apps.testcases.models import TestCaseBug, TestCaseText, NoneText
 from tcms.apps.testruns import signals as run_watchers
 from tcms.core.contrib.linkreference.models import LinkReference
 from tcms.core.models import TCMSActionModel, TimedeltaField
-from tcms.xmlrpc.utils import distinct_filter
 
 try:
     from tcms.core.contrib.plugins_support.signals import register_model
@@ -83,6 +82,8 @@ class TestRun(TCMSActionModel):
     @classmethod
     def to_xmlrpc(cls, query=None):
         from tcms.core.utils.xmlrpc import TestRunXMLRPCSerializer
+        from tcms.xmlrpc.utils import distinct_filter
+
         _query = query or {}
         qs = distinct_filter(TestRun, _query).order_by('pk')
         s = TestRunXMLRPCSerializer(model_class=cls, queryset=qs)
@@ -589,6 +590,8 @@ class TestCaseRun(TCMSActionModel):
     @classmethod
     def to_xmlrpc(cls, query={}):
         from tcms.core.utils.xmlrpc import TestCaseRunXMLRPCSerializer
+        from tcms.xmlrpc.utils import distinct_filter
+
         qs = distinct_filter(TestCaseRun, query).order_by('pk')
         s = TestCaseRunXMLRPCSerializer(model_class=cls, queryset=qs)
         return s.serialize_queryset()
