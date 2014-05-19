@@ -822,7 +822,7 @@ class TestCaseViewDataMixin(object):
         return comments
 
 
-class SimpleTestCaseView(TemplateView):
+class SimpleTestCaseView(TemplateView, TestCaseViewDataMixin):
     '''Simple read-only TestCase View used in TestPlan page'''
 
     template_name = 'case/get_details.html'
@@ -848,12 +848,13 @@ class SimpleTestCaseView(TemplateView):
                 'attachments': case.attachment.only('file_name'),
                 'components': case.component.only('name'),
                 'tags': case.tag.only('name'),
+                'case_comments': self.get_case_comments(case),
             })
 
         return data
 
 
-class TestCaseReviewPaneView(SimpleTestCaseView, TestCaseViewDataMixin):
+class TestCaseReviewPaneView(SimpleTestCaseView):
     '''Used in Reviewing Cases tab in test plan page'''
 
     template_name = 'case/get_details_review.html'

@@ -73,8 +73,14 @@ Nitrate.TestCases.AdvanceList.on_load = function()
         var c_container = c.next(); // Content Containers
         var case_id = c.getElementsBySelector('input[name="case"]')[0].value;
 
-        var type = 'case';
-        toggleTestCaseContents(type, c, c_container, case_id);
+        toggleTestCasePane({
+            case_id: case_id,
+            casePaneContainer: jQ(c_container)
+        });
+        toggleExpandArrow({
+            caseRowContainer: jQ(c),
+            expandPaneContainer: jQ(c_container)
+        });
     }
 
     $$('.expandable').invoke('observe', 'click', toggle_case);
