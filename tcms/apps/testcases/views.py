@@ -808,6 +808,19 @@ class TestCaseViewDataMixin(object):
         logs = logs.values('date', 'who__username', 'action')
         return logs.order_by('date')
 
+    def get_case_comments(self, case):
+        '''Get a case' comments'''
+        ct = self.get_case_contenttype()
+        comments = Comment.objects.filter(content_type=ct,
+                                          object_pk=case.pk,
+                                          site=settings.SITE_ID)
+        comments = comments.select_related('user').only('submit_date',
+                                                        'user__email',
+                                                        'user__username',
+                                                        'comment')
+        comments.order_by('pk')
+        return comments
+
 
 class SimpleTestCaseView(TemplateView):
     '''Simple read-only TestCase View used in TestPlan page'''
@@ -850,8 +863,10 @@ class TestCaseReviewPaneView(SimpleTestCaseView, TestCaseViewDataMixin):
         testcase = data['test_case']
         if testcase is not None:
             logs = self.get_case_logs(testcase)
+            comments = self.get_case_comments(testcase)
             data.update({
                 'logs': logs,
+                'case_comments': comments,
             })
         return data
 

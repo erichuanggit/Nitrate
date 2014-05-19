@@ -68,7 +68,6 @@
 		</tr>
 		<tr>
 			<td colspan="3" style="border:none; background:none">
-				{% get_comment_list for test_case as case_comments %}
 				<h4>Comments:</h4>
 				<ul class="comment ul-no-format">
 				{% for comment in case_comments %}
@@ -78,7 +77,7 @@
 							<input type="hidden" name="comment_id" value="{{ comment.pk }}" />
 							<input type="hidden" name="object_pk" value="{{ test_case.pk }}" />
 							<span class="strong">#{{ forloop.counter }}</span>
-							<span class="strong">{{ comment.user__email }}</span>
+							<span class="strong">{{ comment.user.email }}</span>
 							<span class="grey">{{ comment.submit_date }}</span>
 							<br/>
 							{{ comment.comment|redhat_urlize|linebreaksbr }}
@@ -92,7 +91,7 @@
 						{{ comment.comment|redhat_urlize|linebreaksbr }}
 						{% endifequal %}
 					</li>
-					{% endfor %}
+				{% endfor %}
 				<ul>
 			</td>
 		</tr>
