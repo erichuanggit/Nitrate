@@ -111,7 +111,8 @@ def _need_distinct_m2m_rows(cls, fields):
     @return: whether use distinct or not
     @rtype: bool
     """
-    return _lookup_fields_in_model(cls, fields).next() if fields else False
+    return next(_lookup_fields_in_model(cls, fields), False) \
+        if fields else False
 
 
 def distinct_m2m_rows(cls, values, op_type):
