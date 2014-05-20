@@ -159,7 +159,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.New.on_load);
 					<tr class="{% cycle 'odd' 'even' %}" id="row_{{ forloop.counter }}" >
 						<td >
 							<a href="/case/{{ test_case.case_id }}/">{{ test_case.case_id }}</a>
-							{% if test_case.case_status__name == 'CONFIRMED' %}
+							{% if test_case.case_status.name == 'CONFIRMED' %}
 							<input type="hidden" name="case" value="{{ test_case.case_id }}">
 							{% endif %}
 						</td>
