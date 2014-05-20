@@ -663,7 +663,7 @@ def get_case_run_history(request, case_id):
     Example:
     >>> TestCase.get_case_run_history(12345)
     """
-    pass
+    raise NotImplementedError('Not implemented RPC method')
 
 
 def get_case_status(request, id=None):
@@ -700,7 +700,7 @@ def get_change_history(request, case_id):
     Example:
     >>> TestCase.get_change_history(12345)
     """
-    pass
+    raise NotImplementedError('Not implemented RPC method')
 
 
 def get_components(request, case_id):

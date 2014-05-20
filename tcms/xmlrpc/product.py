@@ -369,12 +369,12 @@ def get_components(request, product):
 
 def get_environments(request, product):
     """FIXME: NOT IMPLEMENTED"""
-    pass
+    raise NotImplementedError('Not implemented RPC method')
 
 
 def get_milestones(request, product):
     """FIXME: NOT IMPLEMENTED"""
-    pass
+    raise NotImplementedError('Not implemented RPC method')
 
 
 def get_plans(request, product):

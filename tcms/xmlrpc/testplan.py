@@ -290,7 +290,7 @@ def get_change_history(request, plan_id):
 
     Returns:     Array: An array of hashes with changed fields and their details.
     """
-    pass
+    raise NotImplementedError('Not implemented RPC method')
 
 
 def get_env_groups(request, plan_id):

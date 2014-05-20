@@ -407,7 +407,7 @@ def get_change_history(request, run_id):
 
     Returns:     Array: An array of hashes with changed fields and their details.
     """
-    pass
+    raise NotImplementedError('Not implemented RPC method')
 
 
 def get_completion_report(request, run_ids):
@@ -422,7 +422,7 @@ def get_completion_report(request, run_ids):
                         case-runs in the run. Counts only the most recently statused case-run
                         for a given build and environment.
     """
-    pass
+    raise NotImplementedError('Not implemented RPC method')
 
 
 def get_env_values(request, run_id):

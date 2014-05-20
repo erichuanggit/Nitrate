@@ -499,7 +499,7 @@ def get_history(request, case_run_id):
 
     Returns:     Array: An array of case-run object hashes.
     """
-    pass
+    raise NotImplementedError('Not implemented RPC method')
 
 
 def get_history_s(request, run_id, build_id, environment_id):
