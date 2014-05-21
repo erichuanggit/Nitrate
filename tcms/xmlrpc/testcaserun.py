@@ -594,7 +594,7 @@ def update(request, case_run_ids, values):
             if form.cleaned_data['notes']:
                 data['notes'] = form.cleaned_data['notes']
 
-        if form.cleaned_data['sortkey']:
+        if form.cleaned_data['sortkey'] is not None:
             data['sortkey'] = form.cleaned_data['sortkey']
 
         tcrs.update(**data)

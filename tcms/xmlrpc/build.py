@@ -171,7 +171,7 @@ def update(request, build_id, values):
         | product     | Integer/String | Optional  | ID or Name of product     |
         | name        | String         | Optional  |                           |
         | description | String         | Optional  |                           |
-        | is_active   | Boolean        | Optional  |                           |
+        | is_active   | Boolean        | Optional  | True/False                |
         +-------------+----------------+-----------+---------------------------+
 
     Returns:     Hash: The updated Build object hash.
@@ -195,7 +195,7 @@ def update(request, build_id, values):
         _update_value(tb, 'name', values['name'])
     if values.get('description'):
         _update_value(tb, 'description', values['description'])
-    if values.get('is_active'):
+    if values.get('is_active') is not None:
         _update_value(tb, 'is_active', values.get('is_active', True))
 
     tb.save(update_fields=update_fields)
