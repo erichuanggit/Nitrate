@@ -22,10 +22,10 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.AssignCase.on_load);
 <div id="content">
 	<div class="sprites crumble">
 		<a href="{% url "tcms.core.views.index" %}">Home</a>
-		>> <a href="{% url "tcms.apps.testplans.views.all" %}">...</a>
-		>> <a href="{{ test_run.plan.get_absolute_url }}">...</a>
-		>> <a href="{% url "tcms.apps.testruns.views.get" test_run.run_id %}">{{ test_run.run_id }}: {{ test_run.summary }}</a>
-		>> Add test case
+		&gt;&gt; <a href="{% url "tcms.apps.testplans.views.all" %}">...</a>
+		&gt;&gt; <a href="{{ test_run.plan.get_absolute_url }}">...</a>
+		&gt;&gt; <a href="{% url "tcms.apps.testruns.views.get" test_run.run_id %}">{{ test_run.run_id }}: {{ test_run.summary }}</a>
+		&gt;&gt; Add test case
 	</div>
 	<h2 id="display_title"><a href="{% url "tcms.apps.testruns.views.get" test_run.run_id %}">{{ test_run.summary }}</a></h2>
 	<table class="runsDetail" border="0" width="66%" cellspacing="0" cellpadding="0">
@@ -65,7 +65,7 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.AssignCase.on_load);
 			<div class="Detailform system_info border-1" id="help_assign" style="display:none">
 				<div class="Detailform-variety_1">
 					<p>
-						The table below list all the confirmed test case of plan {{ test_run.plan }}, check the checkbox to add the case into the test run, uncheck it to remove from the test run, remember to update at last. 
+						The table below list all the confirmed test cases of plan {{ test_run.plan }}, check the checkbox to add cases into test run. Remember to update at last. 
 						<span class="right-action">
 							<a href="#" onclick="$('help_assign').hide();">X</a>
 						</span>
@@ -77,13 +77,13 @@ Nitrate.Utils.after_page_load(Nitrate.TestRuns.AssignCase.on_load);
 					<tr>
 						<th class="nosort" align="left" width="20px"><input id="id_check_all_button" type="checkbox" /></th>
 						<th class="nosort" align="left" width="20px"></th>
-						<th  class="sortcol widthID" align="left" width="50px">ID</th>
-						<th  class="sortcol">Test Case Summary</th>
+						<th class="sortcol widthID" align="left" width="50px">ID</th>
+						<th class="sortcol">Test Case Summary</th>
 						<th class="sortcol" width="130">Author</th>
-						<th  class="sortcol" width="150">Created Date</th>
+						<th class="sortcol" width="150">Created Date</th>
 						<th class="sortcol" width="150">Category</th>
-						<th  class="sortcol"  width="70">Priority</th>
-						<th  class="sortcol"  width="70">Selected</th>
+						<th class="sortcol"  width="70">Priority</th>
+						<th class="sortcol"  width="70">Selected</th>
 					</tr>
 				</thead>
 				<tbody>
