@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+3.8.7-5 (May 22 2014)
+---------------------
+
+- TCMS-326 - [XMLRPC] Optimize TestRun.get_test_cases, which generates a slow
+  query that would affect other SQL execution on test_case_runs table
+
 3.8.7-3 (Apr 22 2014)
 ---------------------
 

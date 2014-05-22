@@ -2,7 +2,7 @@
 
 Name:           nitrate
 Version:        3.8.7
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Test Case Management System
 
 Group:          Development/Languages
@@ -77,6 +77,9 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{python_sitelib}/tcms/settings/product.py
 
 %changelog
+
+* Thu May 22 2014 Chenxiong Qi <cqi@redhat.com> - 3.8.7-5
+- TCMS-326 - [XMLRPC] Optimize TestRun.get_test_cases, which generates a slow query that would affect other SQL execution on test_case_runs table
 
 * Tue Apr 22 2014 Jian Chen <jianchen@redhat.com> - 3.8.7-3
 - TCMS-264 - Temp workaround to avoid updates automatically bugzilla with TCMS test case ID.
