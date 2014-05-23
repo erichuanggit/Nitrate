@@ -114,11 +114,11 @@ def wrap_exceptions(func):
         except django.core.exceptions.PermissionDenied as e:
             # 403 Forbidden
             fault_code = httplib.FORBIDDEN
-            fault_string = e.message
+            fault_string = str(e)
         except django.db.models.ObjectDoesNotExist as e:
             # 404 Not Found
             fault_code = httplib.NOT_FOUND
-            fault_string = e.message
+            fault_string = str(e)
         except (django.db.models.FieldDoesNotExist,
                 django.core.exceptions.FieldError,
                 django.core.exceptions.ValidationError,
@@ -127,18 +127,18 @@ def wrap_exceptions(func):
                 TypeError) as e:
             # 400 Bad Request
             fault_code = httplib.BAD_REQUEST
-            fault_string = e.message
+            fault_string = str(e)
         except django.db.utils.IntegrityError as e:
             # 409 Duplicate
             fault_code = httplib.CONFLICT
-            fault_string = e.message
+            fault_string = str(e)
         except NotImplementedError as e:
             fault_code = httplib.NOT_IMPLEMENTED
-            fault_string = e.message
+            fault_string = str(e)
         except Exception as e:
             # 500 Server Error
             fault_code = httplib.INTERNAL_SERVER_ERROR
-            fault_string = e.message
+            fault_string = str(e)
 
         if settings.DEBUG:
             stack_trace = ''.join(traceback.format_exception(*sys.exc_info()))
