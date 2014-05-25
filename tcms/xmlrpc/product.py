@@ -18,6 +18,7 @@
 
 from kobo.django.xmlrpc.decorators import user_passes_test
 
+from django.contrib.auth.models import User
 from tcms.apps.management.models import Product
 from tcms.core.decorators import log_call
 from tcms.xmlrpc.utils import pre_check_product
@@ -35,7 +36,9 @@ __all__ = (
     'get_cases',
     'get_categories',
     'get_category',
+    'add_component',
     'get_component',
+    'update_component',
     'get_components',
     'get_environments',
     'get_milestones',
@@ -328,6 +331,42 @@ def get_category(request, id):
     return TestCaseCategory.objects.get(id=id).serialize()
 
 
+@log_call(namespace='Product')
+@user_passes_test(lambda u: u.has_perm('management.add_component'))
+def add_component(request, product, name, initial_owner_id=None, initial_qa_contact_id=None):
+    """
+    Description: Get the component matching the given id.
+
+
+    Params:      $product - Integer/String
+                            Integer: product_id of the product in the Database
+                            String: Product name
+                 $name    - String: Component name
+                 [$initial_owner_id] - Integer: (OPTIONAL) The numeric ID or the login of the author.
+                                    Defaults to logged in user.
+                 [$initial_qa_contact_id] - Integer: (OPTIONAL) The numeric ID or the login of the author.
+                                         Defaults to logged in user.
+
+
+    Returns:     Hash: Component object hash.
+
+    Example:
+    >>> Product.add_component(71, 'JPBMM')
+    """
+    from tcms.apps.management.models import Component
+
+    product = pre_check_product(values=product)
+
+    return Component.objects.create(
+        name=name,
+        product=product,
+        initial_owner_id=initial_owner_id if \
+            User.objects.filter(pk=initial_owner_id).exists() else request.user.pk,
+        initial_qa_contact_id=initial_qa_contact_id if \
+            User.objects.filter(pk=initial_qa_contact_id).exists() else request.user.pk,
+    ).serialize()
+
+
 def get_component(request, id):
     """
     Description: Get the component matching the given id.
@@ -342,6 +381,47 @@ def get_component(request, id):
     from tcms.apps.management.models import Component
 
     return Component.objects.get(id=id).serialize()
+
+
+@log_call(namespace='Product')
+@user_passes_test(lambda u: u.has_perm('management.change_component'))
+def update_component(request, component_id, values):
+    """
+    Description: Get the component matching the given id.
+
+    Params:      $component_id - Integer: ID of the component in the database.
+
+                 $values   - Hash of keys matching TestCase fields and the new values
+                             to set each field to.
+
+        +-----------------------+----------------+-----------------------------------------+
+        | Field                 | Type           | Null                                    |
+        +-----------------------+----------------+-----------------------------------------+
+        | name                  | String         | Optional                                |
+        | initial_owner_id      | Integer        | Optional(int - user_id)                 |
+        | initial_qa_contact_id | Integer        | Optional(int - user_id)                 |
+        +-----------------------+----------------+-----------------------------------------+
+
+    Returns:     Hash: Component object hash.
+
+    Example:
+    >>> Product.update_component(71, {'name': 'NewName'})
+    """
+    from tcms.apps.management.models import Component
+
+    component = Component.objects.get(pk=component_id)
+
+    if values.get('name') and values['name']:
+        component.name = values['name']
+
+    if values.get('initial_owner_id') and User.objects.filter(pk=values['initial_owner_id']).exists():
+        component.initial_owner_id = values['initial_owner_id']
+
+    if values.get('initial_qa_contact_id') and User.objects.filter(pk=values['initial_qa_contact_id']).exists():
+        component.initial_qa_contact_id = values['initial_qa_contact_id']
+
+    component.save()
+    return component.serialize()
 
 
 def get_components(request, product):
