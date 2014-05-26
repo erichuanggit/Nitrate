@@ -20,6 +20,7 @@
 from django.db.models import ObjectDoesNotExist
 from kobo.django.xmlrpc.decorators import user_passes_test
 
+from tcms.apps.testcases.models import TestCaseBug
 from tcms.apps.testruns.models import TestCaseRun, TestCaseRunStatus
 from tcms.core.contrib.linkreference.models import create_link, LinkReference
 from tcms.core.decorators import log_call
@@ -65,7 +66,6 @@ class GetCaseRun(object):
 
         if environment_id:
             query['environment_id'] = environment_id
-            return TestCaseRun.objects.get(**query)
 
         return TestCaseRun.objects.get(**query)
 
@@ -371,14 +371,7 @@ def get_bugs(request, case_run_id):
     Example:
     >>> TestCase.get_bugs(12345)
     """
-    from tcms.apps.testcases.models import TestCaseBug
-
-    try:
-        tcr = gcr.pre_process_tcr(case_run_id=case_run_id)
-    except:
-        raise
-
-    query = {'case_run__case_run_id': tcr.case_run_id}
+    query = {'case_run': int(case_run_id)}
     return TestCaseBug.to_xmlrpc(query)
 
 
@@ -396,19 +389,18 @@ def get_bugs_s(request, run_id, case_id, build_id, environment_id=0):
     Example:
     >>> TestCaseRun.get_bugs_s(3113, 565, 72, 90)
     """
-    from tcms.apps.testcases.models import TestCaseBug
-
-    try:
-        tcr = gcr.pre_process_tcr_s(
-            run_id=run_id,
-            case_id=case_id,
-            build_id=build_id,
-            environment_id=environment_id,
-        )
-    except:
-        raise
-
-    query = {'case_run__case_run_id': tcr.case_run_id}
+    query = {
+        'case_run__case_run_id': int(case_run_id),
+        'case_run__build': int(build_id),
+        'case_run__case': int(case_id),
+    }
+    # Just keep the same with original implementation that calls
+    # pre_process_tcr_s. In which following logical exists. I don't why this
+    # should happen there exactly.
+    # FIXME: seems it should be `if environment_id is not None`, otherwise such
+    # judgement should not happen.
+    if environment_id:
+        query['case_run__environment_id'] = int(environment_id)
     return TestCaseBug.to_xmlrpc(query)
 
 
