@@ -125,6 +125,7 @@ def remove_cases(request, run_ids, case_ids):
         raise
 
 
+
 @log_call(namespace='TestRun')
 @user_passes_test(lambda u: u.has_perm('testruns.add_testruntag'))
 def add_tag(request, run_ids, tags):
@@ -287,6 +288,7 @@ def env_value(request, action, run_ids, env_value_ids):
     return
 
 
+@log_call(namespace='TestRun')
 def filter(request, values={}):
     """
     Description: Performs a search and returns the resulting list of test runs.
@@ -325,6 +327,7 @@ def filter(request, values={}):
     return TestRun.to_xmlrpc(values)
 
 
+@log_call(namespace='TestRun')
 def filter_count(request, values={}):
     """
     Description: Performs a search and returns the resulting count of runs.
@@ -337,6 +340,7 @@ def filter_count(request, values={}):
     # See distinct_count()
     """
     return distinct_count(TestRun, values)
+
 
 
 def get(request, run_id):
@@ -463,6 +467,7 @@ def get_tags(request, run_id):
     return TestTag.to_xmlrpc(query)
 
 
+@log_call(namespace='TestRun')
 def get_test_case_runs(request, run_id, is_current=None):
     """
     Description: Get the list of cases that this run is linked to.
@@ -487,6 +492,7 @@ def get_test_case_runs(request, run_id, is_current=None):
     return TestCaseRun.to_xmlrpc(query)
 
 
+@log_call(namespace='TestRun')
 def get_test_cases(request, run_id):
     """
     Description: Get the list of cases that this run is linked to.
@@ -499,23 +505,17 @@ def get_test_cases(request, run_id):
     Example:
     >>> TestRun.get_test_cases(1193)
     """
-    from tcms.apps.testcases.models import TestCase
-    from tcms.core.utils.xmlrpc import XMLRPCSerializer
+    tcs_serializer = TestCase.to_xmlrpc(query={'case_run__run_id': run_id})
 
-    try:
-        tr = TestRun.objects.get(run_id=run_id)
-    except ObjectDoesNotExist:
-        raise
+    qs = TestCaseRun.objects.filter(run_id=run_id).values(
+        'case', 'pk', 'case_run_status__name')
+    extra_info = dict(((row['case'], row) for row in qs.iterator()))
 
-    tc_ids = tr.case_run.values_list('case_id', flat=True)
-    tc_run_id = dict(tr.case_run.values_list('case_id', 'case_run_id'))
-    tc_status = dict(tr.case_run.values_list('case_id',
-                                             'case_run_status__name'))
-    tcs = TestCase.objects.filter(case_id__in=tc_ids)
-    tcs_serializer = XMLRPCSerializer(tcs).serialize_queryset()
     for case in tcs_serializer:
-        case['case_run_id'] = tc_run_id[case['case_id']]
-        case['case_run_status'] = tc_status[case['case_id']]
+        info = extra_info[case['case_id']]
+        case['case_run_id'] = info['pk']
+        case['case_run_status'] = info['case_run_status__name']
+
     return tcs_serializer
 
 
@@ -533,6 +533,7 @@ def get_test_plan(request, run_id):
     """
     return TestRun.objects.select_related('plan').get(
         run_id=run_id).plan.serialize()
+
 
 
 @log_call(namespace='TestRun')
