@@ -16,13 +16,11 @@
 # Authors:
 #   Xuqing Kuang <xkuang@redhat.com>, Chaobin Tang <ctang@redhat.com>
 
-# from django
-from django.db.models.query import QuerySet
-from django.conf import settings
 # from tcms
 from tcms.apps.testruns.models import TestRun
 from tcms.apps.testplans.models import TestPlan
 from tcms.apps.testcases.models import TestCase
+
 
 class SmartDjangoQuery(object):
     '''
@@ -64,11 +62,13 @@ class SmartDjangoQuery(object):
             'pl_authors': 'author__username__in',
             'pl_owners': 'owner__username__in',
             'pl_tags': 'tag__name__in',
+            'pl_tags_distinct': True,
             'pl_active': 'is_active',
             'pl_created_since': 'create_date__gte',
             'pl_created_before': 'create_date__lte',
             'pl_product': 'product__id__in',
             'pl_component': 'component__in',
+            'pl_component_distinct': True,
             'pl_version': 'product_version__in',
         },
         TestCase.__name__: {
@@ -77,7 +77,9 @@ class SmartDjangoQuery(object):
             'cs_authors': 'author__username__in',
             'cs_tester': 'default_tester__username__in',
             'cs_tags': 'tag__name__in',
+            'cs_tags_distinct': True,
             'cs_bugs': 'case_bug__bug_id__in',
+            'cs_bugs_distinct': True,
             'cs_status': 'case_status__in',
             'cs_auto': 'is_automated',
             'cs_proposed': 'is_automated_proposed',
@@ -86,6 +88,7 @@ class SmartDjangoQuery(object):
             'cs_created_since': 'create_date__gte',
             'cs_created_before': 'create_date__lte',
             'cs_component': 'component__in',
+            'cs_component_distinct': True,
             'cs_category': 'category__in',
             'cs_product': 'category__product__in',
         },
@@ -97,9 +100,11 @@ class SmartDjangoQuery(object):
             'r_tester': 'default_tester__username__in',
             'r_running': 'stop_date__isnull',
             'r_tags': 'tag__name__in',
+            'r_tags_distinct': True,
             'r_created_since': 'start_date__gte',
             'r_created_before': 'start_date__lte',
             'r_real_tester': 'case_run__tested_by__username__in',
+            'r_real_tester_distinct': True,
             'r_product': 'build__product__in',
             'r_build': 'build__in',
             'r_version': 'product_version__in'
@@ -107,26 +112,30 @@ class SmartDjangoQuery(object):
     }
 
     def __init__(self, queries, result_kls):
-        self.queryset   = self.CONTENT_TYPES[result_kls]._default_manager.all()
-        self.queries    = queries
+        self.queryset = self.CONTENT_TYPES[result_kls]._default_manager.all()
+        self.queries = queries
         self.result_kls = result_kls
 
     def filter(self):
         queryset = None
-        rules    = self.RULES[self.result_kls]
+        rules = self.RULES[self.result_kls]
         for key in self.PRIORITIES[self.result_kls]:
             if not rules.has_key(key):
                 continue
-            lookup  = rules[key]
-            value   = self.queries.get(key, None)
+            lookup = rules[key]
+            value = self.queries.get(key, None)
             if isinstance(value, int) or isinstance(value, bool) or value:
                 if queryset is None:
                     queryset = self.queryset
-                if self.queries.get(key+'_'+self.EXCLUDE_POSTFIX, False):
+                if self.queries.get(key + '_' + self.EXCLUDE_POSTFIX, False):
                     # for complicated Q filtering
                     queryset = queryset.exclude(**{lookup: value})
                 else:
                     queryset = queryset.filter(**{lookup: value})
+
+                if rules.get(key + '_distinct', False):
+                    queryset = queryset.distinct()
+
         self.queryset = queryset
 
     def evaluate(self):
