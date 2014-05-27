@@ -217,6 +217,10 @@ class TestCase(TCMSActionModel):
         tcs = cls.objects.filter(pk__in=case_ids)
         _values = dict((k, v) for k, v in values.items() if
                        k in fields and v is not None and v != u'')
+        if values['notes'] == u'':
+            _values['notes'] = u''
+        if values['script'] == u'':
+            _values['script'] = u''
         tcs.update(**_values)
         return tcs
 
