@@ -724,11 +724,18 @@ def ajax_search(request, template_name='case/common/json_cases.txt'):
                              'category')
     tcs = tcs.extra(select={'num_bug': RawSQL.num_case_bugs,})
 
-    #columnIndexNameMap is required for correct sorting behavior, 5 should be product, but we use run.build.product
-    columnIndexNameMap = { 0: '', 1: '', 2: 'case_id', 3: 'summary', 4: 'author__username',
-                          5: 'default_tester__username', 6: 'is_automated', 7: 'case_status__name', 8: 'category__name',
-                          9: 'priority__value', 10: 'create_date'}
-    return ajax_response(request, tcs, tp, columnIndexNameMap, jsonTemplatePath='case/common/json_cases.txt')
+    # columnIndexNameMap is required for correct sorting behavior, 5 should be
+    # product, but we use run.build.product
+    columnIndexNameMap = {
+        0: '', 1: '', 2: 'case_id',
+        3: 'summary', 4: 'author__username',
+        5: 'default_tester__username', 6: 'is_automated',
+        7: 'case_status__name', 8: 'category__name',
+        9: 'priority__value', 10: 'create_date'
+    }
+    return ajax_response(request, tcs, tp, columnIndexNameMap,
+                         jsonTemplatePath='case/common/json_cases.txt')
+
 
 def ajax_response(request, querySet, testplan, columnIndexNameMap, jsonTemplatePath='case/common/json_cases.txt', *args):
     """

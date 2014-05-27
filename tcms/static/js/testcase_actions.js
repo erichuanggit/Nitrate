@@ -160,18 +160,23 @@ Nitrate.TestCases.List.on_load = function()
     });
     jQ("#testcases_table tbody tr td.expandable").live("click", function() {
         var tr = this.up();
-        var case_id = tr.getElementsBySelector('input[name="case"]')[0].value;
-        var detail_td = '<tr class="case_content hide" style="display: none;"><td colspan="11"><div id="id_loading_' + case_id + '" class="ajax_loading"></div></td></tr>'
-        var blind_icon = tr.getElementsBySelector('.blind_icon')[0]
-        if ( oTable.fnIsOpen(tr) ) {
-            $(blind_icon).removeClassName('collapse');
-            $(blind_icon).addClassName('expand');
-            $(blind_icon).src = "/static/images/t1.gif";
-            oTable.fnClose( tr );
-        } else {
-          oTable.fnOpen( tr, detail_td, "info_row" );
-          getTestCaseContents("case", tr, tr.next(), case_id);
+        var caseRowContainer = jQ(tr);
+        var case_id = caseRowContainer.find('input[name="case"]').attr('value');
+
+        var detail_td = '<tr class="case_content hide" style="display: none;"><td colspan="11">' +
+                        '<div id="id_loading_' + case_id + '" class="ajax_loading"></div></td></tr>';
+        if (!caseRowContainer.next().hasClass('hide')) {
+            caseRowContainer.after(detail_td);
         }
+
+        toggleTestCasePane({
+            case_id: case_id,
+            casePaneContainer: jQ(tr.next())
+        });
+        toggleExpandArrow({
+            caseRowContainer: jQ(tr),
+            expandPaneContainer: jQ(tr.next())
+        });
     });
 }
 
@@ -415,45 +420,6 @@ Nitrate.TestCases.Clone.on_load = function()
         $('id_copy_case').checked = false;
     })
     };
-}
-
-function getTestCaseContents(template_type, container, content_container, object_pk, case_text_version, case_run_id, callback)
-{
-    if (typeof(container) != 'object')
-    var container = $(container)
-
-    if(typeof(content_container) != 'object')
-    var content_container = $(content_container)
-
-    if ($('id_loading_' + object_pk)) {
-        var url = Nitrate.http.URLConf.reverse({
-            name: 'case_details',
-            arguments: {id: object_pk}
-        });
-        var parameters = {
-            template_type: template_type,
-            case_text_version: case_text_version,
-            case_run_id: case_run_id,
-        };
-
-        new Ajax.Updater(content_container, url, {
-            method: 'get',
-            parameters: parameters,
-            onComplete: callback,
-            onFailure: html_failure
-        });
-    };
-
-    var blind_icon = container.getElementsBySelector('.blind_icon')[0]
-    if (content_container.getStyle('display') == 'none') {
-        $(blind_icon).removeClassName('collapse');
-        $(blind_icon).addClassName('expand');
-        $(blind_icon).src = "/static/images/t1.gif";
-    } else {
-        $(blind_icon).removeClassName('expand');
-        $(blind_icon).addClassName('collapse');
-        $(blind_icon).src = "/static/images/t2.gif";
-    }
 }
 
 
