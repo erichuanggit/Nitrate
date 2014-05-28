@@ -336,7 +336,8 @@ def calculate_average_estimated_time(request, case_ids):
     from datetime import timedelta
     from tcms.core.utils.xmlrpc import SECONDS_PER_DAY
 
-    tcs = TestCase.objects.filter(pk__in=pre_process_ids(case_ids))
+    tcs = TestCase.objects.filter(
+        pk__in=pre_process_ids(case_ids)).only('estimated_time')
     time = timedelta(0)
     case_count = 0
     for tc in tcs.iterator():
@@ -369,9 +370,10 @@ def calculate_total_estimated_time(request, case_ids):
     from datetime import timedelta
     from tcms.core.utils.xmlrpc import SECONDS_PER_DAY
 
-    tcs = TestCase.objects.filter(pk__in=pre_process_ids(case_ids)).iterator()
+    tcs = TestCase.objects.filter(
+        pk__in=pre_process_ids(case_ids)).only('estimated_time')
     time = timedelta(0)
-    for tc in tcs:
+    for tc in tcs.iterator():
         time += tc.estimated_time
 
     seconds = time.seconds + (time.days * SECONDS_PER_DAY)
